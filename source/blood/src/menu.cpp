@@ -68,6 +68,7 @@ void SetMouseSensitivity(CGameMenuItemSliderFloat *);
 void SetMouseAimFlipped(CGameMenuItemZBool *);
 void SetTurnSpeed(CGameMenuItemSlider *);
 void SetTurnAcceleration(CGameMenuItemZCycle *);
+void SetJoystickRumble(CGameMenuItemZBool *pItem);
 void ResetKeys(CGameMenuItemChain *);
 void ResetKeysClassic(CGameMenuItemChain *);
 void SetMessages(CGameMenuItemZBool *);
@@ -700,6 +701,7 @@ CGameMenu menuOptionsControlMouseButtonAssignment;
 CGameMenu menuOptionsControlJoystickButtonAssignment[MAXJOYSTICKBUTTONPAGES];
 CGameMenu menuOptionsControlJoystickListAxes; // contains list of editable joystick axes
 CGameMenu menuOptionsControlJoystickAxis[MAXJOYAXES]; // options menu for each joystick axis
+CGameMenu menuOptionsControlJoystickMisc;
 
 void SetupMouseMenu(CGameMenuItemChain *pItem);
 void SetupJoystickButtonsMenu(CGameMenuItemChain *pItem);
@@ -723,6 +725,7 @@ CGameMenuItemChain itemOptionsControlKeyboard("KEYBOARD SETUP", 1, 0, 60, 320, 1
 CGameMenuItemChain itemOptionsControlMouse("MOUSE SETUP", 1, 0, 80, 320, 1, &menuOptionsControlMouse, -1, SetupMouseMenu, 0);
 CGameMenuItemChain itemOptionsControlJoystickButtons("JOYSTICK BUTTONS SETUP", 1, 0, 120, 320, 1, &menuOptionsControlJoystickButtonAssignment[0], -1, SetupJoystickButtonsMenu, 0);
 CGameMenuItemChain itemOptionsControlJoystickAxes("JOYSTICK AXES SETUP", 1, 0, 140, 320, 1, &menuOptionsControlJoystickListAxes, -1, SetupJoystickAxesMenu, 0);
+CGameMenuItemChain itemOptionsControlJoystickMisc("JOYSTICK MISC SETUP", 1, 0, 160, 320, 1, &menuOptionsControlJoystickMisc, -1, NULL, 0);
 
 CGameMenuItemTitle itemOptionsControlKeyboardTitle("KEYBOARD SETUP", 1, 160, 20, 2038);
 CGameMenuItemSlider itemOptionsControlKeyboardSliderTurnSpeed("Key Turn Speed:", 1, 18, 50, 280, &gTurnSpeed, 64, 128, 4, SetTurnSpeed, -1, -1);
@@ -843,6 +846,9 @@ CGameMenuItemZCycle *pItemOptionsControlJoystickAxisDigitalPos[MAXJOYAXES];
 CGameMenuItemZCycle *pItemOptionsControlJoystickAxisDigitalNeg[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisDeadzone[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisSaturate[MAXJOYAXES];
+
+CGameMenuItemTitle itemOptionsControlJoystickMiscTitle("JOYSTICK MISC", 1, 160, 20, 2038);
+CGameMenuItemZBool itemOptionsControlJoystickMiscRumble("RUMBLE CONTROLLER:", 1, 18, 70, 280, 0, SetJoystickRumble, NULL, NULL);
 
 void SetupLoadingScreen(void)
 {
@@ -1434,6 +1440,7 @@ void SetupControlsMenu(void)
     menuOptionsControl.Add(&itemOptionsControlMouse, false);
     menuOptionsControl.Add(&itemOptionsControlJoystickButtons, false);
     menuOptionsControl.Add(&itemOptionsControlJoystickAxes, false);
+    menuOptionsControl.Add(&itemOptionsControlJoystickMisc, false);
     menuOptionsControl.Add(&itemBloodQAV, false);
 
     menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardTitle, false);
@@ -1476,8 +1483,15 @@ void SetupJoystickMenu(void)
     {
         itemOptionsControlJoystickButtons.bEnable = 0;
         itemOptionsControlJoystickAxes.bEnable = 0;
+        itemOptionsControlJoystickMisc.bEnable = 0;
         return;
     }
+
+    menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscTitle, false);
+    menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscRumble, true);
+    menuOptionsControlJoystickMisc.Add(&itemBloodQAV, false);
+
+    itemOptionsControlJoystickMiscRumble.at20 = gSetup.joystickrumble;
 
     int i = 0, y = 0;
     for (int nButton = 0; nButton < joystick.numButtons; nButton++) // store every joystick button/hat name for button list at launch
@@ -1806,6 +1820,11 @@ void SetTurnSpeed(CGameMenuItemSlider *pItem)
 void SetTurnAcceleration(CGameMenuItemZCycle *pItem)
 {
     gTurnAcceleration = pItem->m_nFocus;
+}
+
+void SetJoystickRumble(CGameMenuItemZBool *pItem)
+{
+    gSetup.joystickrumble = pItem->at20;
 }
 
 void SetAutoAim(CGameMenuItemZCycle *pItem)
@@ -2308,6 +2327,7 @@ void SetupPollJoystick(CGameMenuItemChain *pItem)
     {
         itemOptionsControlJoystickButtons.bEnable = 1;
         itemOptionsControlJoystickAxes.bEnable = 1;
+        itemOptionsControlJoystickMisc.bEnable = 1;
         SetupJoystickMenu();
     }
 }
