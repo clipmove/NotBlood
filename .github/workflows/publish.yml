@@ -45,7 +45,7 @@ jobs:
         echo "revision=$revision" >> $GITHUB_OUTPUT
         cd upload/
         ls -R
-        for i in */ ; do cd "$i" ; cp -a ../../template/* ./ ; for j in */ ; do cd "$j" ; 7zz a -mx9 -ms=on -t7z -m0=lzma2 -mmt2 "../../${j%/}_${i%/}_$(date +%Y%m%d)-$revision.7z" * ; cd .. ; done ; cd .. ; done
+        for i in */ ; do cd "$i" ; cp -a ../../template/* ./ ; for j in */ ; do cd "$j" ; 7z a -mx9 -ms=on -t7z -m0=lzma2 -mmt2 "../../${j%/}_${i%/}_$(date +%Y%m%d)-$revision.7z" * ; cd .. ; done ; cd .. ; done
 
     - name: Publish
       uses: "marvinpinto/action-automatic-releases@latest"
