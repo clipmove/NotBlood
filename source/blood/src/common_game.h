@@ -912,6 +912,10 @@ inline int approxDist3D(spritetype *pSprite1, spritetype *pSprite2)
     return approxDist3D(dx, dy, dz);
 }
 
+inline char isempty(const char* str)            { return (!str || str[0] == '\0'); }
+inline char rngok(int val, int rngA, int rngB)  { return (val >= rngA && val < rngB); }
+inline char irngok(int val, int rngA, int rngB) { return (val >= rngA && val <= rngB); }
+
 class Rect {
 public:
     int x0, y0, x1, y1;
