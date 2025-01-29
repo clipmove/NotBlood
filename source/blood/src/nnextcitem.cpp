@@ -358,7 +358,7 @@ char userItemPickup(PLAYER* pPlayer, spritetype* pISpr, ITEM* pItem)
 
             for (i = 0; i < pItem->numactions; i++, data.act++)
             {
-                data.isShared   = ((isShared > 0) | (data.act->type == kItemActionKey && pOpt->bPlayerKeys == PLAYERKEYSMODE::SHARED));
+                data.isShared   = ((isShared > 0) | (data.act->type == kItemActionKey && pOpt->nKeySettings == 2));
                 data.isCompat   = ((data.act->flags & kFlagActionCompat) != 0);
                 data.isTest     = (testReq > 0);
 
