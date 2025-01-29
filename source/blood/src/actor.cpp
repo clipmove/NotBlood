@@ -2507,6 +2507,13 @@ void actInit(bool bSaveLoad) {
         LOG_F(INFO, "> This map provides modern features.");
         nnExtInitModernStuff(bSaveLoad);
     }
+
+    if (!gUserItemsInitialized)
+    {
+        userItemsInit(1);
+        gUserItemsInitialized = 1;
+    }
+
     #endif
     
     for (int nSprite = headspritestat[kStatItem]; nSprite >= 0; nSprite = nextspritestat[nSprite]) {
@@ -2645,6 +2652,11 @@ void actInit(bool bSaveLoad) {
                     seqSpawn(seqStartId, 3, pSprite->extra);
             }
         }
+
+        #ifdef NOONE_EXTENSIONS
+        userItemsInitSprites();
+        #endif
+
         aiInit();
     }
 }
@@ -2943,6 +2955,13 @@ spritetype *actDropFlag(spritetype *pSprite, int nType)
 spritetype *actDropObject(spritetype *pSprite, int nType) {
     spritetype *pSprite2 = NULL;
     
+#ifdef NOONE_EXTENSIONS
+    if (IsUserItem(nType))
+    {
+        pSprite2 = userItemDrop(pSprite, nType);
+    }
+    else
+#endif
     if (nType >= kItemKeyBase && nType < kItemKeyMax) pSprite2 = actDropKey(pSprite, nType);
     else if (nType == kItemFlagA || nType == kItemFlagB) pSprite2 = actDropFlag(pSprite, nType);
     else if (nType >= kItemBase && nType < kItemMax) pSprite2 = actDropItem(pSprite, nType);
@@ -7138,6 +7157,11 @@ int actGetRespawnTime(spritetype *pSprite) {
             return gGameOptions.nMonsterRespawnTime;
         return -1;
     }
+
+#ifdef NOONE_EXTENSIONS
+    if (IsUserItemSprite(pSprite))
+        return userItemGetRespawnTime(pSprite);
+#endif
 
     if (IsWeaponSprite(pSprite)) {
         if (pXSprite->respawn == 3 || gGameOptions.nWeaponSettings == 1) return 0;
