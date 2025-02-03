@@ -1079,9 +1079,18 @@ void WeaponUpdateState(PLAYER *pPlayer)
     }
 }
 
-void FirePitchfork(int, PLAYER *pPlayer)
+void FirePitchfork(int nTrigger, PLAYER *pPlayer)
 {
     Aim *aim = &pPlayer->aim;
+#ifdef NOONE_EXTENSIONS
+    if (nTrigger == 1024)
+    {
+        // for WLB
+        for (int i = 0; i < 4; i++)
+            actFireVector(pPlayer->pSprite, 0, pPlayer->zWeapon - pPlayer->pSprite->z, aim->dx, aim->dy, aim->dz, kVectorTine);
+        return;
+    }
+#endif
     int r1 = Random2(2000);
     int r2 = Random2(2000);
     int r3 = Random2(2000);
