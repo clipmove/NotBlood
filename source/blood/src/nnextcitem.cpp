@@ -184,6 +184,7 @@ enum enum_ACTION_DEST
     kItemActionEffect,
     kItemActionAirTime,
     kItemActionDmgIgnore,
+    kItemActionTeamScore,
 };
 static const char* gParItemActType[] =
 {
@@ -197,6 +198,8 @@ static const char* gParItemActType[] =
     "ScreenEffect",
     "AirTime",
     "IgnoreDamage",
+    "TeamScore",
+    "Frag",
     NULL,
 };
 
@@ -249,6 +252,8 @@ static char ACTION_ChangePowerupTime(PLAYER* pPlayer, ACTIONARG* a);
 static char ACTION_ChangeEffect(PLAYER* pPlayer, ACTIONARG* a);
 static char ACTION_ChangeAirTime(PLAYER* pPlayer, ACTIONARG* a);
 static char ACTION_ChangeIgnoreDmg(PLAYER* pPlayer, ACTIONARG* a);
+static char ACTION_ChangeTeamScore(PLAYER* pPlayer, ACTIONARG* a);
+static char ACTION_ChangeFrag(PLAYER* pPlayer, ACTIONARG* a);
 
 
 ITEMACTIONPROC gItemActFunc[] =
@@ -263,6 +268,8 @@ ITEMACTIONPROC gItemActFunc[] =
     ACTION_ChangeEffect,
     ACTION_ChangeAirTime,
     ACTION_ChangeIgnoreDmg,
+    ACTION_ChangeTeamScore,
+    ACTION_ChangeFrag,
 };
 
 
@@ -877,6 +884,48 @@ static char ACTION_ChangeIgnoreDmg(PLAYER* pPlayer, ACTIONARG* a)
     return 1;
 }
 
+static char ACTION_ChangeTeamScore(PLAYER* pPlayer, ACTIONARG* a)
+{
+    if (gGameOptions.nGameType == kGameTypeTeams)
+    {
+        int nCur = gPlayerScores[pPlayer->teamId];
+        int nOld = nCur;
+
+        nCur = helperChangeValue(nCur, a->act);
+        if (nCur == nOld)
+            return 0;
+
+        if (!a->isTest)
+        {
+            gPlayerScores[pPlayer->teamId] = nCur;
+            gPlayerScoreTicks[pPlayer->teamId] += 30;
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+static char ACTION_ChangeFrag(PLAYER* pPlayer, ACTIONARG* a)
+{
+    if (gGameOptions.nGameType != kGameTypeCoop)
+    {
+        int nCur = pPlayer->fragCount;
+
+        nCur = helperChangeValue(nCur, a->act);
+        if (nCur == pPlayer->fragCount)
+            return 0;
+
+        if (!a->isTest)
+            pPlayer->fragCount = nCur;
+
+        return 1;
+    }
+
+    return 0;
+}
+
 static int helperChangeValue(int nValue, ITEM::ACTION* pAct)
 {
     int32_t n = pAct->amount[0];
@@ -1191,7 +1240,7 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
                 if (extLimits)
                 {
                     if (n > 999)        n = 9990;   // spray can and such
-                    else if (n > 100)   n = 999;    // normal weapons
+                    else if (n > 99)    n = 999;    // normal weapons
                     else                n = 99;     // prox / remote bombs cannot have more than 2 digits in HUD.
                 }
 
@@ -1207,7 +1256,7 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
                 if (extLimits)
                 {
                     if (n > 999)        n = 9990;   // spray can and such
-                    else if (n > 100)   n = 999;    // normal weapons
+                    else if (n > 99)    n = 999;    // normal weapons
                     else                n = 99;     // prox / remote bombs cannot have more than 2 digits in HUD.
                 }
 
