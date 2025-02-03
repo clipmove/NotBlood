@@ -1316,9 +1316,6 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
                 break;
             }
             return 0;
-        case kItemActionTeamScore:
-            pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
-            break;
     }
 
     if (pAct->amount[1] > pAct->amount[2])
