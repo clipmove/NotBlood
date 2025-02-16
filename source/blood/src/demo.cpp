@@ -231,7 +231,6 @@ void ReadGameOptionsLegacy(GAMEOPTIONS &gameOptions, GAMEOPTIONSLEGACY &gameOpti
     gameOptions.bEnemyShuffle = false;
     gameOptions.bPitchforkOnly = false;
     gameOptions.bPermaDeath = false;
-    gameOptions.bCarryOverEpisode = false;
     gameOptions.bFriendlyFire = true;
     gameOptions.nKeySettings = 0;
     gameOptions.bItemWeaponSettings = 0;
