@@ -79,7 +79,6 @@ struct GAMEOPTIONS {
     bool bEnemyShuffle;
     bool bPitchforkOnly;
     bool bPermaDeath;
-    bool bCarryOverEpisode;
     bool bFriendlyFire;
     char nKeySettings;
     char bItemWeaponSettings;
