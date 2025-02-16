@@ -738,6 +738,7 @@ void StartLevel(GAMEOPTIONS *gameOptions)
         gGameOptions.bEnemyShuffle = false;
         gGameOptions.bPitchforkOnly = false;
         gGameOptions.bPermaDeath = false;
+        gGameOptions.bCarryOverEpisode = false;
         gGameOptions.uSpriteBannedFlags = gPacketStartGame.uSpriteBannedFlags;
         ///////
     }
@@ -1348,6 +1349,24 @@ void ProcessFrame(void)
             gDemo.Close();
         sndFadeSong(4000);
         seqKillAll();
+        if ((gGameOptions.uGameFlags&kGameFlagEnding) && (gGameOptions.nGameType == kGameTypeSinglePlayer) && (gGameOptions.bCarryOverEpisode))
+        {
+            int nNewEpisode;
+            levelPlayEndScene(gGameOptions.nEpisode);
+            for (nNewEpisode = gGameOptions.nEpisode+1; nNewEpisode < gEpisodeCount; nNewEpisode++)
+            {
+                if (!gEpisodeInfo[nNewEpisode].bloodbath)
+                    break;
+            }
+            if (nNewEpisode > gGameOptions.nEpisode) // no more episodes, show credits and end game
+            {
+                gGameOptions.uGameFlags &= ~(kGameFlagContinuing|kGameFlagEnding);
+                gGameOptions.uGameFlags |= kGameFlagPlayIntro;
+                gGameOptions.nEpisode = nNewEpisode;
+                gGameOptions.nLevel = gNextLevel = 0;
+                
+            }
+        }
         if (gGameOptions.uGameFlags&kGameFlagEnding)
         {
             if (gGameOptions.nGameType == kGameTypeSinglePlayer)

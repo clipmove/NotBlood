@@ -87,6 +87,7 @@ GAMEOPTIONS gSingleGameOptions = {
     0,     // bool bEnemyShuffle;
     0,     // bool bPitchforkOnly;
     0,     // bool bPermaDeath;
+    0,     // bool bCarryOverEpisode;
     0,     // bool bFriendlyFire;
     1,     // char nKeySettings;
     0,     // char bItemWeaponSettings;
