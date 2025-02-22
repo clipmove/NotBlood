@@ -196,7 +196,6 @@ const DEMOVALIDATE gDemoValidate[] = {
     {"/validatedemos/TEST134.DEM", (int32_t)0x000008E1, 0xB172DEB5, 0x00000000, {(int32_t)0x00000482, (int32_t)0x000078C1, (int32_t)0xFFFF39A4}, 1},
     {"/validatedemos/TEST135.DEM", (int32_t)0x00002B13, 0xED1F723F, 0x000002FF, {(int32_t)0x0000A241, (int32_t)0x0000A067, (int32_t)0x00020D50}, 1},
     {"/validatedemos/TEST136.DEM", (int32_t)0x00003419, 0x5BD6E490, 0x00000B1B, {(int32_t)0x0000A245, (int32_t)0x00009F55, (int32_t)0x00020DE4}, 1},
-    {"/validatedemos/TEST137.DEM", (int32_t)0x00004077, 0x9C07094D, 0x00000330, {(int32_t)0x00005CCD, (int32_t)0x00009154, (int32_t)0x00003D50}, 1},
 };
 
 int nBuild = 0;
@@ -232,7 +231,6 @@ void ReadGameOptionsLegacy(GAMEOPTIONS &gameOptions, GAMEOPTIONSLEGACY &gameOpti
     gameOptions.bEnemyShuffle = false;
     gameOptions.bPitchforkOnly = false;
     gameOptions.bPermaDeath = false;
-    gameOptions.bCarryOverEpisode = false;
     gameOptions.bFriendlyFire = true;
     gameOptions.nKeySettings = 0;
     gameOptions.bItemWeaponSettings = 0;
