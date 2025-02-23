@@ -456,12 +456,14 @@ void fakeProcessInput(PLAYER *pPlayer, GINPUT *pInput)
             predict.at48 = 0;
         break;
     default:
+        if (gFlyMode)
+            break;
         if (!predict.at6f && predict.at71 && predict.at6a == 0) {
             if (packItemActive(pPlayer, kPackJumpBoots)) predict.at64 = pPosture->pwupJumpZ;//-0x175555;
             else predict.at64 = pPosture->normalJumpZ;//-0xbaaaa;
             predict.at6f = 1;
         }
-        if (pInput->buttonFlags.crouch && !gFlyMode)
+        if (pInput->buttonFlags.crouch)
             predict.at48 = 2;
         break;
     }
