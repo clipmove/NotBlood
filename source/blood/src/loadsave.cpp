@@ -164,14 +164,11 @@ void LoadSave::LoadGame(char *pzFile)
     if (hLFile == -1)
         ThrowError("Error loading save file.");
     LoadSave *rover = head.next;
-    const double frameTimeOld = timerGetFractionalTicks();
     while (rover != &head)
     {
         rover->Load();
         rover = rover->next;
     }
-    const double frameTimeNew = timerGetFractionalTicks();
-    OSD_Printf("%.1f ms\n", frameTimeNew - frameTimeOld);
     kclose(hLFile);
     hLFile = -1;
     if (!gGameStarted)
@@ -321,14 +318,11 @@ void LoadSave::SaveGame(char *pzFile)
     if (hSFile == NULL)
         ThrowError("File error #%d creating save file.", errno);
     LoadSave *rover = head.next;
-    const double frameTimeOld = timerGetFractionalTicks();
     while (rover != &head)
     {
         rover->Save();
         rover = rover->next;
     }
-    const double frameTimeNew = timerGetFractionalTicks();
-    OSD_Printf("%.1f ms\n", frameTimeNew - frameTimeOld);
     fclose(hSFile);
     hSFile = NULL;
     if (saveFileExists)
