@@ -134,6 +134,8 @@ static void StompSeqCallback(int, int nXSprite)
                     continue;
                 if (pSprite2->flags&32)
                     continue;
+                if (!gSpriteHit[pSprite2->extra].florhit && EnemiesNotBlood() && !VanillaMode()) // if dude sprite is not on floor
+                    continue;
                 if (TestBitString(sectmap, pSprite2->sectnum) && CheckProximity(pSprite2, x, y, z, nSector, vc))
                 {
                     int top, bottom;
