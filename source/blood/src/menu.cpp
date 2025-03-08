@@ -480,6 +480,9 @@ CGameMenuItemZEditBitmap itemSaveGame6(NULL, 3, 20, 120, 320, strRestoreGameStri
 CGameMenuItemZEditBitmap itemSaveGame7(NULL, 3, 20, 130, 320, strRestoreGameStrings[kLoadSaveSlot7], 16, 1, SaveGame, kLoadSaveSlot7);
 CGameMenuItemZEditBitmap itemSaveGame8(NULL, 3, 20, 140, 320, strRestoreGameStrings[kLoadSaveSlot8], 16, 1, SaveGame, kLoadSaveSlot8);
 CGameMenuItemZEditBitmap itemSaveGame9(NULL, 3, 20, 150, 320, strRestoreGameStrings[kLoadSaveSlot9], 16, 1, SaveGame, kLoadSaveSlot9);
+CGameMenuItemZEditBitmap itemSaveGameQuick(NULL, 3, 20, 163, 320, strRestoreGameStrings[kLoadSaveSlotQuick], 16, 1, SaveGame, kLoadSaveSlotQuick);
+CGameMenuItemZEditBitmap itemSaveGameAutosaveStart(NULL, 3, 20, 176, 320, strRestoreGameStrings[kLoadSaveSlotSpawn], 16, 1, SaveGame, kLoadSaveSlotSpawn);
+CGameMenuItemZEditBitmap itemSaveGameAutosaveKey(NULL, 3, 20, 186, 320, strRestoreGameStrings[kLoadSaveSlotKey], 16, 1, SaveGame, kLoadSaveSlotKey);
 CGameMenuItemBitmapLS itemSaveGamePic(NULL, 3, 0, 0, 2050);
 
 CGameMenuItemTitle itemLoadTitle("Load Game", 1, 160, 20, 2038);
@@ -1624,6 +1627,9 @@ void SetupSaveGameMenu(void)
     menuSaveGame.Add(&itemSaveGame7, false);
     menuSaveGame.Add(&itemSaveGame8, false);
     menuSaveGame.Add(&itemSaveGame9, false);
+    menuSaveGame.Add(&itemSaveGameQuick, false);
+    menuSaveGame.Add(&itemSaveGameAutosaveStart, false);
+    menuSaveGame.Add(&itemSaveGameAutosaveKey, false);
     menuSaveGame.Add(&itemSaveGamePic, false);
     menuSaveGame.Add(&itemBloodQAV, false);
 
@@ -1666,6 +1672,16 @@ void SetupSaveGameMenu(void)
     itemSaveGame9.at2c = &itemSaveGamePic;
     if (!strcmp(strRestoreGameStrings[kLoadSaveSlot9], "<Empty>"))
         itemSaveGame9.at37 = 1;
+
+    itemSaveGameQuick.at2c = &itemSaveGamePic;
+    itemSaveGameAutosaveStart.at2c = &itemSaveGamePic;
+    itemSaveGameAutosaveKey.at2c = &itemSaveGamePic;
+
+    itemSaveGameQuick.bEnable = 0; // don't let these save slots be selectable
+    itemSaveGameAutosaveStart.bEnable = 0;
+    itemSaveGameAutosaveStart.bNoDraw = gAutosave == 0;
+    itemSaveGameAutosaveKey.bEnable = 0;
+    itemSaveGameAutosaveKey.bNoDraw = gAutosave != 2;
 }
 
 void SetupLoadGameMenu(void)
@@ -2720,8 +2736,10 @@ void SetAutosaveMode(CGameMenuItemZCycle *pItem)
 
     itemLoadGameAutosaveStart.bEnable = gAutosave != 0; // remove autosave slots if autosaves are disabled
     itemLoadGameAutosaveStart.bNoDraw = gAutosave == 0;
+    itemSaveGameAutosaveStart.bNoDraw = gAutosave == 0;
     itemLoadGameAutosaveKey.bEnable = gAutosave == 2;
     itemLoadGameAutosaveKey.bNoDraw = gAutosave != 2;
+    itemSaveGameAutosaveKey.bNoDraw = gAutosave != 2;
 }
 
 void SetLockSaving(CGameMenuItemZBool *pItem)
