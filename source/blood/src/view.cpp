@@ -1341,38 +1341,32 @@ void viewDrawStats(PLAYER *pPlayer, int x, int y)
     colorStr.nColor2[0] = colorStr.nColor2[1] = -1; // unused
     colorStrKills = colorStrSecrets = colorStr;
 
-    int nHeight, nLevelTime = (gGameOptions.nGameType >= kGameTypeBloodBath) && (gGameOptions.uNetGameFlags&kNetGameFlagLimitMinutes) ? ClipLow(gPlayerRoundLimit-gLevelTime, 0) : gLevelTime;
+    y += 20;
+    int nHeight;
     viewGetFontInfo(nFont, NULL, NULL, &nHeight);
-    sprintf(buffer, "T:%d:%02d.%02d",
-        (nLevelTime/(kTicsPerSec*60)),
-        (nLevelTime/kTicsPerSec)%60,
-        ((nLevelTime%kTicsPerSec)*33)/10
-        );
-    viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStr);
-    if ((gGameOptions.nMonsterSettings > 0) && (max(gKillMgr.at4, gKillMgr.at0) > 0))
-    {
-        y += nHeight+1;
-        sprintf(buffer, "K:%d/%d", gKillMgr.at4, max(gKillMgr.at4, gKillMgr.at0));
-        if (gKillMgr.at0 && (gKillMgr.at4 >= gKillMgr.at0)) // if killed all enemies in level, set counter to gold
-            colorStrKills.nColor2[0] = 2; // set valid start position for gold color
-        viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStrKills);
-    }
-#if 0
-    else
-    {
-        y += nHeight+1;
-        sprintf(buffer, "K:%d", pPlayer->fragCount);
-        viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStrKills);
-    }
-#endif
     if (gGameOptions.nGameType <= kGameTypeCoop) // only show secrets counter for single-player/co-op mode
     {
-        y += nHeight+1;
         sprintf(buffer, "S:%d/%d", gSecretMgr.nNormalSecretsFound, VanillaMode() ? gSecretMgr.nAllSecrets : max(gSecretMgr.nNormalSecretsFound, gSecretMgr.nAllSecrets)); // if we found more than there are, increase the total - some levels have a bugged counter
         if (gSecretMgr.nNormalSecretsFound && (gSecretMgr.nNormalSecretsFound >= gSecretMgr.nAllSecrets)) // if all secrets found, set counter to gold
             colorStrSecrets.nColor2[0] = 2; // set valid start position for gold color
         viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStrSecrets);
+        y -= (nHeight + 1);
     }
+    if ((gGameOptions.nMonsterSettings > 0) && (max(gKillMgr.at4, gKillMgr.at0) > 0))
+    {
+        sprintf(buffer, "K:%d/%d", gKillMgr.at4, max(gKillMgr.at4, gKillMgr.at0));
+        if (gKillMgr.at0 && (gKillMgr.at4 >= gKillMgr.at0)) // if killed all enemies in level, set counter to gold
+            colorStrKills.nColor2[0] = 2; // set valid start position for gold color
+        viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStrKills);
+        y -= (nHeight + 1);
+    }
+    const int nLevelTime = (gGameOptions.nGameType >= kGameTypeBloodBath) && (gGameOptions.uNetGameFlags & kNetGameFlagLimitMinutes) ? ClipLow(gPlayerRoundLimit - gLevelTime, 0) : gLevelTime;
+    sprintf(buffer, "T:%d:%02d.%02d",
+        (nLevelTime / (kTicsPerSec * 60)),
+        (nLevelTime / kTicsPerSec) % 60,
+        ((nLevelTime % kTicsPerSec) * 33) / 10
+    );
+    viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStr);
 }
 
 #define kMaxBurnFlames 9
