@@ -82,14 +82,15 @@ If you have the GOG version of the game, do the following:
    - Replace the default vanilla explosion calculation with an new improved sector scanning system
    - Fixes rare cases where enemies appear to ignore explosive damage due to sector/span order
    - Includes two methods to choose from: NotBlood (check linked sectors once) and Raze (always check linked sectors)
+* Projectiles behavior (Raze)
+   - For all missiles/projectiles, use the more accurate eduke32's clipmove() function
+   - Use original hitbox sizes for projectiles
 * Projectiles behavior (NotBlood)
    - For all missiles/projectiles, use the more accurate eduke32's clipmove() function
    - Player missiles/projectile hitboxes have been reduced so it's easier to throw/target around corners
+   - Force TNT/spray cans to explode if directly landed on enemy's head
    - Run raymarching checks on player projectiles to ensure they do not clip through enemies/geometry
    - When spawning player projectiles, it'll do a alpha pixel check for initial hitscan that return a non-dude sprite hit (e.g: throwing TNT up close to the tree sprites in CPSL.MAP)
-* Projectiles behavior (Raze)
-   - For all missiles/projectiles, use the more accurate eduke32's clipmove() function
-   - Leave all hitbox sizes as original
 * Napalm gravity falloff
    - For player spawned napalm projectiles, make gravity affect their trajectory path
 * Enemy behavior (NBlood)
