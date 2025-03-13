@@ -8303,6 +8303,10 @@ int app_main(int argc, char const * const * argv)
         }
     }
 #endif
+#ifdef POLYMER
+    if (glrendmode == REND_POLYMER) // polymer is unsupported
+        glrendmode = REND_POLYMOST;
+#endif
 
     G_LoadGroups(!g_noAutoLoad && !ud.setup.noautoload);
 //    flushlogwindow = 1;
