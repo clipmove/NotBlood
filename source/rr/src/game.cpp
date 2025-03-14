@@ -8303,10 +8303,6 @@ int app_main(int argc, char const * const * argv)
         }
     }
 #endif
-#ifdef POLYMER
-    if (glrendmode == REND_POLYMER) // polymer is unsupported
-        glrendmode = REND_POLYMOST;
-#endif
 
     G_LoadGroups(!g_noAutoLoad && !ud.setup.noautoload);
 //    flushlogwindow = 1;
@@ -8509,6 +8505,10 @@ int app_main(int argc, char const * const * argv)
     {
         // force gl mode
         ud.setup.bpp = 32;
+#ifdef POLYMER
+        if (glrendmode == REND_POLYMER)  // polymer is unsupported for duke nukem 64
+            glrendmode = REND_POLYMOST;
+#endif
     }
 
     //if (g_networkMode != NET_DEDICATED_SERVER)
