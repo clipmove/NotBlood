@@ -68,6 +68,8 @@ Resource::~Resource(void)
                 Free(dict[i].type);
             if (dict[i].name)
                 Free(dict[i].name);
+            if (dict[i].oldname)
+                Free(dict[i].oldname);
             if (dict[i].path)
                 Free(dict[i].path);
         }
@@ -153,11 +155,14 @@ void Resource::Init(const char *filename)
                     int nNameLength = strnlen(tdict[i].name, 8);
                     dict[i].type = (char*)Alloc(nTypeLength+1);
                     dict[i].name = (char*)Alloc(nNameLength+1);
+                    dict[i].oldname = (char*)Alloc(nNameLength+1);
                     strncpy(dict[i].type, tdict[i].type, min(3, nTypeLength));
                     strncpy(dict[i].name, tdict[i].name, min(8, nNameLength));
+                    strncpy(dict[i].oldname, tdict[i].name, min(8, nNameLength));
                     dict[i].path = NULL;
                     dict[i].type[nTypeLength] = 0;
                     dict[i].name[nNameLength] = 0;
+                    dict[i].oldname[nNameLength] = 0;
                     dict[i].id = B_LITTLE32(tdict[i].id);
                     dict[i].buffer = NULL;
                 }
@@ -283,7 +288,7 @@ DICTNODE **Resource::Probe(const char *fname, const char *type)
             return &indexName[i];
         }
         if (!strcmp((*indexName[i]).type, type)
-            && !strcmp((*indexName[i]).name, fname))
+            && !strcmp((*indexName[i]).oldname, fname))
         {
             return &indexName[i];
         }
@@ -372,7 +377,7 @@ void Resource::Grow(void)
 
 void Resource::AddExternalResource(const char *name, const char *type, int id, int flags, const char *pzDirectory)
 {
-    char name2[BMAX_PATH], type2[BMAX_PATH], filename[BMAX_PATH], path[BMAX_PATH];
+    char name2[BMAX_PATH], oldName[BMAX_PATH], type2[BMAX_PATH], filename[BMAX_PATH], path[BMAX_PATH];
 
     if (Bstrlen(type) > 0)
         Bsnprintf(filename, BMAX_PATH-1, "%s.%s", name, type);
@@ -418,6 +423,14 @@ void Resource::AddExternalResource(const char *name, const char *type, int id, i
             Free(node->name);
             node->name = NULL;
         }
+        if (node->oldname)
+        {
+            strcpy(oldName, node->oldname);
+            Free(node->oldname);
+            node->oldname = NULL;
+        }
+        else
+            strcpy(oldName, name2);
         if (node->path)
         {
             Free(node->path);
@@ -425,12 +438,15 @@ void Resource::AddExternalResource(const char *name, const char *type, int id, i
         }
         int nTypeLength = strlen(type2);
         int nNameLength = strlen(name2);
+        int nOldNameLength = strlen(oldName);
         int nPathLength = strlen(path);
         node->type = (char*)Alloc(nTypeLength+1);
         node->name = (char*)Alloc(nNameLength+1);
+        node->oldname = (char*)Alloc(nOldNameLength+1);
         node->path = (char*)Alloc(nPathLength+1);
         strcpy(node->type, type2);
         strcpy(node->name, name2);
+        strcpy(node->oldname, oldName);
         strcpy(node->path, path);
         node->id = -1;
     }
@@ -463,6 +479,14 @@ void Resource::AddExternalResource(const char *name, const char *type, int id, i
             Free(node->name);
             node->name = NULL;
         }
+        if (node->oldname)
+        {
+            strcpy(oldName, node->oldname);
+            Free(node->oldname);
+            node->oldname = NULL;
+        }
+        else
+            strcpy(oldName, name2);
         if (node->path)
         {
             Free(node->path);
@@ -470,12 +494,15 @@ void Resource::AddExternalResource(const char *name, const char *type, int id, i
         }
         int nTypeLength = strlen(type2);
         int nNameLength = strlen(name2);
+        int nOldNameLength = strlen(oldName);
         int nPathLength = strlen(path);
         node->type = (char*)Alloc(nTypeLength+1);
         node->name = (char*)Alloc(nNameLength+1);
+        node->oldname = (char*)Alloc(nOldNameLength+1);
         node->path = (char*)Alloc(nPathLength+1);
         strcpy(node->type, type2);
         strcpy(node->name, name2);
+        strcpy(node->oldname, oldName);
         strcpy(node->path, path);
         node->id = id;
         node->size = size;
@@ -487,7 +514,7 @@ void Resource::AddExternalResource(const char *name, const char *type, int id, i
 
 void Resource::AddFromBuffer(const char* name, const char* type, char* data, int size, int id, int flags)
 {
-    char name2[BMAX_PATH], type2[BMAX_PATH];
+    char name2[BMAX_PATH], oldName[BMAX_PATH], type2[BMAX_PATH];
 
     char *pHeapData = (char*)Alloc(size);
     if (!pHeapData)
@@ -520,6 +547,14 @@ void Resource::AddFromBuffer(const char* name, const char* type, char* data, int
             Free(node->name);
             node->name = NULL;
         }
+        if (node->oldname)
+        {
+            strcpy(oldName, node->oldname);
+            Free(node->oldname);
+            node->oldname = NULL;
+        }
+        else
+            strcpy(oldName, name2);
         if (node->path)
         {
             Free(node->path);
@@ -527,10 +562,13 @@ void Resource::AddFromBuffer(const char* name, const char* type, char* data, int
         }
         int nTypeLength = strlen(type2);
         int nNameLength = strlen(name2);
+        int nOldNameLength = strlen(oldName);
         node->type = (char*)Alloc(nTypeLength+1);
         node->name = (char*)Alloc(nNameLength+1);
+        node->name = (char*)Alloc(nOldNameLength+1);
         strcpy(node->type, type2);
         strcpy(node->name, name2);
+        strcpy(node->oldname, oldName);
         node->id = -1;
     }
     node->size = size;
@@ -562,6 +600,14 @@ void Resource::AddFromBuffer(const char* name, const char* type, char* data, int
             Free(node->name);
             node->name = NULL;
         }
+        if (node->oldname)
+        {
+            strcpy(oldName, node->oldname);
+            Free(node->oldname);
+            node->oldname = NULL;
+        }
+        else
+            strcpy(oldName, name2);
         if (node->path)
         {
             Free(node->path);
@@ -569,10 +615,13 @@ void Resource::AddFromBuffer(const char* name, const char* type, char* data, int
         }
         int nTypeLength = strlen(type2);
         int nNameLength = strlen(name2);
+        int nOldNameLength = strlen(oldName);
         node->type = (char*)Alloc(nTypeLength+1);
         node->name = (char*)Alloc(nNameLength+1);
+        node->oldname = (char*)Alloc(nOldNameLength+1);
         strcpy(node->type, type2);
         strcpy(node->name, name2);
+        strcpy(node->oldname, oldName);
         node->id = id;
         node->size = size;
         node->flags = DICT_BUFFER | flags;
