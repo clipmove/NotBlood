@@ -77,6 +77,7 @@ struct DICTNODE : CACHENODE
     //char name[8];
     char *type;
     char *name;
+    char *oldname;
     char *path;
     char *buffer;
     unsigned int id;
