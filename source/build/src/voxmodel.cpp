@@ -969,7 +969,9 @@ void voxfree(voxmodel_t *m)
     if (!m)
         return;
 
+#ifdef USE_GLEXT
     voxvbofree(m);
+#endif
 
     DO_FREE_AND_NULL(m->mytex);
     DO_FREE_AND_NULL(m->vertex);
@@ -1299,8 +1301,9 @@ int32_t polymost_voxdraw(voxmodel_t *m, tspriteptr_t const tspr)
             buildgl_bindTexture(GL_TEXTURE_2D, m->texid8bit);
 
         buildgl_bindSamplerObject(0, PTH_INDEXED);
-
-        int visShade = int(fabsf(((tspr->x-globalposx)*gcosang+(tspr->y-globalposy)*gsinang)*globvis2*(1.f/(64.f*1024.f*2.f))));
+        
+        float yp = (tspr->x-globalposx)*gcosang2+(tspr->y-globalposy)*gsinang2;
+        int visShade = int(fabsf(yp*float(globvis2)*float(xdimscale)*(1.f/(256.f*128.f*65536.f))));
 
         if (polymost_usetileshades())
         {

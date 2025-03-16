@@ -1859,10 +1859,6 @@ int32_t videoSetMode(int32_t x, int32_t y, int32_t c, int32_t fs)
             int32_t value;
         } sdlayer_gl_attributes[] =
         {
-#ifdef EDUKE32_GLES
-              { SDL_GL_CONTEXT_MAJOR_VERSION, 1 },
-              { SDL_GL_CONTEXT_MINOR_VERSION, 1 },
-#endif
               { SDL_GL_CONTEXT_FLAGS,
 #ifndef NDEBUG
               SDL_GL_CONTEXT_DEBUG_FLAG |
@@ -1895,7 +1891,11 @@ int32_t videoSetMode(int32_t x, int32_t y, int32_t c, int32_t fs)
             nogl = 1;
         }
 
+#ifndef EDUKE32_GLES
         gladLoadGLLoader(SDL_GL_GetProcAddress);
+#else
+        gladLoadGLES2Loader(SDL_GL_GetProcAddress);
+#endif
         if (GLVersion.major < 2)
         {
             LOG_F(ERROR, "Video driver does not support OpenGL version 2 or greater; all OpenGL modes are unavailable.");

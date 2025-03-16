@@ -16,10 +16,6 @@
 # define USE_GLEXT
 #endif
 
-#if defined EDUKE32_GLES
-# include "jwzgles.h"
-#endif
-
 # ifdef _WIN32
 #  define PR_CALLBACK __stdcall
 # else
@@ -71,6 +67,16 @@ extern GLuint samplerObjectIDs[NUM_SAMPLERS];
 
 #define TEXUNIT_INDEX_FROM_NAME(x) (x - GL_TEXTURE0)
 #define ACTIVETEX (gl.currentActiveTexture ? TEXUNIT_INDEX_FROM_NAME(gl.currentActiveTexture) : 0)
+
+#ifndef EDUKE32_GLES
+# define buildgl_debugMessageCallback glDebugMessageCallbackARB
+# define buildgl_debugMessageControl glDebugMessageControlARB
+# define buildgl_debugMessageInsert glDebugMessageInsertARB
+#else
+# define buildgl_debugMessageCallback glDebugMessageCallbackKHR
+# define buildgl_debugMessageControl glDebugMessageControlKHR
+# define buildgl_debugMessageInsert glDebugMessageInsertKHR
+#endif
 
 extern void buildgl_activeTexture(GLenum texture);
 extern void buildgl_bindBuffer(GLenum target, uint32_t bufferID);
