@@ -1996,8 +1996,10 @@ static int32_t polymost_md3draw(md3model_t *m, tspriteptr_t tspr)
 
     buildgl_outputDebugMessage(3, "polymost_md3draw(m:%p, tspr:%p)", m, tspr);
 
+#ifdef USE_GLEXT
     if (m->vbos == NULL)
         mdloadvbos(m);
+#endif
 
     // if (tspr->cstat & CSTAT_SPRITE_ALIGNMENT_FLOOR) return 0;
 
