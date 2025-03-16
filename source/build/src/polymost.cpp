@@ -908,12 +908,14 @@ void polymost_clearOrnamentSprites(void);
 
 void polymost_initdrawpoly(void)
 {
-#ifdef USE_GLEXT
+#if defined USE_GLEXT && !defined EDUKE32_GLES
     if (r_persistentStreamBuffer && ((!glinfo.bufferstorage) || (!glinfo.sync)))
     {
         VLOG_F(LOG_GL, "Unable to use persistent stream buffers: required extensions missing.");
         r_persistentStreamBuffer = 0;
     }
+#else
+    r_persistentStreamBuffer = 0;
 #endif
 
     drawpolyVertsBufferLength = r_drawpolyVertsBufferLength;
@@ -1557,6 +1559,8 @@ static int32_t texfmt_rgb_mask;
 static int32_t texfmt_rgb;
 static int32_t texfmt_rgba;
 
+#ifdef SUPPORT_ETC
+
 #if defined EDUKE32_IOS
 static int32_t const comprtexfmts_rgb[] = { GL_ETC1_RGB8_OES, 0 };
 static int32_t const comprtexfmts_rgba[] = { 0 };
@@ -1614,9 +1618,11 @@ static ETCFunction_t Polymost_PickETCFunction(int32_t const comprtexfmt)
 # endif
 
         default:
-            EDUKE32_UNREACHABLE_SECTION(return NULL);
+            return nullptr;
     }
 }
+
+#endif
 
 static int Polymost_ConfirmNoGLError(void)
 {
@@ -1644,13 +1650,14 @@ static int32_t Polymost_TryDummyTexture(coltype const * const pic, int32_t const
     return 0;
 }
 
+#ifdef SUPPORT_ETC
 static int32_t Polymost_TryCompressedDummyTexture(coltype const * const pic, int32_t const * formats)
 {
     while (*formats)
     {
         ETCFunction_t func = Polymost_PickETCFunction(*formats);
         uint64_t const comprpic = func((uint8_t const *)pic);
-        jwzgles_glCompressedTexImage2D(GL_TEXTURE_2D, 0, *formats, 4,4, 0, sizeof(uint64_t), &comprpic);
+        glad_glCompressedTexImage2D(GL_TEXTURE_2D, 0, *formats, 4,4, 0, sizeof(uint64_t), &comprpic);
 
         if (Polymost_ConfirmNoGLError())
             return *formats;
@@ -1660,6 +1667,7 @@ static int32_t Polymost_TryCompressedDummyTexture(coltype const * const pic, int
 
     return 0;
 }
+#endif
 
 static void Polymost_DetermineTextureFormatSupport(void)
 {
@@ -1674,9 +1682,11 @@ static void Polymost_DetermineTextureFormatSupport(void)
     texfmt_rgba = Polymost_TryDummyTexture(pic, texfmts_rgba);
     texfmt_rgb_mask = Polymost_TryDummyTexture(pic, texfmts_rgb_mask);
 
+#ifdef SUPPORT_ETC
     comprtexfmt_rgb = Polymost_TryCompressedDummyTexture(pic, comprtexfmts_rgb);
     comprtexfmt_rgba = Polymost_TryCompressedDummyTexture(pic, comprtexfmts_rgba);
     comprtexfmt_rgb_mask = Polymost_TryCompressedDummyTexture(pic, comprtexfmts_rgb_mask);
+#endif
 
     glDeleteTextures(1, &tex);
 }
@@ -1687,13 +1697,13 @@ static void Polymost_SendTexToDriver(int32_t const doalloc,
                                      int32_t const texfmt,
                                      coltype const * const pic,
                                      int32_t const intexfmt,
-#if defined EDUKE32_GLES
+#if defined EDUKE32_GLES && defined SUPPORT_ETC
                                      int32_t const comprtexfmt,
                                      int32_t const texcompress_ok,
 #endif
                                      int32_t const level)
 {
-#if defined EDUKE32_GLES
+#if defined EDUKE32_GLES && defined SUPPORT_ETC
     if (texcompress_ok && comprtexfmt && (siz.x & 3) == 0 && (siz.y & 3) == 0)
     {
         size_t const picLength = siz.x * siz.y;
@@ -1729,9 +1739,9 @@ static void Polymost_SendTexToDriver(int32_t const doalloc,
             }
 
         if (doalloc & 1)
-            jwzgles_glCompressedTexImage2D(GL_TEXTURE_2D, level, comprtexfmt, siz.x,siz.y, 0, imageSize, comprpic);
+            glad_glCompressedTexImage2D(GL_TEXTURE_2D, level, comprtexfmt, siz.x,siz.y, 0, imageSize, comprpic);
         else
-            jwzgles_glCompressedTexSubImage2D(GL_TEXTURE_2D, level, 0,0, siz.x,siz.y, comprtexfmt, imageSize, comprpic);
+            glad_glCompressedTexSubImage2D(GL_TEXTURE_2D, level, 0,0, siz.x,siz.y, comprtexfmt, imageSize, comprpic);
 
         Xaligned_free(comprpic);
 
@@ -1770,7 +1780,11 @@ void uploadtexture(int32_t doalloc, vec2_t siz, int32_t texfmt,
     const int onebitalpha  = !!(dameth & DAMETH_ONEBITALPHA);
 
     int32_t const intexfmt = hasalpha ? (onebitalpha ? texfmt_rgb_mask : texfmt_rgba) : texfmt_rgb;
+#ifdef SUPPORT_ETC
     int32_t const comprtexfmt = hasalpha ? (onebitalpha ? comprtexfmt_rgb_mask : comprtexfmt_rgba) : comprtexfmt_rgb;
+#else
+    (void)texcompress_ok;
+#endif
 #endif
 
     dameth &= ~DAMETH_UPLOADTEXTURE_MASK;
@@ -1813,7 +1827,7 @@ void uploadtexture(int32_t doalloc, vec2_t siz, int32_t texfmt,
     if (!miplevel)
         Polymost_SendTexToDriver(doalloc, siz, texfmt, pic,
                                  intexfmt,
-#if defined EDUKE32_GLES
+#if defined EDUKE32_GLES && defined SUPPORT_ETC
                                  comprtexfmt,
                                  texcompress_ok,
 #endif
@@ -1878,7 +1892,7 @@ void uploadtexture(int32_t doalloc, vec2_t siz, int32_t texfmt,
         if (j >= miplevel)
             Polymost_SendTexToDriver(doalloc, siz3, texfmt, pic,
                                      intexfmt,
-#if defined EDUKE32_GLES
+#if defined EDUKE32_GLES && defined SUPPORT_ETC
                                      comprtexfmt,
                                      texcompress_ok,
 #endif
@@ -3653,6 +3667,7 @@ static void polymost_drawpoly(vec2f_t const* const dpxy, int32_t const n, int32_
 
     if (videoGetRenderMode() != REND_POLYMOST)
     {
+#ifdef USE_GLEXT
         while (texunits > GL_TEXTURE0)
         {
             buildgl_activeTexture(texunits);
@@ -3667,6 +3682,7 @@ static void polymost_drawpoly(vec2f_t const* const dpxy, int32_t const n, int32_
 
             --texunits;
         }
+#endif
 
         if (!waloff[globalpicnum])
             glColorMask(true, true, true, true);
@@ -3684,6 +3700,7 @@ static void polymost_drawpoly(vec2f_t const* const dpxy, int32_t const n, int32_
         glLoadIdentity();
         glMatrixMode(GL_MODELVIEW);
 
+#ifdef USE_GLEXT
         // necessary?
         if (r_detailmapping)
         {
@@ -3696,6 +3713,7 @@ static void polymost_drawpoly(vec2f_t const* const dpxy, int32_t const n, int32_
             glClientActiveTexture(GL_TEXTURE4);
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         }
+#endif
 
         glClientActiveTexture(GL_TEXTURE0);
     }
@@ -9864,7 +9882,9 @@ int32_t polymost_printtext256(int32_t xpos, int32_t ypos, int16_t col, int16_t b
     polymost_setFogEnabled(false);
     // We want to have readable text in wireframe mode, too:
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#ifndef EDUKE32_GLES
     lastglpolygonmode = 0;
+#endif
 
     if (backcol >= 0)
     {

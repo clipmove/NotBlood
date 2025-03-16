@@ -347,10 +347,12 @@ static void texcache_deletefiles(void)
 
 int32_t texcache_enabled(void)
 {
-#if defined EDUKE32_GLES || !defined USE_GLEXT
-    return 0;
-#else
-    if (!glinfo.texcompr || !glusetexcompr || !glusetexcache)
+#if defined USE_GLEXT && !defined EDUKE32_GLES
+    if (!glinfo.texcompr || !glusetexcompr)
+        return 0;
+#endif
+
+    if (!glusetexcache)
         return 0;
 
     if (!texcache.indexFilePtr || !texcache.dataFilePtr)
@@ -360,7 +362,6 @@ int32_t texcache_enabled(void)
     }
 
     return 1;
-#endif
 }
 
 void texcache_openfiles(void)
@@ -591,8 +592,6 @@ failure:
 
 #undef READTEXHEADER_FAILURE
 
-#if defined USE_GLEXT && !defined EDUKE32_GLES
-
 void texcache_prewritetex(texcacheheader *head)
 {
     Bmemcpy(head->magic, TEXCACHEMAGIC, 4);   // sizes are set by caller
@@ -606,6 +605,8 @@ void texcache_prewritetex(texcacheheader *head)
     head->flags   = B_LITTLE32(head->flags);
     head->quality = B_LITTLE32(head->quality);
 }
+
+#if defined USE_GLEXT && !defined EDUKE32_GLES
 
 #define WRITEX_FAIL_ON_ERROR() if (glGetError() != GL_NO_ERROR) goto failure
 
@@ -709,6 +710,8 @@ failure:
 
 #undef WRITEX_FAIL_ON_ERROR
 
+#endif
+
 void texcache_postwritetex(char const * const cacheid, int32_t const offset)
 {
     int32_t const i = hash_find(&texcache.hashes, cacheid);
@@ -759,8 +762,6 @@ void texcache_postwritetex(char const * const cacheid, int32_t const offset)
         LOG_F(ERROR, "fatal error in texcache: no indexFilePtr");
 }
 
-#endif
-
 static void texcache_setuptexture(int32_t *doalloc, GLuint *glpic)
 {
     if (*doalloc&1)
@@ -772,6 +773,7 @@ static void texcache_setuptexture(int32_t *doalloc, GLuint *glpic)
     buildgl_bindTexture(GL_TEXTURE_2D, *glpic);
 }
 
+#if defined USE_GLEXT && !defined EDUKE32_GLES
 static char const* texcache_format_to_name(GLint format)
 {
     switch (format)
@@ -788,6 +790,7 @@ static char const* texcache_format_to_name(GLint format)
             return "UNKNOWN/INVALID";
     }
 }
+#endif
 
 static int32_t texcache_loadmips(const texcacheheader *head, GLenum *glerr)
 {
