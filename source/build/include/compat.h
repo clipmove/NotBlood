@@ -73,34 +73,38 @@
 
 ////////// Language detection //////////
 
-#if defined __STDC__
-# if defined __STDC_VERSION__ && __STDC_VERSION__ >= 201710L
-#  define CSTD 2017
-# elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L
-#  define CSTD 2011
-# elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
-#  define CSTD 1999
-# elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199409L
-#  define CSTD 1994
-# else
-#  define CSTD 1989
-# endif
-#else
+#if !defined __STDC__
 # define CSTD 0
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 202311L
+# define CSTD 2023
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 201710L
+# define CSTD 2017
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L
+# define CSTD 2011
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+# define CSTD 1999
+#elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199409L
+# define CSTD 1994
+#else
+# define CSTD 1989
 #endif
 
-#if defined __cplusplus && __cplusplus >= 202002L
+#if !defined __cplusplus
+# define CXXSTD 0
+#elif __cplusplus >= 202302L
+# define CXXSTD 2023
+#elif __cplusplus >= 202002L
 # define CXXSTD 2020
-#elif defined __cplusplus && __cplusplus >= 201703L
+#elif __cplusplus >= 201703L
 # define CXXSTD 2017
-#elif defined __cplusplus && __cplusplus >= 201402L
+#elif __cplusplus >= 201402L
 # define CXXSTD 2014
-#elif defined __cplusplus && __cplusplus >= 201103L
+#elif __cplusplus >= 201103L
 # define CXXSTD 2011
-#elif defined __cplusplus && __cplusplus >= 199711L
+#elif __cplusplus >= 199711L
 # define CXXSTD 1998
 #else
-# define CXXSTD 0
+# define CXXSTD 1
 #endif
 
 
