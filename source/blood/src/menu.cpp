@@ -470,7 +470,7 @@ CGameMenuItemZCycle itemOptionsGameWeaponSwitch("EQUIP PICKUPS:", 3, 66, 130, 18
 
 ///////////////
 CGameMenuItemZBool itemOptionsGameBoolWeaponsV10X("V1.0x WEAPONS BALANCE:", 3, 66, 140, 180, gWeaponsV10x, SetWeaponsV10X, NULL, NULL);
-CGameMenuItemZBool itemOptionsGameBoolVanillaMode("VANILLA MODE:", 3, 66, 150, 180, gVanilla, SetVanillaMode, NULL, NULL);
+CGameMenuItemZBool itemOptionsGameBoolVanillaMode("STRICT VANILLA MODE:", 3, 66, 150, 180, gVanilla, SetVanillaMode, NULL, NULL);
 ///////////////////
 
 CGameMenuItemTitle itemOptionsDisplayTitle("DISPLAY SETUP", 1, 160, 20, 2038);
