@@ -4631,17 +4631,7 @@ void viewDrawScreen(void)
         }
         renderSetRollAngle(nRollAngle);
 #endif
-        if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh)
-        {
-            if (!waloff[DOWNSCALEBUFFER])
-                viewSetRenderScale(0);
-            if (waloff[DOWNSCALEBUFFER])
-            {
-                renderSetTarget(DOWNSCALEBUFFER, tilesiz[DOWNSCALEBUFFER].x, tilesiz[DOWNSCALEBUFFER].y);
-                renderSetAspect(viewingRange_fov, yxaspect);
-            }
-        }
-        else if (nTilt || bDelirium)
+        if (nTilt || bDelirium)
         {
             if (videoGetRenderMode() == REND_CLASSIC)
             {
@@ -4668,6 +4658,16 @@ void viewDrawScreen(void)
             else
                 renderSetRollAngle(nTilt+nRollAngle);
 #endif
+        }
+        else if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh)
+        {
+            if (!waloff[DOWNSCALEBUFFER])
+                viewSetRenderScale(0);
+            if (waloff[DOWNSCALEBUFFER])
+            {
+                renderSetTarget(DOWNSCALEBUFFER, tilesiz[DOWNSCALEBUFFER].x, tilesiz[DOWNSCALEBUFFER].y);
+                renderSetAspect(viewingRange_fov, yxaspect);
+            }
         }
         else if (bCrystalBall)
         {
@@ -4884,28 +4884,7 @@ RORHACK:
         gView->pSprite->cstat = bakCstat;
         char bMirrorScreen = (videoGetRenderMode() == REND_CLASSIC) && MIRRORMODE; // mirror framebuffer for classic renderer
 
-        if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh)
-        {
-            dassert(waloff[DOWNSCALEBUFFER] != 0);
-            renderRestoreTarget();
-            tileInvalidate(DOWNSCALEBUFFER, -1, -1);
-            const int nScale = divscale16(fix16_from_int(320), fix16_from_int(tilesiz[DOWNSCALEBUFFER].y-1));
-            unsigned int nStat = RS_NOMASK|RS_YFLIP|RS_AUTO|RS_STRETCH;
-            int nAng = 0;
-            if (nTilt || bDelirium)
-            {
-                nAng = nTilt & (kAng90-1);
-                if (nAng > kAng45)
-                    nAng = nAng - kAng90;
-            }
-            if (bMirrorScreen) // mirror tilt buffer
-            {
-                videoMirrorTile((uint8_t *)waloff[DOWNSCALEBUFFER], tilesiz[DOWNSCALEBUFFER].y, tilesiz[DOWNSCALEBUFFER].x);
-                bMirrorScreen = 0;
-            }
-            rotatesprite(fix16_from_int(320>>1), fix16_from_int(200>>1), nScale, nAng+kAng90, DOWNSCALEBUFFER, 0, 0, nStat, gViewX0, gViewY0, gViewX1, gViewY1);
-        }
-        else if (nTilt || bDelirium)
+        if (nTilt || bDelirium)
         {
             if (videoGetRenderMode() == REND_CLASSIC)
             {
@@ -4948,6 +4927,20 @@ RORHACK:
                 }
             }
 #endif
+        }
+        else if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh)
+        {
+            dassert(waloff[DOWNSCALEBUFFER] != 0);
+            renderRestoreTarget();
+            tileInvalidate(DOWNSCALEBUFFER, -1, -1);
+            const int nScale = divscale16(fix16_from_int(320), fix16_from_int(tilesiz[DOWNSCALEBUFFER].y-1));
+            unsigned int nStat = RS_NOMASK|RS_YFLIP|RS_AUTO|RS_STRETCH;
+            if (bMirrorScreen) // mirror tilt buffer
+            {
+                videoMirrorTile((uint8_t *)waloff[DOWNSCALEBUFFER], tilesiz[DOWNSCALEBUFFER].y, tilesiz[DOWNSCALEBUFFER].x);
+                bMirrorScreen = 0;
+            }
+            rotatesprite(fix16_from_int(320>>1), fix16_from_int(200>>1), nScale, kAng90, DOWNSCALEBUFFER, 0, 0, nStat, gViewX0, gViewY0, gViewX1, gViewY1);
         }
 
         if (bRenderScaleRefresh)
