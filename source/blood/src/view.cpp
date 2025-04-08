@@ -4659,16 +4659,6 @@ void viewDrawScreen(void)
                 renderSetRollAngle(nTilt+nRollAngle);
 #endif
         }
-        else if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh)
-        {
-            if (!waloff[DOWNSCALEBUFFER])
-                viewSetRenderScale(0);
-            if (waloff[DOWNSCALEBUFFER])
-            {
-                renderSetTarget(DOWNSCALEBUFFER, tilesiz[DOWNSCALEBUFFER].x, tilesiz[DOWNSCALEBUFFER].y);
-                renderSetAspect(viewingRange_fov, yxaspect);
-            }
-        }
         else if (bCrystalBall)
         {
             int tmp = ((int)totalclock/240)%(gNetPlayers-1);
@@ -4785,6 +4775,16 @@ RORHACKOTHER:
         else
         {
             othercameraclock = (int)totalclock;
+        }
+        if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh)
+        {
+            if (!waloff[DOWNSCALEBUFFER])
+                viewSetRenderScale(0);
+            if (waloff[DOWNSCALEBUFFER])
+            {
+                renderSetTarget(DOWNSCALEBUFFER, tilesiz[DOWNSCALEBUFFER].x, tilesiz[DOWNSCALEBUFFER].y);
+                renderSetAspect(viewingRange_fov, yxaspect);
+            }
         }
 
         if (!bDelirium)
@@ -4942,8 +4942,7 @@ RORHACK:
             }
             rotatesprite(fix16_from_int(320>>1), fix16_from_int(200>>1), nScale, kAng90, DOWNSCALEBUFFER, 0, 0, nStat, gViewX0, gViewY0, gViewX1, gViewY1);
         }
-
-        if (bRenderScaleRefresh)
+        else if (bRenderScaleRefresh)
             bRenderScaleRefresh = 0;
 
         if (bMirrorScreen)
