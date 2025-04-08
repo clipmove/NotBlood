@@ -4891,20 +4891,19 @@ RORHACK:
             tileInvalidate(DOWNSCALEBUFFER, -1, -1);
             const int nScale = divscale16(fix16_from_int(320), fix16_from_int(tilesiz[DOWNSCALEBUFFER].y-1));
             unsigned int nStat = RS_NOMASK|RS_YFLIP|RS_AUTO|RS_STRETCH;
-            int nAng = kAng90;
+            int nAng = 0;
             if (nTilt || bDelirium)
             {
                 nAng = nTilt & (kAng90-1);
                 if (nAng > kAng45)
                     nAng = nAng - kAng90;
-                nAng += kAng90;
             }
             if (bMirrorScreen) // mirror tilt buffer
             {
                 videoMirrorTile((uint8_t *)waloff[DOWNSCALEBUFFER], tilesiz[DOWNSCALEBUFFER].y, tilesiz[DOWNSCALEBUFFER].x);
                 bMirrorScreen = 0;
             }
-            rotatesprite(fix16_from_int(320>>1), fix16_from_int(200>>1), nScale, nAng, DOWNSCALEBUFFER, 0, 0, nStat, gViewX0, gViewY0, gViewX1, gViewY1);
+            rotatesprite(fix16_from_int(320>>1), fix16_from_int(200>>1), nScale, nAng+kAng90, DOWNSCALEBUFFER, 0, 0, nStat, gViewX0, gViewY0, gViewX1, gViewY1);
         }
         else if (nTilt || bDelirium)
         {
