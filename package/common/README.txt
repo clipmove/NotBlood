@@ -217,6 +217,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable view horizontal bobbing
 * cl_rollangle
    - Sets how much your screen tilts when strafing (polymost only)
+* cl_shotgunaltfirereload
+   - Enable/disable alt fire as reload for shotgun when fired one shell (always off in multiplayer)
 * cl_showloadsavebackdrop
    - Enable/disable the menu backdrop for loading/saving game
 * cl_slopecrosshair
@@ -227,14 +229,14 @@ If you have the GOG version of the game, do the following:
    - Enable/disable 3D projection for fake sprite shadows
 * cl_smoketrail3d
    - Enable/disable 3D smoke trail positioning for tnt/spray can (single-player only)
+* cl_packitemswitch
+   - Enable/disable item slot switching to activated item (always enabled in multiplayer)
 * cl_particlesduration
    - Enable/disable extended particle duration modification (single-player only - turned off for modern maps)
 * cl_projectileoldsprite
    - Enable/disable old pink sprite for hitscan projectiles
 * cl_weaponfastswitch
    - Enable/disable fast weapon switching
-* cl_packitemswitch
-   - Enable/disable item slot switching to activated item (always enabled in multiplayer)
 * color
    - Set preferred player color palette in multiplayer (0: none, 1: blue, 2: red, 3: teal, 4: gray)
 * crosshair
