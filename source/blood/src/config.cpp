@@ -120,6 +120,7 @@ int32_t gMessageState;
 int32_t gMessageCount;
 int32_t gMessageTime;
 int32_t gMessageFont;
+int32_t gShotgunAltFireReload;
 int32_t gStereo;
 int32_t gPlayerTeamPreference;
 int32_t gPlayerColorPreference;
@@ -536,6 +537,7 @@ void CONFIG_SetDefaults(void)
     gMessageCount = 4;
     gMessageTime = 5;
     gMessageFont = 0;
+    gShotgunAltFireReload = 0;
     gStereo = 1;
     gPlayerTeamPreference = 0;
     gPlayerColorPreference = 0;
