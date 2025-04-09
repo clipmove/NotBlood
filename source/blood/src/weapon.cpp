@@ -2919,7 +2919,7 @@ void WeaponProcess(PLAYER *pPlayer) {
                 StartQAV(pPlayer, 56, nClientFireShotgun, 0);
                 return;
             }
-            if (!powerupCheck(pPlayer, kPwUpTwoGuns) && gShotgunAltFireReload && !VanillaMode()) // alt fire always reloads if only one shell is loaded
+            if (!powerupCheck(pPlayer, kPwUpTwoGuns) && gShotgunAltFireReload && (numplayers == 1) && !VanillaMode()) // alt fire always reloads if only one shell is loaded
             {
                 if ((pPlayer->weaponState == 2) && CheckAmmo(pPlayer, 2, 1) && (pPlayer->ammoCount[2] || gInfiniteAmmo))
                 {
