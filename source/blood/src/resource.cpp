@@ -372,7 +372,6 @@ void Resource::Grow(void)
     memcpy(p, dict, count * sizeof(DICTNODE));
 
     auto newDict = (DICTNODE*)p;
-    intptr_t fixup = (intptr_t)p - (intptr_t)dict;
     for (int i = 0; i < count; i++)
     {
         if (dict[i].ptr && dict[i].lockCount == 0)
