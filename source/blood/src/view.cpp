@@ -4776,7 +4776,7 @@ RORHACKOTHER:
         {
             othercameraclock = (int)totalclock;
         }
-        if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh)
+        if ((videoGetRenderMode() == REND_CLASSIC) && (gRenderScale > 1) && !bRenderScaleRefresh && !nTilt && !bDelirium)
         {
             if (!waloff[DOWNSCALEBUFFER])
                 viewSetRenderScale(0);
