@@ -252,6 +252,9 @@
     <ClCompile Include="..\..\source\blood\src\nnextcitem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\blood\src\nnextslaser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\source\blood\rsrc\gameres.rc">
@@ -503,6 +506,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\blood\src\nnextcitem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\blood\src\nnextslaser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

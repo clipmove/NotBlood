@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <random>
 #include "nnexts.h"
 #include "nnextsif.h"
+#include "nnextslaser.h"
 #include "eventq.h"
 #include "aicdud.h"
 #include "triggers.h"
@@ -51,6 +52,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "kplib.h"
 #endif
 
+#define kMaxPathSpriteSectors 512
+#define kMaxLasers 2048
+
 #define kMaxPatrolFoundSounds 256 //sizeof(Bonkle) / sizeof(Bonkle[0])
 PATROL_FOUND_SOUNDS patrolBonkles[kMaxPatrolFoundSounds];
 
@@ -64,6 +68,13 @@ IDLIST gSightSpritesList(false);
 IDLIST gImpactSpritesList(false);
 IDLIST gPhysSpritesList(false);
 IDLIST gFlwSpritesList(false);
+
+IDLIST* gPathSprList[kMaxPathSpriteSectors]; // this is a lists of sprites that sector makes move
+uint16_t gPathSprIndex[kMaxSectors];
+uint16_t gPathSprCount = 0;
+
+LASER* gLaser[kMaxLasers];
+uint16_t gLasersCount = 0;
 
 EXTERNAL_FILES_LIST gExternFiles[] =
 {
@@ -282,6 +293,8 @@ AISTATE genPatrolStates[] = {
 
 };
 
+LASER* laserGet(spritetype* pSpr);
+
 void nnExResetPatrolBonkles() {
 
     for (int i = 0; i < kMaxPatrolFoundSounds; i++) {
@@ -297,7 +310,7 @@ char idListProcessProxySprite(int32_t nSpr)
     bool causerPart;
 
     spritetype* pSpr = &sprite[nSpr];
-    if (pSpr->flags & kHitagFree) return kListREMOVE;
+    if (!xspriRangeIsFine(pSpr->extra)) return kListREMOVE;
     else if (isOnRespawn(pSpr))
         return kListSKIP; // don't process
 
@@ -357,7 +370,7 @@ char idListProcessSightSprite(int32_t nSpr)
     PLAYER* pPlayer; spritetype* pPlaySpr;
     bool causerPart;
 
-    if (pSpr->flags & kHitagFree) return kListREMOVE;
+    if (!xspriRangeIsFine(pSpr->extra)) return kListREMOVE;
     else if (isOnRespawn(pSpr))
         return kListSKIP; // don't process
 
@@ -426,7 +439,7 @@ char idListProcessSightSprite(int32_t nSpr)
 char idListProcessPhysSprite(int32_t nSpr)
 {
     spritetype* pSpr = &sprite[nSpr];
-    if (pSpr->flags & kHitagFree)
+    if (!xspriRangeIsFine(pSpr->extra))
         return kListREMOVE;
 
     XSPRITE* pXSpr = &xsprite[pSpr->extra];
@@ -588,7 +601,7 @@ void followTarget(spritetype* pSpr, spritetype* pTarg, int nMaxAng)
 char idListProcessFollowSprite(int32_t nSpr)
 {
     spritetype* pSpr = &sprite[nSpr];
-    if ((pSpr->flags & kHitagFree) || pSpr->owner < 0)
+    if (!xspriRangeIsFine(pSpr->extra) || pSpr->owner < 0)
         return kListREMOVE;
 
     spritetype* pOwn = &sprite[pSpr->owner];
@@ -916,6 +929,7 @@ void nnExtResetGlobals()
     // clear sprite mass cache
     memset(gSpriteMass, 0, sizeof(gSpriteMass));
 
+    lasersClear();
 }
 
 
@@ -1427,6 +1441,9 @@ void nnExtInitModernStuff(bool bSaveLoad) {
         consoleSysMsg("There is %d extra external files added in total.", i);
         gExternalFilesAdded = true;
     }
+
+    // init lasers
+    lasersInit();
 }
 
 
@@ -1549,6 +1566,8 @@ spritetype* randomSpawnDude(XSPRITE* pXSource, spritetype* pSprite, int a3, int 
 void nnExtProcessSuperSprites()
 {
     conditionsTrackingProcess();							            // process tracking conditions
+    lasersProcess();
+
     gProxySpritesList.Process(idListProcessProxySprite, true);          // process additional proximity sprites
     gSightSpritesList.Process(idListProcessSightSprite, true);          // process sight sprites (for players only)
     gPhysSpritesList.Process(idListProcessPhysSprite,   true);          // process Debris sprites for movement
@@ -3199,7 +3218,7 @@ void useEffectGen(XSPRITE* pXSource, spritetype* pSpr)
                 pos = bottom;
                 break;
             case 2: // middle
-                pos = pSpr->z + (tilesiz[pSpr->picnum].y / 2 + picanm[pSpr->picnum].yofs);
+                pos = top + ((bottom-top) >> 1);
                 break;
             case 3:
             case 4:
@@ -3599,7 +3618,7 @@ void useSeqSpawnerGen(XSPRITE* pXSource, int objType, int index) {
                             sprite[nSprite].z = top;
                             break;
                         case 4:
-                            sprite[nSprite].z = sprite[index].z + (tilesiz[sprite[index].picnum].y / 2 + picanm[sprite[index].picnum].yofs);
+                            sprite[nSprite].z = top + ((bottom-top) >> 1);
                             break;
                         case 5:
                         case 6:
@@ -4131,10 +4150,14 @@ void sectorContinueMotion(int nSector, EVENT event) {
     
     int busyTimeA = pXSector->busyTimeA;    int waitTimeA = pXSector->waitTimeA;
     int busyTimeB = pXSector->busyTimeB;    int waitTimeB = pXSector->waitTimeB;
-    if (sector[nSector].type == kSectorPath) {
-        if (!spriRangeIsFine(pXSector->marker0)) return;
-        busyTimeA = busyTimeB = xsprite[sprite[pXSector->marker0].extra].busyTime;
-        waitTimeA = waitTimeB = xsprite[sprite[pXSector->marker0].extra].waitTime;
+    switch(sector[nSector].type)
+    {
+        case kSectorPath:
+        case kModernSectorPathSprite:
+            if (!spriRangeIsFine(pXSector->marker0)) return;
+            busyTimeA = busyTimeB = xsprite[sprite[pXSector->marker0].extra].busyTime;
+            waitTimeA = waitTimeB = xsprite[sprite[pXSector->marker0].extra].waitTime;
+            break;
     }
     
     if (!pXSector->interruptable && event.cmd != kCmdSectorMotionContinue
@@ -4196,6 +4219,9 @@ void sectorContinueMotion(int nSector, EVENT event) {
         case kSectorPath:
             busyFunc = BUSYID_7;
             break;
+        case kModernSectorPathSprite:
+            busyFunc = BUSY_PATHSPRITE;
+            break;
         default:
             ThrowError("Unsupported sector type %d", sector[nSector].type);
             break;
@@ -4256,6 +4282,13 @@ bool modernTypeOperateSector(int nSector, sectortype* pSector, XSECTOR* pXSector
         sectorPauseMotion(nSector, event.causer);
         return true;
 
+    }
+
+    switch (pSector->type)
+    {
+		case kModernSectorPathSprite:
+			pathSpriteOperate(nSector, pXSector, event);
+			return true;
     }
 
     return false;
@@ -4382,6 +4415,26 @@ bool modernTypeOperateSprite(int nSprite, spritetype* pSprite, XSPRITE* pXSprite
             if (!(pXSprite->sysData1 & kModernTypeFlag128)) useGibObject(pXSprite, pSprite);
             else if (pXSprite->txID) modernTypeSetSpriteState(nSprite, pXSprite, pXSprite->state ^ 1, causerID);
             return true;
+		case kModernLaserGen:
+            switch (event.cmd)
+			{
+                case kCmdOff:
+					if (pXSprite->state == 1) laserGet(pSprite)->SetState(0);
+                    break;
+                case kCmdOn:
+                    if (pXSprite->state == 0) laserGet(pSprite)->SetState(1);
+                    break;
+                default:
+					laserGet(pSprite)->SetState(pXSprite->state ^ 1);
+                    break;
+            }
+			
+			if (pXSprite->state && pXSprite->waitTime)
+			{
+				evKill(nSprite, OBJ_SPRITE);
+				evPost(nSprite, OBJ_SPRITE, EVTIME2TICKS(pXSprite->waitTime), kCmdOff, event.causer);
+			}
+			return true;
         case kModernCondition:
         case kModernConditionFalse:
             if (!pXSprite->isTriggered) useCondition(pSprite, pXSprite, &event);
@@ -8291,6 +8344,663 @@ int nnExtDudeStartHealth(spritetype* pSpr, int nHealth)
     return getDudeInfo(pSpr->type)->startHealth << 4;
 }
 
+char IsPhysicsSprite(spritetype* pSpr)
+{
+    if (pSpr->extra > 0)
+    {
+        if (xsprite[pSpr->extra].physAttr)
+            return 2;
+
+        if (pSpr->statnum == kStatThing || pSpr->statnum == kStatDude)
+            if (pSpr->flags & (kPhysMove | kPhysGravity))
+                return 1;
+    }
+
+    return 0;
+}
+
+void nnExtTrInit()
+{
+    gSprNSect.Init(); // collect sprites near outside walls
+    pathSpriteInit();
+}
+
+// Functions to handle lasers
+///////////////////////////////////////////////////
+void lasersInit()
+{
+    spritetype* pSpr; LASER* pLaser;
+    int i = numsectors;
+    int j;
+
+    lasersClear();
+    LASER::GenerateTiles(0);
+    LASER::GenerateTables();
+
+    while(--i >= 0)
+    {
+        for (j = headspritesect[i]; j >= 0; j = nextspritesect[j])
+        {
+            pSpr = &sprite[j];
+            if (pSpr->type != kModernLaserGen)
+                continue;
+
+            dassert(gLasersCount < kMaxLasers);
+
+            if (pSpr->extra <= 0)
+                dbInsertXSprite(pSpr->index);
+
+            gLaser[gLasersCount] = new LASER(pSpr);
+
+            pLaser = gLaser[gLasersCount];
+            pLaser->pXOwn->sysData1 = gLasersCount++;
+        }
+    }
+}
+
+void lasersClear()
+{
+    int i = gLasersCount;
+    while(--i >= 0)
+        DELETE_AND_NULL(gLaser[i]);
+
+    gLasersCount = 0;
+}
+
+void lasersProcess()
+{
+    int i = gLasersCount;
+    LASER* pLaser;
+
+    while(--i >= 0)
+    {
+        pLaser = gLaser[i];
+        if (pLaser->pXOwn->state)
+            pLaser->Process();
+    }
+}
+
+void lasersProcessView3D(int camx, int camy, int camz, int cama, int cams, int camh)
+{
+    int i = numsectors, j;
+    char cameraSet = 0;
+    LASER* pLaser;
+
+    while(--i >= 0)
+    {
+        if (!TestBitString(gotsector, i))
+                continue;
+
+        if (!cameraSet)
+        {
+            LASER::cam.x = camx;
+            LASER::cam.y = camy;
+            LASER::cam.z = camz;
+            LASER::cam.s = cams;
+            LASER::cam.a = cama;
+            LASER::cam.h = camh;
+            cameraSet = 1;
+        }
+
+        j = gLasersCount;
+        while(--j >= 0)
+        {
+            pLaser = gLaser[j];
+            if (!pLaser->pXOwn->state) continue;
+            else if (!pLaser->RayShow(i))
+                return;
+        }
+    }
+}
+
+LASER* laserGet(spritetype* pSpr)
+{
+    dassert(pSpr->extra > 0);
+    return gLaser[xsprite[pSpr->extra].sysData1];
+}
+
+void laserSave(LoadSave* pSave)
+{
+    int32_t i = gLasersCount;
+    LASER* pLaser;
+
+    // total number of lasers
+    pSave->Write(&i, sizeof(i));
+
+    for (i = 0; i < gLasersCount; i++)
+    {
+        pLaser = gLaser[i];
+
+        // save oldscan hitsprite to avoid triggering it again after loading a save
+        pSave->Write(&pLaser->oldscan.hitsprite, sizeof(pLaser->oldscan.hitsprite));
+    }
+}
+
+void laserLoad(LoadSave* pSave)
+{
+    LASER* pLaser;
+    int32_t i, t;
+
+    // total number of lasers
+    pSave->Read(&t, sizeof(t));
+    dassert(t == gLasersCount);
+
+    for (i = 0; i < t; i++)
+    {
+        pLaser = gLaser[i];
+
+        // restore oldscan hitsprite
+        pSave->Read(&pLaser->oldscan.hitsprite, sizeof(pLaser->oldscan.hitsprite));
+    }
+}
+
+
+// Functions to handle path sectors
+///////////////////////////////////////////////////
+
+void pathSpriteClear()
+{
+    int i = gPathSprCount;
+    while(--i >= 0)
+    {
+        if (gPathSprList[i])
+            DELETE_AND_NULL(gPathSprList[i]);
+    }
+
+    gPathSprCount = 0;
+}
+
+void pathSpriteInit()
+{
+    XSPRITE *pXFirst = NULL, *pXNext, *pXPrev;
+    sectortype* pSect; XSECTOR* pXSect;
+    int i = numsectors, j, dz;
+    IDLIST* pList;
+
+    pathSpriteClear();
+
+    while(--i >= 0)
+    {
+        pSect = &sector[i];
+        if (pSect->type != kModernSectorPathSprite)
+            continue;
+
+       dassert(gPathSprCount < kMaxPathSpriteSectors);
+
+        pXSect = &xsector[pSect->extra];
+        gPathSprList[gPathSprCount] = new IDLIST(true);
+        pList = gPathSprList[gPathSprCount];
+
+        for (j = headspritesect[i]; j >= 0; j = nextspritesect[j])
+        {
+            spritetype *pSpr = &sprite[j];
+            if (pSpr->statnum == kStatMarker || pSpr->statnum == kStatPathMarker)
+                continue;
+
+            pList->Add(j);
+        }
+
+        if ((pXFirst = pathSectFindNextMarker(pXSect)) != NULL)
+        {
+            dz = pSect->floorz - sprite[pXFirst->reference].z;
+            pXNext = pXFirst;
+
+            do
+            {
+                // offset all markers relative to first marker
+                // so sprites won't get weird positions
+                // on sector activation
+
+                sprite[pXNext->reference].z += dz;
+                pXPrev = pXNext;
+            }
+            while((pXNext = pathSectFindNextMarker(pXSect, pXNext)) != NULL && pXNext != pXPrev && pXNext != pXFirst);
+
+            pXSect->marker0     = pXFirst->reference;
+            basePath[i]         = pXFirst->reference;
+            gPathSprIndex[i]    = gPathSprCount++;
+
+            if (pXSect->state)
+                evPost(i, 6, 0, kCmdOn, kCauserGame);
+        }
+        else
+        {
+            ThrowError("Unable to find path marker with id #%d for path sprite sector #%d", pXSect->data, i);
+            DELETE_AND_NULL(gPathSprList[gPathSprCount]);
+        }
+    }
+}
+
+void pathSpriteOperate(unsigned int nSect, XSECTOR *pXSect, EVENT event)
+{
+    spritetype* pFirst  = &sprite[basePath[nSect]];
+    XSPRITE* pXFirst    = &xsprite[pFirst->extra];
+    spritetype* pThis   = &sprite[pXSect->marker0];
+    XSPRITE* pXThis     = &xsprite[pThis->extra];
+    XSPRITE* pXNext     = NULL;
+
+    if (event.cmd >= kCmdNumberic)
+    {
+        switch (event.cmd - kCmdNumberic)
+        {
+            case kCmdOff:       pXFirst->sysData4  = 0;  break;
+            case kCmdOn:        pXFirst->sysData4  = 1;  break;
+            case kCmdToggle:    pXFirst->sysData4 ^= 1;  break;
+        }
+    }
+
+    if ((pXNext = pathSectFindNextMarker(pXSect, pXThis, pXFirst->sysData4 == 0)) == NULL)
+    {
+        ThrowError("Unable to find path marker with id #%d for path sector #%d", pXSect->data, nSect);
+        return;
+    }
+
+    if (!pXSect->state && pXSect->triggerOff)
+    {
+        trTriggerSprite(pThis->index, pXThis, pXSect->command, kCauserGame); // trigger marker at departure
+    }
+
+    pXSect->state   = 0;
+    pXSect->busy    = 0;
+
+    if (pXNext != pXThis)
+    {
+        pXSect->marker1 = pXNext->reference;
+
+        switch (event.cmd)
+        {
+            case kCmdOn:
+                AddBusy(nSect, BUSY_PATHSPRITE, 65536 / ClipLow(EVTIME2TICKS(pXThis->busyTime), 1));
+                SectorStartSound(nSect, 1);
+                if (pXThis->data3)
+                    PathSound(nSect, pXThis->data3);
+
+                break;
+        }
+    }
+}
+
+void pathSpriteFixSector(spritetype* pSpr)
+{
+    int s;
+
+    if (pSpr->type == kSoundSector)
+    {
+        // we don't change sector for this because
+        // it seems like it doesn't matter
+        // for sound
+
+        return;
+    }
+
+    s = pSpr->sectnum;
+    if (!FindSector(pSpr->x, pSpr->y, pSpr->z, &s))     // try 3D first
+        if (!FindSector(pSpr->x, pSpr->y, &s))          // then 2D
+            return;
+
+    if (s != pSpr->sectnum)
+        ChangeSpriteSect(pSpr->index, s);
+}
+
+char pathSpriteStaysOnSprite(IDLIST* pList, spritetype* pSpr)
+{
+    if (pSpr->extra > 0)
+    {
+        int nHit = gSpriteHit[pSpr->extra].florhit;
+        if ((nHit & 0xC000) != 0xC000)
+            return 0;
+
+        int nSpr = nHit & 0x3FFF;
+        if (pList->Exists(nSpr))
+        {
+            if (sprite[nSpr].cstat & 0x4000)
+                return 2;
+
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+inline IDLIST* pathSpriteGetList(int nSect)
+{
+    return gPathSprList[gPathSprIndex[nSect]];
+}
+
+void pathSpriteTranslate(int nSect, int nBusyA, int nBusyB, int fX, int fY, int cX, int cY, int cZ, int cA, int nX, int nY, int nZ, int nA)
+{
+    XSECTOR *pXSect = &xsector[sector[nSect].extra];
+    IDLIST* pList = pathSpriteGetList(nSect);
+    spritetype *pSpr;
+    int nSpr, x, y;
+    int32_t* p;
+    char r;
+
+    int x1 = interpolate(cX, nX, nBusyA);
+    int x2 = interpolate(cX, nX, nBusyB);
+    int dx = x2 - x1;
+
+    int y1 = interpolate(cY, nY, nBusyA);
+    int y2 = interpolate(cY, nY, nBusyB);
+    int dy = y2 - y1;
+
+    int a1 = interpolate(cA, nA, nBusyA);
+    int a2 = interpolate(cA, nA, nBusyB);
+    int da = a2 - a1;
+
+    int dz = nZ - cZ;
+    int oz;
+
+    if (dz)
+    {
+        oz = baseFloor[nSect];
+        baseFloor[nSect] = cZ + mulscale16(dz, nBusyB);
+        dz = baseFloor[nSect] - oz;
+        velFloor[nSect] += (dz<<8);
+    }
+
+    for (p = pList->First(); *p >= 0; p++)
+    {
+        nSpr = *p;
+        pSpr = &sprite[nSpr];
+        x = baseSprite[nSpr].x;
+        y = baseSprite[nSpr].y;
+
+        if (pSpr->cstat & 0x2000)
+        {
+            if (a2)
+                RotatePoint(&x, &y, a2, fX, fY);
+
+            viewBackupSpriteLoc(nSpr, pSpr);
+            pSpr->ang = (pSpr->ang+da) & kAngMask;
+            pSpr->x = x+x2-fX;
+            pSpr->y = y+y2-fY;
+            pSpr->z += dz;
+        }
+        else if (pSpr->cstat & 0x4000)
+        {
+            if (a2)
+                RotatePoint(&x, &y, -a2, fX, fY);
+
+            viewBackupSpriteLoc(nSpr, pSpr);
+            pSpr->ang = (pSpr->ang-da) & kAngMask;
+            pSpr->x = x-(x2-fX);
+            pSpr->y = y-(y2-fY);
+            pSpr->z -= dz;
+        }
+        else if (pXSect->Drag)
+        {
+            if ((r = pathSpriteStaysOnSprite(pList, pSpr)) > 0)
+            {
+                switch(r)
+                {
+                    case 2:
+                        if (da)
+                            RotatePoint(&pSpr->x, &pSpr->y, -da, x1, y1);
+
+                        viewBackupSpriteLoc(nSpr, pSpr);
+                        pSpr->ang = (pSpr->ang-da) & kAngMask;
+                        pSpr->x -= dx;
+                        pSpr->y -= dy;
+                        pSpr->z -= dz;
+                        break;
+                    default:
+                        if (da)
+                            RotatePoint(&pSpr->x, &pSpr->y, da, x1, y1);
+
+                        viewBackupSpriteLoc(nSpr, pSpr);
+                        pSpr->ang = (pSpr->ang+da) & kAngMask;
+                        pSpr->x += dx;
+                        pSpr->y += dy;
+                        pSpr->z += dz;
+                        break;
+                }
+
+                // Force movement process functions
+                // to update touch data.
+
+                if ((r = IsPhysicsSprite(pSpr)) == 2)
+                {
+                    xsprite[pSpr->extra].physAttr |= kPhysFalling;
+                }
+                else if (r == 1)
+                    pSpr->flags |= kPhysFalling;
+            }
+        }
+
+        pathSpriteFixSector(pSpr);
+    }
+}
+
+int pathSpriteBusy(unsigned int nSect, unsigned int a2, int causerID)
+{
+    static BITSECTOR visited; spritetype* pSpr;
+    int i, j, t; IDLIST* pList;
+    int32_t* p;
+
+    XSECTOR *pXSect     = &xsector[sector[nSect].extra];
+
+    spritetype *pFirst  = &sprite[basePath[nSect]];
+    spritetype *pThis   = &sprite[pXSect->marker0];
+    spritetype *pNext   = &sprite[pXSect->marker1];
+    XSPRITE *pXThis     = &xsprite[pThis->extra];
+    XSPRITE *pXNext     = &xsprite[pNext->extra];
+
+    // the hardest part is to add/remove sprites dynamically...
+
+    memset(visited, 0, sizeof(visited));
+    pList = pathSpriteGetList(nSect);
+    i = pList->Length();
+    p = pList->First();
+
+    while(--i >= 0)
+    {
+        pSpr = &sprite[p[i]];
+        if (pSpr->statnum >= kMaxStatus || pSpr->sectnum < 0)
+        {
+            pList->Remove(pSpr->index), p = pList->First();     // watch out for ptr!
+            continue;
+        }
+
+        if (pXSect->Drag)
+        {
+            if (!(pSpr->cstat & 0x6000))
+            {
+                if (!pathSpriteStaysOnSprite(pList, pSpr))
+                    pList->Remove(pSpr->index), p = pList->First();     // watch out for ptr!
+            }
+
+            t = pSpr->sectnum;
+            if (!TestBitString(visited, t))
+            {
+                for (j = headspritesect[t]; j >= 0; j = nextspritesect[j])
+                {
+                    if (!pList->Exists(j) && pathSpriteStaysOnSprite(pList, &sprite[j]))
+                        pList->Add(j);
+                }
+
+                SetBitString(visited, t);
+                p = pList->First(); // watch out for ptr!
+            }
+        }
+    }
+
+    pathSpriteTranslate
+    (
+        nSect,
+        GetWaveValue(pXSect->busy, pXThis->wave), GetWaveValue(a2, pXThis->wave),
+        pFirst->x, pFirst->y,
+        pThis->x, pThis->y, pThis->z, pThis->ang,
+        pNext->x, pNext->y, pNext->z, pNext->ang
+    );
+
+    pXSect->busy = a2;
+    if ((pXSect->busy & 0xffff) == 0)
+    {
+        if (!pXSect->state && pXSect->triggerOn) // trigger marker at arrival
+            trTriggerSprite(pNext->index, pXNext, pXSect->command, kCauserGame);
+
+        evPost(nSect, 6, EVTIME2TICKS(pXNext->waitTime), kCmdOn, causerID);
+        pXSect->busy = pXSect->state = 0;
+        SectorEndSound(nSect, 1);
+
+        if (pXThis->data4)
+            PathSound(nSect, pXThis->data4);
+
+        pXSect->marker0     = pXSect->marker1;
+        pXSect->data        = pXNext->data1;
+        return 3;
+    }
+
+    return 0;
+}
+
+XSPRITE* pathSectFindNextMarker(XSECTOR* pXSect, XSPRITE *pXMark, char dir)
+{
+    spritetype* pSpr; XSPRITE* pXSpr;
+    int nID, i;
+
+    nID = (pXMark != NULL) ? ((dir) ? pXMark->data2 : pXMark->data1) : pXSect->data;
+
+    for (i = headspritestat[kStatPathMarker]; i >= 0; i = nextspritestat[i])
+    {
+        pSpr = &sprite[i];
+        if (!xspriRangeIsFine(pSpr->extra))
+            continue;
+
+        pXSpr = &xsprite[pSpr->extra];
+        if (!pXSpr->locked && !pXSpr->isTriggered)
+        {
+            if ((dir && pXSpr->data1 == nID) || (!dir && pXSpr->data2 == nID))
+                return pXSpr;
+        }
+    }
+
+    return NULL;
+}
+
+void pathSpriteSave(LoadSave* pSave)
+{
+    int32_t i, *p;
+    IDLIST* pList;
+
+    // total number of sectors
+    pSave->Write(&gPathSprCount, sizeof(gPathSprCount));
+
+    for (i = 0; i < numsectors; i++)
+    {
+        if (sector[i].type == kModernSectorPathSprite)
+        {
+            pSave->Write(&gPathSprIndex[i], sizeof(gPathSprIndex[i]));
+            pList = pathSpriteGetList(i);
+            p = pList->First();
+
+            // writes -1 in the end
+            do pSave->Write(&*p, sizeof(int32_t));
+            while (*p++ >= 0);
+        }
+    }
+}
+
+void pathSpriteLoad(LoadSave* pSave)
+{
+    IDLIST* pList; int32_t i, j;
+
+    pathSpriteClear();
+
+    // total number of sectors
+    pSave->Read(&gPathSprCount, sizeof(gPathSprCount));
+
+    for (i = 0; i < numsectors; i++)
+    {
+        if (sector[i].type == kModernSectorPathSprite)
+        {
+            pSave->Read(&gPathSprIndex[i], sizeof(gPathSprIndex[i]));
+            j = gPathSprIndex[i], gPathSprList[j] = pList = new IDLIST(true);
+
+            while ( 1 )
+            {
+                pSave->Read(&j, sizeof(j));
+                if (j == -1)
+                    break;
+
+                pList->Add(j); // keep adding sprites
+            }
+        }
+    }
+}
+
+char scanWallOfSector(SCANWALL* pIn, SCANWALL* pOut)
+{
+    vec3_t pos = { pIn->pos.x, pIn->pos.y, pIn->pos.z };
+    sectortype* pSect = &sector[pIn->s];
+    int nSect = pIn->s;
+    hitdata_t hit;
+
+    static struct
+    {
+        int fslope, fstat;
+        int cslope, cstat;
+        int goalx, goaly;
+        int headspr;
+        int fz, cz;
+    }
+    backup;
+
+    backup.fslope   = pSect->floorheinum;
+    backup.cslope   = pSect->ceilingheinum;
+    backup.fstat    = pSect->floorstat;
+    backup.cstat    = pSect->ceilingstat;
+    backup.fz       = pSect->floorz;
+    backup.cz       = pSect->ceilingz;
+    backup.goalx    = hitscangoal.x;
+    backup.goaly    = hitscangoal.y;
+    backup.headspr  = headspritesect[nSect];
+
+    pSect->floorz       = 0x7ffffff >> 3;
+    pSect->ceilingz     = pSect->floorz - 8192;
+    pSect->floorheinum  = pSect->ceilingheinum = 0;
+    pSect->floorstat    = pSect->ceilingstat = 0;
+
+    hitscangoal.x = hitscangoal.y = 0x1fffffff;
+    headspritesect[nSect] = -1;
+    pOut->w = -1;
+
+    pos.z = pSect->floorz - 4096;
+
+    hitscan
+    (
+        &pos, nSect,
+        Cos(pIn->pos.a)>>16, Sin(pIn->pos.a)>>16, 0,
+        &hit,
+        CLIPMASK0
+    );
+
+    pSect->floorheinum  = backup.fslope;
+    pSect->ceilingheinum = backup.cslope;
+    pSect->floorstat    = backup.fstat;
+    pSect->ceilingstat  = backup.cstat;
+    pSect->floorz       = backup.fz;
+    pSect->ceilingz     = backup.cz;
+
+    hitscangoal.x = backup.goalx; hitscangoal.y = backup.goaly;
+    headspritesect[nSect] = backup.headspr;
+
+    pOut->w = hit.wall;
+    pOut->s = hit.sect;
+
+    if (pOut->w >= 0)
+    {
+        pOut->pos.New((GetWallAngle(pOut->w) + kAng90) & kAngMask, hit.x, hit.y, pIn->pos.z);
+        return 1;
+    }
+
+    pOut->pos.New(pIn->pos.a, hit.x, hit.y, pIn->pos.z);
+    return 0;
+}
+
+
 class nnExtLoadSave : public LoadSave
 {
     const char* nnExtBlkSign[2] =
@@ -8311,7 +9021,9 @@ void nnExtLoadSave::Load(void)
 
     memset(tmp, 0, sizeof(tmp));
     Read(tmp, Bstrlen(nnExtBlkSign[0]));
-    gSprNSect.Load(this); // load sprites near walls
+    gSprNSect.Load(this);
+    laserLoad(this);
+    pathSpriteLoad(this);
     Read(tmp, Bstrlen(nnExtBlkSign[1]));
 }
 
@@ -8321,7 +9033,9 @@ void nnExtLoadSave::Save(void)
         return;
 
     Write(nnExtBlkSign[0], strlen(nnExtBlkSign[0]));
-    gSprNSect.Save(this); // save sprites near walls
+    gSprNSect.Save(this);
+    laserSave(this);
+    pathSpriteSave(this);
     Write(nnExtBlkSign[1], strlen(nnExtBlkSign[1]));
 }
 

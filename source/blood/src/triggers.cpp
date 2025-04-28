@@ -2082,7 +2082,10 @@ int(*gBusyProc[])(unsigned int, unsigned int, int) =
     RDoorBusy,
     StepRotateBusy,
     GenSectorBusy,
-    PathBusy
+    PathBusy,
+#ifdef NOONE_EXTENSIONS
+    pathSpriteBusy,
+#endif
 };
 
 void trProcessBusy(void)
@@ -2168,7 +2171,7 @@ void trInit(void)
 
 #ifdef NOONE_EXTENSIONS
     if (gModernMap)
-        gSprNSect.Init(); // collect sprites near outside walls
+        nnExtTrInit(); // init modern triggers stuff
 #endif
     
     for (i = 0; i < numwalls; i++)

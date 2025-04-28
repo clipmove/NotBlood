@@ -98,6 +98,7 @@ extern int gScreenTilt;
 extern int deliriumTilt, deliriumTurn, deliriumPitch;
 extern int gScreenTiltO, deliriumTurnO, deliriumPitchO;
 extern int gShowFrameRate;
+extern int gInterpolate;
 extern char gInterpolateSprite[];
 extern char gInterpolateWall[];
 extern char gInterpolateSector[];
@@ -168,6 +169,40 @@ void viewResetCrosshairToDefault(void);
 void viewPrintFPS(void);
 void viewSetSystemMessage(const char* pMessage, ...);
 void viewPrecacheTiles(void);
+
+extern fix16_t gCameraAng;
+#include "trig.h"
+template<typename T> tspritetype* viewInsertTSprite(int nSector, int nStatnum, T const * const pSprite)
+{
+    if (spritesortcnt >= maxspritesonscreen)
+        return nullptr;
+    int nTSprite = spritesortcnt;
+    tspritetype *pTSprite = &tsprite[nTSprite];
+    memset(pTSprite, 0, sizeof(tspritetype));
+    pTSprite->cstat = 128;
+    pTSprite->xrepeat = 64;
+    pTSprite->yrepeat = 64;
+    pTSprite->owner = -1;
+    pTSprite->extra = -1;
+    pTSprite->type = -spritesortcnt;
+    pTSprite->statnum = nStatnum;
+    pTSprite->sectnum = nSector;
+    spritesortcnt++;
+    if (pSprite)
+    {
+        pTSprite->x = pSprite->x;
+        pTSprite->y = pSprite->y;
+        pTSprite->z = pSprite->z;
+        pTSprite->owner = pSprite->owner;
+        pTSprite->ang = pSprite->ang;
+    }
+    if (videoGetRenderMode() >= REND_POLYMOST)
+    {
+        pTSprite->x += Cos(gCameraAng)>>25;
+        pTSprite->y += Sin(gCameraAng)>>25;
+    }
+    return pTSprite;
+}
 
 inline void viewInterpolateSector(int nSector, sectortype *pSector)
 {

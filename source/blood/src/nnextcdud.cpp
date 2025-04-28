@@ -912,7 +912,7 @@ int CUSTOMDUDE::Damage(int nFrom, int nDmgType, int nDmg)
         if (nDmgType == kDmgElectric)
             pExtra->teslaHit = 1;
 
-        if (CanRecoil() && recoil.Allow(t))
+        if ((CanRecoil() || (pExtra->teslaHit && CanElectrocute())) && recoil.Allow(t))
             Recoil();
 
         if (CanMove() && dodge.onDamage.Allow(t))
@@ -960,7 +960,9 @@ void CUSTOMDUDE::Recoil(void)
         }
 
         PlaySound(kCdudeSndGotHit);
-        NewState(nState);
+        
+        if (nState >= 0)
+            NewState(nState);
     }
 
     pExtra->teslaHit = 0;

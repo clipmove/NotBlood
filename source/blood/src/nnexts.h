@@ -47,8 +47,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "nnextcitem.h"
 
 // CONSTANTS
-#define LENGTH(x) 					        (int)(sizeof(x) / sizeof(x[0]))
+#define LENGTH(x)                           (int)(sizeof(x) / sizeof(x[0]))
 #define EVTIME2TICKS(x)                     ((x * 120) / 10)
+#define DELETE_AND_NULL(x)                  delete(x), x = NULL;
 
 #define TRIGGER_START_CHANNEL_NBLOOD kChannelLevelStartNBLOOD  // uncomment only for Nblood
 //#define TRIGGER_START_CHANNEL_RAZE kChannelLevelStartRAZE  // uncomment only for Raze
@@ -99,6 +100,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define kMinAllowedPowerup kPwUpFeatherFall
 #define kMaxAllowedPowerup kMaxPowerUps
 
+typedef char BITSECTOR[(kMaxSectors+7)>>3];
+typedef char BITSPRITE[(kMaxSprites+7)>>3];
+
 // modern statnums
 enum {
 kStatModernBase                     = 20,
@@ -143,9 +147,16 @@ kModernPlayerControl                = 500, /// WIP
 kModernCondition                    = 501, /// WIP, sends command only if specified conditions == true
 kModernConditionFalse               = 502, /// WIP, sends command only if specified conditions != true
 kModernSlopeChanger                 = 504,
+kModernLaserGen                     = 505,
 kModernVelocityChanger              = 506,
 kGenModernMissileUniversal          = 704,
 kGenModernSound                     = 708,
+};
+
+// modern sector types
+enum
+{
+kModernSectorPathSprite             = 611,  // unlike kSectorPath it moves only sprites and allows intersection
 };
 
 // type of random
@@ -701,6 +712,23 @@ DICTNODE* nnExtResFileSearch(Resource* pIn, const char* pName, const char* pExt,
 int nnExtResAddExternalFiles(Resource* pIn, const char* pPath, EXTERNAL_FILES_LIST* pList, int nLen);
 void getSectorWalls(int nSect, int* swal, int* ewal);
 
+void nnExtTrInit();
+
+void lasersInit();
+void lasersClear();
+void lasersProcess();
+void lasersProcessView3D(int camx, int camy, int camz, int cama, int cams, int camh);
+
+
+void pathSpriteInit();
+void pathSpriteClear();
+void pathSpriteOperate(unsigned int nSect, XSECTOR* pXSect, EVENT event);
+void pathSpriteFixSector(spritetype* pSpr);
+char pathSpriteStaysOnSprite(IDLIST* pList, spritetype* pSpr);
+inline IDLIST* pathSpriteGetList(int nSect);
+void pathSpriteTranslate(int nSect, int nBusyA, int nBusyB, int fX, int fY, int cX, int cY, int cZ, int cA, int nX, int nY, int nZ, int nA);
+int pathSpriteBusy(unsigned int nSect, unsigned int a2, int causerID);
+XSPRITE* pathSectFindNextMarker(XSECTOR* pXSect, XSPRITE* pXMark = NULL, char dir = 1);
 
 // SPRITES_NEAR_SECTORS
 // Intended for move sprites that is close to the outside walls with
@@ -709,7 +737,7 @@ void getSectorWalls(int nSect, int* swal, int* ewal);
 class SPRINSECT
 {
 #define kMaxSprNear 256
-#define kWallDist	16
+#define kWallDist   16
 
 private:
     //-----------------------------------------------------------------------------------
@@ -878,6 +906,66 @@ public:
 };
 
 extern SPRINSECT gSprNSect;
+
+// easy coords offsetting (relative to angle)
+class POSOFFS
+{
+    private:
+        int bx, by, bz, ba;
+    public:
+        int x, y, z, a;
+        //------------------------------------------------------------------------------------------
+        POSOFFS(int aA, int aX, int aY, int aZ)     { New(aA, aX, aY, aZ); }
+        POSOFFS(int aA, int aX, int aY)             { New(aA, aX, aY, 0); }
+        POSOFFS() { New(1536, 0, 0, 0); };
+        //------------------------------------------------------------------------------------------
+        void New(int aA, int aX, int aY, int aZ)
+        {
+            x = bx = aX;
+            y = by = aY;
+            z = bz = aZ;
+            a = ba = aA;
+        }
+        void Reset(char which = 0x0F)
+        {
+            if (which & 0x01) x = bx;
+            if (which & 0x02) y = by;
+            if (which & 0x04) z = bz;
+            if (which & 0x08) a = ba;
+        }
+        void New(int aA, int aX, int aY)                    { New(aA, aX, aY, 0); }
+        //------------------------------------------------------------------------------------------
+        void Offset (int byX, int byY, int byZ)             { nnExtOffsetPos(byX, byY, byZ, a, &x, &y, &z); }
+        void Left(int nBy)                                  { Offset(-klabs(nBy), 0, 0); }
+        void Right(int nBy)                                 { Offset(klabs(nBy), 0, 0); }
+        void Backward(int nBy)                              { Offset(0, -klabs(nBy), 0); }
+        void Forward(int nBy)                               { Offset(0, klabs(nBy), 0); }
+        void Up(int nBy)                                    { Offset(0, 0, -klabs(nBy)); }
+        void Down(int nBy)                                  { Offset(0, 0, klabs(nBy)); }
+        void Turn(int nAng)                                 { a = (a + nAng) & kAngMask; }
+        //------------------------------------------------------------------------------------------
+        #if 0
+        void Offset (int byX, int byY, int* aX, int* aY)    { Offset(byX, byY, 0); *aX = x; *aY = y; }
+        void Left(int nBy, int* aX, int* aY)                { Left(nBy);        *aX = x; *aY = y; }
+        void Right(int nBy, int* aX, int* aY)               { Right(nBy);       *aX = x; *aY = y; }
+        void Backward(int nBy, int* aX, int* aY)            { Backward(nBy);    *aX = x; *aY = y; }
+        void Forward(int nBy, int* aX, int* aY)             { Forward (nBy);    *aX = x; *aY = y; }
+        void Up(int nBy, int* aZ)                           { Up(nBy);          *aZ = z; }
+        void Down(int nBy, int* aZ)                         { Down(nBy);        *aZ = z; }
+        #endif
+        //------------------------------------------------------------------------------------------
+        int  Distance()                                     { return approxDist(x - bx, y - by);}
+        int  Angle()                                        { return getangle(x - bx, y - by); }
+};
+
+struct SCANWALL
+{
+    POSOFFS pos;
+    short w, s;
+};
+
+char scanWallOfSector(SCANWALL* pIn, SCANWALL* pOut);
+
 #endif
 
 ////////////////////////////////////////////////////////////////////////

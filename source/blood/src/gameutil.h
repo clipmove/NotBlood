@@ -63,6 +63,8 @@ inline bool wallRangeIsFine(int nIndex) {
 }
 ///
 
+#define DANGLE(a1, a2)  		(((a1 + kAng180 - a2) & kAngMask) - kAng180)
+
 bool AreSectorsNeighbors(int sect1, int sect2);
 bool FindSector(int nX, int nY, int nZ, int *nSector);
 bool FindSector(int nX, int nY, int *nSector);
@@ -81,6 +83,4 @@ int GetDistToLine(int x1, int y1, int x2, int y2, int x3, int y3);
 unsigned int ClipMove(int *x, int *y, int *z, int *nSector, int xv, int yv, int wd, int cd, int fd, unsigned int nMask);
 int GetClosestSectors(int nSector, int x, int y, int nDist, short *pSectors, char *pSectBit);
 int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSectors, char *pSectBit, short *pWalls = NULL);
-int picWidth(short nPic, short repeat);
-int picHeight(short nPic, short repeat);
-
+void GetSpriteExtents(spritetype* pSpr, int* x1, int* y1, int* x2, int* y2, int* zt, int* zb, char flags = 0x07);
