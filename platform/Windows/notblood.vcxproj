@@ -210,6 +210,7 @@
     <ClCompile Include="..\..\source\blood\src\nnextcitem.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnexts.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnextsif.cpp" />
+    <ClCompile Include="..\..\source\blood\src\nnextslaser.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnextstr.cpp" />
     <ClCompile Include="..\..\source\blood\src\osdcmd.cpp" />
     <ClCompile Include="..\..\source\blood\src\player.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="..\..\source\blood\src\nnextcitem.h" />
     <ClInclude Include="..\..\source\blood\src\nnexts.h" />
     <ClInclude Include="..\..\source\blood\src\nnextsif.h" />
+    <ClInclude Include="..\..\source\blood\src\nnextslaser.h" />
     <ClInclude Include="..\..\source\blood\src\nnextstr.h" />
     <ClInclude Include="..\..\source\blood\src\warp.h" />
     <ClInclude Include="..\..\source\blood\src\inifile.h" />
