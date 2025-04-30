@@ -40,6 +40,9 @@ enum BUSYID {
     BUSYID_5,
     BUSYID_6,
     BUSYID_7,
+#ifdef NOONE_EXTENSIONS
+    BUSY_PATHSPRITE,
+#endif
 };
 
 #define kMaxBusyCountVanilla 128
@@ -54,6 +57,7 @@ struct BUSY {
 
 extern BUSY gBusy[kMaxBusyCount];
 extern int gBusyCount;
+extern int basePath[kMaxSectors];
 
 void trTriggerSector(unsigned int nSector, XSECTOR *pXSector, int command, int causerID);
 void trMessageSector(unsigned int nSector, const EVENT &event);
@@ -70,3 +74,9 @@ char SetSectorState(int nSector, XSECTOR* pXSector, int nState, int causerID);
 void TeleFrag(int nKiller, int nSector);
 void SectorStartSound(int nSector, int nState);
 void SectorEndSound(int nSector, int nState);
+void PathSound(int nSector, int nSound);
+
+void AddBusy(int a1, BUSYID a2, int nDelta);
+void ReverseBusy(int a1, BUSYID a2);
+unsigned int GetSourceBusy(const EVENT& a1);
+unsigned int GetWaveValue(unsigned int nPhase, int nType);

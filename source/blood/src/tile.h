@@ -64,3 +64,4 @@ char * tileAllocTile(int nTile, int x, int y, int ox, int oy);
 void tilePreloadTile(int nTile);
 void tilePrecacheTile(int nTile, int nType = 1);
 char tileGetSurfType(int hit, int nType = 0);
+int tileSearchFreeRange(int nRange, int nStart = MAXUSERTILES);

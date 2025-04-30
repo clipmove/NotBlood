@@ -1193,12 +1193,45 @@ int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSector
     return n;
 }
 
-int picWidth(short nPic, short repeat) {
-    return ClipLow((tilesiz[nPic].x * repeat) << 2, 0);
-}
+// Gets left and right extents (based on clipmove, for face and wall sprites only)
+void GetSpriteExtents(spritetype* pSpr, int* x1, int* y1, int* x2, int* y2, int* zt, int* zb, char flags)
+{
+	int t, cx, cy, xoff = 0;
+	int nPic = pSpr->picnum, nAng = pSpr->ang;
+	int xrep = pSpr->xrepeat, wh = tilesiz[nPic].x;
+	
+	*x1 = *x2 = pSpr->x;
+	*y1 = *y2 = pSpr->y;
+	
+	if (flags & 0x01)
+		xoff = picanm[nPic].xofs;
 
-int picHeight(short nPic, short repeat) {
-    return ClipLow((tilesiz[nPic].y * repeat) << 2, 0);
+	if (flags & 0x02)
+		xoff += pSpr->xoffset;
+
+	if (pSpr->cstat & CSTAT_SPRITE_YFLIP)
+		xoff = -xoff;
+	
+	if ((pSpr->cstat & CSTAT_SPRITE_ALIGNMENT) == CSTAT_SPRITE_ALIGNMENT_FACING)
+		wh = (wh * 3) >> 2;
+	
+	cx = sintable[nAng & kAngMask] * xrep;
+	cy = sintable[(nAng + kAng90 + kAng180) & kAngMask] * xrep;
+	t = (wh>>1)+xoff;
+	
+	*x1 -= mulscale16(cx, t);	*x2 = *x1 + mulscale16(cx, wh);
+	*y1 -= mulscale16(cy, t);	*y2 = *y1 + mulscale16(cy, wh);
+	
+	if (zt || zb)
+	{
+		int tzt, tzb;
+		GetSpriteExtents(pSpr, &tzt, &tzb);
+		if (zt)
+			*zt = tzt;
+		
+		if (zb)
+			*zb = tzb;
+	}
 }
 
 
