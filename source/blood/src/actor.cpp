@@ -6083,8 +6083,10 @@ void actProcessSprites(void)
                         #endif
                         if (pSprite->type == kThingDroppedLifeLeech && pXSprite->target == -1)  {
                             int nOwner = actOwnerIdToSpriteId(pSprite->owner);
+                            if (!spriRangeIsFine(nOwner) && !VanillaMode())
+                                continue;
                             spritetype *pOwner = &sprite[nOwner];
-                            if (!IsPlayerSprite(pOwner))
+                            if (!IsPlayerSprite(pOwner) && !VanillaMode())
                                 continue;
                             PLAYER *pPlayer = &gPlayer[pOwner->type - kDudePlayer1];
                             PLAYER *pPlayer2 = NULL;

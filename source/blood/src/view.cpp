@@ -2720,39 +2720,8 @@ void viewDrawInterface(ClockTicks arg)
     UpdateStatusBar(arg);
 }
 
-static fix16_t gCameraAng;
+fix16_t gCameraAng = 0;
 
-template<typename T> tspritetype* viewInsertTSprite(int nSector, int nStatnum, T const * const pSprite)
-{
-    if (spritesortcnt >= maxspritesonscreen)
-        return nullptr;
-    int nTSprite = spritesortcnt;
-    tspritetype *pTSprite = &tsprite[nTSprite];
-    memset(pTSprite, 0, sizeof(tspritetype));
-    pTSprite->cstat = 128;
-    pTSprite->xrepeat = 64;
-    pTSprite->yrepeat = 64;
-    pTSprite->owner = -1;
-    pTSprite->extra = -1;
-    pTSprite->type = -spritesortcnt;
-    pTSprite->statnum = nStatnum;
-    pTSprite->sectnum = nSector;
-    spritesortcnt++;
-    if (pSprite)
-    {
-        pTSprite->x = pSprite->x;
-        pTSprite->y = pSprite->y;
-        pTSprite->z = pSprite->z;
-        pTSprite->owner = pSprite->owner;
-        pTSprite->ang = pSprite->ang;
-    }
-    if (videoGetRenderMode() >= REND_POLYMOST)
-    {
-        pTSprite->x += Cos(gCameraAng)>>25;
-        pTSprite->y += Sin(gCameraAng)>>25;
-    }
-    return pTSprite;
-}
 
 int effectDetail[kViewEffectMax] = {
     4, 4, 4, 4, 0, 0, 0, 0, 0, 1, 4, 4, 0, 0, 0, 1, 0, 0, 0
@@ -3984,6 +3953,11 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
             nAnim--;
         }
     }
+
+#ifdef NOONE_EXTENSIONS
+    if (gModernMap) lasersProcessView3D(cX, cY, cZ, cA, -1, 0);
+#endif
+
 }
 
 int othercameradist = 1280;

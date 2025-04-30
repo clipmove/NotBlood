@@ -287,3 +287,19 @@ char tileGetSurfType(int hit, int nType)
     }
     return 0;
 }
+
+// search range of free tiles from end
+int tileSearchFreeRange(int nRange, int nStart)
+{
+	int i = nStart;
+	int j = 0;
+	
+	while(--i >= 0)
+	{
+		if (tilesiz[i].x || tilesiz[i].y) j = 0;
+		else if (j == nRange) return i;
+		else j++;
+	}
+	
+	return -1;
+}
