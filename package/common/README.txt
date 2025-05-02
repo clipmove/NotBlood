@@ -127,6 +127,7 @@ If you have the GOG version of the game, do the following:
    - Adds a charge up stab for pitchfork's alt fire
    - Lifeleech steals enemy's health (like V1.X behavior)
    - Makes lifeleech throwable and increases damage while in sentry mode
+   - Lifeleech autoaim range increased by 30 degrees (only in single-player)
    - Do double melee damage if attacking enemies from 45 degrees behind
    - Allows tesla projectiles to be reflected back with reflective shots powerup
    - While quad damage is active, the pitchfork's alt fire max charge will fire a missile

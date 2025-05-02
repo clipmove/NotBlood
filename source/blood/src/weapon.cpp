@@ -390,6 +390,9 @@ void UpdateAimVector(PLAYER * pPlayer)
         if (gGameOptions.bSectorBehavior && !VanillaMode()) // check for ror so autoaim can work peering above water
             CheckLink(&x, &y, &z, &nSector);
         int nClosest = 0x7fffffff;
+        int nWeapAng = pWeaponTrack->at8;
+        if ((pPlayer->curWeapon == kWeaponLifeLeech) && (gGameOptions.nGameType == kGameTypeSinglePlayer) && WeaponsNotBlood() && !VanillaMode()) // increase effectiveness of life leech for single player
+            nWeapAng += kAng30;
         for (nSprite = headspritestat[kStatDude]; nSprite >= 0; nSprite = nextspritestat[nSprite])
         {
             pSprite = &sprite[nSprite];
@@ -425,7 +428,7 @@ void UpdateAimVector(PLAYER * pPlayer)
             if (lz-zRange>bottom || lz+zRange<top)
                 continue;
             int angle = getangle(x2-x,y2-y);
-            if (klabs(((angle-pPSprite->ang+1024)&2047)-1024) > pWeaponTrack->at8)
+            if (klabs(((angle-pPSprite->ang+1024)&2047)-1024) > nWeapAng)
                 continue;
             if (pPlayer->aimTargetsCount < 16 && cansee(x,y,z,nSector,x2,y2,z2,pSprite->sectnum))
                 pPlayer->aimTargets[pPlayer->aimTargetsCount++] = nSprite;
