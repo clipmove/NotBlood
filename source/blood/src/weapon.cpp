@@ -373,6 +373,7 @@ void UpdateAimVector(PLAYER * pPlayer)
     aim.dy = Sin(pPSprite->ang)>>16;
     aim.dz = pPlayer->slope;
     WEAPONTRACK *pWeaponTrack = &gWeaponTrack[pPlayer->curWeapon];
+    int nWeapAng = pWeaponTrack->at8;
     int nTarget = -1;
     pPlayer->aimTargetsCount = 0;
     const char bPitchforkFireBallReady = (pPlayer->curWeapon == kWeaponPitchfork) && (pPlayer->weaponState == 4) && (pPlayer->throwPower == 65536) && gGameOptions.bQuadDamagePowerup && WeaponsNotBlood() && !VanillaMode(); // never autoaim when ready to shoot fireball
@@ -385,6 +386,8 @@ void UpdateAimVector(PLAYER * pPlayer)
         if (bAutoAim)
             bOnlyTargetRatsEels = 0; // overrides rats/eels only targeting mode
     }
+    if ((pPlayer->curWeapon == kWeaponLifeLeech) && (gGameOptions.nGameType == kGameTypeSinglePlayer) && WeaponsNotBlood() && !VanillaMode()) // increase effectiveness of life leech for single player
+        nWeapAng += kAng30;
     if (bAutoAim || bAutoAimWeapon || bOnlyTargetRatsEels)
     {
         if (gGameOptions.bSectorBehavior && !VanillaMode()) // check for ror so autoaim can work peering above water
@@ -425,7 +428,7 @@ void UpdateAimVector(PLAYER * pPlayer)
             if (lz-zRange>bottom || lz+zRange<top)
                 continue;
             int angle = getangle(x2-x,y2-y);
-            if (klabs(((angle-pPSprite->ang+1024)&2047)-1024) > pWeaponTrack->at8)
+            if (klabs(((angle-pPSprite->ang+1024)&2047)-1024) > nWeapAng)
                 continue;
             if (pPlayer->aimTargetsCount < 16 && cansee(x,y,z,nSector,x2,y2,z2,pSprite->sectnum))
                 pPlayer->aimTargets[pPlayer->aimTargetsCount++] = nSprite;
