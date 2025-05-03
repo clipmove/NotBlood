@@ -393,6 +393,9 @@ void UpdateAimVector(PLAYER * pPlayer)
         if (gGameOptions.bSectorBehavior && !VanillaMode()) // check for ror so autoaim can work peering above water
             CheckLink(&x, &y, &z, &nSector);
         int nClosest = 0x7fffffff;
+        int nWeapAng = pWeaponTrack->at8;
+        if ((pPlayer->curWeapon == kWeaponLifeLeech) && (gGameOptions.nGameType == kGameTypeSinglePlayer) && WeaponsNotBlood() && !VanillaMode()) // increase effectiveness of life leech for single player
+            nWeapAng += kAng30;
         for (nSprite = headspritestat[kStatDude]; nSprite >= 0; nSprite = nextspritestat[nSprite])
         {
             pSprite = &sprite[nSprite];
