@@ -1444,7 +1444,7 @@ const struct POWERUPDISPLAY {
     {gPowerUpInfo[kPwUpGrowShroom].picnum, fix16_from_float(0.4f), 4}, // grow shroom
     {gPowerUpInfo[kPwUpShrinkShroom].picnum, fix16_from_float(0.4f), 4}, // shrink shroom
 
-    {830, fix16_from_float(0.3f), 9}, // diving suit supply
+    {gPowerUpInfo[kPwUpDivingSuit].picnum, fix16_from_float(0.3f), 9}, // diving suit supply
 };
 
 void viewDrawPowerUps(PLAYER* pPlayer)
