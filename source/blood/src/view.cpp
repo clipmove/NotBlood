@@ -1422,7 +1422,7 @@ void viewBurnTime(int gScale)
     }
 }
 
-#define kPowerUps 12
+#define kPowerUps 13
 
 const struct POWERUPDISPLAY {
     int nTile;
@@ -1443,6 +1443,8 @@ const struct POWERUPDISPLAY {
     {gPowerUpInfo[kPwUpAsbestArmor].picnum, fix16_from_float(0.3f), 9}, // asbestos armor
     {gPowerUpInfo[kPwUpGrowShroom].picnum, fix16_from_float(0.4f), 4}, // grow shroom
     {gPowerUpInfo[kPwUpShrinkShroom].picnum, fix16_from_float(0.4f), 4}, // shrink shroom
+
+    {830, fix16_from_float(0.3f), 9}, // diving suit supply
 };
 
 void viewDrawPowerUps(PLAYER* pPlayer)
@@ -1467,6 +1469,8 @@ void viewDrawPowerUps(PLAYER* pPlayer)
     nPowerActive[9] = pPlayer->pwUpTime[kPwUpAsbestArmor]; // asbestos armor
     nPowerActive[10] = pPlayer->pwUpTime[kPwUpGrowShroom]; // grow shroom
     nPowerActive[11] = pPlayer->pwUpTime[kPwUpShrinkShroom]; // shrink shroom
+
+    nPowerActive[12] = pPlayer->isUnderwater && packItemActive(pPlayer, kPackDivingSuit) ? pPlayer->pwUpTime[kPwUpDivingSuit] : 0; // diving suit supply
 
     int nSortPower[kPowerUps+1];
     unsigned char nSortIndex[kPowerUps+1];
@@ -1504,7 +1508,7 @@ void viewDrawPowerUps(PLAYER* pPlayer)
         if (nTime > nWarning || ((int)totalclock & 32))
         {
             if (gPowerupStyle)
-                DrawStatMaskedSprite(pPowerups->nTile, 283+xscalepowerups, y + pPowerups->yOffset, 0, 0, 512, mulscale16(fix16_from_float(1.75f), pPowerups->nScaleRatio));
+                DrawStatMaskedSprite(pPowerups->nTile, 283+xscalepowerups, y + pPowerups->yOffset - 2, 0, 0, 512, mulscale16(fix16_from_float(1.75f), pPowerups->nScaleRatio));
             else
                 DrawStatMaskedSprite(pPowerups->nTile, 15-xscalepowerups, y + pPowerups->yOffset, 0, 0, 256, pPowerups->nScaleRatio);
         }
