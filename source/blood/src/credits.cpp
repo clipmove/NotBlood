@@ -52,6 +52,7 @@ inline char keyJoyGetScan(void)
 char Wait(int nTicks)
 {
     totalclock = 0;
+    ctrlClearAllInput();
     while (totalclock < nTicks)
     {
         gameHandleEvents();
