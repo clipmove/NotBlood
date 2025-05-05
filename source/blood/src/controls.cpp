@@ -49,6 +49,7 @@ int32_t ctrlCheckAllInput(void)
 void ctrlClearAllInput(void)
 {
     KB_FlushKeyboardQueue();
+    KB_FlushKeyboardQueueScans();
     KB_ClearKeysDown();
     MOUSE_ClearAllButtons();
     JOYSTICK_ClearAllButtons();
