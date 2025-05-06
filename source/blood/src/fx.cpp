@@ -169,33 +169,39 @@ spritetype * CFX::fxSpawn(FX_ID nFx, int nSector, int x, int y, int z, unsigned 
         return NULL;
     FXDATA *pFX = &gFXData[nFx];
 
-#ifdef NOONE_EXTENSIONS
-    if (gParticlesDuration && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !gModernMap && !VanillaMode()) // if single-player and not a modern map, extend violent effects duration
-#else
-    if (gParticlesDuration && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !VanillaMode()) // if single-player, extend violent effects duration
-#endif
+    int kFxMax = 512;
+    if (gGameOptions.bGoreBehavior && !VanillaMode())
     {
+        kFxMax = 4096;
+        if (!duration) // no override duration given, load from global fx data struct
+            duration = pFX->duration;
         switch (nFx)
         {
         case FX_0:
         case FX_1:
         case FX_2:
         case FX_3:
-        case FX_13:
+        case FX_13: // blood chunk
         case FX_34:
+            duration *= 20;
+            break;
         case FX_35:
-        case FX_36:
+            duration *= 10;
+            break;
+        case FX_36: // blood splat
+            duration *= 200;
+            break;
         case FX_39: // bullet casing
+            duration *= 2;
+            break;
         case FX_40: // shell casing
-            if (!duration) // no override duration given, load from global fx data struct
-                duration = pFX->duration;
             duration *= 5;
             break;
         default:
             break;
         }
     }
-    if (gStatCount[kStatFX] == 512) // hit upper limit of available sprites, don't spawn any more
+    if (gStatCount[kStatFX] == kFxMax) // hit upper limit of available sprites, don't spawn any more
     {
         int nSprite = headspritestat[kStatFX];
         while ((sprite[nSprite].flags & 32) && nSprite != -1) // scan through sprites for free slot
@@ -257,7 +263,10 @@ void CFX::fxProcess(void)
         dassert(pSprite->type < kFXMax);
         FXDATA *pFXData = &gFXData[pSprite->type];
         vec3_t oldPos = pSprite->xyz;
-        actAirDrag(pSprite, pFXData->airdrag);
+        int nAirDrag = pFXData->airdrag;
+        if ((pSprite->type == FX_27) && gGameOptions.bGoreBehavior && !VanillaMode())
+            nAirDrag >>= 1; // make blood drag less
+        actAirDrag(pSprite, nAirDrag);
         if (xvel[nSprite])
             pSprite->x += xvel[nSprite]>>12;
         if (yvel[nSprite])
@@ -335,12 +344,15 @@ void CFX::fxProcess(void)
                 continue;
             }
         }
+        int nGravity = pFXData->gravity;
         if (bCasingType && IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bSectorBehavior && !VanillaMode()) // lower gravity by 75% underwater (only for bullet casings)
         {
-            zvel[nSprite] += pFXData->gravity>>2;
+            zvel[nSprite] += nGravity>>2;
             continue;
         }
-        zvel[nSprite] += pFXData->gravity;
+        if ((pSprite->type == FX_27) && gGameOptions.bGoreBehavior && !VanillaMode())
+            nGravity = 80000; // make blood heavier
+        zvel[nSprite] += nGravity;
     }
 }
 

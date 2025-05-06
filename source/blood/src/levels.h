@@ -70,6 +70,7 @@ struct GAMEOPTIONS {
     int nWeaponsVer;
     bool bSectorBehavior;
     char nHitscanProjectiles;
+    bool bGoreBehavior;
     char nRandomizerMode;
     char szRandomizerSeed[9];
     int nRandomizerCheat;

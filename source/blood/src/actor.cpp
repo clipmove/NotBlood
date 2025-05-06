@@ -3449,6 +3449,29 @@ void actKillDude(int nKillerSprite, spritetype *pSprite, DAMAGE_TYPE damageType,
                 GibSprite(pSprite, (GIBTYPE)pDudeInfo->nGibType[i], NULL, NULL);
         for (int i = 0; i < 4; i++)
             fxSpawnBlood(pSprite, damage);
+        if (gGameOptions.bGoreBehavior && !VanillaMode()) // for default, spawn more blood on explosion
+        {
+            switch (pSprite->type)
+            {
+            case kDudePhantasm:
+            case kDudeHand:
+            case kDudeSpiderBrown:
+            case kDudeSpiderRed:
+            case kDudeBoneEel:
+            case kDudeBat:
+            case kDudeRat:
+            case kDudeTentacleGreen:
+            case kDudeTentacleFire:
+            case kDudeBurningTinyCaleb:
+                break;
+            default:
+                for (int i = 0; i < 16; i++)
+                    fxSpawnBlood(pSprite, damage);
+                for (int i = 0; i < 2; i++)
+                    GibSprite(pSprite, GIBTYPE_7, NULL, NULL);
+                break;
+            }
+        }
     }
     gKillMgr.AddKill(pSprite);
     actCheckRespawn(pSprite);
@@ -5628,7 +5651,8 @@ static bool MoveMissileBulletVectorTest(spritetype *pSource, spritetype *pShoote
                                 FX_ID t2 = pVectorData->surfHit[nSurf].fx2;
                                 FX_ID t3 = pVectorData->surfHit[nSurf].fx3;
                                 spritetype *pFX = NULL;
-                                if (t2 > FX_NONE && (t3 == FX_NONE || Chance(0x4000)))
+                                const char bSpawnBlood = gGameOptions.bGoreBehavior || (t3 == FX_NONE || Chance(0x4000));
+                                if (t2 > FX_NONE && bSpawnBlood)
                                     pFX = gFX.fxSpawn(t2, nSector, x, y, z);
                                 else if(t3 > FX_NONE)
                                     pFX = gFX.fxSpawn(t3, nSector, x, y, z);
@@ -5642,9 +5666,74 @@ static bool MoveMissileBulletVectorTest(spritetype *pSource, spritetype *pShoote
                         }
                     }
                 }
-                for (int i = 0; i < pVectorData->bloodSplats; i++)
-                    if (Chance(pVectorData->splatChance))
-                        fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                if (gGameOptions.bGoreBehavior) // splatIncrement for default
+                {
+                    switch (pSprite->type)
+                    {
+                    case kDudePhantasm:
+                    case kDudeHand:
+                    case kDudeSpiderBrown:
+                    case kDudeSpiderRed:
+                    case kDudeBoneEel:
+                    case kDudeBat:
+                    case kDudeRat:
+                    case kDudeTentacleGreen:
+                    case kDudeTentacleFire:
+                    case kDudeBurningTinyCaleb:
+                        for (int i = 0; i < pVectorData->bloodSplats; i++)
+                            if (Chance(pVectorData->splatChance))
+                                fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                        break;
+                    default:
+                    {
+                        const int kMaxSplatIncrementBase = 5; // base for random splat increment
+                        const int kShotgunSplatChance = 0x4000; // 25% chance for shotgun-like effects
+                        const int kTommySplatChance = 0x4000; // 25% chance for tommy-like effects
+
+                        int nSplatIncrement = kMaxSplatIncrementBase - gGameOptions.nDifficulty;
+                        nSplatIncrement >>= 1;
+                        const int nBloodSplats = pVectorData->bloodSplats + nSplatIncrement;
+                        if (pShooter)
+                            break;
+                        int nType = pShooter->type;
+                        if (IsPlayerSprite(pShooter))
+                        {
+                            PLAYER* pPlayer = &gPlayer[nType - kDudePlayer1];
+                            if (pPlayer->curWeapon == kWeaponShotgun)
+                                nType = kDudeCultistShotgun;
+                            else if (pPlayer->curWeapon == kWeaponTommy)
+                                nType = kDudeCultistTommy;
+                        }
+
+                        for (int j = 0; j < nBloodSplats; j++)
+                        {
+                            switch (nType)
+                            {
+                            case kDudeCultistShotgun:
+                            case kDudeCultistShotgunProne:
+                                if (Chance(kShotgunSplatChance)) // apply a chance to limit blood splats when using shotgun
+                                    fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                                break;
+                            case kDudeCultistTommy:
+                            case kDudeCultistTommyProne:
+                                if (Chance(kTommySplatChance)) // apply a chance to limit blood splats when using tommy
+                                    fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                                break;
+                            default:
+                                fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < pVectorData->bloodSplats; i++)
+                        if (Chance(pVectorData->splatChance))
+                            fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                }
             }
             #ifdef NOONE_EXTENSIONS
             // add impulse for sprites from physics list
@@ -6418,6 +6507,47 @@ void actProcessSprites(void)
                             if (pThing->type == kThingTNTBarrel && !pXThing->burnTime)
                                 evPost(nSprite2, 3, 0, kCallbackFXFlameLick);
                             actBurnSprite(pSprite->owner, pXThing, pExplodeInfo->burnTime<<2);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (gGameOptions.bGoreBehavior && !VanillaMode() && (nType == 1 || nType == 7) && (nOwner >= 0) && IsPlayerSprite(&sprite[nOwner]))
+        {
+            for (int nSprite2 = headspritestat[kStatFX]; nSprite2 >= 0; nSprite2 = nextspritestat[nSprite2])
+            {
+                spritetype *pFx = &sprite[nSprite2];
+            
+                if (pFx->statnum == kStatFree) // skip free'd fx sprite
+                    continue;
+                switch (pFx->type)
+                {
+                case FX_13:
+                case FX_27:
+                case FX_34:
+                    break;
+                default:
+                    continue;
+                }
+                if (TestBitString(sectmap, pFx->sectnum))
+                {
+                    if (pXSprite->data1 && CheckProximity(pFx, x, y, z, nSector, radius))
+                    {
+                        if (pExplodeInfo->dmgType)
+                        {
+                            int dx = pFx->x-x;
+                            int dy = pFx->y-y;
+                            int dz = (pFx->z-z)>>4;
+                            int size = (tilesiz[pFx->picnum].x* pFx->xrepeat*tilesiz[pFx->picnum].y* pFx->yrepeat)>>1;
+                            int t = scale(pExplodeInfo->dmgType, size, 16);
+                            dx = mulscale16(t, dx);
+                            dy = mulscale16(t, dy);
+                            dz = mulscale16(t<<1, dz);
+                            int nSprite = pFx->index;
+                            xvel[nSprite] += dx;
+                            yvel[nSprite] += dy;
+                            zvel[nSprite] += dz;
                         }
                     }
                 }
@@ -7508,7 +7638,8 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
                                 FX_ID t2 = pVectorData->surfHit[nSurf].fx2;
                                 FX_ID t3 = pVectorData->surfHit[nSurf].fx3;
                                 spritetype *pFX = NULL;
-                                if (t2 > FX_NONE && (t3 == FX_NONE || Chance(0x4000)))
+                                const char bSpawnBlood = (gGameOptions.bGoreBehavior && !VanillaMode()) || (t3 == FX_NONE || Chance(0x4000));
+                                if (t2 > FX_NONE && bSpawnBlood)
                                     pFX = gFX.fxSpawn(t2, nSector, x, y, z);
                                 else if(t3 > FX_NONE)
                                     pFX = gFX.fxSpawn(t3, nSector, x, y, z);
@@ -7522,9 +7653,72 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
                         }
                     }
                 }
-                for (int i = 0; i < pVectorData->bloodSplats; i++)
-                    if (Chance(pVectorData->splatChance))
-                        fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                if (gGameOptions.bGoreBehavior && !VanillaMode()) // splatIncrement for default
+                {
+                    switch (pSprite->type)
+                    {
+                    case kDudePhantasm:
+                    case kDudeHand:
+                    case kDudeSpiderBrown:
+                    case kDudeSpiderRed:
+                    case kDudeBoneEel:
+                    case kDudeBat:
+                    case kDudeRat:
+                    case kDudeTentacleGreen:
+                    case kDudeTentacleFire:
+                    case kDudeBurningTinyCaleb:
+                        for (int i = 0; i < pVectorData->bloodSplats; i++)
+                            if (Chance(pVectorData->splatChance))
+                                fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                        break;
+                    default:
+                    {
+                        const int kMaxSplatIncrementBase = 5; // base for random splat increment
+                        const int kShotgunSplatChance = 0x4000; // 25% chance for shotgun-like effects
+                        const int kTommySplatChance = 0x4000; // 25% chance for tommy-like effects
+
+                        int nSplatIncrement = kMaxSplatIncrementBase - gGameOptions.nDifficulty;
+                        nSplatIncrement >>= 1;
+                        const int nBloodSplats = pVectorData->bloodSplats + nSplatIncrement;
+                        int nType = pShooter->type;
+                        if (IsPlayerSprite(pShooter))
+                        {
+                            PLAYER* pPlayer = &gPlayer[nType - kDudePlayer1];
+                            if (pPlayer->curWeapon == kWeaponShotgun)
+                                nType = kDudeCultistShotgun;
+                            else if (pPlayer->curWeapon == kWeaponTommy)
+                                nType = kDudeCultistTommy;
+                        }
+
+                        for (int j = 0; j < nBloodSplats; j++)
+                        {
+                            switch (nType)
+                            {
+                            case kDudeCultistShotgun:
+                            case kDudeCultistShotgunProne:
+                                if (Chance(kShotgunSplatChance)) // apply a chance to limit blood splats when using shotgun
+                                    fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                                break;
+                            case kDudeCultistTommy:
+                            case kDudeCultistTommyProne:
+                                if (Chance(kTommySplatChance)) // apply a chance to limit blood splats when using tommy
+                                    fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                                break;
+                            default:
+                                fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < pVectorData->bloodSplats; i++)
+                        if (Chance(pVectorData->splatChance))
+                            fxSpawnBlood(pSprite, pVectorData->dmg<<4);
+                }
             }
             #ifdef NOONE_EXTENSIONS
             // add impulse for sprites from physics list
