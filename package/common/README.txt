@@ -232,8 +232,6 @@ If you have the GOG version of the game, do the following:
    - Enable/disable 3D smoke trail positioning for tnt/spray can (single-player only)
 * cl_packitemswitch
    - Enable/disable item slot switching to activated item (always enabled in multiplayer)
-* cl_particlesduration
-   - Enable/disable extended particle duration modification (single-player only - turned off for modern maps)
 * cl_projectileoldsprite
    - Enable/disable old pink sprite for hitscan projectiles
 * cl_weaponfastswitch
