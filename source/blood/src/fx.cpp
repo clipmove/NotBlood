@@ -263,9 +263,13 @@ void CFX::fxProcess(void)
         dassert(pSprite->type < kFXMax);
         FXDATA *pFXData = &gFXData[pSprite->type];
         vec3_t oldPos = pSprite->xyz;
+        int nGravity = pFXData->gravity;
         int nAirDrag = pFXData->airdrag;
-        if ((pSprite->type == FX_27) && gGameOptions.bGoreBehavior && !VanillaMode())
-            nAirDrag >>= 1; // make blood drag less
+        if ((pSprite->type == FX_27) && !IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bGoreBehavior && !VanillaMode())
+        {
+            nGravity = 80000; // make blood heavier
+            nAirDrag >>= 1; // make blood drag 
+        }
         actAirDrag(pSprite, nAirDrag);
         if (xvel[nSprite])
             pSprite->x += xvel[nSprite]>>12;
@@ -274,6 +278,8 @@ void CFX::fxProcess(void)
         if (zvel[nSprite])
             pSprite->z += zvel[nSprite]>>8;
         const bool bCasingType = (pSprite->type >= FX_37) && (pSprite->type <= FX_42);
+        if (bCasingType && IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bSectorBehavior && !VanillaMode()) // lower gravity by 75% underwater (only for bullet casings)
+            nGravity >>= 2;
 #ifdef NOONE_EXTENSIONS
         if (bCasingType && gGameOptions.bSectorBehavior && !gModernMap && !VanillaMode()) // check if new xy position is within a wall
 #else
@@ -344,14 +350,6 @@ void CFX::fxProcess(void)
                 continue;
             }
         }
-        int nGravity = pFXData->gravity;
-        if (bCasingType && IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bSectorBehavior && !VanillaMode()) // lower gravity by 75% underwater (only for bullet casings)
-        {
-            zvel[nSprite] += nGravity>>2;
-            continue;
-        }
-        if ((pSprite->type == FX_27) && gGameOptions.bGoreBehavior && !VanillaMode())
-            nGravity = 80000; // make blood heavier
         zvel[nSprite] += nGravity;
     }
 }
