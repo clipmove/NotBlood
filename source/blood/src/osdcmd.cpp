@@ -1020,7 +1020,6 @@ int32_t registerosdcommands(void)
         { "cl_slowroomflicker", "enable/disable slowed flickering speed for sectors (such as E1M4's snake pit room)", (void *)&gSlowRoomFlicker, CVAR_BOOL, 0, 1 },
         { "cl_shadowsfake3d", "enable/disable 3d projection for fake sprite shadows", (void *)&gShadowsFake3D, CVAR_BOOL, 0, 1 },
         { "cl_smoketrail3d", "enable/disable 3d smoke trail positioning for tnt/spray can (single-player only)", (void *)&gSmokeTrail3D, CVAR_BOOL, 0, 1 },
-        { "cl_particlesduration", "enable/disable extended particle duration modification (single-player only - turned off for modern maps)", (void *)&gParticlesDuration, CVAR_BOOL, 0, 1 },
         { "cl_projectileoldsprite", "enable/disable old pink sprite for hitscan projectiles", (void *)&gProjectileOldSprite, CVAR_BOOL, 0, 1 },
 
         { "cl_rollangle", "sets how much your screen tilts when strafing (polymost)", (void *)&gRollAngle, CVAR_INT, 0, 5 },

@@ -166,7 +166,6 @@ int32_t gShowWeaponSelectPosition;
 int32_t gShowWeaponSelectScale;
 int32_t gShadowsFake3D;
 int32_t gSmokeTrail3D;
-int32_t gParticlesDuration;
 int32_t gProjectileOldSprite;
 int32_t gPackSlotSwitch;
 int32_t gFMPianoFix;
@@ -183,6 +182,7 @@ int gEnemyRandomTNT;
 int gWeaponsVer;
 int gSectorBehavior;
 int gHitscanProjectiles;
+int gGoreBehavior;
 int gRandomizerMode;
 char gzRandomizerSeed[9];
 /////////
@@ -465,7 +465,6 @@ void CONFIG_SetDefaults(void)
     gShowWeaponSelectScale = 10;
     gShadowsFake3D = 1;
     gSmokeTrail3D = 1;
-    gParticlesDuration = 1;
     gProjectileOldSprite = 0;
     gPackSlotSwitch = 1;
     //ud.lockout                = 0;
@@ -571,6 +570,7 @@ void CONFIG_SetDefaults(void)
     gWeaponsVer = 0;
     gSectorBehavior = 0;
     gHitscanProjectiles = 0;
+    gGoreBehavior = 0;
     gRandomizerMode = 0;
     Bmemset(gzRandomizerSeed, 0, sizeof(gzRandomizerSeed));
 
@@ -909,6 +909,7 @@ int CONFIG_ReadSetup(void)
     SCRIPT_GetNumber(scripthandle, "Game Options", "WeaponsVer", &gWeaponsVer);
     SCRIPT_GetNumber(scripthandle, "Game Options", "SectorBehavior", &gSectorBehavior);
     SCRIPT_GetNumber(scripthandle, "Game Options", "HitscanProjectiles", &gHitscanProjectiles);
+    SCRIPT_GetNumber(scripthandle, "Game Options", "GoreBehavior", &gGoreBehavior);
     SCRIPT_GetNumber(scripthandle, "Game Options", "RandomizerMode", &gRandomizerMode);
 
     Bmemset(tempbuf, 0, sizeof(tempbuf));
@@ -1216,6 +1217,7 @@ void CONFIG_WriteSetup(uint32_t flags)
     SCRIPT_PutNumber(scripthandle, "Game Options", "WeaponsVer", gWeaponsVer, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "SectorBehavior", gSectorBehavior, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "HitscanProjectiles", gHitscanProjectiles, FALSE, FALSE);
+    SCRIPT_PutNumber(scripthandle, "Game Options", "GoreBehavior", gGoreBehavior, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "RandomizerMode", gRandomizerMode, FALSE, FALSE);
     gzRandomizerSeed[sizeof(gzRandomizerSeed)-1] = '\0';
     SCRIPT_PutString(scripthandle, "Game Options", "RandomizerSeed", &gzRandomizerSeed[0]);
