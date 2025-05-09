@@ -294,6 +294,14 @@ void CFX::fxProcess(void)
                 pSprite->y = oldPos.y + (yvel[nSprite]>>12);
             }
         }
+        else if ((pSprite->type == FX_27 || pSprite->type == FX_13) && gGameOptions.bGoreBehavior && !VanillaMode()) // check if new xy position is within a wall
+        {
+            if ((xvel[nSprite] || yvel[nSprite]) && !cansee(oldPos.x, oldPos.y, oldPos.z, pSprite->sectnum, pSprite->x, pSprite->y, oldPos.z, pSprite->sectnum)) // if new position has clipped into wall, freeze xy position
+            {
+                pSprite->x = oldPos.x;
+                pSprite->y = oldPos.y;
+            }
+        }
         // Weird...
         if (xvel[nSprite] || (yvel[nSprite] && pSprite->z >= sector[pSprite->sectnum].floorz))
         {
