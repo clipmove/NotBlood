@@ -265,7 +265,7 @@ void CFX::fxProcess(void)
         vec3_t oldPos = pSprite->xyz;
         int nGravity = pFXData->gravity;
         int nAirDrag = pFXData->airdrag;
-        if ((pSprite->type == FX_27) && !IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bGoreBehavior && !VanillaMode())
+        if ((pSprite->type == FX_27) && !IsUnderwaterSector(nSector) && gGameOptions.bGoreBehavior && !VanillaMode())
         {
             nGravity = 80000; // make blood heavier
             nAirDrag >>= 1; // make blood drag 
@@ -278,7 +278,7 @@ void CFX::fxProcess(void)
         if (zvel[nSprite])
             pSprite->z += zvel[nSprite]>>8;
         const bool bCasingType = (pSprite->type >= FX_37) && (pSprite->type <= FX_42);
-        if (bCasingType && IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bSectorBehavior && !VanillaMode()) // lower gravity by 75% underwater (only for bullet casings)
+        if (bCasingType && IsUnderwaterSector(nSector) && gGameOptions.bSectorBehavior && !VanillaMode()) // lower gravity by 75% underwater (only for bullet casings)
             nGravity >>= 2;
 #ifdef NOONE_EXTENSIONS
         if (bCasingType && gGameOptions.bSectorBehavior && !gModernMap && !VanillaMode()) // check if new xy position is within a wall
@@ -286,7 +286,7 @@ void CFX::fxProcess(void)
         if (bCasingType && gGameOptions.bSectorBehavior && !VanillaMode()) // check if new xy position is within a wall
 #endif
         {
-            if (!cansee(oldPos.x, oldPos.y, oldPos.z, pSprite->sectnum, pSprite->x, pSprite->y, oldPos.z, pSprite->sectnum)) // if new position has clipped into wall, invert velocity and continue
+            if (!cansee(oldPos.x, oldPos.y, oldPos.z, nSector, pSprite->x, pSprite->y, oldPos.z, nSector)) // if new position has clipped into wall, invert velocity and continue
             {
                 xvel[nSprite] = -((xvel[nSprite]>>1)+(xvel[nSprite]>>2)); // lower velocity by 75% and invert
                 yvel[nSprite] = -((yvel[nSprite]>>1)+(yvel[nSprite]>>2));
@@ -296,7 +296,7 @@ void CFX::fxProcess(void)
         }
         else if ((pSprite->type == FX_27 || pSprite->type == FX_13) && gGameOptions.bGoreBehavior && !VanillaMode()) // check if new xy position is within a wall
         {
-            if ((xvel[nSprite] || yvel[nSprite]) && !cansee(oldPos.x, oldPos.y, oldPos.z, pSprite->sectnum, pSprite->x, pSprite->y, oldPos.z, pSprite->sectnum)) // if new position has clipped into wall, freeze xy position
+            if ((xvel[nSprite] || yvel[nSprite]) && !cansee(oldPos.x, oldPos.y, oldPos.z, nSector, pSprite->x, pSprite->y, oldPos.z, nSector)) // if new position has clipped into wall, freeze xy position
             {
                 pSprite->x = oldPos.x;
                 pSprite->y = oldPos.y;
@@ -347,6 +347,21 @@ void CFX::fxProcess(void)
         {
             int32_t floorZ, ceilZ;
             getzsofslope(nSector, pSprite->x, pSprite->y, &ceilZ, &floorZ);
+            if (((pSprite->type == FX_27 && !(pSprite->index&7)) || (pSprite->type == FX_13 && zvel[nSprite] > -1250000)) && (ceilZ > pSprite->z) && !(sector[nSector].ceilingstat&1) && !IsUnderwaterSector(nSector) && gGameOptions.bGoreBehavior && !VanillaMode()) // make blood gibs stick to ceiling
+            {
+                pSprite->z = ceilZ;
+                if (pSprite->type == FX_13)
+                {
+                    if (zvel[nSprite] < 0)
+                        zvel[nSprite] = -(zvel[nSprite]>>1);
+                }
+                else
+                {
+                    nGravity >>= zvel[nSprite] < -1500000 ? 1 : 2;
+                    xvel[nSprite] >>= 2;
+                    yvel[nSprite] >>= 2;
+                }
+            }
             if (ceilZ > pSprite->z && !(sector[nSector].ceilingstat&1))
             {
                 fxFree(nSprite);
