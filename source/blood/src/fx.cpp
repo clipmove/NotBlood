@@ -393,9 +393,21 @@ void fxSpawnBlood(spritetype *pSprite, int a2)
     if (pBlood)
     {
         pBlood->ang = 1024;
-        xvel[pBlood->index] = Random2(0x6aaaa);
-        yvel[pBlood->index] = Random2(0x6aaaa);
-        zvel[pBlood->index] = -((int)Random(0x10aaaa))-100;
+        if (IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bGoreBehavior && !VanillaMode())
+        {
+            // make bloodspray more dense underwater
+            // scale velocities (bigger nr is bigger spread)                
+            const int kScale = 80;
+            xvel[pBlood->index] = mulscale8(Random2(0x6aaaa), kScale);
+            yvel[pBlood->index] = mulscale8(Random2(0x6aaaa), kScale);
+            zvel[pBlood->index] = mulscale8(-((int)Random(0x10aaaa)) - 100, kScale);
+        }
+        else
+        {
+            xvel[pBlood->index] = Random2(0x6aaaa);
+            yvel[pBlood->index] = Random2(0x6aaaa);
+            zvel[pBlood->index] = -((int)Random(0x10aaaa)) - 100;
+        }
         evPost(pBlood->index, 3, 8, kCallbackFXBloodSpurt);
     }
 }
