@@ -6541,15 +6541,15 @@ void actProcessSprites(void)
                 int dx = pFx->x-x;
                 int dy = pFx->y-y;
                 int dz = (pFx->z-z)>>4;
-                int size = (tilesiz[pFx->picnum].x* pFx->xrepeat*tilesiz[pFx->picnum].y* pFx->yrepeat)>>1;
+                int size = (tilesiz[pFx->picnum].x*pFx->xrepeat*tilesiz[pFx->picnum].y*pFx->yrepeat)>>1;
                 int t = scale(pExplodeInfo->dmgType, size, 16);
                 dx = mulscale16(t, dx);
                 dy = mulscale16(t, dy);
                 dz = mulscale16(t<<1, dz);
-                int nSprite = pFx->index;
-                xvel[nSprite] += dx;
-                yvel[nSprite] += dy;
-                zvel[nSprite] += dz;
+                const int nSprite3 = pFx->index;
+                xvel[nSprite3] += dx;
+                yvel[nSprite3] += dy;
+                zvel[nSprite3] += dz;
             }
         }
         
