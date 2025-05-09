@@ -6518,7 +6518,9 @@ void actProcessSprites(void)
             for (int nSprite2 = headspritestat[kStatFX]; nSprite2 >= 0; nSprite2 = nextspritestat[nSprite2])
             {
                 spritetype *pFx = &sprite[nSprite2];
-            
+
+                if (pFx->statnum == kStatFree) // skip free'd fx sprite
+                    continue;
                 switch (pFx->type)
                 {
                 case FX_13:
@@ -6528,8 +6530,6 @@ void actProcessSprites(void)
                 default:
                     continue;
                 }
-                if (pFx->statnum == kStatFree) // skip free'd fx sprite
-                    continue;
                 if (pFx->cstat&CSTAT_SPRITE_ALIGNMENT_MASK)
                     continue;
                 if (!TestBitString(sectmap, pFx->sectnum))
@@ -6541,7 +6541,7 @@ void actProcessSprites(void)
                 int dx = pFx->x-x;
                 int dy = pFx->y-y;
                 int dz = (pFx->z-z)>>4;
-                int size = (tilesiz[pFx->picnum].x*pFx->xrepeat*tilesiz[pFx->picnum].y*pFx->yrepeat)>>1;
+                int size = (tilesiz[pFx->picnum].x* pFx->xrepeat*tilesiz[pFx->picnum].y* pFx->yrepeat)>>1;
                 int t = scale(pExplodeInfo->dmgType, size, 16);
                 dx = mulscale16(t, dx);
                 dy = mulscale16(t, dy);
