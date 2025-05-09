@@ -347,6 +347,21 @@ void CFX::fxProcess(void)
         {
             int32_t floorZ, ceilZ;
             getzsofslope(nSector, pSprite->x, pSprite->y, &ceilZ, &floorZ);
+            if (((pSprite->type == FX_27 && !(pSprite->index&7)) || (pSprite->type == FX_13 && zvel[nSprite] > -1250000)) && (ceilZ > pSprite->z) && !(sector[nSector].ceilingstat&1) && !IsUnderwaterSector(nSector) && gGameOptions.bGoreBehavior && !VanillaMode()) // make blood gibs stick to ceiling
+            {
+                pSprite->z = ceilZ;
+                if (pSprite->type == FX_13)
+                {
+                    if (zvel[nSprite] < 0)
+                        zvel[nSprite] = -(zvel[nSprite]>>1);
+                }
+                else
+                {
+                    nGravity >>= zvel[nSprite] < -1500000 ? 1 : 2;
+                    xvel[nSprite] >>= 2;
+                    yvel[nSprite] >>= 2;
+                }
+            }
             if (ceilZ > pSprite->z && !(sector[nSector].ceilingstat&1))
             {
                 fxFree(nSprite);
