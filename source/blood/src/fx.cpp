@@ -393,7 +393,7 @@ void fxSpawnBlood(spritetype *pSprite, int a2)
     if (pBlood)
     {
         pBlood->ang = 1024;
-        if (IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bGoreBehavior && !gModernMap && !VanillaMode())
+        if (IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bGoreBehavior && !VanillaMode())
         {
             // make bloodspray more dense underwater
             // scale velocities (bigger nr is bigger spread)                
