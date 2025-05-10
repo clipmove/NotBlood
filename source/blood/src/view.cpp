@@ -4523,7 +4523,7 @@ void viewDrawScreen(void)
                 gViewSpritePredictLoc.z = interpolate(pView->at58, gViewSpritePredictLoc.z, gInterpolate);
             }
         }
-        if (gView == gMe && (numplayers <= 1 || gPrediction) && gView->pXSprite->health != 0 && !VanillaMode())
+        if (gView == gMe && (numplayers <= 1 || gPrediction) && gView->pXSprite->health != 0 && !gDemo.at1 && !VanillaMode())
         {
             fix16_t q16look;
             cA = gViewAngle;
