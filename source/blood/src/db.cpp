@@ -1462,10 +1462,8 @@ inline int dbShuffleEnemyList(spritetype **pSpriteList = NULL)
     int nSprites = 0;
     for (int i = headspritestat[kStatDude]; i >= 0; i = nextspritestat[i])
     {
-        if (!IsDudeSprite(&sprite[i]) || IsPlayerSprite(&sprite[i])) // not an enemy sprite, skip
-            continue;
         const int type = sprite[i].type;
-        if ((type <= kDudeBase) || (type >= kDudeVanillaMax))
+        if (!((type >= kDudeBase) && (type < kDudeVanillaMax))) // not an enemy sprite, skip
             continue;
         switch (type) // filter problematic enemy types
         {
