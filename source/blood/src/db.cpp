@@ -1492,6 +1492,9 @@ inline int dbShuffleEnemyList(spritetype **pSpriteList = NULL)
         case kDudePlayer6:
         case kDudePlayer7:
         case kDudePlayer8:
+#ifdef NOONE_EXTENSIONS
+        case kDudeModernCustom:
+#endif
             continue;
         default:
             break;
