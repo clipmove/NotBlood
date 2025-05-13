@@ -1465,14 +1465,41 @@ inline int dbShuffleEnemyList(spritetype **pSpriteList = NULL)
         if (!IsDudeSprite(&sprite[i]) || IsPlayerSprite(&sprite[i])) // not an enemy sprite, skip
             continue;
         const int type = sprite[i].type;
-        if ((type >= kDudeCultistTommy) && (type <= kDudeBurningBeast) && !(type >= kDudePlayer1 && type <= kDudePlayer8) && (type != kDudeCultistReserved) && (type != kDudeBeast) && (type != kDudeCultistBeast) && (type != kDudeGargoyleStone) && (type != kDudeTchernobog) && (type != kDudeCerberusTwoHead) && (type != kDudeCerberusOneHead) && (type != kDudeSpiderMother) && (type != kDudeBoneEel)) // filter problematic enemy types
+        if (!((type > kDudeBase) && (type < kDudeMax)))
+            continue;
+        switch (type) // filter problematic enemy types
         {
-            if (pSpriteList)
-                pSpriteList[nSprites] = &sprite[i];
-            nSprites++;
+        case kDudeBurningBeast:
+        case kDudeBurningInnocent:
+        case kDudeBurningCultist:
+        case kDudeBurningZombieAxe:
+        case kDudeBurningZombieButcher:
+        case kDudeBurningTinyCaleb:
+        case kDudeCultistReserved:
+        case kDudeBeast:
+        case kDudeCultistBeast:
+        case kDudeGargoyleStone:
+        case kDudeTchernobog:
+        case kDudeCerberusTwoHead:
+        case kDudeCerberusOneHead:
+        case kDudeSpiderMother:
+        case kDudeBoneEel:
+        case kDudePlayer1:
+        case kDudePlayer2:
+        case kDudePlayer3:
+        case kDudePlayer4:
+        case kDudePlayer5:
+        case kDudePlayer6:
+        case kDudePlayer7:
+        case kDudePlayer8:
+            continue;
+        default:
+            break;
         }
+        if (pSpriteList)
+            pSpriteList[nSprites] = &sprite[i];
+        nSprites++;
     }
-
     return nSprites;
 }
 
