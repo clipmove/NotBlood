@@ -4370,7 +4370,7 @@ void StartNetGame(CGameMenuItemChain *pItem)
     ////
     SetGameVanillaMode(0); // turn off vanilla mode for multiplayer so menus don't get bugged
     gPacketStartGame.bQuadDamagePowerup = itemNetMutatorBoolQuadDamagePowerup.at20;
-    gPacketStartGame.nDamageInvul = itemNetMutatorDamageInvul.m_nFocus % ARRAY_SSIZE(pzExplosionBehaviorStrings);
+    gPacketStartGame.nDamageInvul = itemNetMutatorDamageInvul.m_nFocus % ARRAY_SSIZE(pzDamageInvulBehaviorStrings);
     gPacketStartGame.nExplosionBehavior = itemNetMutatorExplosionBehavior.m_nFocus % ARRAY_SSIZE(pzExplosionBehaviorStrings);
     gPacketStartGame.nProjectileBehavior = itemNetMutatorProjectileBehavior.m_nFocus % ARRAY_SSIZE(pzProjectileBehaviorStrings);
     gPacketStartGame.bNapalmFalloff = itemNetMutatorNapalmFalloff.at20;
