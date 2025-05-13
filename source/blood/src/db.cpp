@@ -1465,7 +1465,7 @@ inline int dbShuffleEnemyList(spritetype **pSpriteList = NULL)
         if (!IsDudeSprite(&sprite[i]) || IsPlayerSprite(&sprite[i])) // not an enemy sprite, skip
             continue;
         const int type = sprite[i].type;
-        if (!((type > kDudeBase) && (type < kDudeMax)))
+        if ((type <= kDudeBase) || (type >= kDudeVanillaMax))
             continue;
         switch (type) // filter problematic enemy types
         {
@@ -1492,9 +1492,6 @@ inline int dbShuffleEnemyList(spritetype **pSpriteList = NULL)
         case kDudePlayer6:
         case kDudePlayer7:
         case kDudePlayer8:
-#ifdef NOONE_EXTENSIONS
-        case kDudeModernCustom:
-#endif
             continue;
         default:
             break;
