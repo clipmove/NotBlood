@@ -81,10 +81,9 @@ int VectorScanROR(spritetype *pSprite, int nOffset, int nZOffset, int dx, int dy
 void GetZRange(spritetype *pSprite, int *ceilZ, int *ceilHit, int *floorZ, int *floorHit, int nDist, unsigned int nMask, unsigned int nClipParallax = 0);
 void GetZRangeAtXYZ(int x, int y, int z, int nSector, int *ceilZ, int *ceilHit, int *floorZ, int *floorHit, int nDist, unsigned int nMask, unsigned int nClipParallax = 0);
 int GetDistToLine(int x1, int y1, int x2, int y2, int x3, int y3);
-int GetDistToWall(int x, int y, const walltype* pWall);
 int CheckHitSpriteAlpha(int x, int y, int dx, int dy, HITINFO *pHitInfo);
 unsigned int ClipMove(int *x, int *y, int *z, int *nSector, int xv, int yv, int wd, int cd, int fd, unsigned int nMask);
 unsigned int ClipMoveEDuke(int *x, int *y, int *z, int *nSector, int xv, int yv, int wd, int cd, int fd, unsigned int nMask, spritetype *raySprite = NULL);
 int GetClosestSectors(int nSector, int x, int y, int nDist, short *pSectors, char *pSectBit);
-int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSectors, char *pSectBit, short *pWalls = NULL, bool newSectCheckMethod = false, bool sectCheckNotBlood = false);
+int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSectors, char *pSectBit, short *pWalls = NULL, bool bAccurateCheck = false);
 void GetSpriteExtents(spritetype* pSpr, int* x1, int* y1, int* x2, int* y2, int* zt, int* zb, char flags = 0x07);

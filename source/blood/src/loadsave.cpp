@@ -275,7 +275,6 @@ void LoadSave::LoadGame(char *pzFile)
     {
         gGameOptions.bQuadDamagePowerup = gQuadDamagePowerup;
         gGameOptions.nDamageInvul = gDamageInvul;
-        gGameOptions.nExplosionBehavior = gExplosionBehavior;
         gGameOptions.nProjectileBehavior = gProjectileBehavior;
         gGameOptions.bNapalmFalloff = gNapalmFalloff;
         gGameOptions.nEnemyBehavior = gEnemyBehavior;

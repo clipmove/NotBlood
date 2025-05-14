@@ -1036,7 +1036,8 @@ void TranslateSector(int nSector, int a2, int a3, int a4, int a5, int a6, int a7
                     int nFoundWall = nStartWall, nDist = INT_MAX;
                     for (nWall = nStartWall; nWall < nEndWall; nWall++) // check each wall distance of sector to sprite
                     {
-                        const int nDistCurWall = GetDistToWall(pSprite->x, pSprite->y, &wall[nWall]); // find closest wall to sprite
+                        const vec2_t pos = {pSprite->x, pSprite->y};
+                        const int nDistCurWall = getwalldist(pos, nWall); // find closest wall to sprite
                         if (nDistCurWall < nDist)
                         {
                             nDist = nDistCurWall;
@@ -1173,7 +1174,8 @@ void ZTranslateSector(int nSector, XSECTOR *pXSector, int a3, int a4)
                     int nFoundWall = nStartWall, nDist = INT_MAX;
                     for (int nWall = nStartWall; nWall < nEndWall; nWall++) // because elevators have an entrance, we need to only move sprites aligned to the elevator interior walls
                     {
-                        const int nDistCurWall = GetDistToWall(pSprite->x, pSprite->y, &wall[nWall]); // find closest wall to sprite
+                        const vec2_t pos = {pSprite->x, pSprite->y};
+                        const int nDistCurWall = getwalldist(pos, nWall); // find closest wall to sprite
                         if (nDistCurWall < nDist)
                         {
                             nDist = nDistCurWall;

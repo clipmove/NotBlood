@@ -174,7 +174,6 @@ int32_t gFMPianoFix;
 int gVanilla;
 int gQuadDamagePowerup;
 int gDamageInvul;
-int gExplosionBehavior;
 int gProjectileBehavior;
 int gNapalmFalloff;
 int gEnemyBehavior;
@@ -558,7 +557,6 @@ void CONFIG_SetDefaults(void)
     gVanilla = 0;
     gQuadDamagePowerup = 0;
     gDamageInvul = 0;
-    gExplosionBehavior = 0;
     gProjectileBehavior = 0;
     gNapalmFalloff = 0;
     gEnemyBehavior = 1;
@@ -897,7 +895,6 @@ int CONFIG_ReadSetup(void)
     SCRIPT_GetNumber(scripthandle, "Game Options", "VanillaMode", &gVanilla);
     SCRIPT_GetNumber(scripthandle, "Game Options", "QuadDamagePowerup", &gQuadDamagePowerup);
     SCRIPT_GetNumber(scripthandle, "Game Options", "DamageInvul", &gDamageInvul);
-    SCRIPT_GetNumber(scripthandle, "Game Options", "ExplosionsBehavior", &gExplosionBehavior);
     SCRIPT_GetNumber(scripthandle, "Game Options", "ProjectilesBehavior", &gProjectileBehavior);
     SCRIPT_GetNumber(scripthandle, "Game Options", "NapalmFalloff", &gNapalmFalloff);
     SCRIPT_GetNumber(scripthandle, "Game Options", "EnemyBehavior", &gEnemyBehavior);
@@ -1205,7 +1202,6 @@ void CONFIG_WriteSetup(uint32_t flags)
     SCRIPT_PutNumber(scripthandle, "Game Options", "VanillaMode", gVanilla, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "QuadDamagePowerup", gQuadDamagePowerup, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "DamageInvul", gDamageInvul, FALSE, FALSE);
-    SCRIPT_PutNumber(scripthandle, "Game Options", "ExplosionsBehavior", gExplosionBehavior, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "ProjectilesBehavior", gProjectileBehavior, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "NapalmFalloff", gNapalmFalloff, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "EnemyBehavior", gEnemyBehavior, FALSE, FALSE);
