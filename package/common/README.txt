@@ -25,7 +25,6 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * UT99 style multi kill alerts
 
 ### Mutators (Optional)
-* Replaced sector based damage logic for player explosions
 * Difficulty based invulnerability timer for player damage
 * Raymarching collision testing for player projectiles
 * Fix blood/bullet casings not being dragged with sectors
@@ -78,10 +77,6 @@ If you have the GOG version of the game, do the following:
 * Player damage invulnerability
    - Apply a short invulnerability state for the player for bullet hitscans/spirit/tesla damage
    - Invulnerability duration changes depending on damage taken scale/current health (lower health = longer invulnerability state)
-* Explosions behavior
-   - Replace the default vanilla explosion calculation with an new improved sector scanning system
-   - Fixes rare cases where enemies appear to ignore explosive damage due to sector/span order
-   - Includes two methods to choose from: NotBlood (check linked sectors once) and Raze (always check linked sectors)
 * Projectiles behavior (Raze)
    - For all missiles/projectiles, use the more accurate eduke32's clipmove() function
    - Use original hitbox sizes for projectiles

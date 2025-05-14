@@ -875,46 +875,6 @@ int GetDistToLine(int x1, int y1, int x2, int y2, int x3, int y3)
     return approxDist(t1-x1, t2-y1);
 }
 
-int GetDistToWall(int x, int y, const walltype* pWall)
-{
-    // this is a modern style calculation that uses floating point
-    // for an authentic DOS-style integer calculation consider using getwalldist()
-    dassert(pWall != NULL);
-    const int lx1 = pWall->x;
-    const int ly1 = pWall->y;
-    const int lx2 = wall[pWall->point2].x;
-    const int ly2 = wall[pWall->point2].y;
-    const float A = x - lx1, B = y - ly1;
-    const float C = lx2 - lx1, D = ly2 - ly1;
-
-    const float nDot = A*C+B*D;
-    const float nLength = C*C+D*D;
-    float param = -1;
-    if (nLength != 0) // in case of 0 length line
-      param = nDot / nLength;
-
-    int xx, yy;
-    if (param < 0)
-    {
-        xx = lx1;
-        yy = ly1;
-    }
-    else if (param > 1)
-    {
-        xx = lx2;
-        yy = ly2;
-    }
-    else
-    {
-        xx = lx1 + (int)(param * C);
-        yy = ly1 + (int)(param * D);
-    }
-
-    const int dx = x - xx;
-    const int dy = y - yy;
-    return ksqrt(dx*dx+dy*dy);
-}
-
 int CheckHitSpriteAlpha(int x, int y, int dx, int dy, HITINFO *pHitInfo)
 {
     if (pHitInfo->hitsprite >= kMaxSprites)
@@ -1108,12 +1068,12 @@ int GetClosestSectors(int nSector, int x, int y, int nDist, short *pSectors, cha
     return n;
 }
 
-int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSectors, char *pSectBit, short *pWalls, bool newSectCheckMethod, bool sectCheckNotBlood)
+int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSectors, char *pSectBit, short *pWalls, bool bAccurateCheck)
 {
     // by default this function fails with sectors that linked with wide spans, or there was more than one link to the same sector. for example...
     // E6M1: throwing TNT on the stone footpath while standing on the brown road will fail due to the start/end points of the span being too far away. it'll only do damage at one end of the road
     // E1M2: throwing TNT at the double doors while standing on the train platform
-    // by setting newSectCheckMethod to true these issues will be resolved
+    // by setting bAccurateCheck to true these issues will be resolved
     char sectbits[bitmap_size(kMaxSectors)];
     dassert(pSectors != NULL);
     memset(sectbits, 0, sizeof(sectbits));
@@ -1121,55 +1081,39 @@ int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSector
     SetBitString(sectbits, nSector);
     int n = 1, m = 0;
     int i = 0;
-    const int nDist4 = nDist<<4;
+    bool bWithinRange;
     if (pSectBit)
     {
         memset(pSectBit, 0, bitmap_size(kMaxSectors));
         SetBitString(pSectBit, nSector);
     }
-    while (i < n) // scan through sectors
+    while (i < n)
     {
-        const int nCurSector = pSectors[i];
-        const int nStartWall = sector[nCurSector].wallptr;
-        const int nEndWall = nStartWall + sector[nCurSector].wallnum;
-        for (int j = nStartWall; j < nEndWall; j++) // scan each wall of current sector for new sectors
+        int nCurSector = pSectors[i];
+        int nStartWall = sector[nCurSector].wallptr;
+        int nEndWall = nStartWall + sector[nCurSector].wallnum;
+        walltype *pWall = &wall[nStartWall];
+        for (int j = nStartWall; j < nEndWall; j++, pWall++)
         {
-            const walltype *pWall = &wall[j];
-            const int nNextSector = pWall->nextsector;
-            if (nNextSector < 0) // if next wall isn't linked to a sector, skip
+            int nNextSector = pWall->nextsector;
+            if (nNextSector < 0)
                 continue;
-            if (TestBitString(sectbits, nNextSector)) // if we've already checked this sector, skip
+            if (TestBitString(sectbits, nNextSector))
                 continue;
-            bool setSectBit = true;
-            bool withinRange = false;
-            if (!newSectCheckMethod) // original method
+            if (!bAccurateCheck) // original method
             {
-                withinRange = CheckProximityWall(pWall->point2, x, y, nDist);
+                bWithinRange = CheckProximityWall(wall[j].point2, x, y, nDist);
+                SetBitString(sectbits, nNextSector);
             }
-            else // new method - calculate dot to line distance
+            else // accurate check
             {
-                // notblood sector mode flags a sector as checked once all walls referencing that sector have been checked
-                // raze does not to this - instead raze only sets the next sector as checked if within range
-                if (sectCheckNotBlood)
-                {
-                    for (int k = (j+1); k < nEndWall; k++) // scan through the rest of the sector's walls
-                    {
-                        if (wall[k].nextsector == nNextSector) // if the next walls still reference the sector, then don't flag the sector as checked (yet)
-                        {
-                            setSectBit = false;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    setSectBit = false; // always check every sector link
-                }
-                withinRange = GetDistToWall(x, y, pWall) <= nDist4;
+                vec2_t pos = {x, y};
+                bWithinRange = getwalldist(pos, j) <= (nDist<<4);
+                if (bWithinRange) // only set if sector is within range
+                    SetBitString(sectbits, nNextSector);
             }
-            if (withinRange) // if new sector is within range, set to current sector and test walls
+            if (bWithinRange)
             {
-                setSectBit = true; // sector is within range, set the sector as checked
                 if (pSectBit)
                     SetBitString(pSectBit, nNextSector);
                 pSectors[n++] = nNextSector;
@@ -1180,8 +1124,6 @@ int GetClosestSpriteSectors(int nSector, int x, int y, int nDist, short *pSector
                         pWalls[m++] = j;
                 }
             }
-            if (setSectBit)
-                SetBitString(sectbits, nNextSector);
         }
         i++;
     }

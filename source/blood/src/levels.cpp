@@ -70,7 +70,6 @@ GAMEOPTIONS gSingleGameOptions = {
     7200,  // int nSpecialRespawnTime;
     0,     // bool bQuadDamagePowerup;
     0,     // int nDamageInvul;
-    0,     // int nExplosionBehavior;
     0,     // int nProjectileBehavior;
     0,     // bool bNapalmFalloff;
     0,     // int nEnemyBehavior;
