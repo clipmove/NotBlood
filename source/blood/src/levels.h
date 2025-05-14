@@ -62,7 +62,6 @@ struct GAMEOPTIONS {
     int nSpecialRespawnTime;
     bool bQuadDamagePowerup;
     int nDamageInvul;
-    int nExplosionBehavior;
     int nProjectileBehavior;
     bool bNapalmFalloff;
     int nEnemyBehavior;

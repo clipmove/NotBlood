@@ -81,7 +81,6 @@ struct PKT_STARTGAME {
     char monsterQuantity, monsterHealth, monsterSpeed;
     bool bQuadDamagePowerup;
     int nDamageInvul;
-    int nExplosionBehavior;
     int nProjectileBehavior;
     bool bNapalmFalloff;
     int nEnemyBehavior;

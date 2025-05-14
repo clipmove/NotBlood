@@ -154,7 +154,6 @@ extern int32_t gFMPianoFix;
 extern int gVanilla;
 extern int gQuadDamagePowerup;
 extern int gDamageInvul;
-extern int gExplosionBehavior;
 extern int gProjectileBehavior;
 extern int gNapalmFalloff;
 extern int gEnemyBehavior;
