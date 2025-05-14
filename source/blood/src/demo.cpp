@@ -199,6 +199,7 @@ const DEMOVALIDATE gDemoValidate[] = {
     {"/validatedemos/TEST137.DEM", (int32_t)0x00004077, 0x9C07094D, 0x00000330, {(int32_t)0x00005CCD, (int32_t)0x00009154, (int32_t)0x00003D50}, 1},
     {"/validatedemos/TEST138.DEM", (int32_t)0x00002C1A, 0x0E08B278, 0x000006AC, {(int32_t)0x00005DBF, (int32_t)0x000092B4, (int32_t)0x00003D50}, 0},
     {"/validatedemos/TEST139.DEM", (int32_t)0x000005EE, 0x1E12503F, 0x00000000, {(int32_t)0xFFFFFE24, (int32_t)0xFFFFDB4E, (int32_t)0xFFFFF9A4}, 1},
+    {"/validatedemos/TEST140.DEM", (int32_t)0x0000AFAA, 0x49A8C956, 0x00000479, {(int32_t)0xFFFFB6DD, (int32_t)0xFFFF8798, (int32_t)0x00005D50}, 1},
 };
 
 int nBuild = 0;
