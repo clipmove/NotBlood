@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <set>
 #include <functional>
 #include "common_game.h"
-#define kPQueueSize 1024
+#define kPQueueSize (1024*4)
 
 template <typename T> struct queueItem
 {
