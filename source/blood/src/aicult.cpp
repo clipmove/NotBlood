@@ -210,7 +210,7 @@ static void sub_68230(int, int nXSprite)
     int dz = pTarget->z - pSprite->z;
     int nDist = approxDist(dx, dy);
     int nDist2 = nDist / 540;
-    spritetype *pMissile = actFireThing(pSprite, 0, 0, dz/128-14500, nMissile, (nDist2<<17)/120);
+    spritetype *pMissile = actFireThing(pSprite, 0, 0, dz/128-14500, nMissile, (nDist2<<23)/120);
     xsprite[pMissile->extra].Impact = 1;
 }
 
