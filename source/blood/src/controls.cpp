@@ -344,6 +344,53 @@ void ctrlGetInput(void)
     if (gCrouchToggle && gInput.buttonFlags.jump) // reset crouch toggle state on jump
         gCrouchToggleState = 0;
 
+    if (gCrouchAuto && gMe && gMe->pSprite && !gMe->isUnderwater)
+    {
+        static int gLastCrouchCheck = 0;
+        static char bCrouchState = 0;
+        while (gLastCrouchCheck != gLevelTime)
+        {
+            bCrouchState = 0;
+            gLastCrouchCheck = gLevelTime;
+
+            int16_t nSectnum = gMe->pSprite->sectnum;
+            const char bInAir = gMe->cantJump;
+            if (!sectRangeIsFine(nSectnum))
+                break;
+            int32_t nAng, nX, nY, nZ, fZ, cZ, fZCurrentSect, nDiff;
+            nAng = gMe->pSprite->ang;
+            nX = gMe->pSprite->x;
+            nY = gMe->pSprite->y;
+            nZ = gMe->pSprite->z;
+            getzsofslope(nSectnum, nX, nY, &cZ, &fZCurrentSect); // get current floor
+            nDiff = cZ - fZCurrentSect;
+            if ((nDiff < -3072) && (nDiff > -15000)) // we're in tiny crawl space, keep crouching
+            {
+                bCrouchState = 1;
+                break;
+            }
+            const int nStepX = mulscale30(128, Cos(nAng));
+            const int nStepY = mulscale30(128, Sin(nAng));
+            for (int i = 0; i < 3; i++) // check sector in front of player
+            {
+                nX += nStepX; // move forward
+                nY += nStepY;
+                updatesector(nX, nY, &nSectnum);
+                if (!sectRangeIsFine(nSectnum))
+                    continue;
+                getzsofslope(nSectnum, nX, nY, &cZ, &fZ);
+                nDiff = cZ - (bInAir ? nZ : fZCurrentSect); // if player is in air, use current Z height position as compare
+                if ((nDiff < -3072) && (nDiff > -15000))
+                {
+                    bCrouchState = 1;
+                    break;
+                }
+            }
+        }
+        if (bCrouchState && !gInput.buttonFlags.jump)
+            gInput.buttonFlags.crouch = 1;
+    }
+
     if (BUTTON(gamefunc_Weapon_Fire))
         gInput.buttonFlags.shoot = 1;
 
