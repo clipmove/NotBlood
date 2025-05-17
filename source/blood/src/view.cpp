@@ -2918,11 +2918,11 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                     break;
                 case kItemFlagA:
                     pTSprite->pal = 10;
-                    pTSprite->cstat |= 1024;
+                    pTSprite->cstat |= 4;
                     break;
                 case kItemFlagB:
                     pTSprite->pal = 7;
-                    pTSprite->cstat |= 1024;
+                    pTSprite->cstat |= 4;
                     break;
                 default:
                     if (pTSprite->type >= kItemKeySkull && pTSprite->type < kItemKeyMax)
