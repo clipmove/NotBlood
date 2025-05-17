@@ -284,6 +284,8 @@ If you have the GOG version of the game, do the following:
    - Enables/disables redbook audio if midi song is not specified for level (mus_redbook must already be enabled)
 * in_centerviewondrop
    - Enable/disable recenter view when dropping down onto ground
+* in_crouchauto
+   - Enable/disable automatic crouching for small crawl spaces
 * in_crouchmode
    - Toggles crouch button (0:hold, 1:toggle)
 * in_targetaimassist
