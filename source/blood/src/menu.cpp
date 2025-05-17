@@ -91,6 +91,7 @@ void SetCenterView(CGameMenuItemZBool *);
 void SetJoystickTargetAimAssist(CGameMenuItemZBool *);
 void SetJoystickRumble(CGameMenuItemZBool *);
 void SetCrouchToggle(CGameMenuItemZBool *);
+void SetCrouchAuto(CGameMenuItemZBool *);
 void ResetKeys(CGameMenuItemChain *);
 void ResetKeysClassic(CGameMenuItemChain *);
 void SetMessages(CGameMenuItemZBool *);
@@ -1102,9 +1103,10 @@ CGameMenuItemTitle itemOptionsControlKeyboardTitle("KEYBOARD SETUP", 1, 160, 20,
 CGameMenuItemSlider itemOptionsControlKeyboardSliderTurnSpeed("Key Turn Speed:", 1, 18, 50, 280, &gTurnSpeed, 64, 128, 4, SetTurnSpeed, -1, -1);
 CGameMenuItemZCycle itemOptionsControlKeyboardCycleTurnAcceleration("Key Turn Acceleration:", 1, 18, 70, 280, 0, SetTurnAcceleration, pzTurnAccelerationStrings, ARRAY_SIZE(pzTurnAccelerationStrings), 0);
 CGameMenuItemZBool itemOptionsControlKeyboardBoolCrouchToggle("Crouch Toggle:", 1, 18, 90, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
-CGameMenuItemChain itemOptionsControlKeyboardList("Configure Keys...", 1, 0, 110, 320, 1, &menuKeys, -1, NULL, 0);
-CGameMenuItemChain itemOptionsControlKeyboardReset("Reset Keys (default)...", 1, 0, 135, 320, 1, &menuKeys, -1, ResetKeys, 0);
-CGameMenuItemChain itemOptionsControlKeyboardResetClassic("Reset Keys (classic)...", 1, 0, 155, 320, 1, &menuKeys, -1, ResetKeysClassic, 0);
+CGameMenuItemZBool itemOptionsControlKeyboardBoolCrouchAuto("Crouch Auto:", 1, 18, 110, 280, gCrouchAuto, SetCrouchAuto, NULL, NULL);
+CGameMenuItemChain itemOptionsControlKeyboardList("Configure Keys...", 1, 0, 130, 320, 1, &menuKeys, -1, NULL, 0);
+CGameMenuItemChain itemOptionsControlKeyboardReset("Reset Keys (default)...", 1, 0, 155, 320, 1, &menuKeys, -1, ResetKeys, 0);
+CGameMenuItemChain itemOptionsControlKeyboardResetClassic("Reset Keys (classic)...", 1, 0, 175, 320, 1, &menuKeys, -1, ResetKeysClassic, 0);
 
 CGameMenuItemTitle itemKeysTitle("KEY SETUP", 1, 160, 20, 2038);
 CGameMenuItemKeyList itemKeyList("", 3, 56, 40, 200, 16, NUMGAMEFUNCTIONS, 0);
@@ -1225,10 +1227,11 @@ CGameMenuItemSlider *pItemOptionsControlJoystickAxisSaturate[MAXJOYAXES];
 CGameMenuItemZBool *pItemOptionsControlJoystickAxisSoloDeadzone[MAXJOYAXES];
 
 CGameMenuItemTitle itemOptionsControlJoystickMiscTitle("JOYSTICK MISC", 1, 160, 20, 2038);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 70, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCenterView("CENTER VIEW ON DROP:", 1, 18, 90, 280, gCenterViewOnDrop, SetCenterView, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscTargetAimAssist("TARGET AIM ASSIST:", 1, 18, 110, 280, 0, SetJoystickTargetAimAssist, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscRumble("RUMBLE CONTROLLER:", 1, 18, 130, 280, 0, SetJoystickRumble, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 60, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchAuto("AUTO CROUCH:", 1, 18, 80, 280, gCrouchAuto, SetCrouchAuto, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCenterView("CENTER VIEW ON DROP:", 1, 18, 100, 280, gCenterViewOnDrop, SetCenterView, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscTargetAimAssist("TARGET AIM ASSIST:", 1, 18, 120, 280, 0, SetJoystickTargetAimAssist, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscRumble("RUMBLE CONTROLLER:", 1, 18, 140, 280, 0, SetJoystickRumble, NULL, NULL);
 
 void SetupLoadingScreen(void)
 {
@@ -2111,6 +2114,7 @@ void SetupControlsMenu(void)
     menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardSliderTurnSpeed, true);
     menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardCycleTurnAcceleration, false);
     menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardBoolCrouchToggle, false);
+    menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardBoolCrouchAuto, false);
     menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardList, false);
     menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardReset, false);
     menuOptionsControlKeyboard.Add(&itemOptionsControlKeyboardResetClassic, false);
@@ -2119,6 +2123,7 @@ void SetupControlsMenu(void)
     itemOptionsControlKeyboardSliderTurnSpeed.nValue = gTurnSpeed;
     itemOptionsControlKeyboardCycleTurnAcceleration.m_nFocus = gTurnAcceleration % ARRAY_SSIZE(pzTurnAccelerationStrings);
     itemOptionsControlKeyboardBoolCrouchToggle.at20 = gCrouchToggle;
+    itemOptionsControlKeyboardBoolCrouchAuto.at20 = gCrouchAuto;
 
     menuKeys.Add(&itemKeysTitle, false);
     menuKeys.Add(&itemKeyList, true);
@@ -2159,6 +2164,7 @@ void SetupJoystickMenu(void)
 
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscTitle, false);
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscCrouchToggle, true);
+    menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscCrouchAuto, false);
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscCenterView, false);
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscTargetAimAssist, false);
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscRumble, false);
@@ -2167,6 +2173,7 @@ void SetupJoystickMenu(void)
     itemOptionsControlJoystickMiscTargetAimAssist.tooltip_pzTextLower = "crosshair is over an enemy";
 
     itemOptionsControlJoystickMiscCrouchToggle.at20 = gCrouchToggle;
+    itemOptionsControlJoystickMiscCrouchAuto.at20 = gCrouchAuto;
     itemOptionsControlJoystickMiscCenterView.at20 = gCenterViewOnDrop;
     itemOptionsControlJoystickMiscTargetAimAssist.at20 = gTargetAimAssist;
     itemOptionsControlJoystickMiscRumble.at20 = gSetup.joystickrumble;
@@ -2644,6 +2651,11 @@ void SetJoystickRumble(CGameMenuItemZBool *pItem)
 void SetCrouchToggle(CGameMenuItemZBool *pItem)
 {
     gCrouchToggle = itemOptionsControlKeyboardBoolCrouchToggle.at20 = itemOptionsControlJoystickMiscCrouchToggle.at20 = pItem->at20;
+}
+
+void SetCrouchAuto(CGameMenuItemZBool *pItem)
+{
+    gCrouchAuto = itemOptionsControlKeyboardBoolCrouchAuto.at20 = itemOptionsControlJoystickMiscCrouchAuto.at20 = pItem->at20;
 }
 
 void SetAutoAim(CGameMenuItemZCycle *pItem)
