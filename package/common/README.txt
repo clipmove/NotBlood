@@ -15,6 +15,7 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * New singleplayer cheats
 * Weapon selection bar
 * Mirror mode
+* Auto crouch
 
 ### Multiplayer Features
 * Cloak powerup hides player weapon icon

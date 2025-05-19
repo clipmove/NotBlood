@@ -27,6 +27,7 @@ Download for Windows/Linux/MacOS can be found on [https://github.com/clipmove/No
 * New singleplayer cheats
 * Weapon selection bar ([demo](https://web.archive.org/web/20220514203005if_/https://files.catbox.moe/0zh37q.mp4))
 * Mirror mode
+* Auto crouch
 
 ### Multiplayer Features
 * Cloak powerup hides player weapon icon
