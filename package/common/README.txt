@@ -191,6 +191,8 @@ If you have the GOG version of the game, do the following:
 * SNEAKYFU - Proned shotgun/tommy gun cultists only
 
 ### New console variables for NotBlood
+* cl_autoaimrange
+   - Set auto aim range angle modifier (default: 4, single-player only)
 * cl_autodivingsuit
    - Enable/disable automatic diving suit equipping when entering water (always enabled in multiplayer)
 * cl_calebtalk

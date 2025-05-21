@@ -231,9 +231,11 @@ public:
     int nSliderTile;
     int nCursorTile;
     int nShowValue;
+    int nShowValueOffset;
+    int nShowValueMul;
     CGameMenuItemSlider();
-    CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int _nValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue = kMenuSliderNone);
-    CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int *pnValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue = kMenuSliderNone);
+    CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int _nValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue = kMenuSliderNone, int _nShowValueOffset = 0, int _nShowValueMul = 1);
+    CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int *pnValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue = kMenuSliderNone, int _nShowValueOffset = 0, int _nShowValueMul = 1);
     virtual void Draw(void);
     virtual bool Event(CGameMenuEvent &);
     virtual bool MouseEvent(CGameMenuEvent &);
