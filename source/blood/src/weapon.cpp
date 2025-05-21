@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "actor.h"
 #include "blood.h"
 #include "db.h"
+#include "demo.h"
 #include "callback.h"
 #include "config.h"
 #include "eventq.h"
@@ -400,6 +401,13 @@ void UpdateAimVector(PLAYER * pPlayer)
         int nWeapAng = pWeaponTrack->at8;
         if ((pPlayer->curWeapon == kWeaponLifeLeech) && (gGameOptions.nGameType == kGameTypeSinglePlayer) && WeaponsNotBlood() && !VanillaMode()) // increase effectiveness of life leech for single player
             nWeapAng += kAng30;
+        if (nWeapAng && !gDemo.bPlaying && !gDemo.bRecording && (gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1))
+        {
+            int nAutoAimModifier = divscale16(fix16_from_int(gAutoAimRange+1), fix16_from_int(5));
+            nAutoAimModifier = mulscale16(fix16_from_int(nWeapAng), nAutoAimModifier);
+            nWeapAng = fix16_to_int(nAutoAimModifier);
+            nWeapAng = ClipHigh(nWeapAng, kAng180-1);
+        }
         for (nSprite = headspritestat[kStatDude]; nSprite >= 0; nSprite = nextspritestat[nSprite])
         {
             pSprite = &sprite[nSprite];

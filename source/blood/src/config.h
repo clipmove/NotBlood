@@ -63,6 +63,7 @@ extern int32_t gCrouchToggle;
 extern int32_t gCrouchAuto;
 extern int32_t gDetail;
 extern int32_t gAutoAim;
+extern int32_t gAutoAimRange;
 extern int32_t gWeaponSwitch;
 extern int32_t gWeaponFastSwitch;
 extern int32_t gLockManualSaving;

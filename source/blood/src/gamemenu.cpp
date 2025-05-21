@@ -1244,7 +1244,7 @@ CGameMenuItemSlider::CGameMenuItemSlider()
     nShowValue = kMenuSliderNone;
 }
 
-CGameMenuItemSlider::CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int _nValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue)
+CGameMenuItemSlider::CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int _nValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue, int _nShowValueOffset, int _nShowValueMul)
 {
     m_pzText = _pzText;
     m_nFont = _nFont;
@@ -1263,9 +1263,11 @@ CGameMenuItemSlider::CGameMenuItemSlider(const char *_pzText, int _nFont, int _n
     if (_nCursorTile >= 0)
         nCursorTile = _nCursorTile;
     nShowValue = _nShowValue;
+    nShowValueOffset = _nShowValueOffset;
+    nShowValueMul = _nShowValueMul;
 }
 
-CGameMenuItemSlider::CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int *pnValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue)
+CGameMenuItemSlider::CGameMenuItemSlider(const char *_pzText, int _nFont, int _nX, int _nY, int _nWidth, int *pnValue, int _nRangeLow, int _nRangeHigh, int _nStep, void(*_pCallback)(CGameMenuItemSlider *), int _nSliderTile, int _nCursorTile, int _nShowValue, int _nShowValueOffset, int _nShowValueMul)
 {
     m_pzText = _pzText;
     m_nFont = _nFont;
@@ -1286,6 +1288,8 @@ CGameMenuItemSlider::CGameMenuItemSlider(const char *_pzText, int _nFont, int _n
     if (_nCursorTile >= 0)
         nCursorTile = _nCursorTile;
     nShowValue = _nShowValue;
+    nShowValueOffset = _nShowValueOffset;
+    nShowValueMul = _nShowValueMul;
 }
 
 void CGameMenuItemSlider::Draw(void)
@@ -1316,13 +1320,13 @@ void CGameMenuItemSlider::Draw(void)
     case kMenuSliderNone:
         break;
     case kMenuSliderValue:
-        sprintf(buffer, "%i ", nValue);
+        sprintf(buffer, "%i ", (nValue+nShowValueOffset)*nShowValueMul);
         break;
     case kMenuSliderPercent:
-        sprintf(buffer, "%i%% ", roundscale(value, 100, nRange));
+        sprintf(buffer, "%i%% ", roundscale(value+nShowValueOffset, 100, nRange+nShowValueOffset)*nShowValueMul);
         break;
     case kMenuSliderQ16:
-        snprintf(buffer, 16, "%.3f ", nValue/65536.f);
+        snprintf(buffer, 16, "%.3f ", (nValue+nShowValueOffset)/65536.f*float(nShowValueMul));
         break;
     }
     int valueWidth;

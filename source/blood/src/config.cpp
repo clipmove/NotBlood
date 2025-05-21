@@ -84,6 +84,7 @@ int32_t gCrouchAuto;
 int32_t gDetail;
 int32_t gMouseAim;
 int32_t gAutoAim;
+int32_t gAutoAimRange;
 int32_t gWeaponSwitch;
 int32_t gWeaponFastSwitch;
 int32_t gLockManualSaving;
@@ -553,6 +554,7 @@ void CONFIG_SetDefaults(void)
     gMouseAimingFlipped = 0;
     gMouseAim = 1;
     gAutoAim = 2;
+    gAutoAimRange = 4;
     gWeaponSwitch = 2;
     gWeaponFastSwitch = 0;
     gLockManualSaving = 0;

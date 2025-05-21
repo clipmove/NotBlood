@@ -695,6 +695,7 @@ const char *pzWeaponInterpolateStrings[] = {
 };
 
 void SetAutoAim(CGameMenuItemZCycle *pItem);
+void SetAutoAimRange(CGameMenuItemSlider *pItem);
 void SetAutoRun(CGameMenuItemZBool *pItem);
 void SetLevelStats(CGameMenuItemZCycle *pItem);
 void SetLevelStatsOnAutomap(CGameMenuItemZBool *pItem);
@@ -726,13 +727,14 @@ CGameMenuItemZEdit itemMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 155, 180
 
 CGameMenuItemTitle itemOptionsGameTitle("GAME SETUP", 1, 160, 20, 2038);
 CGameMenuItemZCycle itemOptionsGameCycleAutoAim("AUTO AIM:", 3, 66, 60, 180, 0, SetAutoAim, pzAutoAimStrings, ARRAY_SSIZE(pzAutoAimStrings), 0);
-CGameMenuItemZBool itemOptionsGameBoolAutoRun("AUTO RUN:", 3, 66, 70, 180, 0, SetAutoRun, NULL, NULL);
-CGameMenuItemZCycle itemOptionsGameWeaponSwitch("EQUIP PICKUPS:", 3, 66, 80, 180, 0, SetWeaponSwitch, pzWeaponSwitchStrings, ARRAY_SSIZE(pzWeaponSwitchStrings), 0);
-CGameMenuItemZBool itemOptionsGameWeaponFastSwitch("FAST WEAPON SWITCH:", 3, 66, 90, 180, 0, SetWeaponFastSwitch, NULL, NULL);
-CGameMenuItemZCycle itemOptionsGameAutosaveMode("AUTOSAVE TRIGGER:", 3, 66, 110, 180, 0, SetAutosaveMode, pzAutosaveModeStrings, ARRAY_SSIZE(pzAutosaveModeStrings), 0);
-CGameMenuItemZBool itemOptionsGameLockSaving("LOCK MANUAL SAVING:", 3, 66, 120, 180, 0, SetLockSaving, "AUTOSAVES ONLY", "NEVER");
-CGameMenuItemZBool itemOptionsGameRestoreLastSave("ASK TO RESTORE LAST SAVE:", 3, 66, 130, 180, 0, SetRestoreLastSave, NULL, NULL);
-CGameMenuItemZCycle itemOptionsGameBoolVanillaMode("VANILLA MODE:", 3, 66, 140, 180, 0, SetVanillaMode, pzVanillaModeStrings, ARRAY_SSIZE(pzVanillaModeStrings), 0);
+CGameMenuItemSlider itemOptionsGameSliderAutoAimRange("AUTO AIM RANGE:", 3, 66, 70, 180, &gAutoAimRange, 0, 9, 1, SetAutoAimRange, -1, -1, kMenuSliderPercent, 1, 2);
+CGameMenuItemZBool itemOptionsGameBoolAutoRun("AUTO RUN:", 3, 66, 80, 180, 0, SetAutoRun, NULL, NULL);
+CGameMenuItemZCycle itemOptionsGameWeaponSwitch("EQUIP PICKUPS:", 3, 66, 90, 180, 0, SetWeaponSwitch, pzWeaponSwitchStrings, ARRAY_SSIZE(pzWeaponSwitchStrings), 0);
+CGameMenuItemZBool itemOptionsGameWeaponFastSwitch("FAST WEAPON SWITCH:", 3, 66, 100, 180, 0, SetWeaponFastSwitch, NULL, NULL);
+CGameMenuItemZCycle itemOptionsGameAutosaveMode("AUTOSAVE TRIGGER:", 3, 66, 120, 180, 0, SetAutosaveMode, pzAutosaveModeStrings, ARRAY_SSIZE(pzAutosaveModeStrings), 0);
+CGameMenuItemZBool itemOptionsGameLockSaving("LOCK MANUAL SAVING:", 3, 66, 130, 180, 0, SetLockSaving, "AUTOSAVES ONLY", "NEVER");
+CGameMenuItemZBool itemOptionsGameRestoreLastSave("ASK TO RESTORE LAST SAVE:", 3, 66, 140, 180, 0, SetRestoreLastSave, NULL, NULL);
+CGameMenuItemZCycle itemOptionsGameBoolVanillaMode("VANILLA MODE:", 3, 66, 150, 180, 0, SetVanillaMode, pzVanillaModeStrings, ARRAY_SSIZE(pzVanillaModeStrings), 0);
 
 CGameMenuItemTitle itemOptionsDisplayTitle("DISPLAY SETUP", 1, 160, 20, 2038);
 CGameMenuItemChain itemOptionsDisplayColor("COLOR CORRECTION", 3, 66, 40, 180, 0, &menuOptionsDisplayColor, -1, NULL, 0);
@@ -1781,6 +1783,7 @@ void SetupOptionsMenu(void)
 
     menuOptionsGame.Add(&itemOptionsGameTitle, false);
     menuOptionsGame.Add(&itemOptionsGameCycleAutoAim, true);
+    menuOptionsGame.Add(&itemOptionsGameSliderAutoAimRange, false);
     menuOptionsGame.Add(&itemOptionsGameBoolAutoRun, false);
     menuOptionsGame.Add(&itemOptionsGameWeaponSwitch, false);
     menuOptionsGame.Add(&itemOptionsGameWeaponFastSwitch, false);
@@ -1788,8 +1791,10 @@ void SetupOptionsMenu(void)
     menuOptionsGame.Add(&itemOptionsGameLockSaving, false);
     menuOptionsGame.Add(&itemOptionsGameRestoreLastSave, false);
     menuOptionsGame.Add(&itemOptionsGameBoolVanillaMode, false);
+    itemOptionsGameSliderAutoAimRange.bDisableForNet = 1;
     itemOptionsGameLockSaving.bDisableForNet = 1;
     itemOptionsGameBoolVanillaMode.bDisableForNet = 1;
+    itemOptionsGameSliderAutoAimRange.tooltip_pzTextUpper = "Set autoaim angle modifier";
     itemOptionsGameWeaponFastSwitch.tooltip_pzTextUpper = "Allow weapon switching while";
     itemOptionsGameWeaponFastSwitch.tooltip_pzTextLower = "weapon is being lowered/raised";
     itemOptionsGameAutosaveMode.tooltip_pzTextUpper = "Set when autosave will trigger";
@@ -1839,6 +1844,7 @@ void SetupOptionsMenu(void)
 
     menuOptionsGame.Add(&itemBloodQAV, false);
     itemOptionsGameCycleAutoAim.m_nFocus = gAutoAim;
+    itemOptionsGameSliderAutoAimRange.nValue = gAutoAimRange;
     itemOptionsGameBoolAutoRun.at20 = !!gAutoRun;
     itemOptionsGameWeaponSwitch.m_nFocus = gWeaponSwitch % ARRAY_SSIZE(pzWeaponSwitchStrings);
     itemOptionsGameWeaponFastSwitch.at20 = !!gWeaponFastSwitch;
@@ -2671,6 +2677,11 @@ void SetAutoAim(CGameMenuItemZCycle *pItem)
         gProfile[myconnectindex].nAutoAim = gAutoAim;
         netBroadcastPlayerInfo(myconnectindex);
     }
+}
+
+void SetAutoAimRange(CGameMenuItemSlider *pItem)
+{
+    gAutoAimRange = pItem->nValue;
 }
 
 void SetAutoRun(CGameMenuItemZBool *pItem)
