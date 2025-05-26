@@ -1173,7 +1173,7 @@ void RecoilDude(spritetype *pSprite, XSPRITE *pXSprite)
                 aiNewState(pSprite, pXSprite, &houndRecoil);
             break;
         case kDudeTchernobog:
-            aiPlay3DSound(pSprite, 2370+Random(2), AI_SFX_PRIORITY_2, -1);
+            aiPlay3DSound(pSprite, 2370+Random(6), AI_SFX_PRIORITY_2, -1);
             aiNewState(pSprite, pXSprite, &tchernobogRecoil);
             break;
         case kDudeHand:
