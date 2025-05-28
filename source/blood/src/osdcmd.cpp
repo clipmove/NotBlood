@@ -96,6 +96,10 @@ static int osdcmd_changelevel(osdcmdptr_t parm)
         gGameMenuMgr.Deactivate();
         return OSDCMD_OK;
     }
+    else if (gGameStarted) // keep items while changing level
+    {
+        gGameOptions.uGameFlags |= kGameFlagContinuing;
+    }
     levelSetupOptions(volume, level);
     StartLevel(&gGameOptions);
     viewResizeView(gViewSize);
