@@ -922,7 +922,7 @@ CGameMenuItemZBool itemOptionsDisplayPolymostDeliriumBlur("DELIRIUM EFFECT BLUR:
 CGameMenuItemZBool itemOptionsDisplayPolymostUseColorIndexedTex("PALETTE EMULATON:", 3, 66, 140, 180, 0, UpdateTexColorIndex, NULL, NULL);
 CGameMenuItemZBool itemOptionsDisplayPolymostShadeInterpolation("PALETTE INTERPOLATION:", 3, 66, 150, 180, 0, UpdateShadeInterpolation, NULL, NULL);
 CGameMenuItemZBool itemOptionsDisplayPolymostYShearing("Y-SHEARING:", 3, 66, 160, 180, 0, UpdateYShrearing, NULL, NULL);
-CGameMenuItemSlider itemOptionsDisplayPolymostRollAngle("VIEW ROLLING:", 3, 66, 170, 180, &gRollAngle, 0, 5, 1, UpdateRollAngle, -1, -1, kMenuSliderValue);
+CGameMenuItemSlider itemOptionsDisplayPolymostRollAngle("VIEW ROLLING:", 3, 66, 170, 180, &gRollAngle, -5, 5, 1, UpdateRollAngle, -1, -1, kMenuSliderValue);
 #endif
 
 void UpdateSoundToggle(CGameMenuItemZBool *pItem);
