@@ -4603,8 +4603,10 @@ void viewDrawScreen(void)
             {
                 const int nAng = fix16_to_int(gViewAngle)&kAngMask;
                 RotateVector(&nXVel, &nYVel, -nAng);
-                nRollAngle = 13 + (5 - gRollAngle);
+                nRollAngle = 13 + (5 - klabs(gRollAngle));
                 nRollAngle = ClipRange(nYVel>>nRollAngle, -(kAng15+kAng5), kAng15+kAng5);
+                if (gRollAngle < 0)
+                    nRollAngle = -nRollAngle;
             }
         }
         renderSetRollAngle(nRollAngle);
