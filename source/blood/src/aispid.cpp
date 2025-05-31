@@ -146,11 +146,12 @@ static void SpidJumpSeqCallback(int, int nXSprite)
         dz += pTarget->z-pSprite->z;
         switch (pSprite->type) {
             case kDudeSpiderBrown:
-            case kDudeSpiderRed:
             case kDudeSpiderBlack:
                 xvel[nSprite] = dx << 16;
                 yvel[nSprite] = dy << 16;
                 zvel[nSprite] = dz << 16;
+                break;
+            case kDudeSpiderRed:
                 break;
         }
     }
