@@ -165,6 +165,7 @@ extern int gSectorBehavior;
 extern int gHitscanProjectiles;
 extern int gGoreBehavior;
 extern int gRandomizerMode;
+extern int gRandomizerScaleMode;
 extern char gzRandomizerSeed[9];
 //////
 
