@@ -1554,7 +1554,7 @@ void DrawPackItemInStatusBar(PLAYER *pPlayer, int x, int y, int x2, int y2, int 
     if (pPlayer->packItemId < 0) return;
 
     DrawStatSprite(gPackIcons[pPlayer->packItemId], x, y, 0, 0, nStat);
-    DrawStatNumber("%3d", pPlayer->packSlots[pPlayer->packItemId].curAmount, 2250, x2, y2, 0, 0, nStat);
+    DrawStatNumber("%3d", pPlayer->packSlots[pPlayer->packItemId].curAmount, 2250, x2, y2, 4, 0, nStat);
 }
 
 void DrawPackItemInStatusBar2(PLAYER *pPlayer, int x, int y, int x2, int y2, int nStat, int nScale)
@@ -1562,7 +1562,7 @@ void DrawPackItemInStatusBar2(PLAYER *pPlayer, int x, int y, int x2, int y2, int
     if (pPlayer->packItemId < 0) return;
 
     DrawStatMaskedSprite(gPackIcons2[pPlayer->packItemId].nTile, x, y+gPackIcons2[pPlayer->packItemId].nYOffs, 0, 0, nStat, gPackIcons2[pPlayer->packItemId].nScale);
-    DrawStatNumber("%3d", pPlayer->packSlots[pPlayer->packItemId].curAmount, kSBarNumberInv, x2, y2, 0, 0, nStat, nScale);
+    DrawStatNumber("%3d", pPlayer->packSlots[pPlayer->packItemId].curAmount, kSBarNumberInv, x2, y2, 4, 0, nStat, nScale);
 }
 
 void viewDrawPlayerSlots(void)
