@@ -526,7 +526,7 @@ void aiActivateDude(spritetype *pSprite, XSPRITE *pXSprite)
             aiNewState(pSprite, pXSprite, &eelSearch);
         else
         {
-            if (Chance(0x8000))
+            if (Chance(0x4000))
                 aiPlay3DSound(pSprite, 1501, AI_SFX_PRIORITY_1, -1);
             else
                 aiPlay3DSound(pSprite, 1500, AI_SFX_PRIORITY_1, -1);
