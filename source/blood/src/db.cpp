@@ -1413,8 +1413,8 @@ void dbRandomizerMode(spritetype *pSprite)
 
 void dbRandomizerModeScale(spritetype *pSprite, XSPRITE* pXSprite)
 {
-    const bool randomCheatActive = (gGameOptions.nRandomizerCheat >= 0) && (gGameOptions.nRandomizerCheat <= 15); // only randomize enemy sizes if seed cheats 0-15 are active
-    if (!randomCheatActive)
+    const bool bRandomCheatActive = ((gGameOptions.nGameType != kGameTypeSinglePlayer || gRandomizerScaleMode) && (gGameOptions.nRandomizerCheat >= 0) && (gGameOptions.nRandomizerCheat <= 15)) || (gGameOptions.nGameType == kGameTypeSinglePlayer && gRandomizerScaleMode == 2); // only randomize enemy sizes if seed cheats 0-15 are active
+    if (!bRandomCheatActive)
         return;
     if (!pXSprite->scale && !dbRandomizerRNGDudes(3)) { // randomly change enemy scale (only if enemy does not have scale set already)
         switch (pSprite->type) { // make enemies randomly huge

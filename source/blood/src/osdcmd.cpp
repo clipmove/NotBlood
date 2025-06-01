@@ -1017,6 +1017,7 @@ int32_t registerosdcommands(void)
         { "cl_viewhbob", "enable/disable view horizontal bobbing", (void *)&gViewHBobbing, CVAR_BOOL, 0, 1 },
         { "cl_viewvbob", "enable/disable view vertical bobbing", (void *)&gViewVBobbing, CVAR_BOOL, 0, 1 },
         { "cl_weaponhbob", "enable/disable weapon horizontal bobbing (0: off, 1: original, 2: V1.0x)", (void *)&gWeaponHBobbing, CVAR_INT|CVAR_MULTI, 0, 2 },
+        { "cl_randomizerscale", "enable/disable randomly scaling enemies for randomizer mode (0: disable, 1: only with seed cheats, 2: always) (always use 1 in multiplayer)", (void *)&gRandomizerScaleMode, CVAR_INT, 0, 2 },
         { "cl_slopetilting", "enable/disable slope tilting", (void *)&gSlopeTilting, CVAR_BOOL, 0, 1 },
         { "cl_slopecrosshair", "enable/disable adjusting crosshair position for slope tilting", (void *)&gSlopeReticle, CVAR_BOOL, 0, 1 },
         { "cl_showplayernames", "enable/disable showing player names in multiplayer when looking at other players", (void *)&gShowPlayerNames, CVAR_BOOL, 0, 1 },
