@@ -2172,7 +2172,7 @@ void FragPlayer(PLAYER *pPlayer, int nSprite)
         int nTeam2 = pPlayer->teamId&1;
         if (nTeam1 == 0)
         {
-            if (nTeam1 != nTeam2)
+            if (nTeam1 == nTeam2)
                 evSend(0, 0, 15, kCmdToggle, pPlayer->nSprite);
             else
                 evSend(0, 0, 16, kCmdToggle, pPlayer->nSprite);
