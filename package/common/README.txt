@@ -219,6 +219,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable multi kill messages (0: disable, 1: enable, 2: enable + audio alert)
 * cl_weaponhbob
    - Enable/disable view horizontal bobbing
+* cl_randomizerscale
+   - Enable/disable randomly scaling enemies for randomizer mode (0: disable, 1: only with seed cheats, 2: always) (always use 1 in multiplayer)
 * cl_rollangle
    - Sets how much your screen tilts when strafing (polymost only)
 * cl_shotgunaltfirereload

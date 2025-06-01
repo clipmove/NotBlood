@@ -185,6 +185,7 @@ int gSectorBehavior;
 int gHitscanProjectiles;
 int gGoreBehavior;
 int gRandomizerMode;
+int gRandomizerScaleMode;
 char gzRandomizerSeed[9];
 /////////
 
@@ -574,6 +575,7 @@ void CONFIG_SetDefaults(void)
     gHitscanProjectiles = 0;
     gGoreBehavior = 0;
     gRandomizerMode = 0;
+    gRandomizerScaleMode = 1;
     Bmemset(gzRandomizerSeed, 0, sizeof(gzRandomizerSeed));
 
     CONFIG_SetDefaultPlayerName();
