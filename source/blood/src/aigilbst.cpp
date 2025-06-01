@@ -258,7 +258,7 @@ static void thinkSwimChase(spritetype *pSprite, XSPRITE *pXSprite)
 {
     if (pXSprite->target == -1)
     {
-        aiNewState(pSprite, pXSprite, &gillBeastSwimSearch);
+        aiNewState(pSprite, pXSprite, &gillBeastSwimGoto);
         return;
     }
     dassert(pSprite->type >= kDudeBase && pSprite->type < kDudeMax);
