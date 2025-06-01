@@ -1542,7 +1542,7 @@ void TeleFrag(int nKiller, int nSector)
         if (pSprite->statnum == kStatDude)
             actDamageSprite(nKiller, pSprite, kDamageExplode, 4000);
         else if (pSprite->statnum == kStatThing)
-            actDamageSprite(nKiller, pSprite, kDamageExplode, 4000);
+            actDamageSprite(nKiller, pSprite, kDamageExplode, 8000);
     }
 }
 
