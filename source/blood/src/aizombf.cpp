@@ -160,7 +160,7 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
         int height = (pDudeInfo->eyeHeight*pSprite->yrepeat)<<2;
         if (cansee(pTarget->x, pTarget->y, pTarget->z, pTarget->sectnum, pSprite->x, pSprite->y, pSprite->z - height, pSprite->sectnum))
         {
-            if (klabs(nDeltaAngle) <= pDudeInfo->periphery)
+            if (nDist < pDudeInfo->seeDist && klabs(nDeltaAngle) <= pDudeInfo->periphery)
             {
                 aiSetTarget(pXSprite, pXSprite->target);
                 if (nDist < 0x1400 && nDist > 0xe00 && klabs(nDeltaAngle) < 85)
