@@ -477,7 +477,7 @@ void netGetPackets(void)
         }
         case 3:
             pPacket += 4;
-            if (pPacket[0] != '/' || (!pPacket[0] && (!pPacket[1] || (pPacket[1] >= '1' && pPacket[1] <= '8' && pPacket[1] - '1' == myconnectindex))))
+            if (pPacket[0] != '/' || (pPacket[0] == '/' && (!pPacket[1] || (pPacket[1] >= '1' && pPacket[1] <= '8' && pPacket[1] - '1' == myconnectindex))))
             {
                 sprintf(buffer, !VanillaMode() ? "%s: %s" : "%s : %s", gProfile[nPlayer].name, pPacket);
                 viewSetMessage(buffer, gColorMsg && !VanillaMode() ? playerColorPalMessage(gPlayer[nPlayer].teamId) : 0);
