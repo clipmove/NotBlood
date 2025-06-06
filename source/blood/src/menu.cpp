@@ -90,6 +90,7 @@ void SetTurnAcceleration(CGameMenuItemZCycle *);
 void SetCenterView(CGameMenuItemZBool *);
 void SetJoystickTargetAimAssist(CGameMenuItemZBool *);
 void SetJoystickRadialMenuToggle(CGameMenuItemZBool *);
+void SetJoystickRadialMenuSlowDown(CGameMenuItemZBool *);
 void SetJoystickRumble(CGameMenuItemZBool *);
 void SetCrouchToggle(CGameMenuItemZBool *);
 void SetCrouchAuto(CGameMenuItemZBool *);
@@ -1230,12 +1231,13 @@ CGameMenuItemSlider *pItemOptionsControlJoystickAxisSaturate[MAXJOYAXES];
 CGameMenuItemZBool *pItemOptionsControlJoystickAxisSoloDeadzone[MAXJOYAXES];
 
 CGameMenuItemTitle itemOptionsControlJoystickMiscTitle("JOYSTICK MISC", 1, 160, 20, 2038);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 50, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchAuto("AUTO CROUCH:", 1, 18, 70, 280, gCrouchAuto, SetCrouchAuto, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCenterView("CENTER VIEW ON DROP:", 1, 18, 90, 280, gCenterViewOnDrop, SetCenterView, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscTargetAimAssist("TARGET AIM ASSIST:", 1, 18, 110, 280, 0, SetJoystickTargetAimAssist, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscRadialMenuToggle("RADIAL MENU:", 1, 18, 130, 280, 0, SetJoystickRadialMenuToggle, "TOGGLE", "HOLD");
-CGameMenuItemZBool itemOptionsControlJoystickMiscRumble("RUMBLE CONTROLLER:", 1, 18, 150, 280, 0, SetJoystickRumble, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 35, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchAuto("AUTO CROUCH:", 1, 18, 55, 280, gCrouchAuto, SetCrouchAuto, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCenterView("CENTER VIEW ON DROP:", 1, 18, 75, 280, gCenterViewOnDrop, SetCenterView, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscTargetAimAssist("TARGET AIM ASSIST:", 1, 18, 95, 280, 0, SetJoystickTargetAimAssist, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscRadialMenuToggle("RADIAL MENU:", 1, 18, 115, 280, 0, SetJoystickRadialMenuToggle, "TOGGLE", "HELD DOWN");
+CGameMenuItemZBool itemOptionsControlJoystickMiscRadialMenuSlowDown("RADIAL MENU SLOW DOWN:", 1, 18, 135, 280, 0, SetJoystickRadialMenuSlowDown, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscRumble("RUMBLE CONTROLLER:", 1, 18, 155, 280, 0, SetJoystickRumble, NULL, NULL);
 
 void SetupLoadingScreen(void)
 {
@@ -2176,6 +2178,7 @@ void SetupJoystickMenu(void)
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscCenterView, false);
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscTargetAimAssist, false);
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscRadialMenuToggle, false);
+    menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscRadialMenuSlowDown, false);
     menuOptionsControlJoystickMisc.Add(&itemOptionsControlJoystickMiscRumble, false);
     menuOptionsControlJoystickMisc.Add(&itemBloodQAV, false);
     itemOptionsControlJoystickMiscTargetAimAssist.tooltip_pzTextUpper = "Slows camera movement when";
@@ -2186,6 +2189,7 @@ void SetupJoystickMenu(void)
     itemOptionsControlJoystickMiscCenterView.at20 = gCenterViewOnDrop;
     itemOptionsControlJoystickMiscTargetAimAssist.at20 = gTargetAimAssist;
     itemOptionsControlJoystickMiscRadialMenuToggle.at20 = gRadialMenuToggle;
+    itemOptionsControlJoystickMiscRadialMenuSlowDown.at20 = gRadialMenuSlowDown;
     itemOptionsControlJoystickMiscRumble.at20 = gSetup.joystickrumble;
 
     int i = 0, y = 0;
@@ -2656,6 +2660,11 @@ void SetJoystickTargetAimAssist(CGameMenuItemZBool *pItem)
 void SetJoystickRadialMenuToggle(CGameMenuItemZBool *pItem)
 {
     gRadialMenuToggle = pItem->at20;
+}
+
+void SetJoystickRadialMenuSlowDown(CGameMenuItemZBool *pItem)
+{
+    gRadialMenuSlowDown = pItem->at20;
 }
 
 void SetJoystickRumble(CGameMenuItemZBool *pItem)

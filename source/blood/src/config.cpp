@@ -80,6 +80,7 @@ int32_t gTurnAcceleration;
 int32_t gCenterViewOnDrop;
 int32_t gTargetAimAssist;
 int32_t gRadialMenuToggle;
+int32_t gRadialMenuSlowDown;
 int32_t gCrouchToggle;
 int32_t gCrouchAuto;
 int32_t gDetail;
@@ -508,6 +509,7 @@ void CONFIG_SetDefaults(void)
     gCenterViewOnDrop = 0;
     gTargetAimAssist = 0;
     gRadialMenuToggle = 0;
+    gRadialMenuSlowDown = 1;
     gCrouchToggle = 0;
     gCrouchAuto = 0;
     gDetail = 4;
