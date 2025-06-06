@@ -753,15 +753,18 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
             timerInit(CLOCKTICKSPERSECOND>>4);
             bTimeSlowed = 1;
         }
-        for (int i = 0; i <= 12; i++) // set the reticle to the weapon being switched to
+        if ((gMe->input.newWeapon > kWeaponNone) || (gMe->nextWeapon > kWeaponNone))
         {
-            if ((kWeaponSelectTable[i] != gMe->input.newWeapon) && (kWeaponSelectTable[i] != gMe->nextWeapon)) // we're not picking this weapon, skip
-                continue;
-            gWeaponRadialMenuChoice = kWeaponSelectTable[i];
-            gWeaponRadialMenuAng = kWeaponAngTable[i];
-            break;
+            for (int i = 0; i <= 12; i++) // set the reticle to the weapon being switched to
+            {
+                if ((kWeaponSelectTable[i] != gMe->input.newWeapon) && (kWeaponSelectTable[i] != gMe->nextWeapon)) // we're not picking this weapon, skip
+                    continue;
+                gWeaponRadialMenuChoice = kWeaponSelectTable[i];
+                gWeaponRadialMenuAng = kWeaponAngTable[i];
+                break;
+            }
         }
-        if (gWeaponRadialMenuChoice == -1) // weapon is not being switched, fall back to currently held weapon
+        else // weapon is not being switched, fall back to currently held weapon
         {
             for (int i = 0; i <= 12; i++) // set the reticle already on the current weapon
             {
