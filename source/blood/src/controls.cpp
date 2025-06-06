@@ -721,16 +721,21 @@ void ctrlRadialWeaponMenu(const bool bButton)
     {
         if (!bButton)
             break;
-        gWeaponRadialMenuState = 1;
+        gWeaponRadialMenuState = gRadialMenuToggle ? 4 : 1;
         gWeaponRadialMenuChoice = -1;
         if (gGameOptions.nGameType == kGameTypeSinglePlayer) // only allow slowdown during singleplayer
             timerInit(CLOCKTICKSPERSECOND>>4);
         break;
     }
+    case 4:
+    {
+        if (!gRadialMenuToggle || !bButton)
+            gWeaponRadialMenuState = 1;
+        break;
+    }
     case 1:
     {
-        
-        if (!bButton)
+        if (!gRadialMenuToggle && !bButton || gRadialMenuToggle && bButton)
         {
             gWeaponRadialMenuState = 2;
             if (gMe->curWeapon == gWeaponRadialMenuChoice) // don't bother re-equipping same weapon

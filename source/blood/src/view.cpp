@@ -1567,6 +1567,7 @@ void viewDrawWeaponSelect(PLAYER* pPlayer, XSPRITE *pXSprite)
     float animPos = 0;
 
     const bool timeDiffTooBig = ((animClock - (attackTime+holdTime+decayTime)) > curTime) || ((animClock + (attackTime+holdTime+decayTime)) < curTime);
+    if (gWeaponRadialMenuState || (curTime < (50*kTicsPerFrame)) || (animState && timeDiffTooBig)) // if radial menu is active, player just started level, or the clock is impossibly far ahead (eg player quickloaded)
     {
         animClock = curTime;
         animState = 0;
