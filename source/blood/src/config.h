@@ -60,6 +60,7 @@ extern int32_t gTurnAcceleration;
 extern int32_t gCenterViewOnDrop;
 extern int32_t gTargetAimAssist;
 extern int32_t gRadialMenuToggle;
+extern int32_t gRadialMenuSlowDown;
 extern int32_t gCrouchToggle;
 extern int32_t gCrouchAuto;
 extern int32_t gDetail;

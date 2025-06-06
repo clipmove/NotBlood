@@ -391,7 +391,10 @@ void ctrlGetInput(void)
                 if ((sector[nSectnumNew].ceilingpicnum >= 4080) && (sector[nSectnumNew].ceilingpicnum <= 4095)) // if sector HAS a fake ceiling (e.g. E4M4 elevator), skip
                     continue;
                 getzsofslope(nSectnumNew, nX, nY, &cZ, &fZ);
-                nDiff = cZ - (bInAir ? nZ : fZCurrentSect); // if player is in air, use current Z height position as compare
+                if (bInAir) // if player is in air, use current Z height position as compare
+                    nDiff = cZ - nZ;
+                else
+                    nDiff = cZ - fZCurrentSect;
                 if ((nDiff < -3072) && (nDiff > -15000))
                 {
                     bCrouchState = 1;
@@ -709,10 +712,16 @@ void ctrlRadialWeaponMenu(const bool bButton)
         kWeaponRemoteTNT,
         kWeaponProxyTNT,
     };
+    static char bTimeSlowed = 0;
 
     if (!gMe || gMe->pXSprite->health == 0)
     {
         gWeaponRadialMenuState = 0;
+        if (bTimeSlowed)
+        {
+            timerInit(CLOCKTICKSPERSECOND);
+            bTimeSlowed = 0;
+        }
         return;
     }
     switch (gWeaponRadialMenuState)
@@ -723,19 +732,21 @@ void ctrlRadialWeaponMenu(const bool bButton)
             break;
         gWeaponRadialMenuState = gRadialMenuToggle ? 4 : 1;
         gWeaponRadialMenuChoice = -1;
-        if (gGameOptions.nGameType == kGameTypeSinglePlayer) // only allow slowdown during singleplayer
+        if (gRadialMenuSlowDown && (gGameOptions.nGameType == kGameTypeSinglePlayer)) // only allow slowdown during singleplayer
+        {
             timerInit(CLOCKTICKSPERSECOND>>4);
+            bTimeSlowed = 1;
+        }
         break;
     }
     case 4:
-    {
-        if (!gRadialMenuToggle || !bButton)
-            gWeaponRadialMenuState = 1;
-        break;
-    }
     case 1:
     {
-        if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && bButton))
+        if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
+        {
+            gWeaponRadialMenuState = 1;
+        }
+        else if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && bButton && gWeaponRadialMenuState == 1))
         {
             gWeaponRadialMenuState = 2;
             if (gMe->curWeapon == gWeaponRadialMenuChoice) // don't bother re-equipping same weapon
@@ -773,8 +784,11 @@ void ctrlRadialWeaponMenu(const bool bButton)
         gWeaponRadialMenuState = 0;
         if (gWeaponRadialMenuChoice != -1)
             gInput.newWeapon = gWeaponRadialMenuChoice;
-        if (gGameOptions.nGameType == kGameTypeSinglePlayer) // only allow slowdown during singleplayer
+        if (bTimeSlowed)
+        {
             timerInit(CLOCKTICKSPERSECOND);
+            bTimeSlowed = 0;
+        }
         break;
     }
     default:

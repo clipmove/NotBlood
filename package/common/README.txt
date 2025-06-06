@@ -293,6 +293,10 @@ If you have the GOG version of the game, do the following:
    - Enable/disable automatic crouching for small crawl spaces
 * in_crouchmode
    - Toggles crouch button (0:hold, 1:toggle)
+* in_radialmenuslowdown
+   - Enable/disable the radial menu slow down behavior
+* in_radialmenutoggle
+   - Sets the radial menu behavior (0: held, 1: toggle)
 * in_targetaimassist
    - enable/disable slowing camera movement when aiming towards a target (joystick only)
 * notarget
