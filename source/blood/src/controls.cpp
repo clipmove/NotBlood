@@ -149,7 +149,7 @@ float gViewLookAdjust;
 int gViewLookRecenter;
 int gCrouchToggleState = 0;
 
-void ctrlRadialWeaponMenu(const bool bButton);
+void ctrlRadialWeaponMenu(const bool bButton, const bool bReset);
 
 void ctrlGetInput(void)
 {
@@ -160,6 +160,7 @@ void ctrlGetInput(void)
         gInput = {};
         gInput.keyFlags.isTyping = (gInputMode == INPUT_MODE_2) && gGameStarted && !VanillaMode(); // only show typing indicator for non-vanilla mode
         CONTROL_GetInput(&info);
+        ctrlRadialWeaponMenu(false, true);
         return;
     }
 
@@ -675,7 +676,7 @@ void ctrlGetInput(void)
         gViewLook = fix16_clamp(gViewLook+(input.q16mlook << 3), F16(downAngle), F16(upAngle));
     }
 
-    ctrlRadialWeaponMenu(BUTTON(gamefunc_Radial_Weapon_Menu));
+    ctrlRadialWeaponMenu(BUTTON(gamefunc_Radial_Weapon_Menu), false);
 }
 
 void ctrlJoystickRumble(int nTime)
@@ -695,7 +696,7 @@ int gWeaponRadialMenuState = 0;
 int gWeaponRadialMenuChoice = -1;
 int gWeaponRadialMenuAng = 0;
 
-void ctrlRadialWeaponMenu(const bool bButton)
+void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
 {
     const int kWeaponSelectTable[12] =
     {
@@ -714,7 +715,7 @@ void ctrlRadialWeaponMenu(const bool bButton)
     };
     static char bTimeSlowed = 0;
 
-    if (!gMe || gMe->pXSprite->health == 0)
+    if (bReset || !gMe || gMe->pXSprite->health == 0)
     {
         gWeaponRadialMenuState = 0;
         if (bTimeSlowed)
@@ -760,11 +761,10 @@ void ctrlRadialWeaponMenu(const bool bButton)
             break;
         }
         int nNewChoice = getangle(-gInput.forward, -gInput.strafe) * (12*5) / kAngMask;
-        int nChoiceRounded = nNewChoice%5;
+        const int nChoiceRounded = nNewChoice%5;
         if (nChoiceRounded >= 0 && nChoiceRounded <= 2) // when player has selected the middle of the slice, update choice
         {
-            for (; nChoiceRounded > 0; nChoiceRounded--) // round to nearest 5
-                nNewChoice--;
+            nNewChoice = nNewChoice - nChoiceRounded; // round to nearest 5
             const int nChoiceBak = nNewChoice;
             nNewChoice = ClipRange(nNewChoice/5U, 0, 12);
             nNewChoice = kWeaponSelectTable[nNewChoice];
