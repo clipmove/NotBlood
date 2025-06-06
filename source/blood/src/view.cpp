@@ -1433,7 +1433,7 @@ const struct POWERUPDISPLAY {
     {gPowerUpInfo[kPwUpReflectShots].picnum, fix16_from_float(0.4f), 5}, // reflects enemy shots
     {gPowerUpInfo[kPwUpDeathMask].picnum, fix16_from_float(0.3f), 9}, // invulnerability
     {gPowerUpInfo[kPwUpTwoGuns].picnum, fix16_from_float(0.25f), 4}, // guns akimbo
-    {30463, fix16_from_float(0.45f), 7}, // quad damage
+    {9300, fix16_from_float(0.45f), 7}, // quad damage
     {gPowerUpInfo[kPwUpShadowCloakUseless].picnum, fix16_from_float(0.4f), 9}, // shadow cloak (does nothing, only appears at near the end of CP04)
 
     // not in official maps
@@ -1567,7 +1567,6 @@ void viewDrawWeaponSelect(PLAYER* pPlayer, XSPRITE *pXSprite)
     float animPos = 0;
 
     const bool timeDiffTooBig = ((animClock - (attackTime+holdTime+decayTime)) > curTime) || ((animClock + (attackTime+holdTime+decayTime)) < curTime);
-    if ((curTime < (50*kTicsPerFrame)) || (animState && timeDiffTooBig)) // if player just started level, or the clock is impossibly far ahead (eg player quickloaded)
     {
         animClock = curTime;
         animState = 0;
@@ -1709,6 +1708,78 @@ void viewDrawWeaponSelect(PLAYER* pPlayer, XSPRITE *pXSprite)
         DrawStatMaskedSprite(1142, x-xoffset, ySecondary, 256, 12, 0, 0x2000);
     if (!WeaponIsEquipable(pPlayer, weaponNext)) // if next weapon is unavailable, draw cross over icon
         DrawStatMaskedSprite(1142, x+xoffset, ySecondary, 256, 12, 0, 0x2000);
+}
+
+void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
+{
+    const struct WEAPONICON
+    {
+        int nTile;
+        int nSlot : 8;
+        int nX : 8;
+        int nY : 8;
+        int bMirror : 8;
+        int nScale;
+    } weaponIcons[] =
+    {
+        {  -1, 0,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
+        {3131, 1,  0, -6, 0, -fix16_from_float(0.1f)+fix16_from_float(0.35f),  }, // 1: pitchfork
+        { 524, 2,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.55f),  }, // 2: flare gun
+        { 559, 4,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 3: shotgun
+        { 558, 3,  0, -2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.45f),  }, // 4: tommy gun
+        { 526, 9,  0, -1, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 5: napalm launcher
+        { 589, 5, -1,  5, 0, -fix16_from_float(0.1f)+fix16_from_float(0.6875f),}, // 6: dynamite
+        { 618, 6,  0,  6, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 7: spray can
+        { 539, 10, 0, -6, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 8: tesla gun
+        { 800, 12, 2,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 9: life leech
+        { 525, 11, 2, -7, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 10: voodoo doll
+        { 811, 7, -1,  2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 11: proxy bomb
+        { 810, 8,  1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 12: remote bomb
+        {  -1, 13, 0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
+    };
+
+    const char bPlayerIsDead = !pXSprite || (pXSprite->health == 0);
+    if (bPlayerIsDead)
+        return;
+    const int lerpTime = gViewInterpolate ? rotatespritesmoothratio / (65536 / kTicsPerFrame) : 0; // don't use interpolate value if view interpolation is disabled
+    const int curClock = numplayers > 1 ? int(totalclock)/4U : gLevelTime; // use totalclock for multiplayer (lag friendly 120-based timer)
+    const int curTime = (curClock*kTicsPerFrame)+lerpTime;
+    const char nWeaponCur = ClipRange(gWeaponRadialMenuChoice, kWeaponNone, kWeaponBeast);
+
+    const int nPingPongTicks = 75;
+    char nPingPong = (char)(curTime%nPingPongTicks)-(nPingPongTicks>>1);
+    if (nPingPong > (nPingPongTicks>>1)) // ping-pong fade effect
+        nPingPong = -nPingPong;
+    nPingPong = (nPingPong>>2)+(nPingPong>>3); // decrease overall shade difference by 37.5%
+
+    if (gWeaponRadialMenuChoice != -1) // render reticle
+    {
+        int nX = mulscale30(45, Sin(gWeaponRadialMenuAng));
+        int nY = mulscale30(45, Cos(gWeaponRadialMenuAng));
+        DrawStatMaskedSprite(2089, (320>>1)+(320>>2)+nX, (200>>1)-(200>>5)+nY, 16, 0, RS_AUTO, fix16_from_float(0.25f));
+    }
+    DrawStatMaskedSprite(9287, (320>>1)+(320>>2), (200>>1)-(200>>5), 16, 0, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
+    for (int i = kWeaponPitchfork; i <= kWeaponRemoteTNT; i++)
+    {
+        if (!WeaponIsEquipable(pPlayer, i))
+            continue;
+        const int nWheelSlot = weaponIcons[i].nSlot;
+        const int nTile = weaponIcons[i].nTile;
+        const int nShade = i == nWeaponCur ? nPingPong : 28;
+        const int nPal = i == nWeaponCur ? 0 : 5;
+        const int nFlags = i == nWeaponCur ? RS_AUTO : RS_AUTO|RS_TRANS_MASK;
+        const int nScale = weaponIcons[i].nScale+(i == nWeaponCur ? nPingPong<<5 : 0);
+        const char bMirror = weaponIcons[i].bMirror;
+
+        const int nDist = 46;
+        int nX = mulscale30(nDist, Sin(nWheelSlot*kAng30));
+        int nY = -mulscale30(nDist, Cos(nWheelSlot*kAng30));
+        if (nY > 0)
+            nY -= 5;
+        nX += weaponIcons[i].nX;
+        nY += weaponIcons[i].nY;
+        DrawStatMaskedSprite(nTile, (320>>1)+(320>>2)+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale, bMirror);
+    }
 }
 
 void viewDrawMapTitle(void)
@@ -2213,7 +2284,7 @@ void UpdateStatusBar(ClockTicks arg)
     {
         const char bKeyHolder = (gViewSize == 3); // if hud size 3, use custom key holder attached to health/ammo hud tile
         if (bKeyHolder)
-            DrawStatSprite(30457, (37/2)+(34-xscalehud), 187, 16, nPalette, 256); // use key holder hud tile from notblood.pk3/TILES099.ART
+            DrawStatSprite(9294, (37/2)+(34-xscalehud), 187, 16, nPalette, 256); // use key holder hud tile from notblood.pk3/TILES099.ART
         else
             DrawStatSprite(2201, 34-xscalehud, 187, 16, nPalette, 256);
         if (pXSprite->health >= (gHealthBlink && !VanillaMode() ? 16<<4 : 16) || ((int)totalclock&16) || pXSprite->health == 0)
@@ -2386,6 +2457,9 @@ void UpdateStatusBar(ClockTicks arg)
     if (bDrawWeaponHud) // draw weapon select bar over hud
         viewDrawWeaponSelect(pPlayer, pXSprite);
 
+    if (gWeaponRadialMenuState) // draw weapon radial menu over hud
+        viewDrawWeaponRadialMenu(pPlayer, pXSprite);
+
     if (gGameOptions.nGameType == kGameTypeSinglePlayer) return;
 
     if (gGameOptions.nGameType >= kGameTypeBloodBath)
@@ -2460,7 +2534,7 @@ void viewPrecacheTiles(void)
         tilePrecacheTile(2552 + i, 0);
     }
     // pre-cache all notblood.pk3/TILES099.ART
-    for (int i = 30451; i <= 30463; i++)
+    for (int i = 9287; i <= 9300; i++)
         tilePrecacheTile(i, 0);
 }
 
@@ -3385,7 +3459,7 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
         {
             if ((pTSprite->statnum == kStatItem) && (pTSprite->type == kItemTwoGuns) && (pTSprite->picnum == gPowerUpInfo[kPwUpTwoGuns].picnum) && gGameOptions.bQuadDamagePowerup)
             {
-                pTSprite->picnum = nTile = 30463; // if quad damage is enabled, replace guns akimbo icon with quad damage icon from notblood.pk3/TILES099.ART
+                pTSprite->picnum = nTile = 9300; // if quad damage is enabled, replace guns akimbo icon with quad damage icon from notblood.pk3/TILES099.ART
             }
             else if ((pTSprite->statnum == kStatDude) || (pTSprite->type == kThingVoodooHead))
             {
@@ -3798,7 +3872,7 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                 if (gPlayerTyping[pPlayer->nPlayer] && !VanillaMode()) {
                     auto pNTSprite = viewAddEffect(nTSprite, kViewEffectFlag);
                     if (pNTSprite) {
-                        pNTSprite->picnum = 30456; // use typing indicator icon tile from notblood.pk3/TILES099.ART
+                        pNTSprite->picnum = 9293; // use typing indicator icon tile from notblood.pk3/TILES099.ART
                         pNTSprite->x += mulscale30(Cos((gCameraAng + kAng90) & kAngMask), 96); // offset to the right
                         pNTSprite->y += mulscale30(Sin((gCameraAng + kAng90) & kAngMask), 96);
                         pNTSprite->z -= 12<<8; // offset up
