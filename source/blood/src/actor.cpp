@@ -1685,7 +1685,7 @@ MissileType missileInfo[] = {
     },
     // Shotgun shell projectile
     {
-        30458, // use bullet sprite from notblood.pk3/TILES099.ART
+        9295, // use bullet sprite from notblood.pk3/TILES099.ART
         (625)<<12,
         0,
         14,
@@ -1695,7 +1695,7 @@ MissileType missileInfo[] = {
     },
     // Tommy gun bullet projectile
     {
-        30458, // use bullet sprite from notblood.pk3/TILES099.ART
+        9295, // use bullet sprite from notblood.pk3/TILES099.ART
         (625)<<12,
         0,
         14,
@@ -7187,7 +7187,7 @@ spritetype* actFireMissile(spritetype *pSprite, int a2, int a3, int a4, int a5, 
     {
         if (gProjectileOldSprite)
         {
-            pMissile->picnum = 30451; // use old bullet sprite from notblood.pk3/TILES099.ART
+            pMissile->picnum = 9288; // use old bullet sprite from notblood.pk3/TILES099.ART
             pMissile->xrepeat = pMissile->yrepeat = 32;
         }
         pMissile->cstat &= ~(CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_BLOCK_HITSCAN);

@@ -36,6 +36,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "map2d.h"
 #include "trig.h"
 #include "view.h"
+#include "weapon.h"
 
 
 int32_t ctrlCheckAllInput(void)
@@ -147,6 +148,8 @@ float gViewAngleAdjust;
 float gViewLookAdjust;
 int gViewLookRecenter;
 int gCrouchToggleState = 0;
+
+void ctrlRadialWeaponMenu(const bool bButton);
 
 void ctrlGetInput(void)
 {
@@ -668,6 +671,8 @@ void ctrlGetInput(void)
         }
         gViewLook = fix16_clamp(gViewLook+(input.q16mlook << 3), F16(downAngle), F16(upAngle));
     }
+
+    ctrlRadialWeaponMenu(BUTTON(gamefunc_Radial_Weapon_Menu));
 }
 
 void ctrlJoystickRumble(int nTime)
@@ -681,4 +686,93 @@ void ctrlJoystickRumble(int nTime)
     joystick.rumbleLow  = UINT16_MAX > joystick.rumbleHigh + nRumble ? joystick.rumbleLow  + nRumble : UINT16_MAX;
     joystick.rumbleHigh >>= 1;
     joystick.rumbleTime = nTime      > joystick.rumbleTime ? nTime : joystick.rumbleTime;
+}
+
+int gWeaponRadialMenuState = 0;
+int gWeaponRadialMenuChoice = -1;
+int gWeaponRadialMenuAng = 0;
+
+void ctrlRadialWeaponMenu(const bool bButton)
+{
+    const int kWeaponSelectTable[12] =
+    {
+        kWeaponSprayCan,
+        kWeaponTNT,
+        kWeaponShotgun,
+        kWeaponTommy,
+        kWeaponFlare,
+        kWeaponPitchfork,
+        kWeaponLifeLeech,
+        kWeaponVoodoo,
+        kWeaponTesla,
+        kWeaponNapalm,
+        kWeaponRemoteTNT,
+        kWeaponProxyTNT,
+    };
+
+    if (!gMe || gMe->pXSprite->health == 0)
+    {
+        gWeaponRadialMenuState = 0;
+        return;
+    }
+    switch (gWeaponRadialMenuState)
+    {
+    case 0:
+    {
+        if (!bButton)
+            break;
+        gWeaponRadialMenuState = 1;
+        gWeaponRadialMenuChoice = -1;
+        if (gGameOptions.nGameType == kGameTypeSinglePlayer) // only allow slowdown during singleplayer
+            timerInit(CLOCKTICKSPERSECOND>>4);
+        break;
+    }
+    case 1:
+    {
+        
+        if (!bButton)
+        {
+            gWeaponRadialMenuState = 2;
+            if (gMe->curWeapon == gWeaponRadialMenuChoice) // don't bother re-equipping same weapon
+                gWeaponRadialMenuChoice = -1;
+            gInput.forward = gInput.strafe = 0;
+            break;
+        }
+        if (klabs(gInput.forward) < 256 && klabs(gInput.strafe) < 256) // threshold too low, don't compute selection
+        {
+            gInput.forward = gInput.strafe = 0;
+            break;
+        }
+        int nNewChoice = getangle(-gInput.forward, -gInput.strafe) * (12*5) / kAngMask;
+        int nChoiceRounded = nNewChoice%5;
+        if (nChoiceRounded >= 0 && nChoiceRounded <= 2) // when player has selected the middle of the slice, update choice
+        {
+            for (; nChoiceRounded > 0; nChoiceRounded--) // round to nearest 5
+                nNewChoice--;
+            const int nChoiceBak = nNewChoice;
+            nNewChoice = ClipRange(nNewChoice/5U, 0, 12);
+            nNewChoice = kWeaponSelectTable[nNewChoice];
+            if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice))
+            {
+                gWeaponRadialMenuChoice = nNewChoice;
+                gWeaponRadialMenuAng = int((kAng360 / (12.f * 5)) * float(nChoiceBak));
+            }
+        }
+        gInput.forward = gInput.strafe = 0;
+        break;
+    }
+    case 2:
+    {
+        if (bButton)
+            break;
+        gWeaponRadialMenuState = 0;
+        if (gWeaponRadialMenuChoice != -1)
+            gInput.newWeapon = gWeaponRadialMenuChoice;
+        if (gGameOptions.nGameType == kGameTypeSinglePlayer) // only allow slowdown during singleplayer
+            timerInit(CLOCKTICKSPERSECOND);
+        break;
+    }
+    default:
+        break;
+    }
 }
