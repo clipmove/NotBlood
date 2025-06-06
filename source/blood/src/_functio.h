@@ -86,7 +86,7 @@ char gamefunctions[NUMGAMEFUNCTIONS][MAXGAMEFUNCLEN] =
    "Next_Weapon",
    "Previous_Weapon",
    "Last_Weapon",
-   "Radial_Weapon_Menu_(Joystick)",
+   "Radial_Menu_(Joystick)",
    "Holster_Weapon",
    "Show_Opponents_Weapon",
    "BeastVision",
