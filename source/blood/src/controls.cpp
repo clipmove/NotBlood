@@ -713,6 +713,21 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
         kWeaponRemoteTNT,
         kWeaponProxyTNT,
     };
+    const int kWeaponAngTable[12] =
+    {
+        0,
+        int( 1.f * (kAng360 / 12.f)),
+        int( 2.f * (kAng360 / 12.f)),
+        int( 3.f * (kAng360 / 12.f)),
+        int( 4.f * (kAng360 / 12.f)),
+        int( 5.f * (kAng360 / 12.f)),
+        int( 6.f * (kAng360 / 12.f)),
+        int( 7.f * (kAng360 / 12.f)),
+        int( 8.f * (kAng360 / 12.f)),
+        int( 9.f * (kAng360 / 12.f)),
+        int(10.f * (kAng360 / 12.f)),
+        int(11.f * (kAng360 / 12.f)),
+    };
     static char bTimeSlowed = 0;
 
     if (bReset || !gMe || gMe->pXSprite->health == 0)
@@ -743,7 +758,7 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
             if ((kWeaponSelectTable[i] != gMe->input.newWeapon) && (kWeaponSelectTable[i] != gMe->nextWeapon)) // we're not picking this weapon, skip
                 continue;
             gWeaponRadialMenuChoice = kWeaponSelectTable[i];
-            gWeaponRadialMenuAng = int(float(i) * (kAng360 / 12.f));
+            gWeaponRadialMenuAng = kWeaponAngTable[i];
             break;
         }
         if (gWeaponRadialMenuChoice == -1) // weapon is not being switched, fall back to currently held weapon
@@ -753,7 +768,7 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
                 if (kWeaponSelectTable[i] != gMe->curWeapon) // we're not picking this weapon, skip
                     continue;
                 gWeaponRadialMenuChoice = kWeaponSelectTable[i];
-                gWeaponRadialMenuAng = int(float(i) * (kAng360 / 12.f));
+                gWeaponRadialMenuAng = kWeaponAngTable[i];
                 break;
             }
         }
@@ -781,16 +796,24 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
         }
         int nNewChoice = getangle(-gInput.forward, -gInput.strafe) * (12*5) / kAngMask;
         const int nChoiceRounded = nNewChoice%5;
-        if (nChoiceRounded >= 0 && nChoiceRounded <= 2) // when player has selected the middle of the slice, update choice
+        if ((nChoiceRounded == 0) || (nChoiceRounded == 1) || (nChoiceRounded == 4)) // if player has selected the middle of slice, or the two adjacent points next to the middle, update choice
         {
-            nNewChoice = nNewChoice - nChoiceRounded; // round to nearest 5
-            const int nChoiceBak = nNewChoice;
-            nNewChoice = ClipRange(nNewChoice/5U, 0, 12);
+            if (nChoiceRounded == 1) // counter-clockwise adjacent slice
+            {
+                nNewChoice--;
+            }
+            else if (nChoiceRounded == 4) // clockwise adjacent slice
+            {
+                nNewChoice++;
+                if (nNewChoice >= 12*5) // check for overflow
+                    nNewChoice -= 12*5;
+            }
+            const int nChoiceBak = nNewChoice = ClipRange(nNewChoice/5U, 0, 12);
             nNewChoice = kWeaponSelectTable[nNewChoice];
             if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice))
             {
                 gWeaponRadialMenuChoice = nNewChoice;
-                gWeaponRadialMenuAng = int((kAng360 / (12.f * 5)) * float(nChoiceBak));
+                gWeaponRadialMenuAng = kWeaponAngTable[nChoiceBak];
             }
         }
         gInput.forward = gInput.strafe = 0;
