@@ -1121,6 +1121,7 @@ int32_t registerosdcommands(void)
         { "in_targetaimassist", "enable/disable slowing camera movement when aiming towards a target (joystick only)", (void *)&gTargetAimAssist, CVAR_BOOL, 0, 1 },
         { "in_turnaccelmode", "set keyboard turning acceleration mode (0: off, 1: only when running, 2: always on)", (void *)&gTurnAcceleration, CVAR_INT, 0, 2 },
         { "in_turnspeed", "keyboard turning speed", (void *)&gTurnSpeed, CVAR_INT, 64, 124 },
+        { "in_radialmenutoggle", "sets the radial menu behavior (0: held, 1: toggle)", (void *)&gRadialMenuToggle, CVAR_BOOL, 0, 1 },
 
 //
         { "model", "set player model for multiplayer (0: caleb, 1: cultist)", (void *)&gPlayerModel, CVAR_BOOL, 0, 1 },
