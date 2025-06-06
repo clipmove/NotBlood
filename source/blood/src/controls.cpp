@@ -391,7 +391,10 @@ void ctrlGetInput(void)
                 if ((sector[nSectnumNew].ceilingpicnum >= 4080) && (sector[nSectnumNew].ceilingpicnum <= 4095)) // if sector HAS a fake ceiling (e.g. E4M4 elevator), skip
                     continue;
                 getzsofslope(nSectnumNew, nX, nY, &cZ, &fZ);
-                nDiff = cZ - (bInAir ? nZ : fZCurrentSect); // if player is in air, use current Z height position as compare
+                if (bInAir) // if player is in air, use current Z height position as compare
+                    nDiff = cZ - nZ;
+                else
+                    nDiff = cZ - fZCurrentSect;
                 if ((nDiff < -3072) && (nDiff > -15000))
                 {
                     bCrouchState = 1;
