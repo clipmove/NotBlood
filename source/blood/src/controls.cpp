@@ -709,10 +709,16 @@ void ctrlRadialWeaponMenu(const bool bButton)
         kWeaponRemoteTNT,
         kWeaponProxyTNT,
     };
+    static char bTimeSlowed = 0;
 
     if (!gMe || gMe->pXSprite->health == 0)
     {
         gWeaponRadialMenuState = 0;
+        if (bTimeSlowed)
+        {
+            timerInit(CLOCKTICKSPERSECOND);
+            bTimeSlowed = 0;
+        }
         return;
     }
     switch (gWeaponRadialMenuState)
@@ -724,7 +730,10 @@ void ctrlRadialWeaponMenu(const bool bButton)
         gWeaponRadialMenuState = gRadialMenuToggle ? 4 : 1;
         gWeaponRadialMenuChoice = -1;
         if (gGameOptions.nGameType == kGameTypeSinglePlayer) // only allow slowdown during singleplayer
+        {
             timerInit(CLOCKTICKSPERSECOND>>4);
+            bTimeSlowed = 1;
+        }
         break;
     }
     case 4:
@@ -773,8 +782,11 @@ void ctrlRadialWeaponMenu(const bool bButton)
         gWeaponRadialMenuState = 0;
         if (gWeaponRadialMenuChoice != -1)
             gInput.newWeapon = gWeaponRadialMenuChoice;
-        if (gGameOptions.nGameType == kGameTypeSinglePlayer) // only allow slowdown during singleplayer
+        if (bTimeSlowed)
+        {
             timerInit(CLOCKTICKSPERSECOND);
+            bTimeSlowed = 0;
+        }
         break;
     }
     default:
