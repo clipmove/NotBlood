@@ -735,7 +735,7 @@ void ctrlRadialWeaponMenu(const bool bButton)
     }
     case 1:
     {
-        if (!gRadialMenuToggle && !bButton || gRadialMenuToggle && bButton)
+        if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && bButton))
         {
             gWeaponRadialMenuState = 2;
             if (gMe->curWeapon == gWeaponRadialMenuChoice) // don't bother re-equipping same weapon
