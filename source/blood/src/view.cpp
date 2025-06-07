@@ -1720,7 +1720,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         int nX : 8;
         int nY : 8;
         int bMirror : 8;
-        int nScale;
+        unsigned short nScale;
     } weaponIcons[] =
     {
         {  -1, 0,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
@@ -1737,6 +1737,22 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         { 811, 7, -1,  2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 11: proxy bomb
         { 810, 8,  1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 12: remote bomb
         {  -1, 13, 0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
+    };
+    const short nWeaponOffsets[][2]
+    {
+        {(short)mulscale30(46, Sin( 0*kAng30)), (short)-mulscale30(46, Cos( 0*kAng30))},
+        {(short)mulscale30(46, Sin( 1*kAng30)), (short)-mulscale30(46, Cos( 1*kAng30))},
+        {(short)mulscale30(46, Sin( 2*kAng30)), (short)-mulscale30(46, Cos( 2*kAng30))},
+        {(short)mulscale30(46, Sin( 3*kAng30)), (short)-mulscale30(46, Cos( 3*kAng30))},
+        {(short)mulscale30(46, Sin( 4*kAng30)), (short)-mulscale30(46, Cos( 4*kAng30))},
+        {(short)mulscale30(46, Sin( 5*kAng30)), (short)-mulscale30(46, Cos( 5*kAng30))},
+        {(short)mulscale30(46, Sin( 6*kAng30)), (short)-mulscale30(46, Cos( 6*kAng30))},
+        {(short)mulscale30(46, Sin( 7*kAng30)), (short)-mulscale30(46, Cos( 7*kAng30))},
+        {(short)mulscale30(46, Sin( 8*kAng30)), (short)-mulscale30(46, Cos( 8*kAng30))},
+        {(short)mulscale30(46, Sin( 9*kAng30)), (short)-mulscale30(46, Cos( 9*kAng30))},
+        {(short)mulscale30(46, Sin(10*kAng30)), (short)-mulscale30(46, Cos(10*kAng30))},
+        {(short)mulscale30(46, Sin(11*kAng30)), (short)-mulscale30(46, Cos(11*kAng30))},
+        {(short)mulscale30(46, Sin(12*kAng30)), (short)-mulscale30(46, Cos(12*kAng30))},
     };
 
     const char bPlayerIsDead = !pXSprite || (pXSprite->health == 0);
@@ -1771,12 +1787,11 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         const int nShade = i == nWeaponCur ? nPingPong : 28;
         const int nPal = i == nWeaponCur ? 0 : 5;
         const int nFlags = i == nWeaponCur ? RS_AUTO : RS_AUTO|RS_TRANS_MASK;
-        const int nScale = weaponIcons[i].nScale+(i == nWeaponCur ? nPingPong<<5 : 0);
+        const int nScale = (int)weaponIcons[i].nScale+(i == nWeaponCur ? nPingPong<<5 : 0);
         const char bMirror = weaponIcons[i].bMirror;
 
-        const int nDist = 46;
-        int nX = mulscale30(nDist, Sin(nWheelSlot*kAng30));
-        int nY = -mulscale30(nDist, Cos(nWheelSlot*kAng30));
+        int nX = (int)nWeaponOffsets[nWheelSlot][0];
+        int nY = (int)nWeaponOffsets[nWheelSlot][1];
         if (nY > 0)
             nY -= 5;
         nX += weaponIcons[i].nX;
