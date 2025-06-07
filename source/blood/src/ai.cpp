@@ -1293,12 +1293,19 @@ void RecoilDude(spritetype *pSprite, XSPRITE *pXSprite)
             }
             break;
         case kDudePodGreen:
+            aiNewState(pSprite, pXSprite, &podRecoil);
+            break;
         case kDudePodFire:
             aiNewState(pSprite, pXSprite, &podRecoil);
             break;
         case kDudeTentacleGreen:
+            aiNewState(pSprite, pXSprite, &tentacleRecoil);
+            break;
         case kDudeTentacleFire:
             aiNewState(pSprite, pXSprite, &tentacleRecoil);
+            break;
+        case kDudeGargoyleStatueFlesh:
+        case kDudeGargoyleStatueStone:
             break;
         default:
             aiNewState(pSprite, pXSprite, &genRecoil);
