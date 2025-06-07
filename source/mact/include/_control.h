@@ -125,8 +125,8 @@ typedef struct ControllerAxis
     float sensitivity;
     uint16_t deadzone;
     uint16_t saturation;
+    uint16_t snapzone;
     bool invert;
-    bool solodeadzone;
 } ControllerAxis_t;
 
 typedef struct UserInputState
