@@ -731,17 +731,17 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
     const short kWeaponAngTable[12] = // weapon slot to angle
     {
         0,
-        int( 1.f * (kAng360 / 12.f)),
-        int( 2.f * (kAng360 / 12.f)),
-        int( 3.f * (kAng360 / 12.f)),
-        int( 4.f * (kAng360 / 12.f)),
-        int( 5.f * (kAng360 / 12.f)),
-        int( 6.f * (kAng360 / 12.f)),
-        int( 7.f * (kAng360 / 12.f)),
-        int( 8.f * (kAng360 / 12.f)),
-        int( 9.f * (kAng360 / 12.f)),
-        int(10.f * (kAng360 / 12.f)),
-        int(11.f * (kAng360 / 12.f)),
+        short( 1.f * (kAng360 / 12.f)),
+        short( 2.f * (kAng360 / 12.f)),
+        short( 3.f * (kAng360 / 12.f)),
+        short( 4.f * (kAng360 / 12.f)),
+        short( 5.f * (kAng360 / 12.f)),
+        short( 6.f * (kAng360 / 12.f)),
+        short( 7.f * (kAng360 / 12.f)),
+        short( 8.f * (kAng360 / 12.f)),
+        short( 9.f * (kAng360 / 12.f)),
+        short(10.f * (kAng360 / 12.f)),
+        short(11.f * (kAng360 / 12.f)),
     };
     static char bTimeSlowed = 0;
 
