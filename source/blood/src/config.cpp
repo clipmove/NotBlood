@@ -82,6 +82,7 @@ int32_t gTargetAimAssist;
 int32_t gRadialMenuThreshold;
 int32_t gRadialMenuToggle;
 int32_t gRadialMenuPosition;
+int32_t gRadialMenuDimBackground;
 int32_t gRadialMenuSlowDown;
 int32_t gRadialMenuYaw;
 int32_t gRadialMenuYawInvert;
@@ -516,6 +517,7 @@ void CONFIG_SetDefaults(void)
     gTargetAimAssist = 0;
     gRadialMenuToggle = 0;
     gRadialMenuPosition = 240;
+    gRadialMenuDimBackground = 1;
     gRadialMenuThreshold = 128;
     gRadialMenuSlowDown = 1;
     gRadialMenuYaw = 0;

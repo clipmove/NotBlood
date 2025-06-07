@@ -1753,6 +1753,8 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         nPingPong = -nPingPong;
     nPingPong = (nPingPong>>2)+(nPingPong>>3); // decrease overall shade difference by 37.5%
 
+    if (gRadialMenuDimBackground)
+        viewDimScreen();
     if (gWeaponRadialMenuChoice != -1) // render reticle
     {
         int nX = mulscale30(45, Sin(gWeaponRadialMenuAng));
@@ -2788,7 +2790,7 @@ void UpdateFrame(void)
 void viewDimScreen(void)
 {
     const int shadow_pal = 5;
-    if (gViewDim && gGameMenuMgr.pActiveMenu != &menuOptionsDisplayColor) // if current menu is not on color correction menu, dim screen
+    if ((gViewDim || gWeaponRadialMenuState > 0) && gGameMenuMgr.pActiveMenu != &menuOptionsDisplayColor) // if current menu is not on color correction menu, dim screen
         rotatesprite_fs_alpha(fix16_from_int(320<<1),fix16_from_int(220<<1),fix16_from_int(127),0,0,127,shadow_pal,RS_STRETCH|RS_NOCLIP,192); // stretch tile across entire screen
 }
 
