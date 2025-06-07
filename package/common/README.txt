@@ -299,6 +299,8 @@ If you have the GOG version of the game, do the following:
    - Sets the radial menu pitch threshold (0-1024)
 * in_radialmenutoggle
    - Sets the radial menu behavior (0: held, 1: toggle)
+* in_radialmenuposition
+   - Sets the radial menu position
 * in_radialmenuyaw
    - Sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look)
 * in_radialmenuyawinvert
