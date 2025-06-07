@@ -62,6 +62,7 @@ extern int32_t gTargetAimAssist;
 extern int32_t gRadialMenuThreshold;
 extern int32_t gRadialMenuToggle;
 extern int32_t gRadialMenuPosition;
+extern int32_t gRadialMenuDimBackground;
 extern int32_t gRadialMenuSlowDown;
 extern int32_t gRadialMenuYaw;
 extern int32_t gRadialMenuYawInvert;

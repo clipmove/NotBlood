@@ -91,6 +91,7 @@ void SetCenterView(CGameMenuItemZBool *);
 void SetJoystickTargetAimAssist(CGameMenuItemZBool *);
 void SetJoystickRadialMenuToggle(CGameMenuItemZBool *);
 void SetJoystickRadialMenuPosition(CGameMenuItemSlider *);
+void SetJoystickRadialMenuDimBackground(CGameMenuItemZBool *);
 void SetJoystickRadialMenuSlowDown(CGameMenuItemZBool *);
 void SetJoystickRadialMenuThreshold(CGameMenuItemSlider *);
 void SetJoystickRadialMenuYaw(CGameMenuItemZCycle *);
@@ -1255,13 +1256,14 @@ CGameMenuItemChain itemOptionsControlJoystickRadial("JOYSTICK RADIAL MENU SETUP"
 
 CGameMenuItemTitle itemOptionsControlJoystickRadialTitle("RADIAL SETUP", 1, 160, 20, 2038);
 CGameMenuItemZBool itemOptionsControlJoystickRadialToggle("USAGE BEHAVIOR:", 1, 18, 40, 280, 0, SetJoystickRadialMenuToggle, "TOGGLE", "HELD DOWN");
-CGameMenuItemSlider itemOptionsControlJoystickRadialPosition("POSITION:", 1, 18, 60, 280, &gRadialMenuPosition, 0, 320, 16, SetJoystickRadialMenuPosition, -1, -1, kMenuSliderPercent);
-CGameMenuItemZBool itemOptionsControlJoystickRadialSlowDown("MENU SLOW DOWN:", 1, 18, 80, 280, 0, SetJoystickRadialMenuSlowDown, NULL, NULL);
-CGameMenuItemSlider itemOptionsControlJoystickRadialThreshold("THRESHOLD:", 1, 18, 100, 280, &gRadialMenuThreshold, 0, 1024, 128, SetJoystickRadialMenuThreshold, -1, -1, kMenuSliderPercent);
-CGameMenuItemZCycle itemOptionsControlJoystickRadialYaw("X AXIS:", 1, 18, 120, 280, 0, SetJoystickRadialMenuYaw, zJoystickRadialMenuAxes, ARRAY_SIZE(zJoystickRadialMenuAxes), 0);
-CGameMenuItemZBool itemOptionsControlJoystickRadialYawInvert("X INVERT:", 1, 18, 140, 280, 0, SetJoystickRadialMenuPitchInvert, NULL, NULL);
-CGameMenuItemZCycle itemOptionsControlJoystickRadialPitch("Y AXIS:", 1, 18, 160, 280, 0, SetJoystickRadialMenuPitch, zJoystickRadialMenuAxes, ARRAY_SIZE(zJoystickRadialMenuAxes), 0);
-CGameMenuItemZBool itemOptionsControlJoystickRadialPitchInvert("Y INVERT:", 1, 18, 180, 280, 0, SetJoystickRadialMenuYawInvert, NULL, NULL);
+CGameMenuItemSlider itemOptionsControlJoystickRadialPosition("POSITION:", 1, 18, 57, 280, &gRadialMenuPosition, 0, 320, 16, SetJoystickRadialMenuPosition, -1, -1, kMenuSliderPercent);
+CGameMenuItemZBool itemOptionsControlJoystickRadialDimBackground("FADE BACKGROUND:", 1, 18, 74, 280, 0, SetJoystickRadialMenuDimBackground, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickRadialSlowDown("MENU SLOW DOWN:", 1, 18, 91, 280, 0, SetJoystickRadialMenuSlowDown, NULL, NULL);
+CGameMenuItemSlider itemOptionsControlJoystickRadialThreshold("THRESHOLD:", 1, 18, 108, 280, &gRadialMenuThreshold, 0, 1024, 128, SetJoystickRadialMenuThreshold, -1, -1, kMenuSliderPercent);
+CGameMenuItemZCycle itemOptionsControlJoystickRadialYaw("X AXIS:", 1, 18, 125, 280, 0, SetJoystickRadialMenuYaw, zJoystickRadialMenuAxes, ARRAY_SIZE(zJoystickRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlJoystickRadialYawInvert("X INVERT:", 1, 18, 142, 280, 0, SetJoystickRadialMenuPitchInvert, NULL, NULL);
+CGameMenuItemZCycle itemOptionsControlJoystickRadialPitch("Y AXIS:", 1, 18, 159, 280, 0, SetJoystickRadialMenuPitch, zJoystickRadialMenuAxes, ARRAY_SIZE(zJoystickRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlJoystickRadialPitchInvert("Y INVERT:", 1, 18, 176, 280, 0, SetJoystickRadialMenuYawInvert, NULL, NULL);
 
 void SetupLoadingScreen(void)
 {
@@ -2216,6 +2218,7 @@ void SetupJoystickMenu(void)
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialTitle, false);
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialToggle, true);
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialPosition, false);
+    menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialDimBackground, false);
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialSlowDown, false);
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialThreshold, false);
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialYaw, false);
@@ -2225,6 +2228,7 @@ void SetupJoystickMenu(void)
 
     itemOptionsControlJoystickRadialToggle.at20 = gRadialMenuToggle;
     itemOptionsControlJoystickRadialPosition.nValue = gRadialMenuPosition;
+    itemOptionsControlJoystickRadialDimBackground.at20 = gRadialMenuDimBackground;
     itemOptionsControlJoystickRadialSlowDown.at20 = gRadialMenuSlowDown;
     itemOptionsControlJoystickRadialThreshold.nValue = gRadialMenuThreshold;
     itemOptionsControlJoystickRadialYaw.m_nFocus = gRadialMenuYaw % ARRAY_SSIZE(zJoystickRadialMenuAxes);
@@ -2705,6 +2709,11 @@ void SetJoystickRadialMenuToggle(CGameMenuItemZBool *pItem)
 void SetJoystickRadialMenuPosition(CGameMenuItemSlider *pItem)
 {
     gRadialMenuPosition = pItem->nValue;
+}
+
+void SetJoystickRadialMenuDimBackground(CGameMenuItemZBool *pItem)
+{
+    gRadialMenuDimBackground = pItem->at20;
 }
 
 void SetJoystickRadialMenuSlowDown(CGameMenuItemZBool *pItem)
