@@ -1757,9 +1757,9 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
     {
         int nX = mulscale30(45, Sin(gWeaponRadialMenuAng));
         int nY = mulscale30(45, Cos(gWeaponRadialMenuAng));
-        DrawStatMaskedSprite(2089, (320>>1)+(320>>2)+nX, (200>>1)-(200>>5)+nY, 16, 0, RS_AUTO, fix16_from_float(0.25f));
+        DrawStatMaskedSprite(2089, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, 16, 0, RS_AUTO, fix16_from_float(0.25f));
     }
-    DrawStatMaskedSprite(9287, (320>>1)+(320>>2), (200>>1)-(200>>5), 16, 0, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
+    DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, 0, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
     for (int i = kWeaponPitchfork; i <= kWeaponRemoteTNT; i++)
     {
         if (!WeaponIsEquipable(pPlayer, i))
@@ -1779,7 +1779,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
             nY -= 5;
         nX += weaponIcons[i].nX;
         nY += weaponIcons[i].nY;
-        DrawStatMaskedSprite(nTile, (320>>1)+(320>>2)+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale, bMirror);
+        DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale, bMirror);
     }
 }
 

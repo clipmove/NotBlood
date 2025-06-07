@@ -1121,6 +1121,7 @@ int32_t registerosdcommands(void)
         { "in_radialmenuslowdown", "enable/disable the radial menu slow down behavior", (void*)&gRadialMenuSlowDown, CVAR_BOOL, 0, 1 },
         { "in_radialmenuthreshold", "sets the radial menu pitch threshold (0-1024)", (void*)&gRadialMenuThreshold, CVAR_INT, 0, 1024 },
         { "in_radialmenutoggle", "sets the radial menu behavior (0: held, 1: toggle)", (void*)&gRadialMenuToggle, CVAR_BOOL, 0, 1 },
+        { "in_radialmenuposition", "sets the radial menu position", (void*)&gRadialMenuPosition, CVAR_INT, 0, 320 },
         { "in_radialmenuyaw", "sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look)", (void*)&gRadialMenuYaw, CVAR_INT, 0, 3 },
         { "in_radialmenuyawinvert", "enable/disable invert radial menu yaw input", (void*)&gRadialMenuYawInvert, CVAR_BOOL, 0, 1 },
         { "in_radialmenupitch", "sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look)", (void*)&gRadialMenuPitch, CVAR_INT, 0, 3 },
