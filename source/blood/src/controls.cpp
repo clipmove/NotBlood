@@ -698,7 +698,7 @@ int gWeaponRadialMenuAng = 0;
 
 void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
 {
-    const int kWeaponSelectTable[12] =
+    const char kWeaponSelectTable[12] = // angle to weapon slot
     {
         kWeaponSprayCan,
         kWeaponTNT,
@@ -713,7 +713,22 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
         kWeaponRemoteTNT,
         kWeaponProxyTNT,
     };
-    const int kWeaponAngTable[12] =
+    const char kWeaponSlotTable[12] = // weapon enum to slot
+    {
+        5,
+        4,
+        2,
+        3,
+        9,
+        1,
+        0,
+        8,
+        6,
+        7,
+        11,
+        10,
+    };
+    const short kWeaponAngTable[12] = // weapon slot to angle
     {
         0,
         int( 1.f * (kAng360 / 12.f)),
@@ -747,34 +762,25 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
         if (!bButton)
             break;
         gWeaponRadialMenuState = gRadialMenuToggle ? 4 : 1;
-        gWeaponRadialMenuChoice = -1;
         if (gRadialMenuSlowDown && (gGameOptions.nGameType == kGameTypeSinglePlayer)) // only allow slowdown during singleplayer
         {
             timerInit(CLOCKTICKSPERSECOND>>4);
             bTimeSlowed = 1;
         }
-        if ((gMe->input.newWeapon > kWeaponNone) || (gMe->nextWeapon > kWeaponNone))
+        int nSlot;
+        if ((gMe->input.newWeapon >= kWeaponPitchfork) && (gMe->input.newWeapon <= kWeaponRemoteTNT)) // set the reticle to the weapon being switched to
+            nSlot = kWeaponSlotTable[gMe->input.newWeapon-1];
+        else if ((gMe->nextWeapon >= kWeaponPitchfork) && (gMe->nextWeapon <= kWeaponRemoteTNT)) // set the reticle to the weapon being switched to
+            nSlot = kWeaponSlotTable[gMe->nextWeapon-1];
+        else if ((gMe->curWeapon >= kWeaponPitchfork) && (gMe->curWeapon <= kWeaponRemoteTNT)) // weapon is not being switched, fall back to currently held weapon
+            nSlot = kWeaponSlotTable[gMe->curWeapon-1];
+        else // no weapon found, don't set slot
         {
-            for (int i = 0; i <= 12; i++) // set the reticle to the weapon being switched to
-            {
-                if ((kWeaponSelectTable[i] != gMe->input.newWeapon) && (kWeaponSelectTable[i] != gMe->nextWeapon)) // we're not picking this weapon, skip
-                    continue;
-                gWeaponRadialMenuChoice = kWeaponSelectTable[i];
-                gWeaponRadialMenuAng = kWeaponAngTable[i];
-                break;
-            }
+            gWeaponRadialMenuChoice = -1;
+            break;
         }
-        else // weapon is not being switched, fall back to currently held weapon
-        {
-            for (int i = 0; i <= 12; i++) // set the reticle already on the current weapon
-            {
-                if (kWeaponSelectTable[i] != gMe->curWeapon) // we're not picking this weapon, skip
-                    continue;
-                gWeaponRadialMenuChoice = kWeaponSelectTable[i];
-                gWeaponRadialMenuAng = kWeaponAngTable[i];
-                break;
-            }
-        }
+        gWeaponRadialMenuChoice = kWeaponSelectTable[nSlot];
+        gWeaponRadialMenuAng = kWeaponAngTable[nSlot];
         break;
     }
     case 4:
