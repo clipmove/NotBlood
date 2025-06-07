@@ -295,10 +295,20 @@ If you have the GOG version of the game, do the following:
    - Toggles crouch button (0:hold, 1:toggle)
 * in_radialmenuslowdown
    - Enable/disable the radial menu slow down behavior
+* in_radialmenuthreshold
+   - Sets the radial menu pitch threshold (0-1024)
 * in_radialmenutoggle
    - Sets the radial menu behavior (0: held, 1: toggle)
+* in_radialmenuyaw
+   - Sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look)
+* in_radialmenuyawinvert
+   - Enable/disable invert radial menu yaw input
+* in_radialmenupitch
+   - Sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look)
+* in_radialmenupitchinvert
+   - Enable/disable invert radial menu pitch input
 * in_targetaimassist
-   - enable/disable slowing camera movement when aiming towards a target (joystick only)
+   - Enable/disable slowing camera movement when aiming towards a target (joystick only)
 * notarget
    - Toggles AI player detection
 * r_drawinvisiblesprites
