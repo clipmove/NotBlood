@@ -1721,26 +1721,25 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         int nY : 8;
         int bMirror : 8;
         unsigned short nScale;
-    } weaponIcons[] =
+    } weaponRadialInfo[kWeaponMax] =
     {
         {  -1, 0,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
-        {3131, 1,  0, -6, 0, -fix16_from_float(0.1f)+fix16_from_float(0.35f),  }, // 1: pitchfork
-        { 524, 2,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.55f),  }, // 2: flare gun
-        { 559, 4,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 3: shotgun
-        { 558, 3,  0, -2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.45f),  }, // 4: tommy gun
-        { 526, 9,  0, -1, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 5: napalm launcher
-        { 589, 5, -1,  5, 0, -fix16_from_float(0.1f)+fix16_from_float(0.6875f),}, // 6: dynamite
-        { 618, 6,  0,  6, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 7: spray can
-        { 539, 10, 0, -6, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 8: tesla gun
-        { 800, 12, 2,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 9: life leech
-        { 525, 11, 2, -7, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 10: voodoo doll
-        { 811, 7, -1,  2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 11: proxy bomb
-        { 810, 8,  1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 12: remote bomb
-        {  -1, 13, 0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
+        {3131, 0,  0, -6, 0, -fix16_from_float(0.1f)+fix16_from_float(0.35f),  }, // 1: pitchfork
+        { 524, 1,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.55f),  }, // 2: flare gun
+        { 559, 3,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 3: shotgun
+        { 558, 2,  0, -2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.45f),  }, // 4: tommy gun
+        { 526, 8,  0, -1, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 5: napalm launcher
+        { 589, 4, -1,  5, 0, -fix16_from_float(0.1f)+fix16_from_float(0.6875f),}, // 6: dynamite
+        { 618, 5,  0,  6, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 7: spray can
+        { 539, 9,  0, -6, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 8: tesla gun
+        { 800, 11, 2,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 9: life leech
+        { 525, 10, 2, -7, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 10: voodoo doll
+        { 811, 6, -1,  2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 11: proxy bomb
+        { 810, 7,  1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 12: remote bomb
+        {  -1, 0,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
     };
-    const short nWeaponOffsets[][2]
+    const short nWeaponRadialPos[12][2] = // weapon icon slot to angle position
     {
-        {(short)mulscale30(46, Sin( 0*kAng30)), (short)-mulscale30(46, Cos( 0*kAng30))},
         {(short)mulscale30(46, Sin( 1*kAng30)), (short)-mulscale30(46, Cos( 1*kAng30))},
         {(short)mulscale30(46, Sin( 2*kAng30)), (short)-mulscale30(46, Cos( 2*kAng30))},
         {(short)mulscale30(46, Sin( 3*kAng30)), (short)-mulscale30(46, Cos( 3*kAng30))},
@@ -1753,6 +1752,21 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         {(short)mulscale30(46, Sin(10*kAng30)), (short)-mulscale30(46, Cos(10*kAng30))},
         {(short)mulscale30(46, Sin(11*kAng30)), (short)-mulscale30(46, Cos(11*kAng30))},
         {(short)mulscale30(46, Sin(12*kAng30)), (short)-mulscale30(46, Cos(12*kAng30))},
+    };
+    const short nWeaponRadialReticlePos[12][2] = // select reticle slot to angle position
+    {
+        {(short)mulscale30(45, Sin(short( 5.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 5.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 4.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 4.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 3.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 3.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 2.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 2.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 1.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 1.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(0)),                              (short)mulscale30(45, Cos(0))},
+        {(short)mulscale30(45, Sin(short(11.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short(11.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short(10.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short(10.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 9.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 9.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 8.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 8.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 7.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 7.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 6.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 6.f * (kAng360 / 12.f))))},
     };
 
     const char bPlayerIsDead = !pXSprite || (pXSprite->health == 0);
@@ -1773,8 +1787,9 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         viewDimScreen();
     if (gWeaponRadialMenuChoice != -1) // render reticle
     {
-        int nX = mulscale30(45, Sin(gWeaponRadialMenuAng));
-        int nY = mulscale30(45, Cos(gWeaponRadialMenuAng));
+        const int nSlot = weaponRadialInfo[nWeaponCur].nSlot;
+        const int nX = (int)nWeaponRadialReticlePos[nSlot][0];
+        const int nY = (int)nWeaponRadialReticlePos[nSlot][1];
         DrawStatMaskedSprite(2089, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, 16, 0, RS_AUTO, fix16_from_float(0.25f));
     }
     DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, 0, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
@@ -1782,20 +1797,20 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
     {
         if (!WeaponIsEquipable(pPlayer, i))
             continue;
-        const int nWheelSlot = weaponIcons[i].nSlot;
-        const int nTile = weaponIcons[i].nTile;
+        const int nWheelSlot = weaponRadialInfo[i].nSlot;
+        const int nTile = weaponRadialInfo[i].nTile;
         const int nShade = i == nWeaponCur ? nPingPong : 28;
         const int nPal = i == nWeaponCur ? 0 : 5;
         const int nFlags = i == nWeaponCur ? RS_AUTO : RS_AUTO|RS_TRANS_MASK;
-        const int nScale = (int)weaponIcons[i].nScale+(i == nWeaponCur ? nPingPong<<5 : 0);
-        const char bMirror = weaponIcons[i].bMirror;
+        const int nScale = (int)weaponRadialInfo[i].nScale+(i == nWeaponCur ? nPingPong<<5 : 0);
+        const char bMirror = weaponRadialInfo[i].bMirror;
 
-        int nX = (int)nWeaponOffsets[nWheelSlot][0];
-        int nY = (int)nWeaponOffsets[nWheelSlot][1];
+        int nX = (int)nWeaponRadialPos[nWheelSlot][0];
+        int nY = (int)nWeaponRadialPos[nWheelSlot][1];
         if (nY > 0)
             nY -= 5;
-        nX += weaponIcons[i].nX;
-        nY += weaponIcons[i].nY;
+        nX += weaponRadialInfo[i].nX;
+        nY += weaponRadialInfo[i].nY;
         DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale, bMirror);
     }
 }
