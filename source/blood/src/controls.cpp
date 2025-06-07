@@ -798,6 +798,7 @@ void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo* pInput, const b
         nX = -nX;
     if (gRadialMenuPitchInvert)
         nY = -nY;
+
     switch (gWeaponRadialMenuState)
     {
     case 0:
@@ -829,18 +830,26 @@ void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo* pInput, const b
     case 4:
     case 1:
     {
-        if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
+        char bAbort = 0;
+        if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2) // shooting instantly picks currently selected weapon
         {
-            gWeaponRadialMenuState = 1;
+            bAbort = 1;
+            gInput.buttonFlags.shoot = gInput.buttonFlags.shoot2 = 0;
         }
+        if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
+            gWeaponRadialMenuState = 1;
         else if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && bButton && gWeaponRadialMenuState == 1))
+            bAbort = 1;
+
+        if (bAbort) // we're done, safely close radial menu
         {
             gWeaponRadialMenuState = 2;
             if (gMe->curWeapon == gWeaponRadialMenuChoice) // don't bother re-equipping same weapon
                 gWeaponRadialMenuChoice = -1;
             break;
         }
-        if (klabs(nX) < gRadialMenuThreshold && klabs(nY) < gRadialMenuThreshold) // threshold too low, don't compute selection
+
+        if ((klabs(nX) < gRadialMenuThreshold) && (klabs(nY) < gRadialMenuThreshold)) // threshold too low, don't compute selection
             break;
         int nNewChoice = getangle(nX, nY) * (12*5) / kAngMask;
         const int nChoiceRounded = nNewChoice%5;
