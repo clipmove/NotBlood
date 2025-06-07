@@ -2225,6 +2225,7 @@ void SetupJoystickMenu(void)
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialYawInvert, false);
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialPitch, false);
     menuOptionsControlJoystickRadial.Add(&itemOptionsControlJoystickRadialPitchInvert, false);
+    menuOptionsControlJoystickRadial.Add(&itemBloodQAV, false);
 
     itemOptionsControlJoystickRadialToggle.at20 = gRadialMenuToggle;
     itemOptionsControlJoystickRadialPosition.nValue = gRadialMenuPosition;
