@@ -126,6 +126,8 @@ void ctrlInit(void)
     CONTROL_DefineFlag(gamefunc_Toggle_Crosshair, false);
     CONTROL_DefineFlag(gamefunc_Next_Weapon, false);
     CONTROL_DefineFlag(gamefunc_Previous_Weapon, false);
+    CONTROL_DefineFlag(gamefunc_Last_Weapon, false);
+    CONTROL_DefineFlag(gamefunc_Radial_Weapon_Menu, false);
     CONTROL_DefineFlag(gamefunc_Holster_Weapon, false);
     CONTROL_DefineFlag(gamefunc_Show_Opponents_Weapon, false);
     CONTROL_DefineFlag(gamefunc_BeastVision, false);
