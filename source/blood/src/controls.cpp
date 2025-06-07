@@ -832,7 +832,10 @@ void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo* pInput, const b
     {
         char bAbort = 0;
         if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2) // shooting instantly picks currently selected weapon
+        {
             bAbort = 1;
+            gInput.buttonFlags.shoot = gInput.buttonFlags.shoot2 = 0;
+        }
         if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
             gWeaponRadialMenuState = 1;
         else if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && bButton && gWeaponRadialMenuState == 1))
