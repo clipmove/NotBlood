@@ -599,7 +599,7 @@ void ctrlGetInput(void)
     if (CONTROL_JoystickEnabled) // controller input
     {
         ctrlRadialWeaponMenu(BUTTON(gamefunc_Radial_Weapon_Menu), &info, false);
-        if (gWeaponRadialMenuState)
+        if (gWeaponRadialMenuState > 0)
             return;
         input.strafe -= info.dx>>1;
         input.forward -= info.dz>>1;
@@ -828,24 +828,27 @@ void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo* pInput, const b
         break;
     }
     case 4:
+    case 5:
     case 1:
     {
         char bAbort = 0;
         if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2) // shooting instantly picks currently selected weapon
         {
             bAbort = 1;
+            KB_ClearKeyDown(gamefunc_Weapon_Fire);
+            KB_ClearKeyDown(gamefunc_Weapon_Special_Fire);
             gInput.buttonFlags.shoot = gInput.buttonFlags.shoot2 = 0;
         }
-        if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
+        else if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
+            gWeaponRadialMenuState = 5;
+        else if (gRadialMenuToggle && bButton && gWeaponRadialMenuState == 5) // second click, wait for player to release the toggle button before closing
             gWeaponRadialMenuState = 1;
-        else if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && bButton && gWeaponRadialMenuState == 1))
+        else if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 1))
             bAbort = 1;
 
         if (bAbort) // we're done, safely close radial menu
         {
             gWeaponRadialMenuState = 2;
-            if (gMe->curWeapon == gWeaponRadialMenuChoice) // don't bother re-equipping same weapon
-                gWeaponRadialMenuChoice = -1;
             break;
         }
 
@@ -877,10 +880,8 @@ void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo* pInput, const b
     }
     case 2:
     {
-        if (bButton)
-            break;
-        gWeaponRadialMenuState = 0;
-        if (gWeaponRadialMenuChoice != -1)
+        gWeaponRadialMenuState = -1;
+        if ((gWeaponRadialMenuChoice != -1) || (gMe->curWeapon == gWeaponRadialMenuChoice)) // don't bother re-equipping same weapon
             gInput.newWeapon = gWeaponRadialMenuChoice;
         if (bTimeSlowed)
         {
@@ -888,6 +889,12 @@ void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo* pInput, const b
             bTimeSlowed = 0;
         }
         break;
+    }
+    case -1: // await until player releases button
+    {
+        if (bButton)
+            break;
+        gWeaponRadialMenuState = 0;
     }
     default:
         break;
