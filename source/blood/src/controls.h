@@ -115,7 +115,6 @@ extern int gCrouchToggleState;
 
 extern int gWeaponRadialMenuState;
 extern int gWeaponRadialMenuChoice;
-extern int gWeaponRadialMenuAng;
 
 int32_t ctrlCheckAllInput(void);
 void ctrlClearAllInput(void);
