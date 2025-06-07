@@ -149,7 +149,7 @@ float gViewLookAdjust;
 int gViewLookRecenter;
 int gCrouchToggleState = 0;
 
-void ctrlRadialWeaponMenu(const bool bButton, const bool bReset);
+void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo *pInput, const bool bReset);
 
 void ctrlGetInput(void)
 {
@@ -160,7 +160,7 @@ void ctrlGetInput(void)
         gInput = {};
         gInput.keyFlags.isTyping = (gInputMode == INPUT_MODE_2) && gGameStarted && !VanillaMode(); // only show typing indicator for non-vanilla mode
         CONTROL_GetInput(&info);
-        ctrlRadialWeaponMenu(false, true);
+        ctrlRadialWeaponMenu(false, NULL, true);
         return;
     }
 
@@ -598,6 +598,9 @@ void ctrlGetInput(void)
 
     if (CONTROL_JoystickEnabled) // controller input
     {
+        ctrlRadialWeaponMenu(BUTTON(gamefunc_Radial_Weapon_Menu), &info, false);
+        if (gWeaponRadialMenuState)
+            return;
         input.strafe -= info.dx>>1;
         input.forward -= info.dz>>1;
         if (!run) // when autorun is off/run is not held, reduce overall speed for controller
@@ -675,8 +678,6 @@ void ctrlGetInput(void)
         }
         gViewLook = fix16_clamp(gViewLook+(input.q16mlook << 3), F16(downAngle), F16(upAngle));
     }
-
-    ctrlRadialWeaponMenu(BUTTON(gamefunc_Radial_Weapon_Menu), false);
 }
 
 void ctrlJoystickRumble(int nTime)
@@ -696,7 +697,7 @@ int gWeaponRadialMenuState = 0;
 int gWeaponRadialMenuChoice = -1;
 int gWeaponRadialMenuAng = 0;
 
-void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
+void ctrlRadialWeaponMenu(const bool bButton, const ControlInfo* pInput, const bool bReset)
 {
     const char kWeaponSelectTable[12] = // angle to weapon slot
     {
@@ -745,7 +746,7 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
     };
     static char bTimeSlowed = 0;
 
-    if (bReset || !gMe || gMe->pXSprite->health == 0)
+    if (bReset || !gMe || (gMe->pXSprite->health == 0) || !pInput)
     {
         gWeaponRadialMenuState = 0;
         if (bTimeSlowed)
@@ -755,6 +756,48 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
         }
         return;
     }
+
+    int nX, nY;
+    switch (gRadialMenuYaw)
+    {
+    case 0: // strafe
+        nX = pInput->dz;
+        break;
+    case 1: // move
+        nX = pInput->dx;
+        break;
+    case 2: // turn
+        nX = pInput->dpitch;
+        break;
+    case 3: // look
+        nX = pInput->dyaw;
+        break;
+    default:
+        nX = 0;
+        break;
+    }
+    switch (gRadialMenuPitch)
+    {
+    case 0: // strafe
+        nY = pInput->dz;
+        break;
+    case 1: // move
+        nY = pInput->dx;
+        break;
+    case 2: // turn
+        nY = pInput->dpitch;
+        break;
+    case 3: // look
+        nY = pInput->dyaw;
+        break;
+    default:
+        nY = 0;
+        break;
+    }
+    if (gRadialMenuYawInvert)
+        nX = -nX;
+    if (gRadialMenuPitchInvert)
+        nY = -nY;
     switch (gWeaponRadialMenuState)
     {
     case 0:
@@ -795,15 +838,11 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
             gWeaponRadialMenuState = 2;
             if (gMe->curWeapon == gWeaponRadialMenuChoice) // don't bother re-equipping same weapon
                 gWeaponRadialMenuChoice = -1;
-            gInput.forward = gInput.strafe = 0;
             break;
         }
-        if (klabs(gInput.forward) < 256 && klabs(gInput.strafe) < 256) // threshold too low, don't compute selection
-        {
-            gInput.forward = gInput.strafe = 0;
+        if (klabs(nX) < gRadialMenuThreshold && klabs(nY) < gRadialMenuThreshold) // threshold too low, don't compute selection
             break;
-        }
-        int nNewChoice = getangle(-gInput.forward, -gInput.strafe) * (12*5) / kAngMask;
+        int nNewChoice = getangle(nX, nY) * (12*5) / kAngMask;
         const int nChoiceRounded = nNewChoice%5;
         if ((nChoiceRounded == 0) || (nChoiceRounded == 1) || (nChoiceRounded == 4)) // if player has selected the middle of slice, or the two adjacent points next to the middle, update choice
         {
@@ -825,7 +864,6 @@ void ctrlRadialWeaponMenu(const bool bButton, const bool bReset)
                 gWeaponRadialMenuAng = kWeaponAngTable[nChoiceBak];
             }
         }
-        gInput.forward = gInput.strafe = 0;
         break;
     }
     case 2:
