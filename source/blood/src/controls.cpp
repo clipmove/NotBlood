@@ -496,12 +496,16 @@ void ctrlGetInput(void)
     {
         CONTROL_ClearButton(gamefunc_ProximityBombs);
         gInput.newWeapon = kWeaponProxyTNT;
+        if (!VanillaMode())
+            gInput.newWeapon += kWeaponMax; // adding kWeaponMax will flag the new weapon selection to ignore the TNT/remote/proxy cycling behavior
     }
 
     if (BUTTON(gamefunc_RemoteBombs))
     {
         CONTROL_ClearButton(gamefunc_RemoteBombs);
         gInput.newWeapon = kWeaponRemoteTNT;
+        if (!VanillaMode())
+            gInput.newWeapon += kWeaponMax; // adding kWeaponMax will flag the new weapon selection to ignore the TNT/remote/proxy cycling behavior
     }
 
     if (BUTTON(gamefunc_Holster_Weapon))
@@ -919,7 +923,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
     {
         gWeaponRadialMenuState = -1;
         if ((gWeaponRadialMenuChoice != -1) || (gMe->curWeapon == gWeaponRadialMenuChoice)) // don't bother re-equipping same weapon
-            gInput.newWeapon = gWeaponRadialMenuChoice;
+            gInput.newWeapon = gWeaponRadialMenuChoice+kWeaponMax; // adding kWeaponMax will flag the new weapon selection to ignore the TNT/remote/proxy cycling behavior
         if (bTimeSlowed)
         {
             timerInit(CLOCKTICKSPERSECOND);
