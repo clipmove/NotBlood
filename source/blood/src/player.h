@@ -443,7 +443,8 @@ inline int playerColorPalHud(int nTeam)
 
 inline int playerColorPalDefault(int nTeam)
 {
-    return 11+(nTeam&3);
+    const char nPals[8] = {11, 12, 13, 14, 9, 0, 6, 0};
+    return nPals[nTeam&7];
 }
 
 inline int playerColorPalSprite(int nTeam)

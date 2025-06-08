@@ -1046,7 +1046,7 @@ int32_t registerosdcommands(void)
         { "cl_weaponswitch", "enable/disable auto weapon switching", (void *)&gWeaponSwitch, CVAR_INT|CVAR_MULTI, 0, 3 },
         { "cl_weaponfastswitch", "enable/disable fast weapon switching", (void *)&gWeaponFastSwitch, CVAR_BOOL|CVAR_MULTI, 0, 1 },
         { "cl_packitemswitch", "enable/disable item slot switching to activated item (always enabled in multiplayer)", (void *)&gPackSlotSwitch, CVAR_BOOL, 0, 1 },
-        { "color", "set preferred player color palette in multiplayer (0: none, 1: blue, 2: red, 3: teal, 4: gray)", (void *)&gPlayerColorPreference, CVAR_INT, 0, 4 },
+        { "color", "set preferred player color palette in multiplayer (0: none, 1: blue, 2: red, 3: teal, 4: gray, 5: yellow, 6: brown, 7: copper)", (void *)&gPlayerColorPreference, CVAR_INT, 0, 7 },
 //
 //        { "color", "changes player palette", (void *)&ud.color, CVAR_INT|CVAR_MULTI, 0, MAXPALOOKUPS-1 },
 //
