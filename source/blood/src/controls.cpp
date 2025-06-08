@@ -826,19 +826,16 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
             timerInit(CLOCKTICKSPERSECOND>>4);
             bTimeSlowed = 1;
         }
-        int nSlot;
         if ((gMe->input.newWeapon >= kWeaponPitchfork) && (gMe->input.newWeapon <= kWeaponRemoteTNT)) // set the reticle to the weapon being switched to
-            nSlot = kWeaponSlotTable[gMe->input.newWeapon-1];
+            gWeaponRadialMenuChoice = gMe->input.newWeapon;
         else if ((gMe->nextWeapon >= kWeaponPitchfork) && (gMe->nextWeapon <= kWeaponRemoteTNT)) // set the reticle to the weapon being switched to
-            nSlot = kWeaponSlotTable[gMe->nextWeapon-1];
+            gWeaponRadialMenuChoice = gMe->nextWeapon;
         else if ((gMe->curWeapon >= kWeaponPitchfork) && (gMe->curWeapon <= kWeaponRemoteTNT)) // weapon is not being switched, fall back to currently held weapon
-            nSlot = kWeaponSlotTable[gMe->curWeapon-1];
-        else // no weapon found, set to pitchfork
-        {
-            gWeaponRadialMenuChoice = WeaponIsEquipable(gMe, kWeaponPitchfork) ? 1 : -1;
-            break;
-        }
-        gWeaponRadialMenuChoice = kWeaponSelectTable[nSlot];
+            gWeaponRadialMenuChoice = gMe->curWeapon;
+        else if (WeaponIsEquipable(gMe, kWeaponPitchfork)) // no current weapon found, fallback to pitchfork (if available)
+            gWeaponRadialMenuChoice = kWeaponPitchfork;
+        else // something went terribly wrong, don't set to any weapon slot
+            gWeaponRadialMenuChoice = -1;
         break;
     }
     case 4:
@@ -848,9 +845,9 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
         char bAbort = 0;
         if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2 || gInput.keyFlags.lastWeapon || gInput.keyFlags.action || gInput.keyFlags.useItem) // these button instantly picks currently selected weapon and close menu
             bAbort = 1;
-        else if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
+        else if (gRadialMenuToggle && !bButton && (gWeaponRadialMenuState == 4)) // wait until button is released before checking to close radial menu for toggle mode
             gWeaponRadialMenuState = 5;
-        else if (gRadialMenuToggle && bButton && gWeaponRadialMenuState == 5) // second click, wait for player to release the toggle button before closing
+        else if (gRadialMenuToggle && bButton && (gWeaponRadialMenuState == 5)) // second click, wait for player to release the toggle button before closing
             gWeaponRadialMenuState = 1;
         else if ((!gRadialMenuToggle && !bButton) || (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 1))
             bAbort = 1;
@@ -866,10 +863,9 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
             gInput.keyFlags.nextWeapon = 1, bPrevNextButtonStateOnTrigger = 0;
         else if (bPrevNextButtonStateOnTrigger == 2)
             gInput.keyFlags.prevWeapon = 1, bPrevNextButtonStateOnTrigger = 0;
-        if ((gInput.keyFlags.nextWeapon || gInput.keyFlags.prevWeapon) && (gWeaponRadialMenuChoice != -1)) // set selection to next/previous wheel slice
+        if ((gInput.keyFlags.nextWeapon || gInput.keyFlags.prevWeapon) && (gWeaponRadialMenuChoice != -1)) // set selection to next/previous wheel slice (assuming we have a slot already selected)
         {
-            nNewChoice = gWeaponRadialMenuChoice;
-            nNewChoice = kWeaponSlotTable[nNewChoice-1];
+            nNewChoice = kWeaponSlotTable[gWeaponRadialMenuChoice-1];
             for (;;) // loop to next/prev weapon in wheel
             {
                 if (gInput.keyFlags.prevWeapon)
@@ -911,9 +907,9 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
             nNewChoice = ClipRange(nNewChoice/5U, 0, 12);
             nNewChoice = kWeaponSelectTable[nNewChoice];
         }
-        else // player not moving stick above threshold or pressing next/previous weapon buttons - don't compute selection
+        else // player not moving stick above threshold or pressing next/previous weapon buttons - don't update selection
             break;
-        if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice))
+        if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice)) // if we have a new slot selected, check if it is valid and we have the weapon
             gWeaponRadialMenuChoice = nNewChoice;
         break;
     }
