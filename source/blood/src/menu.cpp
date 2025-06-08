@@ -1051,6 +1051,9 @@ const char *pzPlayerColorPreferenceStrings[] = {
     "RED",
     "TEAL",
     "GRAY",
+    "YELLOW",
+    "BROWN",
+    "COPPER",
 };
 
 const char *pzShowWeaponStrings[] = {
