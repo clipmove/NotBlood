@@ -298,7 +298,7 @@ If you have the GOG version of the game, do the following:
 * in_radialmenuthreshold
    - Sets the radial menu pitch threshold (0-1024)
 * in_radialmenutoggle
-   - Sets the radial menu behavior (0: held, 1: toggle)
+   - Sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon)
 * in_radialmenuposition
    - Sets the radial menu position
 * in_radialmenudim
