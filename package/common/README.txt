@@ -242,7 +242,7 @@ If you have the GOG version of the game, do the following:
 * cl_weaponfastswitch
    - Enable/disable fast weapon switching
 * color
-   - Set preferred player color palette in multiplayer (0: none, 1: blue, 2: red, 3: teal, 4: gray)
+   - Set preferred player color palette in multiplayer (0: none, 1: blue, 2: red, 3: teal, 4: gray, 5: yellow, 6: brown, 7: copper)
 * crosshair
    - Enable/disable crosshair (0: off, 1: on, 2: on [autoaim])
 * crosshairoffsetx
