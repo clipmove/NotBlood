@@ -1269,11 +1269,11 @@ CGameMenuItemSlider *pItemOptionsControlJoystickAxisSaturate[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisSnapZone[MAXJOYAXES];
 
 CGameMenuItemTitle itemOptionsControlJoystickMiscTitle("JOYSTICK MISC", 1, 160, 20, 2038);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 45, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchAuto("AUTO CROUCH:", 1, 18, 65, 280, gCrouchAuto, SetCrouchAuto, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscCenterView("CENTER VIEW ON DROP:", 1, 18, 85, 280, gCenterViewOnDrop, SetCenterView, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscTargetAimAssist("TARGET AIM ASSIST:", 1, 18, 105, 280, 0, SetJoystickTargetAimAssist, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlJoystickMiscRumble("RUMBLE CONTROLLER:", 1, 18, 125, 280, 0, SetJoystickRumble, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 60, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchAuto("AUTO CROUCH:", 1, 18, 80, 280, gCrouchAuto, SetCrouchAuto, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscCenterView("CENTER VIEW ON DROP:", 1, 18, 100, 280, gCenterViewOnDrop, SetCenterView, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscTargetAimAssist("TARGET AIM ASSIST:", 1, 18, 120, 280, 0, SetJoystickTargetAimAssist, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlJoystickMiscRumble("RUMBLE CONTROLLER:", 1, 18, 140, 280, 0, SetJoystickRumble, NULL, NULL);
 
 void SetupLoadingScreen(void)
 {

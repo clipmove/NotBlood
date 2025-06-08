@@ -2345,6 +2345,11 @@ void WeaponProcess(PLAYER *pPlayer) {
 
     char bAlreadySetLastWeapon = 0;
     char bTNTRemoteProxyCycling = 1;
+    if (pPlayer->input.newWeapon > kWeaponMax) // by default, the TNT weapon will cycle between remote/proxy variants - if the user selected the weapon with the radial menu, disable this behavior
+    {
+        pPlayer->input.newWeapon -= kWeaponMax;
+        bTNTRemoteProxyCycling = 0;
+    }
     if (pPlayer->pXSprite->health == 0)
     {
         pPlayer->qavLoop = 0;

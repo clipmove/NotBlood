@@ -496,12 +496,16 @@ void ctrlGetInput(void)
     {
         CONTROL_ClearButton(gamefunc_ProximityBombs);
         gInput.newWeapon = kWeaponProxyTNT;
+        if (!VanillaMode())
+            gInput.newWeapon += kWeaponMax; // adding kWeaponMax will flag the new weapon selection to ignore the TNT/remote/proxy cycling behavior
     }
 
     if (BUTTON(gamefunc_RemoteBombs))
     {
         CONTROL_ClearButton(gamefunc_RemoteBombs);
         gInput.newWeapon = kWeaponRemoteTNT;
+        if (!VanillaMode())
+            gInput.newWeapon += kWeaponMax; // adding kWeaponMax will flag the new weapon selection to ignore the TNT/remote/proxy cycling behavior
     }
 
     if (BUTTON(gamefunc_Holster_Weapon))
@@ -605,7 +609,8 @@ void ctrlGetInput(void)
         gInput.keyFlags.lastWeapon = gInput.keyFlags.nextWeapon = gInput.keyFlags.prevWeapon = 0;
         gInput.keyFlags.action = 0;
         gInput.keyFlags.nextItem = gInput.keyFlags.prevItem = gInput.keyFlags.useItem = 0;
-        return;
+        if (gWeaponRadialMenuState > -2) // don't mute analog stick input while button cooldown is active after closing radial menu
+            return;
     }
 
     if (CONTROL_JoystickEnabled) // controller input
@@ -738,6 +743,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
         10,
     };
     static char bTimeSlowed = 0, bPrevNextButtonStateOnTrigger = 0;
+    static int nMenuCooldown = 0;
 
     if (bReset || !gMe || (gMe->pXSprite->health == 0))
     {
@@ -917,7 +923,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
     {
         gWeaponRadialMenuState = -1;
         if ((gWeaponRadialMenuChoice != -1) || (gMe->curWeapon == gWeaponRadialMenuChoice)) // don't bother re-equipping same weapon
-            gInput.newWeapon = gWeaponRadialMenuChoice;
+            gInput.newWeapon = gWeaponRadialMenuChoice+kWeaponMax; // adding kWeaponMax will flag the new weapon selection to ignore the TNT/remote/proxy cycling behavior
         if (bTimeSlowed)
         {
             timerInit(CLOCKTICKSPERSECOND);
@@ -929,7 +935,15 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
     {
         if (bButton)
             break;
-        gWeaponRadialMenuState = 0;
+        gWeaponRadialMenuState = -2; // start countdown
+        nMenuCooldown = gLevelTime;
+        break;
+    }
+    case -2: // this state is used to add a delay between radial menu closure and clearing button inputs (fixes triggering buttons on tick after closing menu)
+    {
+        if (klabs(nMenuCooldown - gLevelTime) >= (kTicsPerSec>>2)) // if enough time has passed, allow button inputs to become active again
+            gWeaponRadialMenuState = nMenuCooldown = 0;
+        break;
     }
     default:
         break;
