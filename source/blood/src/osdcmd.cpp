@@ -1120,7 +1120,7 @@ int32_t registerosdcommands(void)
         { "in_mousemode", "toggles vertical mouse view", (void *)&gMouseAim, CVAR_BOOL, 0, 1 },
         { "in_radialmenuslowdown", "enable/disable the radial menu slow down behavior", (void*)&gRadialMenuSlowDown, CVAR_BOOL, 0, 1 },
         { "in_radialmenuthreshold", "sets the radial menu pitch threshold (0-1024)", (void*)&gRadialMenuThreshold, CVAR_INT, 0, 1024 },
-        { "in_radialmenutoggle", "sets the radial menu behavior (0: held, 1: toggle)", (void*)&gRadialMenuToggle, CVAR_BOOL, 0, 1 },
+        { "in_radialmenutoggle", "sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon)", (void*)&gRadialMenuToggle, CVAR_INT, 0, 2 },
         { "in_radialmenuposition", "sets the radial menu position", (void*)&gRadialMenuPosition, CVAR_INT, 0, 320 },
         { "in_radialmenudim", "enable/disable radial menu dimming background", (void*)&gRadialMenuDimBackground, CVAR_BOOL, 0, 1 },
         { "in_radialmenuyaw", "sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look)", (void*)&gRadialMenuYaw, CVAR_INT, 0, 3 },
