@@ -1711,7 +1711,7 @@ void viewDrawWeaponSelect(PLAYER* pPlayer, XSPRITE *pXSprite)
         DrawStatMaskedSprite(1142, x+xoffset, ySecondary, 256, 12, 0, 0x2000);
 }
 
-void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
+void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal)
 {
     const struct WEAPONICON
     {
@@ -1792,7 +1792,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite)
         const int nY = (int)nWeaponRadialReticlePos[nSlot][1];
         DrawStatMaskedSprite(2089, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, 16, 0, RS_AUTO, fix16_from_float(0.25f));
     }
-    DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, 0, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
+    DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
     for (int i = kWeaponPitchfork; i <= kWeaponRemoteTNT; i++)
     {
         if (!WeaponIsEquipable(pPlayer, i))
@@ -2491,7 +2491,7 @@ void UpdateStatusBar(ClockTicks arg)
         viewDrawWeaponSelect(pPlayer, pXSprite);
 
     if (gWeaponRadialMenuState > 0) // draw weapon radial menu over hud
-        viewDrawWeaponRadialMenu(pPlayer, pXSprite);
+        viewDrawWeaponRadialMenu(pPlayer, pXSprite, nPalette);
 
     if (gGameOptions.nGameType == kGameTypeSinglePlayer) return;
 
