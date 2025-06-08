@@ -601,7 +601,10 @@ void ctrlGetInput(void)
     ctrlRadialWeaponMenu(CONTROL_JoystickEnabled  ? &info : NULL, false);
     if (gWeaponRadialMenuState != 0) // clear button state if radial menu is active
     {
-        gInput.buttonFlags.shoot = gInput.buttonFlags.shoot2 = gInput.keyFlags.lastWeapon = gInput.keyFlags.nextWeapon = gInput.keyFlags.prevWeapon = 0;
+        gInput.buttonFlags.shoot = gInput.buttonFlags.shoot2 = 0;
+        gInput.keyFlags.lastWeapon = gInput.keyFlags.nextWeapon = gInput.keyFlags.prevWeapon = 0;
+        gInput.keyFlags.action = 0;
+        gInput.keyFlags.nextItem = gInput.keyFlags.prevItem = gInput.keyFlags.useItem = 0;
         return;
     }
 
@@ -803,6 +806,13 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
         else if (gInput.keyFlags.prevWeapon)
             bPrevNextButtonStateOnTrigger = 2;
     }
+    if (gWeaponRadialMenuState > 0) // bind next/prev item buttons to change wheel position
+    {
+        if (gInput.keyFlags.nextItem)
+            gInput.keyFlags.nextWeapon = 1;
+        if (gInput.keyFlags.prevItem)
+            gInput.keyFlags.prevWeapon = 1;
+    }
 
     switch (gWeaponRadialMenuState)
     {
@@ -836,7 +846,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
     case 1:
     {
         char bAbort = 0;
-        if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2 || gInput.keyFlags.lastWeapon) // shooting/last weapon button instantly picks currently selected weapon
+        if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2 || gInput.keyFlags.lastWeapon || gInput.keyFlags.action || gInput.keyFlags.useItem) // these button instantly picks currently selected weapon and close menu
             bAbort = 1;
         else if (gRadialMenuToggle && !bButton && gWeaponRadialMenuState == 4) // wait until button is released before checking to close radial menu for toggle mode
             gWeaponRadialMenuState = 5;
