@@ -605,7 +605,8 @@ void ctrlGetInput(void)
         gInput.keyFlags.lastWeapon = gInput.keyFlags.nextWeapon = gInput.keyFlags.prevWeapon = 0;
         gInput.keyFlags.action = 0;
         gInput.keyFlags.nextItem = gInput.keyFlags.prevItem = gInput.keyFlags.useItem = 0;
-        return;
+        if (gWeaponRadialMenuState > -2) // don't mute analog stick input while button cooldown is active after closing radial menu
+            return;
     }
 
     if (CONTROL_JoystickEnabled) // controller input
@@ -738,6 +739,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
         10,
     };
     static char bTimeSlowed = 0, bPrevNextButtonStateOnTrigger = 0;
+    static int nMenuCooldown = 0;
 
     if (bReset || !gMe || (gMe->pXSprite->health == 0))
     {
@@ -929,7 +931,15 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
     {
         if (bButton)
             break;
-        gWeaponRadialMenuState = 0;
+        gWeaponRadialMenuState = -2; // start countdown
+        nMenuCooldown = gLevelTime;
+        break;
+    }
+    case -2: // this state is used to add a delay between radial menu closure and clearing button inputs (fixes triggering buttons on tick after closing menu)
+    {
+        if (klabs(nMenuCooldown - gLevelTime) >= (kTicsPerSec>>2)) // if enough time has passed, allow button inputs to become active again
+            gWeaponRadialMenuState = nMenuCooldown = 0;
+        break;
     }
     default:
         break;
