@@ -1051,8 +1051,10 @@ static void playerResetTeamId(int nPlayer, int bNewLevel)
             viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPalPlayer, nPalTeam);
         }
     }
-    else if (gProfile[nPlayer].nColorPreference > 0)
-        pPlayer->teamId = gProfile[nPlayer].nColorPreference-1;
+    if ((gGameOptions.nGameType != kGameTypeTeams) && (gProfile[nPlayer].nColorPreference > 0))
+        pPlayer->teamIdPal = gProfile[nPlayer].nColorPreference-1;
+    else
+        pPlayer->teamIdPal = pPlayer->teamId&3;
 }
 
 const int nZoneRandList[kMaxPlayers][kMaxPlayers] = {
@@ -1195,7 +1197,7 @@ void playerStart(int nPlayer, int bNewLevel)
     int top, bottom;
     GetSpriteExtents(pSprite, &top, &bottom);
     pSprite->z -= bottom - pSprite->z;
-    pSprite->pal = !VanillaMode() && (gGameOptions.nGameType == kGameTypeTeams) && !(gGameOptions.uNetGameFlags&kNetGameFlagNoTeamColors) && (gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly || !gProfile[pPlayer->nPlayer].nModel) ? playerColorPalSprite(pPlayer->teamId) : playerColorPalDefault(pPlayer->teamId);
+    pSprite->pal = !VanillaMode() && (gGameOptions.nGameType == kGameTypeTeams) && !(gGameOptions.uNetGameFlags&kNetGameFlagNoTeamColors) && (gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly || !gProfile[pPlayer->nPlayer].nModel) ? playerColorPalSprite(pPlayer->teamIdPal) : playerColorPalDefault(pPlayer->teamIdPal);
     pPlayer->angold = pSprite->ang = pStartZone->ang;
     pPlayer->q16ang = fix16_from_int(pSprite->ang);
     pSprite->type = kDudePlayer1+nPlayer;
