@@ -2380,7 +2380,7 @@ RESTART:
 #ifndef NORENDER
                 if (gGameMenuMgr.m_bActive)
                 {
-                    if (gGameStarted) // dim background
+                    if (gGameStarted && gViewDim) // dim background
                         viewDimScreen();
                     gGameMenuMgr.Draw();
                     if (bQuickNetStart)
