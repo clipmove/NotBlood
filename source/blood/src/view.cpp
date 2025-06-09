@@ -1853,7 +1853,7 @@ void viewDrawAimedPlayerName(void)
         if (powerupCheck(&gPlayer[nPlayer], kPwUpDoppleganger) && !IsTargetTeammate(gView, gPlayer[nPlayer].pSprite)) // if doppleganger powerup is active, set player id as viewer
             nPlayer = gView->pSprite->type-kDudePlayer1;
         char* szName = gProfile[nPlayer].name;
-        int nPalette = !VanillaMode() ? playerColorPalAimName(gPlayer[nPlayer].teamId) : playerColorPalDefault(gPlayer[nPlayer].teamId);
+        int nPalette = !VanillaMode() ? playerColorPalAimName(gPlayer[nPlayer].teamIdPal) : playerColorPalDefault(gPlayer[nPlayer].teamIdPal);
         viewDrawText(4, szName, 160, 125, -128, nPalette, 1, 1);
     }
 }
@@ -1930,7 +1930,7 @@ void viewDrawPlayerFrags(void)
     {
         int x = 80 * (i & 3);
         int y = 9 * (i / 4);
-        int col = playerColorPalDefault(gPlayer[p].teamId);
+        int col = playerColorPalDefault(gPlayer[p].teamIdPal);
         char* name = gProfile[p].name;
         if ((gProfile[p].skill == 2) || (gGameOptions.uNetGameFlags&kNetGameFlagSkillIssue))
             sprintf(gTempStr, "%s", name);
@@ -1950,7 +1950,7 @@ void viewDrawPlayerFlags(void)
     {
         int x = 80 * (i & 3);
         int y = 9 * (i / 4);
-        int col = playerColorPalDefault(gPlayer[p].teamId);
+        int col = playerColorPalDefault(gPlayer[p].teamIdPal);
         char* name = gProfile[p].name;
         if ((gProfile[p].skill == 2) || (gGameOptions.uNetGameFlags&kNetGameFlagSkillIssue))
             sprintf(gTempStr, "%s", name);
@@ -3895,7 +3895,7 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                     pTSprite->shade = -128;
                     pTSprite->pal = 5;
                 } else if (powerupCheck(pPlayer, kPwUpDoppleganger) && (VanillaMode() || !bIsTeammate)) {
-                    pTSprite->pal = !VanillaMode() && !(gGameOptions.uNetGameFlags&kNetGameFlagNoTeamColors) ? playerColorPalSprite(gView->teamId) : playerColorPalDefault(gView->teamId);
+                    pTSprite->pal = !VanillaMode() && !(gGameOptions.uNetGameFlags&kNetGameFlagNoTeamColors) && (gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly || !gProfile[gView->nPlayer].nModel) ? playerColorPalSprite(gView->teamIdPal) : playerColorPalDefault(gView->teamIdPal);
                 }
                 
                 if (powerupCheck(pPlayer, kPwUpReflectShots)) {
