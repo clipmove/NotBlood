@@ -201,7 +201,8 @@ struct PLAYER
     int                 pwUpTime[kMaxPowerUps];
     int                 fragCount;
     int                 fragInfo[kMaxPlayers];
-    int                 teamId;
+    short               teamId;
+    short               teamIdPal;
     int                 fraggerId;
     int                 underwaterTime;
     int                 bloodTime;  // --> useless
