@@ -744,6 +744,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     };
     static char bTimeSlowed = 0;
     static int nMenuCooldown = 0;
+    static int nOldMouseX, nOldMouseY;
 
     if (bReset || !gMe || (gMe->pXSprite->health == 0))
     {
@@ -753,11 +754,11 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             timerInit(CLOCKTICKSPERSECOND);
             bTimeSlowed = 0;
         }
+        nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
         return;
     }
 
     int nX, nY;
-    static int nOldMouseX = 0, nOldMouseY = 0;
     switch (gRadialMenuYaw)
     {
     case 0: // strafe
@@ -945,7 +946,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     {
         if (klabs(nMenuCooldown - gLevelTime) >= (kTicsPerSec>>2)) // if enough time has passed, allow button inputs to become active again
             gWeaponRadialMenuState = nMenuCooldown = 0;
-        nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is off
+        nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
         break;
     }
     default:
