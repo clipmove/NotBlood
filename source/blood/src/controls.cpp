@@ -744,11 +744,11 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     };
     static char bTimeSlowed = 0;
     static int nMenuCooldown = 0;
-    static int nOldMouseX, nOldMouseY;
+    static int nOldMouseX = 0, nOldMouseY = 0;
 
     if (bReset || !gMe || (gMe->pXSprite->health == 0))
     {
-        gWeaponRadialMenuState = 0;
+        gWeaponRadialMenuState = nMenuCooldown = 0;
         if (bTimeSlowed)
         {
             timerInit(CLOCKTICKSPERSECOND);
