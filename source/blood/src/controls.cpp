@@ -742,7 +742,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
         11,
         10,
     };
-    static char bTimeSlowed = 0, bPrevNextButtonStateOnTrigger = 0;
+    static char bTimeSlowed = 0;
     static int nMenuCooldown = 0;
 
     if (bReset || !gMe || (gMe->pXSprite->health == 0))
@@ -805,13 +805,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
 
     char bButton = BUTTON(gamefunc_Radial_Weapon_Menu);
     if (!bButton && (gRadialMenuToggle == 2) && (gWeaponRadialMenuState < 1))
-    {
         bButton = gInput.keyFlags.nextWeapon || gInput.keyFlags.prevWeapon;
-        if (gInput.keyFlags.nextWeapon)
-            bPrevNextButtonStateOnTrigger = 1;
-        else if (gInput.keyFlags.prevWeapon)
-            bPrevNextButtonStateOnTrigger = 2;
-    }
     if (gWeaponRadialMenuState > 0) // bind next/prev item buttons to change wheel position
     {
         if (gInput.keyFlags.nextItem)
@@ -865,10 +859,6 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
         }
 
         int nNewChoice;
-        if (bPrevNextButtonStateOnTrigger == 1)
-            gInput.keyFlags.nextWeapon = 1, bPrevNextButtonStateOnTrigger = 0;
-        else if (bPrevNextButtonStateOnTrigger == 2)
-            gInput.keyFlags.prevWeapon = 1, bPrevNextButtonStateOnTrigger = 0;
         if ((gInput.keyFlags.nextWeapon || gInput.keyFlags.prevWeapon) && (gWeaponRadialMenuChoice != -1)) // set selection to next/previous wheel slice (assuming we have a slot already selected)
         {
             nNewChoice = kWeaponSlotTable[gWeaponRadialMenuChoice-1];
