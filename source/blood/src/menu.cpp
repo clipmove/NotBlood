@@ -1114,12 +1114,14 @@ const char* zRadialMenuToggle[] =
     "Weapon Switch",
 };
 
-const char* zRadialMenuJoystickAxes[] =
+const char* zRadialMenuAxes[] =
 {
     "Moving",
     "Strafing",
     "Turning",
     "Look Up/Down",
+    "Mouse X",
+    "Mouse Y",
 };
 
 CGameMenuItemTitle itemOptionsControlTitle("CONTROL SETUP", 1, 160, 20, 2038);
@@ -1168,10 +1170,10 @@ CGameMenuItemSlider itemOptionsControlRadialPosition("POSITION:", 1, 18, 57, 280
 CGameMenuItemZBool itemOptionsControlRadialDimBackground("FADE BACKGROUND:", 1, 18, 74, 280, 0, SetJoystickRadialMenuDimBackground, NULL, NULL);
 CGameMenuItemZBool itemOptionsControlRadialSlowDown("MENU SLOW DOWN:", 1, 18, 91, 280, 0, SetJoystickRadialMenuSlowDown, NULL, NULL);
 CGameMenuItemSlider itemOptionsControlRadialThreshold("THRESHOLD:", 1, 18, 108, 280, &gRadialMenuThreshold, 0, 1024, 128, SetJoystickRadialMenuThreshold, -1, -1, kMenuSliderPercent);
-CGameMenuItemZCycle itemOptionsControlRadialYaw("JOY X AXIS:", 1, 18, 125, 280, 0, SetJoystickRadialMenuYaw, zRadialMenuJoystickAxes, ARRAY_SIZE(zRadialMenuJoystickAxes), 0);
-CGameMenuItemZBool itemOptionsControlRadialYawInvert("JOY X INVERT:", 1, 18, 142, 280, 0, SetJoystickRadialMenuPitchInvert, NULL, NULL);
-CGameMenuItemZCycle itemOptionsControlRadialPitch("JOY Y AXIS:", 1, 18, 159, 280, 0, SetJoystickRadialMenuPitch, zRadialMenuJoystickAxes, ARRAY_SIZE(zRadialMenuJoystickAxes), 0);
-CGameMenuItemZBool itemOptionsControlRadialPitchInvert("JOY Y INVERT:", 1, 18, 176, 280, 0, SetJoystickRadialMenuYawInvert, NULL, NULL);
+CGameMenuItemZCycle itemOptionsControlRadialYaw("X AXIS:", 1, 18, 125, 280, 0, SetJoystickRadialMenuYaw, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlRadialYawInvert("X INVERT:", 1, 18, 142, 280, 0, SetJoystickRadialMenuPitchInvert, NULL, NULL);
+CGameMenuItemZCycle itemOptionsControlRadialPitch("Y AXIS:", 1, 18, 159, 280, 0, SetJoystickRadialMenuPitch, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlRadialPitchInvert("Y INVERT:", 1, 18, 176, 280, 0, SetJoystickRadialMenuYawInvert, NULL, NULL);
 
 void SetupNetworkMenu(void);
 void SetupNetworkHostMenu(CGameMenuItemChain *pItem);
@@ -2215,9 +2217,9 @@ void SetupControlsMenu(void)
     itemOptionsControlRadialDimBackground.at20 = gRadialMenuDimBackground;
     itemOptionsControlRadialSlowDown.at20 = gRadialMenuSlowDown;
     itemOptionsControlRadialThreshold.nValue = gRadialMenuThreshold;
-    itemOptionsControlRadialYaw.m_nFocus = gRadialMenuYaw % ARRAY_SSIZE(zRadialMenuJoystickAxes);
+    itemOptionsControlRadialYaw.m_nFocus = gRadialMenuYaw % ARRAY_SSIZE(zRadialMenuAxes);
     itemOptionsControlRadialYawInvert.at20 = gRadialMenuYawInvert;
-    itemOptionsControlRadialPitch.m_nFocus = gRadialMenuPitch % ARRAY_SSIZE(zRadialMenuJoystickAxes);
+    itemOptionsControlRadialPitch.m_nFocus = gRadialMenuPitch % ARRAY_SSIZE(zRadialMenuAxes);
     itemOptionsControlRadialPitchInvert.at20 = gRadialMenuPitchInvert;
 }
 
@@ -2740,7 +2742,7 @@ void SetJoystickRadialMenuThreshold(CGameMenuItemSlider *pItem)
 
 void SetJoystickRadialMenuYaw(CGameMenuItemZCycle *pItem)
 {
-    gRadialMenuYaw = pItem->m_nFocus % ARRAY_SIZE(zRadialMenuJoystickAxes);
+    gRadialMenuYaw = pItem->m_nFocus % ARRAY_SIZE(zRadialMenuAxes);
 }
 
 void SetJoystickRadialMenuYawInvert(CGameMenuItemZBool *pItem)
@@ -2750,7 +2752,7 @@ void SetJoystickRadialMenuYawInvert(CGameMenuItemZBool *pItem)
 
 void SetJoystickRadialMenuPitch(CGameMenuItemZCycle *pItem)
 {
-    gRadialMenuPitch = pItem->m_nFocus % ARRAY_SIZE(zRadialMenuJoystickAxes);
+    gRadialMenuPitch = pItem->m_nFocus % ARRAY_SIZE(zRadialMenuAxes);
 }
 
 void SetJoystickRadialMenuPitchInvert(CGameMenuItemZBool *pItem)

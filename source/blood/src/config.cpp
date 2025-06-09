@@ -524,9 +524,9 @@ void CONFIG_SetDefaults(void)
     gRadialMenuDimBackground = 1;
     gRadialMenuThreshold = 128;
     gRadialMenuSlowDown = 1;
-    gRadialMenuYaw = 0;
+    gRadialMenuYaw = 4;
     gRadialMenuYawInvert = 0;
-    gRadialMenuPitch = 1;
+    gRadialMenuPitch = 5;
     gRadialMenuPitchInvert = 0;
     gCrouchToggle = 0;
     gCrouchAuto = 0;
