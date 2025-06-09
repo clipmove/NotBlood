@@ -602,7 +602,7 @@ void ctrlGetInput(void)
     else
         input.forward -= info.mousey;
 
-    ctrlRadialWeaponMenu(CONTROL_JoystickEnabled  ? &info : NULL, false);
+    ctrlRadialWeaponMenu(&info, false);
     if (gWeaponRadialMenuState != 0) // clear button state if radial menu is active
     {
         gInput.buttonFlags.shoot = gInput.buttonFlags.shoot2 = 0;
@@ -710,7 +710,7 @@ void ctrlJoystickRumble(int nTime)
 int gWeaponRadialMenuState = 0;
 int gWeaponRadialMenuChoice = -1;
 
-void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
+void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
 {
     const char kWeaponSelectTable[12] = // angle to weapon slot
     {
@@ -744,6 +744,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
     };
     static char bTimeSlowed = 0;
     static int nMenuCooldown = 0;
+    static int nOldMouseX, nOldMouseY;
 
     if (bReset || !gMe || (gMe->pXSprite->health == 0))
     {
@@ -753,55 +754,67 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
             timerInit(CLOCKTICKSPERSECOND);
             bTimeSlowed = 0;
         }
+        nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
         return;
     }
 
     int nX, nY;
-    if (pInput)
+    switch (gRadialMenuYaw)
     {
-        switch (gRadialMenuYaw)
-        {
-        case 0: // strafe
-            nX = pInput->dz;
-            break;
-        case 1: // move
-            nX = pInput->dx;
-            break;
-        case 2: // turn
-            nX = pInput->dpitch;
-            break;
-        case 3: // look
-            nX = pInput->dyaw;
-            break;
-        default:
-            nX = 0;
-            break;
-        }
-        switch (gRadialMenuPitch)
-        {
-        case 0: // strafe
-            nY = pInput->dz;
-            break;
-        case 1: // move
-            nY = pInput->dx;
-            break;
-        case 2: // turn
-            nY = pInput->dpitch;
-            break;
-        case 3: // look
-            nY = pInput->dyaw;
-            break;
-        default:
-            nY = 0;
-            break;
-        }
-        if (gRadialMenuYawInvert)
-            nX = -nX;
-        if (gRadialMenuPitchInvert)
-            nY = -nY;
+    case 0: // strafe
+        nX = pInput->dz;
+        break;
+    case 1: // move
+        nX = pInput->dx;
+        break;
+    case 2: // turn
+        nX = pInput->dpitch;
+        break;
+    case 3: // look
+        nX = pInput->dyaw;
+        break;
+    case 4: // mouse x
+        nOldMouseY = pInput->mousey+(nOldMouseY>>1);
+        nX = nOldMouseY;
+        break;
+    case 5: // mouse y
+        nOldMouseX = pInput->mousex+(nOldMouseX>>1);
+        nX = nOldMouseX;
+        break;
+    default:
+        nX = 0;
+        break;
     }
-    else
-        nX = nY = 0;
+    switch (gRadialMenuPitch)
+    {
+    case 0: // strafe
+        nY = pInput->dz;
+        break;
+    case 1: // move
+        nY = pInput->dx;
+        break;
+    case 2: // turn
+        nY = pInput->dpitch;
+        break;
+    case 3: // look
+        nY = pInput->dyaw;
+        break;
+    case 4: // mouse x
+        nOldMouseY = pInput->mousey+(nOldMouseY>>1);
+        nY = nOldMouseY;
+        break;
+    case 5: // mouse y
+        nOldMouseX = pInput->mousex+(nOldMouseX>>1);
+        nY = nOldMouseX;
+        break;
+    default:
+        nY = 0;
+        break;
+    }
+    if (gRadialMenuYawInvert)
+        nX = -nX;
+    if (gRadialMenuPitchInvert)
+        nY = -nY;
 
     char bButton = BUTTON(gamefunc_Radial_Weapon_Menu);
     if (!bButton && (gRadialMenuToggle == 2) && (gWeaponRadialMenuState < 1))
@@ -933,6 +946,7 @@ void ctrlRadialWeaponMenu(const ControlInfo* pInput, const bool bReset)
     {
         if (klabs(nMenuCooldown - gLevelTime) >= (kTicsPerSec>>2)) // if enough time has passed, allow button inputs to become active again
             gWeaponRadialMenuState = nMenuCooldown = 0;
+        nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
         break;
     }
     default:

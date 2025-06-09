@@ -304,11 +304,11 @@ If you have the GOG version of the game, do the following:
 * in_radialmenudim
    - Enable/disable radial menu dimming background
 * in_radialmenuyaw
-   - Sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look)
+   - Sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)
 * in_radialmenuyawinvert
    - Enable/disable invert radial menu yaw input
 * in_radialmenupitch
-   - Sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look)
+   - Sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)
 * in_radialmenupitchinvert
    - Enable/disable invert radial menu pitch input
 * in_targetaimassist
