@@ -713,7 +713,7 @@ _DEMOPLAYBACK:
             viewDrawScreen();
             if ((gInputMode == INPUT_MODE_1) && CGameMenuMgr::m_bActive && !gDemoRunValidation)
             {
-                if (gGameStarted) // dim background
+                if (gGameStarted && gViewDim) // dim background
                     viewDimScreen();
                 gGameMenuMgr.Draw();
             }
