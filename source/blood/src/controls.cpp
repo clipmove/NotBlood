@@ -359,14 +359,15 @@ void ctrlGetInput(void)
             bCrouchState = 0;
             gLastCrouchCheck = gLevelTime;
 
-            int16_t nSectnum = gMe->pSprite->sectnum;
+            spritetype *pSprite = gMe->pSprite;
+            int16_t nSectnum = pSprite->sectnum;
             if (!sectRangeIsFine(nSectnum))
                 break;
             int32_t nAng, nX, nY, nZ, fZ, cZ, fZCurrentSect, nDiff;
-            nAng = gMe->pSprite->ang;
-            nX = gMe->pSprite->x;
-            nY = gMe->pSprite->y;
-            nZ = gMe->pSprite->z;
+            nAng = pSprite->ang;
+            nX = pSprite->x;
+            nY = pSprite->y;
+            nZ = pSprite->z;
             getzsofslope(nSectnum, nX, nY, &cZ, &fZCurrentSect); // get current floor
             if ((sector[nSectnum].ceilingpicnum < 4080) || (sector[nSectnum].ceilingpicnum > 4095)) // if sector does not have a fake ceiling (e.g. E4M4 elevator), checking this sector
             {
@@ -378,7 +379,7 @@ void ctrlGetInput(void)
                 }
             }
 
-            const char bInAir = gMe->cantJump;
+            const char bInAir = (pSprite->flags&kPhysFalling) && (zvel[pSprite->index] < -1000);
             const int32_t nStepX = mulscale30(128, Cos(nAng));
             const int32_t nStepY = mulscale30(128, Sin(nAng));
             int16_t nSectnumNew = nSectnum;
@@ -387,9 +388,9 @@ void ctrlGetInput(void)
                 nX += nStepX; // move forward
                 nY += nStepY;
                 updatesector(nX, nY, &nSectnumNew);
-                if (!sectRangeIsFine(nSectnumNew))
+                if (nSectnumNew == -1) // we drilled too far sir, abort
                     break;
-                if (nSectnum == nSectnumNew)
+                if (nSectnumNew == nSectnum)
                     continue;
                 if ((sector[nSectnumNew].ceilingpicnum >= 4080) && (sector[nSectnumNew].ceilingpicnum <= 4095)) // if sector HAS a fake ceiling (e.g. E4M4 elevator), skip
                     continue;
@@ -400,7 +401,8 @@ void ctrlGetInput(void)
                     nDiff = cZ - fZCurrentSect;
                 if ((nDiff < -3072) && (nDiff > -15000))
                 {
-                    bCrouchState = 1;
+                    nDiff = cZ - (nDiff>>1);
+                    bCrouchState = cansee(nX, nY, nDiff, nSectnumNew, pSprite->x, pSprite->y, nDiff, nSectnum); // if the area we want to crouch in has direct line of sight to the player
                     break;
                 }
             }
