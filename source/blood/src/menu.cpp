@@ -145,7 +145,7 @@ char strRestoreGameStrings[kMaxLoadSaveSlot][16] =
     "<Empty>",
 };
 
-char restoreGameDifficulty[kMaxLoadSaveSlot] = 
+int restoreGameDifficulty[kMaxLoadSaveSlot] = 
 {
     -1,
     -1,
