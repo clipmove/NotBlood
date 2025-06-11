@@ -1913,10 +1913,12 @@ void CGameMenuItemZEditBitmap::Draw(void)
     {
         shade = 32-((int)totalclock&63);
         char buffer[48];
-        if (restoreGameDifficulty[at28] < 5)
+        if ((restoreGameDifficulty[at28] >= 0) && (restoreGameDifficulty[at28] <= 4))
             snprintf(buffer, sizeof(buffer), "DIFFICULTY: %s", zDiffStrings[restoreGameDifficulty[at28]]);
-        else
+        else if (restoreGameDifficulty[at28] == 5)
             snprintf(buffer, sizeof(buffer), "DIFFICULTY: CUSTOM (%d-%d-%d-%d-%d-%s-%s)", gSaveGameOptions[at28].nEnemyQuantity, gSaveGameOptions[at28].nEnemyHealth, gSaveGameOptions[at28].nDifficulty, gSaveGameProfileSkill[at28], gSaveGameOptions[at28].nEnemySpeed, gSaveGameOptions[at28].bEnemyShuffle ? "ON" : "OFF", gSaveGameOptions[at28].bPitchforkOnly ? "ON" : "OFF");
+        else
+            buffer[0] = '\0';
         gMenuTextMgr.DrawText(buffer, m_nFont, 20, 50, 32, 0, true);
     }
     at2c->at24 = -1;
