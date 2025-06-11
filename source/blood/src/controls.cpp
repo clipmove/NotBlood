@@ -776,12 +776,12 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         nX = pInput->dyaw;
         break;
     case 4: // mouse x
-        nOldMouseY = pInput->mousey+(nOldMouseY>>1);
-        nX = nOldMouseY;
+        nOldMouseY += pInput->mousey;
+        nX = nOldMouseY>>2;
         break;
     case 5: // mouse y
-        nOldMouseX = pInput->mousex+(nOldMouseX>>1);
-        nX = nOldMouseX;
+        nOldMouseX += pInput->mousex;
+        nX = nOldMouseX>>2;
         break;
     default:
         nX = 0;
@@ -802,12 +802,12 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         nY = pInput->dyaw;
         break;
     case 4: // mouse x
-        nOldMouseY = pInput->mousey+(nOldMouseY>>1);
-        nY = nOldMouseY;
+        nOldMouseY += pInput->mousey;
+        nY = nOldMouseY>>2;
         break;
     case 5: // mouse y
-        nOldMouseX = pInput->mousex+(nOldMouseX>>1);
-        nY = nOldMouseX;
+        nOldMouseX += pInput->mousex;
+        nY = nOldMouseX>>2;
         break;
     default:
         nY = 0;
@@ -922,6 +922,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             break;
         if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice)) // if we have a new slot selected, check if it is valid and we have the weapon
             gWeaponRadialMenuChoice = nNewChoice;
+        nOldMouseX = nOldMouseY = 0; // picked a slot, reset mouse state
         break;
     }
     case 2:
