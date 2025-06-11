@@ -52,7 +52,7 @@ extern CGameMenu menuOptionsSound;
 extern CGameMenu menuOptionsControl;
 extern short gQuickLoadSlot;
 extern char strRestoreGameStrings[][16];
-extern char restoreGameDifficulty[];
+extern int restoreGameDifficulty[];
 extern const char *zDiffStrings[];
 extern char zUserMapName[BMAX_PATH];
 extern char zNetAddressBuffer[16];
