@@ -181,8 +181,9 @@ class CGameMenuItemBitmap : public CGameMenuItem
 {
 public:
     int at20;
+    int m_nSize;
     CGameMenuItemBitmap();
-    CGameMenuItemBitmap(const char *, int, int, int, int);
+    CGameMenuItemBitmap(const char *, int, int, int, int, int nScale = 65536);
     virtual void Draw(void);
     virtual bool Event(CGameMenuEvent &);
 };
