@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "sfx.h"
 #include "screen.h"
 #include "sound.h"
+#include "tile.h"
 #include "view.h"
 #ifdef _WIN32 // required for MME device selection
 #include "driver_winmm.h"
@@ -1092,6 +1093,7 @@ CGameMenu menuOptionsControlJoystickMisc;
 void SetupMouseMenu(CGameMenuItemChain *pItem);
 void SetupJoystickButtonsMenu(CGameMenuItemChain *pItem);
 void SetupJoystickAxesMenu(CGameMenuItemChain *pItem);
+void SetupJoystickAxisHeatmap(CGameMenuItemChain *pItem);
 void SetJoystickScale(CGameMenuItemSlider* pItem);
 void SetJoystickAnalogue(CGameMenuItemZCycle* pItem);
 void SetJoystickAnalogueInvert(CGameMenuItemZBool* pItem);
@@ -1269,6 +1271,7 @@ CGameMenuItemZCycle *pItemOptionsControlJoystickAxisDigitalNeg[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisDeadzone[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisSaturate[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisSnapZone[MAXJOYAXES];
+CGameMenuItemBitmap *pItemOptionsControlJoystickAxisHeatmapPic[MAXJOYAXES];
 
 CGameMenuItemTitle itemOptionsControlJoystickMiscTitle("JOYSTICK MISC", 1, 160, 20, 2038);
 CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 60, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
@@ -2325,7 +2328,7 @@ void SetupJoystickMenu(void)
     menuOptionsControlJoystickListAxes.Add(&itemJoyAxesTitle, false);
     for (int nAxis = 0; nAxis < nMaxJoyAxes; nAxis++) // create list of axes for joystick axis menu
     {
-        pItemOptionsControlJoystickAxis[nAxis] = new CGameMenuItemChain(MenuJoyAxisNames[nAxis], bUseBigFont ? 1 : 3, 66, y, 180, 0, &menuOptionsControlJoystickAxis[nAxis], -1, NULL, 0);
+        pItemOptionsControlJoystickAxis[nAxis] = new CGameMenuItemChain(MenuJoyAxisNames[nAxis], bUseBigFont ? 1 : 3, 66, y, 180, 0, &menuOptionsControlJoystickAxis[nAxis], -1, SetupJoystickAxisHeatmap, 0);
         dassert(pItemOptionsControlJoystickAxis[nAxis] != NULL);
         menuOptionsControlJoystickListAxes.Add(pItemOptionsControlJoystickAxis[nAxis], nAxis == 0);
         y += bUseBigFont ? 20 : 10;
@@ -2360,18 +2363,21 @@ void SetupJoystickMenu(void)
         dassert(pItemOptionsControlJoystickAxisDigitalNeg[nAxis] != NULL);
         menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisDigitalNeg[nAxis], false);
         y += 22;
-        pItemOptionsControlJoystickAxisDeadzone[nAxis] = new CGameMenuItemSlider("DEAD ZONE:", 1, 18, y, 280, &JoystickAnalogueDead[nAxis], fix16_from_int(0), fix16_from_float(0.5f), fix16_from_float(0.025f), SetJoystickDeadzone, -1, -1, kMenuSliderPercent); // get dead size
+        pItemOptionsControlJoystickAxisDeadzone[nAxis] = new CGameMenuItemSlider("DEAD ZONE:", 1, 18, y, 220, &JoystickAnalogueDead[nAxis], fix16_from_int(0), fix16_from_float(0.5f), fix16_from_float(0.025f), SetJoystickDeadzone, -1, -1, kMenuSliderPercent); // get dead size
         dassert(pItemOptionsControlJoystickAxisDeadzone[nAxis] != NULL);
         menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisDeadzone[nAxis], false);
         y += 17;
-        pItemOptionsControlJoystickAxisSaturate[nAxis] = new CGameMenuItemSlider("SATURATE:", 1, 18, y, 280, &JoystickAnalogueSaturate[nAxis], fix16_from_int(0), fix16_from_float(0.5f), fix16_from_float(0.025f), SetJoystickSaturate, -1, -1, kMenuSliderPercent); // get saturate
+        pItemOptionsControlJoystickAxisSaturate[nAxis] = new CGameMenuItemSlider("SATURATE:", 1, 18, y, 220, &JoystickAnalogueSaturate[nAxis], fix16_from_int(0), fix16_from_float(0.5f), fix16_from_float(0.025f), SetJoystickSaturate, -1, -1, kMenuSliderPercent); // get saturate
         dassert(pItemOptionsControlJoystickAxisSaturate[nAxis] != NULL);
         menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisSaturate[nAxis], false);
         y += 17;
-        pItemOptionsControlJoystickAxisSnapZone[nAxis] = new CGameMenuItemSlider("SNAP ZONE:", 1, 18, y, 280, &JoystickAnalogueSnap[nAxis], fix16_from_int(0), fix16_from_float(0.5f), fix16_from_float(0.05f), SetJoystickSnapZone, -1, -1, kMenuSliderPercent); // get snap axis zone
+        pItemOptionsControlJoystickAxisSnapZone[nAxis] = new CGameMenuItemSlider("SNAP ZONE:", 1, 18, y, 220, &JoystickAnalogueSnap[nAxis], fix16_from_int(0), fix16_from_float(0.5f), fix16_from_float(0.05f), SetJoystickSnapZone, -1, -1, kMenuSliderPercent); // get snap axis zone
         dassert(pItemOptionsControlJoystickAxisSnapZone[nAxis] != NULL);
         if (CONTROL_GetControllerAxisIsTwinAxisStick(nAxis)) // only add for analog stick axis
             menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisSnapZone[nAxis], false);
+        pItemOptionsControlJoystickAxisHeatmapPic[nAxis] = new CGameMenuItemBitmap(NULL, 3, 490, 288, kAxisHeatmapTile, fix16_from_float(0.4f));
+        dassert(pItemOptionsControlJoystickAxisHeatmapPic[nAxis] != NULL);
+        menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisHeatmapPic[nAxis], false);
         menuOptionsControlJoystickAxis[nAxis].Add(&itemBloodQAV, false);
     }
 }
@@ -3932,6 +3938,30 @@ void SetupJoystickAxesMenu(CGameMenuItemChain *pItem)
     }
 }
 
+inline void GenerateJoystickAxisHeatmap(const int nAxis)
+{
+    if (!waloff[kAxisHeatmapTile])
+    {
+        tileAllocTile(kAxisHeatmapTile, 128, 128, 0, 0);
+        tileSetSize(kAxisHeatmapTile, 128, 128);
+    }
+    dassert(waloff[kAxisHeatmapTile] != 0);
+    CONTROL_GetAxisHeatMap((uint8_t*)waloff[kAxisHeatmapTile], 128, 128, 0, 31, nAxis);
+    tileInvalidate(kAxisHeatmapTile, -1, -1);
+}
+
+void SetupJoystickAxisHeatmap(CGameMenuItemChain* pItem)
+{
+    for (int nAxis = 0; nAxis < MAXJOYAXES; nAxis++)
+    {
+        if (pItem == pItemOptionsControlJoystickAxis[nAxis])
+        {
+            GenerateJoystickAxisHeatmap(nAxis);
+            break;
+        }
+    }
+}
+
 void SetJoystickScale(CGameMenuItemSlider* pItem)
 {
     for (int nAxis = 0; nAxis < MAXJOYAXES; nAxis++)
@@ -4037,6 +4067,7 @@ void SetJoystickDeadzone(CGameMenuItemSlider* pItem)
         {
             JoystickAnalogueDead[nAxis] = pItem->nValue;
             JOYSTICK_SetDeadZone(nAxis, JoystickAnalogueDead[nAxis], JoystickAnalogueSaturate[nAxis]);
+            GenerateJoystickAxisHeatmap(nAxis);
             break;
         }
     }
@@ -4050,6 +4081,7 @@ void SetJoystickSaturate(CGameMenuItemSlider* pItem)
         {
             JoystickAnalogueSaturate[nAxis] = pItem->nValue;
             JOYSTICK_SetDeadZone(nAxis, JoystickAnalogueDead[nAxis], JoystickAnalogueSaturate[nAxis]);
+            GenerateJoystickAxisHeatmap(nAxis);
             break;
         }
     }
@@ -4063,6 +4095,7 @@ void SetJoystickSnapZone(CGameMenuItemSlider* pItem)
         {
             JoystickAnalogueSnap[nAxis] = pItem->nValue;
             JOYSTICK_SetSnapZone(nAxis, JoystickAnalogueSnap[nAxis]);
+            GenerateJoystickAxisHeatmap(nAxis);
             break;
         }
     }
