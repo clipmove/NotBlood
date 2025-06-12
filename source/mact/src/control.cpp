@@ -656,9 +656,9 @@ void CONTROL_GetAxisHeatMap(uint8_t* tilePtr, int32_t nWidth, int32_t nHeight, i
     {
         for (int32_t nX = nWidth-1; nX >= 0; nX--, tilePtr++)
         {
-            fStick.x = (xSlice*float(!bRotateMap ? nX : nY))-1.f;
+            fStick.x = (xSlice*float(!bRotateMap ? nY : nX))-1.f;
             if (bTwoAxis)
-                fStick.y = (ySlice*float(!bRotateMap ? nY : nX))-1.f;
+                fStick.y = (ySlice*float(!bRotateMap ? nX : nY))-1.f;
             else
                 fStick.y = 0;
             fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
