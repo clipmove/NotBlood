@@ -88,7 +88,11 @@ void _consoleSysMsg(const char* pMessage, ...);
 #define TILTBUFFER 4078
 #define CRYSTALBALLBUFFER 4079
 
-#define DOWNSCALEBUFFER 30450
+#define kAxisHeatmapTile (MAXTILES-2)
+#define kSMKPal 5
+#define kSMKTile (MAXTILES-1)
+
+#define DOWNSCALEBUFFER (MAXTILES-3)
 
 #define kExplodeMax 8
 
