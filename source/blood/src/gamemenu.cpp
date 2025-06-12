@@ -831,13 +831,14 @@ CGameMenuItemBitmap::CGameMenuItemBitmap()
     m_pzText = NULL;
 }
 
-CGameMenuItemBitmap::CGameMenuItemBitmap(const char *a1, int a2, int a3, int a4, int a5)
+CGameMenuItemBitmap::CGameMenuItemBitmap(const char *a1, int a2, int a3, int a4, int a5, int nScale)
 {
     m_pzText = a1;
     m_nFont = a2;
     m_nX = a3;
     m_nY = a4;
     at20 = a5;
+    m_nSize = nScale;
 }
 
 void CGameMenuItemBitmap::Draw(void)
@@ -855,7 +856,7 @@ void CGameMenuItemBitmap::Draw(void)
         gMenuTextMgr.GetFontInfo(m_nFont, NULL, NULL, &height);
         y += height + 2;
     }
-    rotatesprite(x<<15,y<<15, 65536, 0, at20, 0, 0, 82|8, 0, 0, xdim-1,ydim-1);
+    rotatesprite(x<<15,y<<15, m_nSize, 0, at20, 0, 0, 82|8, 0, 0, xdim-1,ydim-1);
 }
 
 bool CGameMenuItemBitmap::Event(CGameMenuEvent &event)
