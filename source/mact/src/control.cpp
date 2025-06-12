@@ -605,6 +605,8 @@ static void controlUpdateAxisState(int index, ControlInfo *const info, const boo
 
 void CONTROL_GetAxisHeatMap(uint8_t* tilePtr, int32_t nWidth, int32_t nHeight, int32_t nPalBase, int32_t nPalRange, int32_t nAxis)
 {
+    auto easeOutExpoHeatmap = [=](float fNum) { fNum = fabs(fNum); fNum = min(fNum, 1.f); if (fNum == 1.f) return 1.f; else return 1.f - powf(2.f, -10.f * fNum); };
+
     if (!tilePtr)
         return;
     if (nWidth <= 1)
@@ -663,7 +665,7 @@ void CONTROL_GetAxisHeatMap(uint8_t* tilePtr, int32_t nWidth, int32_t nHeight, i
                 fStick.y = 0;
             fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
             *tilePtr = nPalBase;
-            *tilePtr += (uint8_t)(min(fabsf(fStick.x*fStick.x) * float(nPalRange) / fabsf(fStick.x), float(nPalRange)));
+            *tilePtr += (uint8_t)(min(easeOutExpoHeatmap(fStick.x) * float(nPalRange), float(nPalRange)));
         }
     }
 }
