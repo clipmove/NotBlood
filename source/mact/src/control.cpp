@@ -524,6 +524,15 @@ static inline vec2f_t controlCalExpo(const vec2f_t fInput, const vec2f_t fExpo)
     return fOut;
 };
 
+static inline vec2f_t controlCalAxisState(vec2f_t fInput, vec2f_t fDead, vec2f_t fSnap, vec2f_t fExpo, const bool bTwoAxis)
+{
+    fInput = controlCalDeadzone(fInput, fDead); // radial deadzone
+    if (bTwoAxis && ((fSnap.x > 0.f) || (fSnap.y > 0.f))) // apply only if either stick has a snap value
+        fInput = controlCalSlopedScaledAxialDeadzone(fInput, fSnap); // sloped scaled axial deadzone
+    fInput = controlCalExpo(fInput, fExpo); // exponent using stick magnitude
+    return fInput;
+}
+
 static inline void controlTransformToAxis(int index, int input, ControlInfo* const info)
 {
     auto& a = joyAxes[index];
@@ -588,13 +597,75 @@ static void controlUpdateAxisState(int index, ControlInfo *const info, const boo
     else
         fDead.y = fSat.y = fSnap.y = fStick.y = 0.f;
 
-    fStick = controlCalDeadzone(fStick, fDead); // radial deadzone
-    if (bTwoAxis && ((fSnap.x > 0.f) || (fSnap.y > 0.f))) // apply only if either stick has a snap value
-        fStick = controlCalSlopedScaledAxialDeadzone(fStick, fSnap); // sloped scaled axial deadzone
-    fStick = controlCalExpo(fStick, fSat); // exponent using stick magnitude
+    fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
     controlTransformToAxis(index, int(fStick.x / kSDLStickNorm), info);
     if (bTwoAxis)
         controlTransformToAxis(index+1, int(fStick.y / kSDLStickNorm), info);
+}
+
+void CONTROL_GetAxisHeatMap(uint8_t* tilePtr, int32_t nWidth, int32_t nHeight, int32_t nPalBase, int32_t nPalRange, int32_t nAxis)
+{
+    if (!tilePtr)
+        return;
+    if (nWidth <= 1)
+        return;
+    if (nHeight <= 1)
+        return;
+    if (nPalRange <= 2)
+        return;
+    if (nAxis >= joystick.numAxes)
+        return;
+
+    int32_t nSecondaryAxis = nAxis+1;
+
+    const bool bTwoAxis = CONTROL_GetControllerAxisIsTwinAxisStick(nAxis);
+    const bool bRotateMap = !bTwoAxis || (nAxis&1); // plot to Y axis instead (for Y axis/triggers/single axis inputs)
+    if (bTwoAxis && (nAxis&1)) // needed to ensure accuracy calculation for snap zone
+        nSecondaryAxis = nAxis-1;
+
+    const float kDead10KRange = 10000.f / 32768.f; // convert old eduke deadzone values to new float calculation
+
+    vec2f_t fDead, fSat, fSnap;
+    auto &a1 = joyAxes[nAxis];
+
+    fDead.x  = fix16_to_float(a1.deadzone<<1)   / kDead10KRange;
+    fSat.x   = fix16_to_float(a1.saturation<<1) / kDead10KRange;
+    fSnap.x  = fix16_to_float(a1.snapzone);
+
+    fDead.x  = min(fDead.x, 0.99f);
+    fSnap.x  = min(fSnap.x, 0.50f);
+
+    if (bTwoAxis)
+    {
+        auto &a2 = joyAxes[nSecondaryAxis];
+
+        fDead.y  = fix16_to_float(a2.deadzone<<1)   / kDead10KRange;
+        fSat.y   = fix16_to_float(a2.saturation<<1) / kDead10KRange;
+        fSnap.y  = fix16_to_float(a2.snapzone);
+
+        fDead.y  = min(fDead.y, 0.99f);
+        fSnap.y  = min(fSnap.y, 0.50f);
+    }
+    else
+        fDead.y = fSat.y = fSnap.y = 0.f;
+
+    const float xSlice = 2.f / float(nWidth);
+    const float ySlice = 2.f / float(nHeight);
+    vec2f_t fStick;
+    for (int32_t nY = nHeight-1; nY >= 0; nY--)
+    {
+        for (int32_t nX = nWidth-1; nX >= 0; nX--, tilePtr++)
+        {
+            fStick.x = (xSlice*float(!bRotateMap ? nY : nX))-1.f;
+            if (bTwoAxis)
+                fStick.y = (ySlice*float(!bRotateMap ? nX : nY))-1.f;
+            else
+                fStick.y = 0;
+            fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
+            *tilePtr = nPalBase;
+            *tilePtr += (uint8_t)(min(fabsf(fStick.x*fStick.x) * float(nPalRange) / fabsf(fStick.x), float(nPalRange)));
+        }
+    }
 }
 
 static void controlPollDevices(ControlInfo *const info)
