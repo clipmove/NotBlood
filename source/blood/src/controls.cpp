@@ -764,10 +764,10 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     switch (gRadialMenuYaw)
     {
     case 0: // strafe
-        nX = pInput->dz;
+        nX = pInput->dx;
         break;
     case 1: // move
-        nX = pInput->dx;
+        nX = pInput->dz;
         break;
     case 2: // turn
         nX = pInput->dpitch;
@@ -790,10 +790,10 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     switch (gRadialMenuPitch)
     {
     case 0: // strafe
-        nY = pInput->dz;
+        nY = pInput->dx;
         break;
     case 1: // move
-        nY = pInput->dx;
+        nY = pInput->dz;
         break;
     case 2: // turn
         nY = pInput->dpitch;
