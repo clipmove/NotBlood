@@ -1118,8 +1118,8 @@ const char* zRadialMenuToggle[] =
 
 const char* zRadialMenuAxes[] =
 {
-    "Moving",
     "Strafing",
+    "Moving",
     "Turning",
     "Look Up/Down",
     "Mouse X",
