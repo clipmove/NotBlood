@@ -625,6 +625,8 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
     const bool bRotateMap = !bTwoAxis || (nAxis&1); // plot to Y axis instead (for Y axis/triggers/single axis inputs)
     if (bTwoAxis && (nAxis&1)) // needed to ensure accuracy calculation for snap zone
         nSecondaryAxis = nAxis-1;
+    if (!bTwoAxis) // don't dither if stick is single axis (breaks copy process)
+        bDithering = false;
 
     vec2f_t fDead, fSat, fSnap;
     auto &a1 = joyAxes[nAxis];
@@ -654,7 +656,9 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
     const float ySlice = 2.f / float(nHeight);
     vec2f_t fStick;
     uint8_t nDither = 0;
-    for (int32_t nY = nHeight-1; nY >= 0; nY--)
+    uint8_t *tilePtrStart = tilePtr;
+    uint8_t *tilePtrEnd = &tilePtr[nWidth*nHeight-1];
+    for (int32_t nY = bTwoAxis ? nHeight-1 : 0; nY >= 0; nY--)
     {
         for (int32_t nX = nWidth-1; nX >= 0; nX--, tilePtr++)
         {
@@ -666,8 +670,16 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
             fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
             if (bDithering)
                 nDither = (nX&1) == (nY&1) ? 1 : 0;
-            *tilePtr = nPalBase;
-            *tilePtr += (uint8_t)(min(easeOutExpoHeatmap(fStick.x) * float(nPalRange-nDither), float(nPalRange-nDither)));
+            const uint8_t nPixel = uint8_t(nPalBase) + (uint8_t)(min(easeOutExpoHeatmap(fStick.x) * float(nPalRange-nDither), float(nPalRange-nDither)));
+            *tilePtr = nPixel;
+        }
+    }
+    if (!bTwoAxis) // copy row for non-stick axis
+    {
+        for (int32_t nRows = nHeight-2; nRows >= 0; nRows--)
+        {
+            memcpy(tilePtr, tilePtrStart, nWidth);
+            tilePtr = &tilePtr[nWidth]; // offset to next row
         }
     }
 }
