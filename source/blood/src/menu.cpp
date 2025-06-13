@@ -2375,7 +2375,7 @@ void SetupJoystickMenu(void)
         dassert(pItemOptionsControlJoystickAxisSnapZone[nAxis] != NULL);
         if (CONTROL_GetControllerAxisIsTwinAxisStick(nAxis)) // only add for analog stick axis
             menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisSnapZone[nAxis], false);
-        pItemOptionsControlJoystickAxisHeatmapPic[nAxis] = new CGameMenuItemBitmap(NULL, 3, 490, 288, kAxisHeatmapTile, fix16_from_float(0.4f));
+        pItemOptionsControlJoystickAxisHeatmapPic[nAxis] = new CGameMenuItemBitmap(NULL, 3, 500, 290, kAxisHeatmapTile, fix16_from_float(1.f));
         dassert(pItemOptionsControlJoystickAxisHeatmapPic[nAxis] != NULL);
         pItemOptionsControlJoystickAxisHeatmapPic[nAxis]->bEnable = 0;
         menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisHeatmapPic[nAxis], false);
@@ -3943,11 +3943,11 @@ inline void GenerateJoystickAxisHeatmap(const int nAxis)
 {
     if (!waloff[kAxisHeatmapTile])
     {
-        tileAllocTile(kAxisHeatmapTile, 128, 128, 0, 0);
-        tileSetSize(kAxisHeatmapTile, 128, 128);
+        tileAllocTile(kAxisHeatmapTile, 48, 48, 0, 0);
+        tileSetSize(kAxisHeatmapTile, 48, 48);
     }
     dassert(waloff[kAxisHeatmapTile] != 0);
-    CONTROL_GetAxisHeatMap((uint8_t*)waloff[kAxisHeatmapTile], 128, 128, 0, 31, true, nAxis);
+    CONTROL_GetAxisHeatMap((uint8_t*)waloff[kAxisHeatmapTile], 48, 48, 0, 31, true, nAxis);
     tileInvalidate(kAxisHeatmapTile, -1, -1);
 }
 
