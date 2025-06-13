@@ -2375,7 +2375,7 @@ void SetupJoystickMenu(void)
         dassert(pItemOptionsControlJoystickAxisSnapZone[nAxis] != NULL);
         if (CONTROL_GetControllerAxisIsTwinAxisStick(nAxis)) // only add for analog stick axis
             menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisSnapZone[nAxis], false);
-        pItemOptionsControlJoystickAxisHeatmapPic[nAxis] = new CGameMenuItemBitmap(NULL, 3, 500, 290, kAxisHeatmapTile, fix16_from_float(1.f));
+        pItemOptionsControlJoystickAxisHeatmapPic[nAxis] = new CGameMenuItemBitmap(NULL, 3, 500, 290, kAxisHeatmapTile);
         dassert(pItemOptionsControlJoystickAxisHeatmapPic[nAxis] != NULL);
         pItemOptionsControlJoystickAxisHeatmapPic[nAxis]->bEnable = 0;
         menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisHeatmapPic[nAxis], false);
