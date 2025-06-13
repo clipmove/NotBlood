@@ -565,14 +565,13 @@ static inline void controlTransformToAxis(int index, int input, ControlInfo* con
 static void controlUpdateAxisState(int index, ControlInfo *const info, const bool bTwoAxis)
 {
     const float kSDLStickNorm =     1.f / 32767.f; // convert SDL stick range (-32768/32767) to (-1/1)
-    const float kDead10KRange = 10000.f / 32768.f; // convert old eduke deadzone values to new float calculation
 
     vec2f_t fDead, fSat, fSnap, fStick;
     auto      &a1 = joyAxes[index];
     int const in1 = joystick.pAxis[index];
 
-    fDead.x  = fix16_to_float(a1.deadzone<<1)   / kDead10KRange;
-    fSat.x   = fix16_to_float(a1.saturation<<1) / kDead10KRange;
+    fDead.x  = fix16_to_float(a1.deadzone<<1);
+    fSat.x   = fix16_to_float(a1.saturation<<3);
     fSnap.x  = fix16_to_float(a1.snapzone);
     fStick.x = float(in1) * kSDLStickNorm;
 
@@ -585,8 +584,8 @@ static void controlUpdateAxisState(int index, ControlInfo *const info, const boo
         auto      &a2 = joyAxes[index+1];
         int const in2 = joystick.pAxis[index+1];
 
-        fDead.y  = fix16_to_float(a2.deadzone<<1)   / kDead10KRange;
-        fSat.y   = fix16_to_float(a2.saturation<<1) / kDead10KRange;
+        fDead.y  = fix16_to_float(a2.deadzone<<1);
+        fSat.y   = fix16_to_float(a2.saturation<<3);
         fSnap.y  = fix16_to_float(a2.snapzone);
         fStick.y = float(in2) * kSDLStickNorm;
 
@@ -627,13 +626,11 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
     if (bTwoAxis && (nAxis&1)) // needed to ensure accuracy calculation for snap zone
         nSecondaryAxis = nAxis-1;
 
-    const float kDead10KRange = 10000.f / 32768.f; // convert old eduke deadzone values to new float calculation
-
     vec2f_t fDead, fSat, fSnap;
     auto &a1 = joyAxes[nAxis];
 
-    fDead.x  = fix16_to_float(a1.deadzone<<1)   / kDead10KRange;
-    fSat.x   = fix16_to_float(a1.saturation<<1) / kDead10KRange;
+    fDead.x  = fix16_to_float(a1.deadzone<<1);
+    fSat.x   = fix16_to_float(a1.saturation<<3);
     fSnap.x  = fix16_to_float(a1.snapzone);
 
     fDead.x  = min(fDead.x, 0.99f);
@@ -643,8 +640,8 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
     {
         auto &a2 = joyAxes[nSecondaryAxis];
 
-        fDead.y  = fix16_to_float(a2.deadzone<<1)   / kDead10KRange;
-        fSat.y   = fix16_to_float(a2.saturation<<1) / kDead10KRange;
+        fDead.y  = fix16_to_float(a2.deadzone<<1);
+        fSat.y   = fix16_to_float(a2.saturation<<3);
         fSnap.y  = fix16_to_float(a2.snapzone);
 
         fDead.y  = min(fDead.y, 0.99f);
