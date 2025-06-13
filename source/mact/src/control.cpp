@@ -657,7 +657,6 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
     vec2f_t fStick;
     uint8_t nDither = 0;
     uint8_t *tilePtrStart = tilePtr;
-    uint8_t *tilePtrEnd = &tilePtr[nWidth*nHeight-1];
     for (int32_t nY = bTwoAxis ? nHeight-1 : 0; nY >= 0; nY--)
     {
         for (int32_t nX = nWidth-1; nX >= 0; nX--, tilePtr++)
