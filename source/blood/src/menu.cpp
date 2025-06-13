@@ -2377,6 +2377,7 @@ void SetupJoystickMenu(void)
             menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisSnapZone[nAxis], false);
         pItemOptionsControlJoystickAxisHeatmapPic[nAxis] = new CGameMenuItemBitmap(NULL, 3, 490, 288, kAxisHeatmapTile, fix16_from_float(0.4f));
         dassert(pItemOptionsControlJoystickAxisHeatmapPic[nAxis] != NULL);
+        pItemOptionsControlJoystickAxisHeatmapPic[nAxis]->bEnable = 0;
         menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisHeatmapPic[nAxis], false);
         menuOptionsControlJoystickAxis[nAxis].Add(&itemBloodQAV, false);
     }
