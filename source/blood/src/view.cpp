@@ -1729,12 +1729,12 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         { 559, 3,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 3: shotgun
         { 558, 2,  0, -2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.45f),  }, // 4: tommy gun
         { 526, 8,  0, -1, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 5: napalm launcher
-        { 589, 4, -1,  5, 0, -fix16_from_float(0.1f)+fix16_from_float(0.6875f),}, // 6: dynamite
+        { 589, 4, -1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.6875f),}, // 6: dynamite
         { 618, 5,  0,  6, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 7: spray can
         { 539, 9,  0, -6, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 8: tesla gun
         { 800, 11, 2,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 9: life leech
         { 525, 10, 2, -7, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 10: voodoo doll
-        { 811, 6, -1,  2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 11: proxy bomb
+        { 811, 6, -1,  3, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 11: proxy bomb
         { 810, 7,  1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 12: remote bomb
         {  -1, 0,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // NULL
     };
@@ -1759,10 +1759,10 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         {(short)mulscale30(45, Sin(short( 4.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 4.f * (kAng360 / 12.f))))},
         {(short)mulscale30(45, Sin(short( 3.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 3.f * (kAng360 / 12.f))))},
         {(short)mulscale30(45, Sin(short( 2.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 2.f * (kAng360 / 12.f))))},
-        {(short)mulscale30(45, Sin(short( 1.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 1.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short( 1.02f*(kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 1.02f*(kAng360 / 12.f))))},
         {(short)mulscale30(45, Sin(0)),                              (short)mulscale30(45, Cos(0))},
-        {(short)mulscale30(45, Sin(short(11.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short(11.f * (kAng360 / 12.f))))},
-        {(short)mulscale30(45, Sin(short(10.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short(10.f * (kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short(11.02f*(kAng360 / 12.f)))), (short)mulscale30(45, Cos(short(11.02f*(kAng360 / 12.f))))},
+        {(short)mulscale30(45, Sin(short(10.05f*(kAng360 / 12.f)))), (short)mulscale30(45, Cos(short(10.05f*(kAng360 / 12.f))))},
         {(short)mulscale30(45, Sin(short( 9.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 9.f * (kAng360 / 12.f))))},
         {(short)mulscale30(45, Sin(short( 8.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 8.f * (kAng360 / 12.f))))},
         {(short)mulscale30(45, Sin(short( 7.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 7.f * (kAng360 / 12.f))))},
@@ -1790,7 +1790,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         const int nSlot = weaponRadialInfo[nWeaponCur].nSlot;
         const int nX = (int)nWeaponRadialReticlePos[nSlot][0];
         const int nY = (int)nWeaponRadialReticlePos[nSlot][1];
-        DrawStatMaskedSprite(2089, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, 16, 0, RS_AUTO, fix16_from_float(0.25f));
+        DrawStatMaskedSprite(624, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, 0, 9, RS_AUTO, fix16_from_float(71.f / 64.f * 0.25f));
     }
     DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
     for (int i = kWeaponPitchfork; i <= kWeaponRemoteTNT; i++)
