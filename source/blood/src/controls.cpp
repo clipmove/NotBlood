@@ -918,6 +918,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                     break;
                 }
             }
+            if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice)) // if we have a new slot selected, check if it is valid and we have the weapon
+                gWeaponRadialMenuChoice = nNewChoice;
         }
         else if ((klabs(nX) >= gRadialMenuThreshold) || (klabs(nY) >= gRadialMenuThreshold)) // above threshold, read from stick
         {
@@ -936,12 +938,33 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                     nNewChoice -= 12*5;
             }
             nNewChoice = ClipRange(nNewChoice/5U, 0, 12);
-            nNewChoice = kWeaponSelectTable[nNewChoice];
+            const int nNewWeapon = kWeaponSelectTable[nNewChoice];
+            if ((nNewWeapon != gWeaponRadialMenuChoice) && WeaponIsEquipable(gMe, nNewWeapon)) // if we have a new slot selected, check if it is valid and we have the weapon
+            {
+                gWeaponRadialMenuChoice = nNewWeapon;
+            }
+            else if (nNewWeapon != gWeaponRadialMenuChoice) // new slot is unselectable, check neighbor slots
+            {
+                int nChoiceNext = nNewChoice+1, nChoicePrev = nNewChoice-1; // try adjacent slot
+                if (nChoiceNext >= 12)
+                    nChoiceNext = 0;
+                if (nChoicePrev < 0)
+                    nChoicePrev = 11;
+                nChoiceNext = kWeaponSelectTable[nChoiceNext];
+                nChoicePrev = kWeaponSelectTable[nChoicePrev];
+                const char bCanPickNext = (nChoiceNext == gWeaponRadialMenuChoice) || WeaponIsEquipable(gMe, nChoiceNext);
+                const char bCanPickPrev = (nChoicePrev == gWeaponRadialMenuChoice) || WeaponIsEquipable(gMe, nChoicePrev);
+                if (bCanPickNext != bCanPickPrev) // if ONLY ONE of our neighbor slots are valid, snap to adjacent slice
+                {
+                    if (bCanPickNext)
+                        gWeaponRadialMenuChoice = nChoiceNext;
+                    else if (bCanPickPrev)
+                        gWeaponRadialMenuChoice = nChoicePrev;
+                }
+            }
         }
         else // player not moving stick above threshold or pressing next/previous weapon buttons - don't update selection
             break;
-        if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice)) // if we have a new slot selected, check if it is valid and we have the weapon
-            gWeaponRadialMenuChoice = nNewChoice;
         nOldMouseX = nOldMouseY = 0; // picked a slot, reset mouse state
         break;
     }
