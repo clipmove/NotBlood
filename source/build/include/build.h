@@ -1037,9 +1037,6 @@ extern char apptitle[256];
 
 extern int32_t novoxmips;
 
-extern int32_t r_drawinvisiblesprites;
-#define SHOWINVISIBILITY (showinvisibility || r_drawinvisiblesprites)
-
 #ifdef DEBUGGINGAIDS
 extern float debug1, debug2;
 #endif
