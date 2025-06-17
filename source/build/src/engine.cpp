@@ -92,8 +92,6 @@ char g_haveVoxels;
 
 int32_t novoxmips = 0;
 
-int32_t r_drawinvisiblesprites = 0;
-
 //These variables need to be copied into BUILD
 #define MAXXSIZ 256
 #define MAXYSIZ 256
@@ -861,7 +859,7 @@ void yax_tweakpicnums(int32_t bunchnum, int32_t cf, int32_t restore)
             if (!restore)
             {
                 opicnum[cf][i] = SECTORFLD(i,picnum, cf);
-                if (editstatus && SHOWINVISIBILITY)
+                if (editstatus && showinvisibility)
                     SECTORFLD(i,picnum, cf) = MAXTILES-1;
                 else //if ((dastat&(128+256))==0)
                     SECTORFLD(i,picnum, cf) = bloodhack ? MAXTILES-2 : 13; //FOF;
@@ -1822,7 +1820,7 @@ static void classicScanSector(int16_t startsectnum)
         {
             auto const spr = (uspriteptr_t)&sprite[i];
 
-            if (((spr->cstat & 0x8000) && !SHOWINVISIBILITY) || spr->xrepeat == 0 || spr->yrepeat == 0)
+            if (((spr->cstat & 0x8000) && !showinvisibility) || spr->xrepeat == 0 || spr->yrepeat == 0)
                 continue;
 
             vec2_t const s = { spr->x-globalposx, spr->y-globalposy };
@@ -4647,7 +4645,7 @@ static void classicDrawBunches(int32_t bunch)
             if (searchy <= uplc[searchx]
 #ifdef YAX_ENABLE
                 && umost[searchx] <= searchy && getceilzofslope(sectnum, globalposx, globalposy) <= globalposz
-                && (yax_getbunch(sectnum, YAX_CEILING) < 0 || SHOWINVISIBILITY || (sec->ceilingstat&(256+128)) || klabs(yax_globallev-YAX_MAXDRAWS)==YAX_MAXDRAWS)
+                && (yax_getbunch(sectnum, YAX_CEILING) < 0 || showinvisibility || (sec->ceilingstat&(256+128)) || klabs(yax_globallev-YAX_MAXDRAWS)==YAX_MAXDRAWS)
 #endif
                 ) //ceiling
             {
@@ -4657,7 +4655,7 @@ static void classicDrawBunches(int32_t bunch)
             else if (dplc[searchx] <= searchy
 #ifdef YAX_ENABLE
                      && searchy < dmost[searchx] && getflorzofslope(sectnum, globalposx, globalposy) >= globalposz
-                     && (yax_getbunch(sectnum, YAX_FLOOR) < 0 || SHOWINVISIBILITY || (sec->floorstat&(256+128)) || klabs(yax_globallev-YAX_MAXDRAWS)==YAX_MAXDRAWS)
+                     && (yax_getbunch(sectnum, YAX_FLOOR) < 0 || showinvisibility || (sec->floorstat&(256+128)) || klabs(yax_globallev-YAX_MAXDRAWS)==YAX_MAXDRAWS)
 #endif
                 ) //floor
             {
@@ -9602,7 +9600,7 @@ int32_t renderDrawRoomsQ16(int32_t daposx, int32_t daposy, int32_t daposz,
     {
 #  ifdef YAX_ENABLE
         // BEGIN_TWEAK ceiling/floor fake 'TROR' pics, see END_TWEAK in build.c
-        if (editstatus && SHOWINVISIBILITY)
+        if (editstatus && showinvisibility)
         {
             for (i=0; i<numyaxbunches; i++)
             {

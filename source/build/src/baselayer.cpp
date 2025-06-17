@@ -819,7 +819,7 @@ int32_t baselayer_init(void)
         { "r_rotatespriteinterpquantize","enable/disable position quantizing for interpolate repeated rotatesprite calls",(void *) &r_rotatespriteinterpquantize, CVAR_BOOL, 0, 1 },
         { "r_voxels","enable/disable automatic sprite->voxel rendering",(void *) &usevoxels, CVAR_BOOL, 0, 1 },
         { "r_shadowvoxels","enable/disable wall/floor aligned transparent voxels (only for blood)",(void *) &r_shadowvoxels, CVAR_BOOL, 0, 1 },
-        { "r_drawinvisiblesprites", "forcefully draw invisible sprites", (void *) &r_drawinvisiblesprites, CVAR_BOOL, 0, 1 },
+        { "r_drawinvisiblesprites", "forcefully draw invisible sprites", (void *) &showinvisibility, CVAR_BOOL, 0, 1 },
         { "r_maxfps", "limit the frame rate", (void *)&r_maxfps, CVAR_INT | CVAR_FUNCPTR, -2, 1000 },
 #ifdef YAX_ENABLE
         { "r_tror_nomaskpass", "enable/disable additional pass in TROR software rendering", (void *)&r_tror_nomaskpass, CVAR_BOOL, 0, 1 },
