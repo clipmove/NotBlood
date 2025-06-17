@@ -3947,7 +3947,7 @@ inline void GenerateJoystickAxisHeatmap(const int nAxis)
         tileSetSize(kAxisHeatmapTile, 48, 48);
     }
     dassert(waloff[kAxisHeatmapTile] != 0);
-    CONTROL_GetAxisHeatMap((uint8_t*)waloff[kAxisHeatmapTile], 48, 48, 0, 31, true, nAxis);
+    CONTROL_GetAxisHeatMap(nAxis, (uint8_t*)waloff[kAxisHeatmapTile], 48, 48, 0, 31, true);
     tileInvalidate(kAxisHeatmapTile, -1, -1);
 }
 
