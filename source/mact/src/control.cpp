@@ -602,9 +602,9 @@ static void controlUpdateAxisState(int index, ControlInfo *const info, const boo
         controlTransformToAxis(index+1, int(fStick.y / kSDLStickNorm), info);
 }
 
-void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, int32_t nPalBase, int32_t nPalRange, bool bDithering, int32_t nAxis)
+void CONTROL_GetAxisHeatMap(int32_t nAxis, uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, int32_t nPalBase, int32_t nPalRange, bool bDithering)
 {
-    auto easeOutExpoHeatmap = [=](float fNum) { fNum = fabs(fNum); if (fNum >= 1.f) return 1.f; return 1.f - powf(2.f, -10.f * fNum); };
+    auto easeOutExpoHeatmapAndClamp = [=](float fNum) { fNum = fabs(fNum); if (fNum >= 1.f) return 1.f; return 1.f - powf(2.f, -10.f * fNum); };
 
     if (!tilePtr)
         return;
@@ -614,7 +614,7 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
         return;
     if (nPalBase < 0 || nPalBase > 255)
         return;
-    if (nPalRange <= 2 || (nPalBase+nPalRange) > 255)
+    if (nPalRange < 2 || (nPalBase+nPalRange) > 255)
         return;
     if (nAxis >= joystick.numAxes)
         return;
@@ -655,8 +655,12 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
     const float xSlice = 2.f / float(nWidth);
     const float ySlice = 2.f / float(nHeight);
     vec2f_t fStick;
-    uint8_t nDither = 0;
+    uint8_t nDither = 0, palArray[256];
     uint8_t *tilePtrStart = tilePtr;
+    for (int32_t nPal = 0; nPal <= nPalRange; nPal++) // set palette table
+    {
+        palArray[nPal] = nPalBase+nPal;
+    }
     for (int32_t nY = bTwoAxis ? nHeight-1 : 0; nY >= 0; nY--)
     {
         for (int32_t nX = nWidth-1; nX >= 0; nX--, tilePtr++)
@@ -669,8 +673,7 @@ void CONTROL_GetAxisHeatMap(uint8_t *tilePtr, int32_t nWidth, int32_t nHeight, i
             fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
             if (bDithering)
                 nDither = (nX&1) == (nY&1) ? 1 : 0;
-            const uint8_t nPixel = uint8_t(nPalBase) + (uint8_t)(min(easeOutExpoHeatmap(fStick.x) * float(nPalRange-nDither), float(nPalRange-nDither)));
-            *tilePtr = nPixel;
+            *tilePtr = palArray[uint8_t(easeOutExpoHeatmapAndClamp(fStick.x) * float(nPalRange-nDither))&255];
         }
     }
     if (!bTwoAxis) // copy row for non-stick axis
