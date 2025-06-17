@@ -614,7 +614,7 @@ void CONTROL_GetAxisHeatMap(int32_t nAxis, uint8_t *tilePtr, int32_t nWidth, int
         return;
     if (nPalBase < 0 || nPalBase > 255)
         return;
-    if (nPalRange <= 2 || (nPalBase+nPalRange) > 255)
+    if (nPalRange < 2 || (nPalBase+nPalRange) > 255)
         return;
     if (nAxis >= joystick.numAxes)
         return;
@@ -673,7 +673,7 @@ void CONTROL_GetAxisHeatMap(int32_t nAxis, uint8_t *tilePtr, int32_t nWidth, int
             fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
             if (bDithering)
                 nDither = (nX&1) == (nY&1) ? 1 : 0;
-            *tilePtr =  palArray[uint8_t(easeOutExpoHeatmapAndClamp(fStick.x) * float(nPalRange-nDither))&255];
+            *tilePtr = palArray[uint8_t(easeOutExpoHeatmapAndClamp(fStick.x) * float(nPalRange-nDither))&255];
         }
     }
     if (!bTwoAxis) // copy row for non-stick axis
