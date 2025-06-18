@@ -1377,8 +1377,8 @@ SWITCH switches[] = {
     { "masterslave", 3, 0 },
     { "level", 4, 2 },
     { "nodudes", 5, 1 },
-    { "playback", 6, 1 },
-    { "record", 7, 1 },
+    //{ "playback", 6, 1 },
+    //{ "record", 7, 1 },
     { "validate", 44, 1 },
     { "robust", 8, 0 },
     { "setupfile", 9, 1 },
@@ -1463,9 +1463,9 @@ void PrintHelp(void)
         "-noautoload\tDisable loading from autoload directory\n"
         "-nodemo\t\tNo Demos\n"
         "-nodudes\tNo monsters\n"
-        "-playback\tPlay back a demo\n"
+        //"-playback\tPlay back a demo\n"
         "-pname\t\tOverride player name setting from config file\n"
-        "-record\t\tRecord demo\n"
+        //"-record\t\tRecord demo\n"
         "-validate\t\tRun DOS 1.21 compatibility unit test\n"
         "-rff\t\tSpecify an RFF file for Blood game resources\n"
         "-server [players]\tStart a multiplayer server\n"
@@ -1623,18 +1623,6 @@ void ParseOptions(void)
             break;
         case 5:
             gGameOptions.nMonsterSettings = 0;
-            break;
-        case 6:
-            if (OptArgc < 1)
-                gDemo.SetupPlayback(NULL);
-            else
-                gDemo.SetupPlayback(OptArgv[0]);
-            break;
-        case 7:
-            if (OptArgc < 1)
-                gDemo.Create(NULL);
-            else
-                gDemo.Create(OptArgv[0]);
             break;
         case 8:
             gRobust = 1;
