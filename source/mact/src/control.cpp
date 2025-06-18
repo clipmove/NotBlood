@@ -672,7 +672,7 @@ void CONTROL_GetAxisHeatMap(int32_t nAxis, uint8_t *tilePtr, int32_t nWidth, int
             else
                 fStick.y = 0;
             fStick = controlCalAxisState(fStick, fDead, fSnap, fSat, bTwoAxis);
-            uint8_t nPal = uint8_t(easeOutExpoHeatmapAndClamp(fStick.x) * float(fRange));
+            uint8_t nPal = uint8_t(easeOutExpoHeatmapAndClamp(fStick.x) * fRange);
             if (bDithering && (nPal > 0) && ((nX&1) == (nY&1)))
                 nPal -= 1;
             *tilePtr = palArray[nPal];
