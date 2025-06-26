@@ -123,6 +123,7 @@ VIEW predictFifo[256];
 
 int gInterpolate;
 int nInterpolations;
+int nInterpolationsPanning;
 char gInterpolateSprite[bitmap_size(kMaxSprites)];
 char gInterpolateWall[bitmap_size(kMaxWalls)];
 char gInterpolateSector[bitmap_size(kMaxSectors)];
@@ -130,8 +131,9 @@ char gInterpolatePanningWall[bitmap_size(kMaxWalls)];
 char gInterpolatePanningCeiling[bitmap_size(kMaxSectors)];
 char gInterpolatePanningFloor[bitmap_size(kMaxSectors)];
 
-#define kMaxInterpolations (16384*2)
+#define kMaxInterpolationsPanning (1024) // dedicate number of interpolations to texture panning
 #define kMaxInterpolationsVanilla 4096
+#define kMaxInterpolations (16384+kMaxInterpolationsPanning)
 
 INTERPOLATE gInterpolation[kMaxInterpolations];
 
@@ -994,6 +996,7 @@ static char bInterpWarnVanilla = 0;
 void viewClearInterpolations(void)
 {
     nInterpolations = 0;
+    nInterpolationsPanning = 0;
     memset(gInterpolateSprite, 0, sizeof(gInterpolateSprite));
     memset(gInterpolateWall, 0, sizeof(gInterpolateWall));
     memset(gInterpolateSector, 0, sizeof(gInterpolateSector));
@@ -1014,6 +1017,8 @@ void viewAddInterpolation(void *data, INTERPOLATE_TYPE type)
         viewSetSystemMessage("Warning: Interpolations over vanilla limit (%d/%d)\n", nInterpolations, kMaxInterpolationsVanilla);
         bInterpWarnVanilla = 1;
     }
+    if ((nInterpolationsPanning == kMaxInterpolationsPanning) && (type == INTERPOLATE_TYPE_CHAR)) // too many texture panning interpolations, don't add anymore
+        return;
     INTERPOLATE *pInterpolate = &gInterpolation[nInterpolations++];
     pInterpolate->pointer = data;
     pInterpolate->type = type;
@@ -1027,6 +1032,7 @@ void viewAddInterpolation(void *data, INTERPOLATE_TYPE type)
         break;
     case INTERPOLATE_TYPE_CHAR:
         pInterpolate->value = *((char*)data);
+        nInterpolationsPanning++;
         break;
     }
 }
