@@ -257,6 +257,8 @@ void UndoSectorLighting(void)
 }
 
 short wallPanList[kMaxXWalls];
+short wallPanListSect[kMaxXWalls];
+short wallPanListNextSect[kMaxXWalls];
 int wallPanCount;
 
 void DoSectorPanning(void)
@@ -287,7 +289,7 @@ void DoSectorPanning(void)
                 px += mulscale30(speed<<2, Cos(angle))>>xBits;
                 int yBits = (picsiz[nTile]/16)-((pSector->floorstat&8)!=0);
                 py -= mulscale30(speed<<2, Sin(angle))>>yBits;
-                if (!VanillaMode())
+                if (!VanillaMode() && TestBitString(gotsector, nSector))
                     viewInterpolatePanningFloor(nSector, pSector);
                 pSector->floorxpanning = px>>8;
                 pSector->floorypanning = py>>8;
@@ -305,7 +307,7 @@ void DoSectorPanning(void)
                 px += mulscale30(speed<<2, Cos(-angle))>>xBits;
                 int yBits = (picsiz[nTile]/16)-((pSector->ceilingstat&8)!=0);
                 py -= mulscale30(speed<<2, Sin(-angle))>>yBits;
-                if (!VanillaMode())
+                if (!VanillaMode() && TestBitString(gotsector, nSector))
                     viewInterpolatePanningCeiling(nSector, pSector);
                 pSector->ceilingxpanning = px>>8;
                 pSector->ceilingypanning = py>>8;
@@ -334,7 +336,7 @@ void DoSectorPanning(void)
             int py = (wall[nWall].ypanning<<8)+pXWall->ypanFrac;
             px += (psx<<2)>>((uint8_t)picsiz[nTile]&15);
             py += (psy<<2)>>((uint8_t)picsiz[nTile]/16);
-            if (!VanillaMode())
+            if (!VanillaMode() && (TestBitString(gotsector, wallPanListSect[i]) || (wallPanListNextSect[i] >= 0 && TestBitString(gotsector, wallPanListNextSect[i]))))
                 viewInterpolatePanningWall(nWall, &wall[nWall]);
             wall[nWall].xpanning = px>>8;
             wall[nWall].ypanning = py>>8;
@@ -368,7 +370,20 @@ void InitSectorFX(void)
         {
             XWALL *pXWall = &xwall[nXWall];
             if (pXWall->panXVel || pXWall->panYVel)
+            {
+                for (int j = 0; j < numsectors; j++) // lookup sector for wall
+                {
+                    short startwall = sector[j].wallptr;
+                    const short endwall = startwall + sector[j].wallnum;
+                    if ((i >= startwall) && (i < endwall))
+                    {
+                        wallPanListSect[wallPanCount] = j;
+                        break;
+                    }
+                }
+                wallPanListNextSect[wallPanCount] = wall[i].nextsector;
                 wallPanList[wallPanCount++] = nXWall;
+            }
         }
     }
 }
