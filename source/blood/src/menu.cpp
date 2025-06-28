@@ -1271,7 +1271,7 @@ CGameMenuItemZCycle *pItemOptionsControlJoystickAxisDigitalNeg[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisDeadzone[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisSaturate[MAXJOYAXES];
 CGameMenuItemSlider *pItemOptionsControlJoystickAxisSnapZone[MAXJOYAXES];
-CGameMenuItemBitmap *pItemOptionsControlJoystickAxisHeatmapPic[MAXJOYAXES];
+CGameMenuItemBitmap ItemOptionsControlJoystickAxisHeatmapPic(NULL, 3, 500, 290, kAxisHeatmapTile);
 
 CGameMenuItemTitle itemOptionsControlJoystickMiscTitle("JOYSTICK MISC", 1, 160, 20, 2038);
 CGameMenuItemZBool itemOptionsControlJoystickMiscCrouchToggle("CROUCH TOGGLE:", 1, 18, 60, 280, gCrouchToggle, SetCrouchToggle, NULL, NULL);
@@ -2375,12 +2375,10 @@ void SetupJoystickMenu(void)
         dassert(pItemOptionsControlJoystickAxisSnapZone[nAxis] != NULL);
         if (CONTROL_GetControllerAxisIsTwinAxisStick(nAxis)) // only add for analog stick axis
             menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisSnapZone[nAxis], false);
-        pItemOptionsControlJoystickAxisHeatmapPic[nAxis] = new CGameMenuItemBitmap(NULL, 3, 500, 290, kAxisHeatmapTile);
-        dassert(pItemOptionsControlJoystickAxisHeatmapPic[nAxis] != NULL);
-        pItemOptionsControlJoystickAxisHeatmapPic[nAxis]->bEnable = 0;
-        menuOptionsControlJoystickAxis[nAxis].Add(pItemOptionsControlJoystickAxisHeatmapPic[nAxis], false);
+        menuOptionsControlJoystickAxis[nAxis].Add(&ItemOptionsControlJoystickAxisHeatmapPic, false);
         menuOptionsControlJoystickAxis[nAxis].Add(&itemBloodQAV, false);
     }
+    ItemOptionsControlJoystickAxisHeatmapPic.bEnable = 0;
 }
 
 void SetupMenus(void)
