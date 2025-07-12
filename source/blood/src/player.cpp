@@ -1055,6 +1055,8 @@ static void playerResetTeamId(int nPlayer, int bNewLevel)
         pPlayer->teamIdPal = gProfile[nPlayer].nColorPreference-1;
     else
         pPlayer->teamIdPal = pPlayer->teamId&3;
+    if (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) // force player out of spectating mode after respawning
+        gView = &gPlayer[myconnectindex];
 }
 
 const int nZoneRandList[kMaxPlayers][kMaxPlayers] = {

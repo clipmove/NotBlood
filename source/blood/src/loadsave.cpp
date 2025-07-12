@@ -492,7 +492,8 @@ void MyLoadSave::Save(void)
     Write(qsprite_filler, sizeof(qsprite_filler[0])*kMaxSprites);
     Write(&randomseed, sizeof(randomseed));
     Write(&parallaxtype, sizeof(parallaxtype));
-    Write(&showinvisibility, sizeof(showinvisibility));
+    char showinvisibilitytemp; // don't set to current showinvisibility var
+    Write(&showinvisibilitytemp, sizeof(showinvisibilitytemp));
     Write(&pSky->horizfrac, sizeof(pSky->horizfrac));
     Write(&pSky->yoffs, sizeof(pSky->yoffs));
     Write(&pSky->yscale, sizeof(pSky->yscale));

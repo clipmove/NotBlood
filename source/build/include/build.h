@@ -822,7 +822,7 @@ enum {
     PALETTE_TRANSLUC = 1<<2,
 };
 
-EXTERN char showinvisibility;
+EXTERN int32_t showinvisibility;
 EXTERN int32_t g_visibility, parallaxvisibility;
 EXTERN int32_t g_rotatespriteNoWidescreen;
 
