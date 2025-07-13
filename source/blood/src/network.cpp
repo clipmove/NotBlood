@@ -67,6 +67,7 @@ bool gRobust = false;
 bool bOutOfSync = false;
 bool ready2send = false;
 bool gNetNotifyProfileUpdate = false; // inform the user that their gProfile settings will update upon next respawn (needed to keep game in sync)
+bool gNetNotifySpectating = false; // inform every player that we're spectating
 
 NETWORKMODE gNetMode = NETWORK_NONE;
 char gNetAddress[32];
@@ -503,6 +504,10 @@ void netGetPackets(void)
                     sndStartSample(4400+nTaunt, 128, 1, 0);
             }
             break;
+        case 5:
+            sprintf(buffer, "%s is now spectating", gProfile[nPlayer].name);
+            viewSetMessage(buffer, gColorMsg && !VanillaMode() ? playerColorPalMessage(gPlayer[nPlayer].teamId) : 0);
+            break;
         case 7:
             nPlayer = GetPacketDWord(pPacket);
             dassert(nPlayer != myconnectindex);
@@ -665,6 +670,20 @@ void netBroadcastMessage(int nPlayer, const char *pzMessage)
         PutPacketByte(pPacket, 3);
         PutPacketDWord(pPacket, nPlayer);
         PutPacketBuffer(pPacket, pzMessage, nSize+1);
+        netSendPacketAll(packet, pPacket-packet);
+    }
+}
+
+void netBroadcastNotifySpectating(int nPlayer)
+{
+    if (gNetNotifySpectating)
+        return;
+    gNetNotifySpectating = true;
+    if (numplayers > 1)
+    {
+        char *pPacket = packet;
+        PutPacketByte(pPacket, 5);
+        PutPacketDWord(pPacket, nPlayer);
         netSendPacketAll(packet, pPacket-packet);
     }
 }

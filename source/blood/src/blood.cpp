@@ -1023,6 +1023,8 @@ void LocalKeys(void)
             if (gViewIndex == -1)
                 gViewIndex = connecthead;
             gView = &gPlayer[gViewIndex];
+            if (gGameOptions.nGameType != kGameTypeCoop) // inform other players we're spectating
+                netBroadcastNotifySpectating(gMe->nPlayer);
         }
         else if (gGameOptions.nGameType == kGameTypeTeams)
         {
