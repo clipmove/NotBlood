@@ -1085,6 +1085,7 @@ void playerStart(int nPlayer, int bNewLevel)
     {
         gViewIndex = myconnectindex;
         gView = &gPlayer[myconnectindex];
+        gNetNotifySpectating = false;
     }
 
     // normal start position
