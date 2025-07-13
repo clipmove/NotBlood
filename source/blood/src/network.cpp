@@ -585,7 +585,7 @@ void netGetPackets(void)
                     sndStartSample(4400+nTaunt, 128, 1, 0);
             }
             break;
-        case 5:
+        case 6:
             sprintf(buffer, "%s is now spectating", gProfile[nPlayer].name);
             viewSetMessage(buffer, gColorMsg && !VanillaMode() ? playerColorPalMessage(gPlayer[nPlayer].teamId) : 0);
             break;
@@ -763,7 +763,7 @@ void netBroadcastNotifySpectating(int nPlayer)
     if (numplayers > 1)
     {
         char *pPacket = packet;
-        PutPacketByte(pPacket, 5);
+        PutPacketByte(pPacket, 6);
         PutPacketDWord(pPacket, nPlayer);
         netSendPacketAll(packet, pPacket-packet);
     }
