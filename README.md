@@ -11,7 +11,7 @@
 **NotBlood** is a fork of [NBlood](https://github.com/nukeykt/NBlood) with gameplay options, optional mutators and multiplayer features, while retaining NBlood mod support
 
 ### Downloads
-Download for Windows/Linux can be found on [https://github.com/clipmove/NotBlood/releases](https://github.com/clipmove/NotBlood/releases)
+Download for Windows/Linux/MacOS can be found on [https://github.com/clipmove/NotBlood/releases](https://github.com/clipmove/NotBlood/releases)
 
 ### Features
 * Switch to last active weapon if TNT/spray can is active when entering water
