@@ -168,15 +168,15 @@ jobs:
       run: |
         brew install sdl2 flac make
         brew unlink lz4
-    # Removed until upstream EDuke32 fixes keyboard input for builds - https://forums.duke4.net/topic/12622-cant-use-keyboard-in-osx-build/
-    # - name: build
-      # run: gmake -j2 blood tools
-    # - name: 'prepare files for upload'
-      # run: |
-        # mkdir -p ./upload
-        # cp ./notblood ./upload
-    # - uses: actions/upload-artifact@v4
-      # with:
-        # name: notblood-macos
-        # path: ./upload
-        # if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
+    - name: build
+      run: gmake -j2 blood tools
+    - name: 'prepare files for upload'
+      run: |
+        mkdir -p ./upload
+        cp ./notblood ./upload
+        cp ./notblood.app ./upload
+    - uses: actions/upload-artifact@v4
+      with:
+        name: notblood-macos
+        path: ./upload
+        if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
