@@ -213,7 +213,7 @@ void Calc3DValues(BONKLE *pBonkle)
 
     if (!DopplerToggle)
     {
-        lPitch = rPitch = ClipRange(pBonkle->pitch, 5000, 50000);
+        lPitch = rPitch = ClipRange(pBonkle->pitch, 1000, 50000);
         return;
     }
     const int sinVal = Sin(angle);
@@ -221,14 +221,14 @@ void Calc3DValues(BONKLE *pBonkle)
     const int nPitch = dmulscale30r(cosVal, pBonkle->curPos.x - pBonkle->oldPos.x, sinVal, pBonkle->curPos.y - pBonkle->oldPos.y) + nSoundSpeed;
     if (nPitch == 0) // don't allow div by zero
     {
-        lPitch = rPitch = ClipRange(pBonkle->pitch, 5000, 50000);
+        lPitch = rPitch = ClipRange(pBonkle->pitch, 1000, 50000);
         return;
     }
 
     lPitch = scale(pBonkle->pitch, dmulscale30r(cosVal, earVL.dx, sinVal, earVL.dy) + nSoundSpeed, nPitch);
     rPitch = scale(pBonkle->pitch, dmulscale30r(cosVal, earVR.dx, sinVal, earVR.dy) + nSoundSpeed, nPitch);
-    lPitch = ClipRange(lPitch, 5000, 50000);
-    rPitch = ClipRange(rPitch, 5000, 50000);
+    lPitch = ClipRange(lPitch, 1000, 50000);
+    rPitch = ClipRange(rPitch, 1000, 50000);
     if (MIRRORMODE & 1)
     {
         int nTemp;
