@@ -335,6 +335,8 @@ void ctrlGetInput(void)
                 gCrouchToggleState = 1;
             else if (gCrouchToggleState == 2) // stop crouching
                 gCrouchToggleState = 3, gInput.buttonFlags.crouch = 0;
+            else if (gCrouchToggleState == 3)
+                gInput.buttonFlags.crouch = 0;
         }
     }
     else if (gCrouchToggle && (gCrouchToggleState > 0) && (gCrouchToggleState < 3) && gMe && !gMe->isUnderwater)
