@@ -60,7 +60,7 @@ PATROL_FOUND_SOUNDS patrolBonkles[kMaxPatrolFoundSounds];
 
 bool gAllowTrueRandom = false;
 bool gEventRedirectsUsed = false;
-bool gExternalFilesAdded = false;
+
 SPRITEMASS gSpriteMass[];   // cache for getSpriteMassBySize();
 
 IDLIST gProxySpritesList(false);
@@ -76,10 +76,13 @@ uint16_t gPathSprCount = 0;
 LASER* gLaser[kMaxLasers];
 uint16_t gLasersCount = 0;
 
+#ifdef NNEXTS_USE_RES_SYS
+bool gExternalFilesAdded = false;
 EXTERNAL_FILES_LIST gExternFiles[] =
 {
     { kCdudeFileNamePrefixWild, kCdudeFileExt },
 };
+#endif
 
 // SPRITES_NEAR_SECTORS
 // Intended for move sprites that is close to the outside walls with
@@ -215,7 +218,7 @@ DUDEINFO_EXTRA gDudeInfoExtra[] = {
     { false,  true,   0, 8, 9, 9, 11, 10 },         // 251
     { false,  false,  -1, -1, -1, -1, -1, -1 },     // 252
     { false,  false,  -1, -1, -1, -1, -1, -1 },     // 253
-    { false,  false,  0, 3, 2, 5, 1, 4 },           // 254 (seq offsets is dude AI state offsets here!)
+    { false,  false,  0, 4, 0, 4, 0, 4 },           // 254 (seq offsets is dude AI state offsets here!)
     { false,  false,  -1, -1, -1, -1, -1, -1 },     // 255
 
 };
@@ -233,14 +236,14 @@ AISTATE genPatrolStates[] = {
     { kAiStatePatrolMoveL, 0, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
     { kAiStatePatrolMoveL, 6, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
     { kAiStatePatrolMoveL, 7, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
-    { kAiStatePatrolMoveL, 3, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL }, // +1
+    { kAiStatePatrolMoveL, 4, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL }, // +1
 
     { kAiStatePatrolTurnL, 9, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
     { kAiStatePatrolTurnL, 8, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
     { kAiStatePatrolTurnL, 0, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
     { kAiStatePatrolTurnL, 6, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
     { kAiStatePatrolTurnL, 7, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
-    { kAiStatePatrolTurnL, 3, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL }, // +1
+    { kAiStatePatrolTurnL, 4, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL }, // +1
 
     //-------------------------------------------------------------------------------
 
@@ -250,7 +253,7 @@ AISTATE genPatrolStates[] = {
     { kAiStatePatrolWaitW, 17, -1, 0, NULL, NULL, aiPatrolThink, NULL },
     { kAiStatePatrolWaitW, 8, -1, 0, NULL, NULL, aiPatrolThink, NULL },
     { kAiStatePatrolWaitW, 9, -1, 0, NULL, NULL, aiPatrolThink, NULL },
-    { kAiStatePatrolWaitW, 2, -1, 0, NULL, NULL, aiPatrolThink, NULL }, // +1
+    { kAiStatePatrolWaitW, 0, -1, 0, NULL, NULL, aiPatrolThink, NULL }, // +1
 
     { kAiStatePatrolMoveW, 0, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
     { kAiStatePatrolMoveW, 10, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
@@ -259,7 +262,7 @@ AISTATE genPatrolStates[] = {
     { kAiStatePatrolMoveW, 9, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
     { kAiStatePatrolMoveW, 7, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
     { kAiStatePatrolMoveW, 6, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
-    { kAiStatePatrolMoveW, 5, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL }, // +1
+    { kAiStatePatrolMoveW, 4, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL }, // +1
 
 
     { kAiStatePatrolTurnW, 0, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
@@ -269,7 +272,7 @@ AISTATE genPatrolStates[] = {
     { kAiStatePatrolTurnW, 9, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
     { kAiStatePatrolTurnW, 7, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
     { kAiStatePatrolTurnW, 6, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL },
-    { kAiStatePatrolTurnW, 5, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL }, // +1
+    { kAiStatePatrolTurnW, 4, -1, 0, aiPatrolRandGoalAng, aiPatrolTurn, aiPatrolThink, NULL }, // +1
 
     //-------------------------------------------------------------------------------
 
@@ -277,7 +280,7 @@ AISTATE genPatrolStates[] = {
     { kAiStatePatrolWaitC, 11, -1, 0, NULL, NULL, aiPatrolThink, NULL },
     { kAiStatePatrolWaitC, 10, -1, 0, NULL, NULL, aiPatrolThink, NULL },
     { kAiStatePatrolWaitC, 14, -1, 0, NULL, NULL, aiPatrolThink, NULL },
-    { kAiStatePatrolWaitC, 1, -1, 0, NULL, NULL, aiPatrolThink, NULL }, // +1
+    { kAiStatePatrolWaitC, 0, -1, 0, NULL, NULL, aiPatrolThink, NULL }, // +1
 
     { kAiStatePatrolMoveC, 14, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
     { kAiStatePatrolMoveC, 10, -1, 0, NULL, aiPatrolMove, aiPatrolThink, NULL },
@@ -587,6 +590,8 @@ void followTarget(spritetype* pSpr, spritetype* pTarg, int nMaxAng)
         int dAng = (nAng - vAng) & kAngMask;
         RotatePoint(&xvel[pSpr->index], &yvel[pSpr->index], dAng, pSpr->x, pSpr->y);
         pSpr->ang = nAng;
+        if ((pSpr->cstat & CSTAT_SPRITE_ALIGNMENT_MASK) == CSTAT_SPRITE_ALIGNMENT_WALL)
+            pSpr->ang = (pSpr->ang + kAng90) & kAngMask;
 
         if (!(pSpr->flags & kPhysGravity))
         {
@@ -1428,6 +1433,7 @@ void nnExtInitModernStuff(bool bSaveLoad) {
     // prepare custom dudes array
     cdudeAlloc();
 
+#ifdef NNEXTS_USE_RES_SYS
     if (!gExternalFilesAdded)
     {
         // add external files from the mod directory
@@ -1441,6 +1447,7 @@ void nnExtInitModernStuff(bool bSaveLoad) {
         consoleSysMsg("There is %d extra external files added in total.", i);
         gExternalFilesAdded = true;
     }
+#endif
 
     // init lasers
     lasersInit();
@@ -2899,8 +2906,9 @@ void useVelocityChanger(XSPRITE* pXSource, int causerID, short objType, int objI
     bool toSrcAng   = (pSource->flags & kModernTypeFlag4);
     bool toRndAng   = (pSource->flags & kModernTypeFlag8);
     bool chgDstAng  = !(pSource->flags & kModernTypeFlag16);
+    bool toRelAng   = (pSource->flags & kModernTypeFlag64);
     bool toEvnAng   = (toDstAng && toSrcAng && (pCauser = getCauser(causerID)) != NULL);
-    bool toAng      = (toDstAng || toSrcAng || toEvnAng || toRndAng);
+    bool toAng      = (toRelAng || toDstAng || toSrcAng || toEvnAng || toRndAng);
     bool toAng180   = (toRndAng && (toDstAng || toSrcAng || toEvnAng));
 
     if (objType == OBJ_SPRITE)
@@ -2914,6 +2922,10 @@ void useVelocityChanger(XSPRITE* pXSource, int causerID, short objType, int objI
             if ((zv = mulscale14(pXSource->data3 << kVelShift, kScaleVal)) != 0)
                 zv += r;
         }
+        else if (!relative)
+        {
+            zv = zvel[pSpr->index];
+        }
 
         if (!toAng)
         {
@@ -2922,11 +2934,19 @@ void useVelocityChanger(XSPRITE* pXSource, int causerID, short objType, int objI
                 if ((xv = mulscale14(pXSource->data1 << kVelShift, kScaleVal)) != 0)
                     xv += r;
             }
+            else if (!relative)
+            {
+                xv = xvel[pSpr->index];
+            }
 
             if (valueIsBetween(pXSource->data2, -32767, 32767))
             {
                 if ((yv = mulscale14(pXSource->data2 << kVelShift, kScaleVal)) != 0)
                     yv += r;
+            }
+            else if (!relative)
+            {
+                yv = yvel[pSpr->index];
             }
         }
         else
@@ -2934,6 +2954,9 @@ void useVelocityChanger(XSPRITE* pXSource, int causerID, short objType, int objI
             if (toEvnAng)       nAng = pCauser->ang;
             else if (toSrcAng)  nAng = pSource->ang;
             else                nAng = pSpr->ang;
+
+            if (toRelAng)
+               nAng += pSource->ang;
 
             nAng = nAng & kAngMask;
 
@@ -6228,6 +6251,9 @@ bool isActive(int nSprite) {
         return false;
 
     XSPRITE* pXDude = &xsprite[sprite[nSprite].extra];
+    if (!pXDude->aiState)
+        return false;
+
     switch (pXDude->aiState->stateType) {
     case kAiStateIdle:
     case kAiStateGenIdle:
@@ -6483,11 +6509,42 @@ void aiPatrolState(spritetype* pSprite, int state) {
             if (pSprite->type == kDudeModernCustom)
             {
                 if (!rngok(seq, 0, kCdudeStateMax))
-            continue;
+                    continue;
 
                 CUSTOMDUDE* pDude = cdudeGet(pSprite->index);
+                pDude->StatusRem(kCdudeStatusForceCrouch);
+                
+                switch (state)
+                {
+                    case kAiStatePatrolMoveL:
+                    case kAiStatePatrolWaitL:
+                    case kAiStatePatrolTurnL:
+                        pDude->ChangePosture(pDude->CanFly() ? kCdudePostureF : kCdudePostureL);
+                        break;
+                    case kAiStatePatrolMoveW:
+                    case kAiStatePatrolWaitW:
+                    case kAiStatePatrolTurnW:
+                        pDude->ChangePosture(kCdudePostureW);
+                        break;
+                    case kAiStatePatrolMoveC:
+                    case kAiStatePatrolWaitC:
+                    case kAiStatePatrolTurnC:
+                        if (pDude->CanCrouch())
+                        {
+                            pDude->ChangePosture(kCdudePostureC);
+                            pDude->StatusSet(kCdudeStatusForceCrouch);
+                        }
+                        else
+                        {
+                            pDude->ChangePosture(kCdudePostureL);
+                            crouch = false;
+                        }
+                        break;
+
+                }
+
                 AISTATE* pState = (AISTATE*)pDude->states;
-                seq = pState[seq].seqId;
+                seq = pState[seq + pDude->posture].seqId;
                 if (seq <= 0)
                     continue;
             }
@@ -6837,6 +6894,7 @@ void aiPatrolMove(spritetype* pSprite, XSPRITE* pXSprite) {
 
     int nFrontSpeed, nTurnSpeed;
     int dudeIdx = pSprite->type - kDudeBase;
+    char isFlying;
 
     switch (pSprite->type)
     {
@@ -6855,8 +6913,11 @@ void aiPatrolMove(spritetype* pSprite, XSPRITE* pXSprite) {
         {
             int nPosture;
             CUSTOMDUDE* pDude = cdudeGet(pSprite->index);
+            isFlying = pDude->IsFlying();
+
             if (spriteIsUnderwater(pSprite))                nPosture = kCdudePostureW;
             else if (pXSprite->unused1 & kDudeFlagCrouch)   nPosture = kCdudePostureC;
+            else if (isFlying)                              nPosture = kCdudePostureF;
             else                                            nPosture = kCdudePostureL;
 
             nFrontSpeed = pDude->GetVelocity(nPosture, kParVelocityForward);
@@ -6866,6 +6927,7 @@ void aiPatrolMove(spritetype* pSprite, XSPRITE* pXSprite) {
         default:
             nFrontSpeed = pDudeInfo->frontSpeed;
             nTurnSpeed  = (pDudeInfo->angSpeed << 2) >> 4;
+            isFlying = pExtra->flying;
             break;
     }
 
@@ -6875,14 +6937,13 @@ void aiPatrolMove(spritetype* pSprite, XSPRITE* pXSprite) {
     int vel = (pXSprite->unused1 & kDudeFlagCrouch) ? kMaxPatrolCrouchVelocity : kMaxPatrolVelocity;
     int goalAng = 341;
 
-    if (pExtra->flying || spriteIsUnderwater(pSprite))
+    if (isFlying || spriteIsUnderwater(pSprite))
     {
         goalAng >>= 1;
         zvel[pSprite->index] = dz;
-        if (pSprite->flags & kPhysGravity)
         pSprite->flags &= ~kPhysGravity;
     }
-    else if (!pExtra->flying)
+    else if (!isFlying)
     {
         pSprite->flags |= kPhysGravity | kPhysFalling;
     }
@@ -8084,6 +8145,7 @@ void nnExtScaleVelocityRel(spritetype* pSpr, int nVel, int dx, int dy, int dz, c
     }
 }
 
+#ifdef NNEXTS_USE_RES_SYS
 int nnExtResAddExternalFiles(Resource* pIn, const char* pPath, EXTERNAL_FILES_LIST* pList, int nLen)
 {
     char match[BMAX_PATH], dir[BMAX_PATH], name[BMAX_PATH], ext[BMAX_PATH];
@@ -8143,6 +8205,7 @@ DICTNODE* nnExtResFileSearch(Resource* pIn, const char* pName, const char* pExt,
 
     return NULL;
 }
+#endif
 
 void nnExtSprScaleSet(spritetype* pSpr, int nScale)
 {
@@ -8342,6 +8405,25 @@ int nnExtDudeStartHealth(spritetype* pSpr, int nHealth)
         return ClipRange(nHealth << 4, 0, 65535);
 
     return getDudeInfo(pSpr->type)->startHealth << 4;
+}
+
+void nnExtFixDudeDrag(spritetype* pSpr, int nDrag)
+{
+    int fz, zt, zb, d;
+    if (xvel[pSpr->index] || yvel[pSpr->index])
+    {
+        fz = getflorzofslope(pSpr->sectnum, pSpr->x, pSpr->y);
+        GetSpriteExtents(pSpr,&zt,&zb);
+        
+        if (((fz - zb) >> 8) >= 0x100)
+        {
+            d = gDudeDrag - scale(gDudeDrag, nDrag, 0x100);
+            xvel[pSpr->index] -= mulscale16r(xvel[pSpr->index], d);
+            yvel[pSpr->index] -= mulscale16r(yvel[pSpr->index], d);
+            if (approxDist(xvel[pSpr->index], yvel[pSpr->index]) < 0x1000)
+                xvel[pSpr->index] = yvel[pSpr->index] = 0;
+        }
+    }
 }
 
 char IsPhysicsSprite(spritetype* pSpr)
@@ -9024,6 +9106,7 @@ void nnExtLoadSave::Load(void)
     gSprNSect.Load(this);
     laserLoad(this);
     pathSpriteLoad(this);
+    cdudeLoad(this);
     Read(tmp, Bstrlen(nnExtBlkSign[1]));
 }
 
@@ -9036,6 +9119,7 @@ void nnExtLoadSave::Save(void)
     gSprNSect.Save(this);
     laserSave(this);
     pathSpriteSave(this);
+    cdudeSave(this);
     Write(nnExtBlkSign[1], strlen(nnExtBlkSign[1]));
 }
 
