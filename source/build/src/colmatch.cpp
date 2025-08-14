@@ -14,7 +14,7 @@ static int32_t colnext[256];
 static uint8_t coldist[FASTPALCOLDIST];
 static int32_t colscan[27];
 
-static uint8_t const * colmatch_palette;
+static uint8_t colmatch_palette[768];
 
 //
 // paletteInitClosestColor
@@ -36,7 +36,7 @@ void paletteInitClosestColorMap(uint8_t const * const pal)
     Bmemset(colhere,0,sizeof(colhere));
     Bmemset(colhead,0,sizeof(colhead));
 
-    colmatch_palette = pal;
+    Bmemcpy(colmatch_palette, pal, sizeof(colmatch_palette));
 
     char const *pal1 = (char const *)&pal[768-3];
     for (bssize_t i=255; i>=0; i--,pal1-=3)
@@ -71,6 +71,8 @@ void paletteInitClosestColorGrid(void)
 
 static uint32_t colmatchresults[COLRESULTSIZ];
 static int32_t numcolmatchresults;
+static int32_t cache_lastokcol = 255;
+static uint32_t cache_blacklist[8];
 
 void paletteFlushClosestColor(void)
 {
@@ -85,6 +87,40 @@ int32_t paletteGetClosestColorWithBlacklist(int32_t const r, int32_t const g, in
 #ifdef DEBUGGINGAIDS
     Bassert(lastokcol >= 0 && lastokcol <= 255);
 #endif
+    bool flushcache = false;
+
+    if (lastokcol != cache_lastokcol)
+        flushcache = true;
+    else
+    {
+        if (blacklist)
+        {
+            if (memcmp(cache_blacklist, blacklist, sizeof(cache_blacklist)) != 0)
+                flushcache = true;
+        }
+        else
+        {
+            for (bsize_t i = 0; i < ARRAY_SIZE(cache_blacklist); i++)
+            {
+                if (cache_blacklist[i])
+                {
+                    flushcache = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (flushcache)
+    {
+        paletteFlushClosestColor();
+
+        cache_lastokcol = lastokcol;
+        if (blacklist)
+            Bmemcpy(cache_blacklist, blacklist, sizeof(cache_blacklist));
+        else
+            Bmemset(cache_blacklist, 0, sizeof(cache_blacklist));
+    }
 
     uint32_t const col = r | (g<<8) | (b<<16);
 
