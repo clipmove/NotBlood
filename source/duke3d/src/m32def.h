@@ -289,6 +289,7 @@ enum ScriptKeywords_t
     CON_NULLOP,
     CON_DEFINE,
     CON_INCLUDE,
+    CON_INCLUDEOPTIONAL,
     CON_DEFSTATE,
     CON_ENDS,
     CON_STATE,

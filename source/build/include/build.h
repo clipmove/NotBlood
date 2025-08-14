@@ -1220,7 +1220,7 @@ typedef struct artheader_t {
     int32_t tilestart, tileend, numtiles;
     uint8_t* tileread;
 } artheader_t;
-#define ARTv1_UNITOFFSET ((signed)(4*sizeof(int32_t) + 2*sizeof(int16_t) + sizeof(picanm_t)))
+#define ARTv1_UNITOFFSET ((signed)(4*sizeof(int32_t) + 2*sizeof(int16_t) + sizeof(uint32_t)))
 
 int32_t    enginePreInit(void);	// a partial setup of the engine used for launch windows
 int32_t    engineInit(void);

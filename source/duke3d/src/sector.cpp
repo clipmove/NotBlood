@@ -1118,6 +1118,9 @@ void G_OperateActivators(int lotag, int playerNum)
     {
         if (sprite[spriteNum].lotag == lotag)
         {
+            if (VM_OnEvent(EVENT_OPERATEACTIVATORS, spriteNum, playerNum))
+                continue;
+            
             if (sprite[spriteNum].picnum == ACTIVATORLOCKED)
             {
                 sector[SECT(spriteNum)].lotag ^= 16384;

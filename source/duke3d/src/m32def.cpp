@@ -190,6 +190,7 @@ const char *keyw[] =
     "nullop",
     "define",
     "include",
+    "includeoptional",
     "defstate",  // *
     "ends",
     "state",
@@ -1728,6 +1729,7 @@ static int32_t C_ParseCommand(void)
     }
 
     case CON_INCLUDE:
+    case CON_INCLUDEOPTIONAL:
         g_scriptPtr--;
         while (!char_alnumtok(*textptr))
         {
@@ -1757,6 +1759,12 @@ static int32_t C_ParseCommand(void)
             fp = kopen4load(tempbuf, 0 /*g_loadFromGroupOnly*/);
             if (fp == buildvfs_kfd_invalid)
             {
+                if (EDUKE32_PREDICT_FALSE(tw == CON_INCLUDEOPTIONAL))
+                {
+                    LOG_F(INFO, "Optional include %s absent. skipping.", tempbuf);
+                    return 0;
+                }
+
                 g_numCompilerErrors++;
                 LOG_F(ERROR, "%s:%d: could not find file '%s'.",g_szScriptFileName,g_lineNumber,tempbuf);
                 return 1;

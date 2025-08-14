@@ -313,6 +313,7 @@ void CONFIG_SetDefaults(void)
     ud.msgdisptime            = 120;
     ud.obituaries             = 1;
     ud.pwlockout[0]           = '\0';
+    ud.quote_yoffset          = 0;
     ud.runkey_mode            = 0;
     ud.screen_size            = 4;
     ud.screen_tilting         = 1;

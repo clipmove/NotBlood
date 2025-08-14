@@ -1109,6 +1109,7 @@ memberlabel_t const UserdefsLabels[]=
     { "menu_scrollbartilenum",  USERDEFS_MENU_SCROLLBARTILENUM,  0, 0, -1 },
     { "menu_scrollbarz",        USERDEFS_MENU_SCROLLBARZ,        0, 0, -1 },
     { "menu_scrollcursorz",     USERDEFS_MENU_SCROLLCURSORZ,     0, 0, -1 },
+    { "quote_yoffset",          USERDEFS_QUOTE_YOFFSET,          0, 0, -1 },
     { "return",                 USERDEFS_RETURN,                 LABEL_HASPARM2, MAX_RETURN_VALUES, -1 },
     { "userbyteversion",        USERDEFS_USERBYTEVERSION,        0, 0, -1 },
     { "autosave",               USERDEFS_AUTOSAVE,               0, 0, -1 },
@@ -1301,6 +1302,7 @@ int32_t __fastcall VM_GetUserdef(int32_t labelNum, int const lParm2)
         case USERDEFS_MENU_SCROLLBARTILENUM:  labelNum = ud.menu_scrollbartilenum;        break;
         case USERDEFS_MENU_SCROLLBARZ:        labelNum = ud.menu_scrollbarz;              break;
         case USERDEFS_MENU_SCROLLCURSORZ:     labelNum = ud.menu_scrollcursorz;           break;
+        case USERDEFS_QUOTE_YOFFSET:          labelNum = ud.quote_yoffset;                break;
         case USERDEFS_RETURN:
             if (lParm2 == 0)
                 labelNum = aGameVars[g_returnVarID].global;
@@ -1508,6 +1510,7 @@ void __fastcall VM_SetUserdef(int const labelNum, int const lParm2, int32_t cons
         case USERDEFS_MENU_SCROLLBARTILENUM:        ud.menu_scrollbartilenum         = iSet; break;
         case USERDEFS_MENU_SCROLLBARZ:              ud.menu_scrollbarz               = iSet; break;
         case USERDEFS_MENU_SCROLLCURSORZ:           ud.menu_scrollcursorz            = iSet; break;
+        case USERDEFS_QUOTE_YOFFSET:                ud.quote_yoffset                 = iSet; break;
         case USERDEFS_RETURN:
             if (lParm2 == 0)
                 aGameVars[g_returnVarID].global = iSet;
