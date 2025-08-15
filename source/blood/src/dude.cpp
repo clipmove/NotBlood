@@ -1547,7 +1547,7 @@ DUDEINFO dudeInfo[kDudeMax-kDudeBase] =
         120,
         48,			                        // clip distance
         48,			                        // eye above z
-        20,
+        0,                                  // aim above z
         10240,		                        // hear distance
         51200,	                            // seeing distance
         kAng90,	                            // vision periphery

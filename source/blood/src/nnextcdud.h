@@ -51,6 +51,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define kCdudeDmgCheckDelay         1
 #define kCdudeMaxDispersion         3500
 #define kCdudeDefaultSeq            11520
+#define kCdudeDefaultSeqF           4864
 #define kCdudeV1MaxAttackDist       20000
 #define kCdudeMaxDropItems          5
 #define kCdudeDefaultAnimScale      256
@@ -59,10 +60,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define kCdudeFXEffectBase          0
 #define kCudeFXEffectCallbackBase   512
 #define kCdudeGIBEffectBase         1024
+#define kCdudeStateTypeDeathPosture kAiStateOther - 1
+#define kCdudeMinCFDist             0x2000
+#define kCdudeLandDist              0xB00
+#define kCdudeLaunchDist            0x1000
+#define kCdudeCrouchDist            0x2000
 
 #define kCdudeMinSeeDist            3000
 #define kCdudeMinHearDist           (kCdudeMinSeeDist >> 1)
 #define kCdudeBurningHealth         (25 << 4)
+#define kCdudeFlyStartZvel          -0x22222
+
+#define kChanceMax                  0x10000
 
 class CUSTOMDUDE;
 extern int nCdudeAppearanceCallback;
@@ -104,6 +113,7 @@ kErrInvalidArrayLen1,
 kErrInvalidArrayLen2,
 kErrReqGroupNotFound,
 kErrInvaliValuePos,
+kErrInvalidValType2,
 kErrMax,
 };
 
@@ -112,15 +122,22 @@ kParGroupGeneral                = 0,
 kParGroupVelocity,
 kParGroupAnimation,
 kParGroupSound,
+kParGroupTweaks,
 kParGroupWeapon,
 kParGroupDodge,
 kParGroupRecoil,
+kParGroupCrouch,
 kParGroupKnockout,
 kParGroupDamage,
 kParGroupFXEffect,
 kParGroupMovePat,
 kParGroupDropItem,
 kParGroupParser,
+kParGroupFlyPat,
+kParGroupMorph,
+kParGroupSleep,
+kParGroupSlaves,
+kParGroupRandomness,
 };
 
 enum enum_PAR_GENERAL {
@@ -131,6 +148,9 @@ kParGeneralHealth,
 kParGeneralClipdist,
 kParGeneralMorphTo,
 kParGeneralActiveTime,
+kParGeneralSeedist,
+kParGeneralPeriphery,
+kParGeneralHeardist,
 };
 
 
@@ -140,11 +160,15 @@ kParParserWarnings              = 0,
 
 enum enum_PAR_EVENT {
 kParEventOnDmg                  = 0,
+kParEventOnDmgNamed,
 kParEventOnAimTargetWrong,
+kParEvnDeath,
+kParEvnDeathNamed,
 };
 
 enum enum_PAR_DAMAGE {
 kParDmgSource                   = kDmgMax,
+kParDmgBotTouch,
 };
 
 enum enum_PAR_DAMAGE_SOURCE {
@@ -161,6 +185,7 @@ enum enum_PAR_VELOCITY {
 kParVelocityForward             = 0,
 kParVelocityTurn,
 kParVelocityDodge,
+kParVelocityZ,
 kParVelocityMax,
 };
 
@@ -174,6 +199,7 @@ kAppearPal,
 kAppearShade,
 kAppearSize,
 kAppearOffs1,
+kAppearCstat,
 };
 
 
@@ -203,6 +229,12 @@ kParWeaponTargetHealth,
 kParWeaponSkill,
 kParWeaponCooldown,
 kParWeaponStyle,
+kParWeaponSlope,
+kParWeaponAkimboFrame,
+kParWeaponHeigh,
+kParWeaponData,
+kParWeaponAttackSnd,
+kParWeaponIsDefault,
 };
 
 enum enum_PAR_ATTACK {
@@ -211,6 +243,7 @@ kParAttackInterrupt,
 kParAttackTurn2Target,
 kParAttackNumShots,
 kParAttackInertia,
+kParAttackPredict,
 };
 
 enum enum_PAR_SHOT {
@@ -226,6 +259,11 @@ kParWeaponShotRemTimer,
 enum enum_PAR_WEAP_STYLE {
 kParWeaponStyleOffset           = 0,
 kParWeaponStyleAngle,
+};
+
+enum enum_PAR_WEAP_COOLDOWN {
+kParWeaponCooldownTime          = 0,
+kParWeaponCooldownCount,
 };
 
 enum enum_PAR_EFFECT {
@@ -246,10 +284,14 @@ kParEffectChance,
 kParEffectAllUnique,
 kParEffectSrcVel,
 kParEffectFx2Gib,
+kParEffectHpRange,
 };
 
 enum enum_PAR_MOVE {
 kParMoveFallHeight              = 0,
+kParMoveTurnAng,
+kParMoveStopOnTurn,
+kParMoveDirTimer,
 };
 
 enum enum_PAR_DROP_ITEM {
@@ -276,11 +318,78 @@ kParTrigImpact                  = 0x04,
 kParTrigLocked                  = 0x08,
 };
 
+enum enum_PAR_EVENT_DMG {
+kParEvDmgAmount                 = 0,
+kParEvDmgChance,
+kParEvDmgHealth,
+kParEvDmgCooldown,
+kParEvDmgHitCount,
+kParEvDmgCumulative,
+kParEvDmgTime,
+};
+
+enum enum_PAR_RANDOMNESS {
+kParRandStateTime               = 0,
+kParRandVelocity,
+kParRandThinkTime,
+kParRandAnimScale,
+kParRandWeapChance,
+};
+
+enum enum_PAR_TWEAKS {
+kParTweaksThinkClock            = 0,
+kParTweaksWaponSort,
+};
+
+enum enum_PAR_MORPH {
+kParMorphDude                   = 0,
+kParMorphSkill,
+};
+
+enum enum_CDUD_FLYTYPE {
+kCdudeFlyStart                  = 0,
+kCdudeFlyLand,
+kCdudeFlightMax,
+};
+
+enum enum_PAR_FLIGHT {
+kParFlyHeigh                    = kCdudeFlightMax,
+kParFlyGoalzTime,
+kParFlyFriction,
+kParFlyClipHeighDist,
+kParFlyBackOnTrack,
+kParFlyCFDist,
+kParFlyMustReachGoalz,
+kParFlyRelGoalz,
+};
+
+enum enum_PAR_FLYTYPE {
+kParFlyTypeDist                 = 0,
+kParFlyTypeTime,
+kParFlyTypeChance,
+};
+
+enum enum_PAR_SLEEP {
+kParSleepSpotRadius             = 0,
+};
+
+enum enum_PAR_SLAVES {
+kParSlaveNoForce                = 0,
+kParSlaveOnDeathDie,
+};
+
+enum enum_PAR_KEYWORD {
+kParKeywordInherit              = 0,
+kParKeywordAbove,
+kParKeywordBelow,
+};
+
 enum enum_CDUD_POSTURE {
 kCdudePosture                   = 0,
 kCdudePostureL                  = kCdudePosture,
 kCdudePostureC,
 kCdudePostureW,
+kCdudePostureF,
 kCdudePostureMax,
 };
 
@@ -299,6 +408,7 @@ kCdudeSndMax,
 kCdudeSndCompatAttack1,
 kCdudeSndCompatAttack2,
 kCdudeSndCompatAttack3,
+kParSndMultiSrc,
 };
 
 enum enum_CDUD_WEAPON_TYPE {
@@ -309,14 +419,16 @@ kCdudeWeaponThrow,
 kCdudeWeaponSummon,
 kCdudeWeaponSummonCdude,
 kCdudeWeaponKamikaze,
-kCdudeWeaponSpecialBeastStomp,
+kCdudeWeaponSpecial,
 kCdudeWeaponMax,
 };
 
 enum enum_CDUD_WEAPON_TYPE_SPECIAL {
 kCdudeWeaponIdSpecialBase       = 900,
 kCdudeWeaponIdSpecialBeastStomp = kCdudeWeaponIdSpecialBase,
-kCdudeWeaponIdSpecialMax
+kCdudeWeaponIdSpecialRam,
+kCdudeWeaponIdSpecialTeleport,
+kCdudeWeaponIdSpecialMax,
 };
 
 enum enum_CDUD_AISTATE {
@@ -365,6 +477,8 @@ kCdudeStatusMorph               = 0x08,
 kCdudeStatusBurning             = 0x10,
 kCdudeStatusDying               = 0x20,
 kCdudeStatusRespawn             = 0x40,
+kCdudeStatusKnocked             = 0x80,
+kCdudeStatusFlipped             = 0x100,
 };
 
 struct PARAM
@@ -378,30 +492,58 @@ class ARG_PICK_WEAPON
     public:
         unsigned int angle          : 12;
         unsigned int distance       : 32;
+        signed   int height         : 32;
+        signed   int slope          : 32;
         unsigned int dudeHealth     : 8;
         unsigned int targHealth     : 8;
-        ARG_PICK_WEAPON(spritetype* pSpr, XSPRITE* pXSpr, spritetype* pTarg, XSPRITE* pXTarg)
+        ARG_PICK_WEAPON(spritetype* pSpr, XSPRITE* pXSpr, spritetype* pTarg, XSPRITE* pXTarg, int nDist, int nAng, int nSlope)
         {
-            int dx = pTarg->x - pSpr->x;
-            int dy = pTarg->y - pSpr->y;
-            distance = approxDist(dx, dy);
-            angle = klabs(((getangle(dx, dy) + kAng180 - pSpr->ang) & kAngMask) - kAng180);
-            dudeHealth = CountHealthPerc(pSpr, pXSpr);
-            targHealth = CountHealthPerc(pTarg, pXTarg);
-        }
+            int zt, zb;
 
-        ARG_PICK_WEAPON(spritetype* pSpr, XSPRITE* pXSpr, spritetype* pTarg, XSPRITE* pXTarg, int nDist, int nAng)
-        {
             distance = nDist;
             angle = nAng;
             dudeHealth = CountHealthPerc(pSpr, pXSpr);
             targHealth = CountHealthPerc(pTarg, pXTarg);
+
+            height = 0, slope = 0;
+            GetSpriteExtents(pSpr, &zt, &zb);
+            if (!irngok(pTarg->z, zt, zb))
+            {
+                slope = nSlope;
+                if (pTarg->z < zt)          height =  klabs(pTarg->z - zt);
+                else if (pTarg->z > zb)     height = -klabs(pTarg->z - zb);
+            }
         }
 
         char CountHealthPerc(spritetype* pSpr, XSPRITE* pXSpr)
         {
             int nHealth = ClipLow(nnExtGetStartHealth(pSpr), 1);
             return ClipHigh((kPercFull * pXSpr->health) / nHealth, 255);
+        }
+};
+
+class CUSTOMDUDE_TIMER
+{
+    public:
+        uint32_t time;
+        uint16_t rng[2];
+        uint8_t mul;
+
+        inline void Clear(void)   { time = 0; }
+        inline char Exists(void)  { return (time != 0); }
+        inline int  Diff(void)    { return (int)(time - (uint32_t)gFrameClock); }
+        inline char Pass(void)    { return (Diff() < 0); }
+        inline void Set(int n)    { time = (uint32_t)gFrameClock + n; }
+        void Set(void)
+        {
+            int n = rng[0];
+            if (rng[1])
+                n += Random(rng[1] - rng[0]);
+
+            if (mul)
+                n *= mul;
+
+            Set(n);
         }
 };
 
@@ -412,7 +554,7 @@ class CUSTOMDUDE_SOUND
         unsigned int medium         : 3;
         unsigned int ai             : 1;
         unsigned int interruptable  : 1;
-        unsigned int once           : 1;
+        unsigned int once           : 2;
         signed   int volume         : 11;
         int  Pick()                                         { return id[Random(kCdudeMaxSounds)]; }
         void Play(spritetype* pSpr)                         { Play(pSpr, Pick()); }
@@ -435,8 +577,9 @@ class CUSTOMDUDE_SOUND
                             BONKLE* pBonk = BonkleCache[i];
                             for (j = 0; j < kCdudeMaxSounds; j++)
                             {
-                                if (pBonk->sfxId == (int)id[j])
-                                    return;
+                                if ((pBonk->sfxId == (int)id[j])
+                                    && (once != 2 || pBonk->pSndSpr == pSpr))
+                                        return;
                             }
                         }
                     }
@@ -501,30 +644,38 @@ class APPEARANCE
         unsigned int available      : 1;
         unsigned int soundAvailable : 1;
         unsigned int seq            : 20;
-        unsigned int clb            : 4;
+        unsigned int clb            : 12;
         unsigned int pic            : 16;
-        unsigned int xrp            : 8;
-        unsigned int yrp            : 8;
+        unsigned int csta           : 20;
+        unsigned int cstr           : 20;
+        signed   int xrp            : 10;
+        signed   int yrp            : 10;
         signed   int xof            : 8;
         signed   int yof            : 8;
-        signed   int pal            : 9;
-        signed   int shd            : 9;
+        signed   int pal            : 10;
+        signed   int shd            : 10;
+
         void Clear(void)
         {
             Bmemset(this, 0, sizeof(APPEARANCE));
-            pal = -1;   shd = 127;
+            pal = -1;   shd = 128;
         }
 
-        void SetScale(spritetype* pSpr, XSPRITE* pXSpr)
+        void SetScale(spritetype* pSpr, XSPRITE* pXSpr, XSPRITE* pXSrc)
         {
             if (available)
             {
                 int nScale = 0;
-                
-                if (scl[1] > 0)
-                    nScale = ClipRange(scl[1] + Random2(scl[1] - scl[0]), scl[0], scl[1]);
-                else
+                if (pXSrc == NULL)
+                {
                     nScale = scl[0];
+                    if (scl[1] > 0)
+                        nScale += Random(scl[1]-scl[0]);
+                }
+                else
+                {
+                    nScale = pXSrc->scale;
+                }
 
                 nnExtSprScaleSet(pSpr, nScale);
 
@@ -533,7 +684,7 @@ class APPEARANCE
             }
         }
 
-        void Set(spritetype* pSpr)
+        void Set(spritetype* pSpr, spritetype* pSrc)
         {
             if (!available)
                 return;
@@ -545,6 +696,9 @@ class APPEARANCE
             XSPRITE* pXSpr = &xsprite[pSpr->extra];
             SEQINST* pInst; int nCallback = -1;
             int nSeq = seq;
+
+            if (pSrc == NULL)
+                pSrc = pSpr;
 
             if (soundAvailable)
             {
@@ -578,49 +732,53 @@ class APPEARANCE
 
                 if (clb && pInst)
                 {
-                    pXSpr->sysData2 = clb - 1;
-                    if (pXSpr->sysData2 > 10)
-                        pInst->nCallbackID = gCdudeCustomCallback[pXSpr->sysData2];
-                    else
-                        pInst->nCallbackID  = nCdudeAppearanceCallback;
+                    pXSpr->sysData4 = clb - 1;
+                    pInst->nCallbackID  = nCdudeAppearanceCallback;
                 }
             }
 
-            if (shd != 127)
+            if (shd != 128)
             {
                 seqKill(OBJ_SPRITE, pSpr->extra);
-                pSpr->shade = shd;
+                pSpr->shade = (shd == -129) ? pSrc->shade : shd;
             }
 
-            if (pal >= 0)
+            if (pal == -129 || pal >= 0)
             {
                 if (!plu)
                     seqKill(OBJ_SPRITE, pSpr->extra);
 
-                pSpr->pal = pal;
+                pSpr->pal = (pal == -129) ? pSrc->pal : pal;
             }
 
-            if (xrp)
+            if (xrp == -129 || xrp > 0)
             {
                 if (!xs)
                     seqKill(OBJ_SPRITE, pSpr->extra);
 
-                pSpr->xrepeat = xrp;
+                pSpr->xrepeat = (xrp == -129) ? pSrc->xrepeat : xrp;
             }
 
-            if (yrp)
+            if (yrp == -129 || yrp > 0)
             {
                 if (!ys)
                     seqKill(OBJ_SPRITE, pSpr->extra);
 
-                pSpr->yrepeat = yrp;
+                pSpr->yrepeat = (yrp == -129) ? pSrc->yrepeat : yrp;
             }
+
+            if (cstr)
+                pSpr->cstat &= ~((uint16_t)cstr);
+            
+            if (csta)
+                pSpr->cstat |=  ((uint16_t)csta);
+
 
             if (xof) pSpr->xoffset = xof;
             if (yof) pSpr->yoffset = yof;
 
             if (scl[0])
-                SetScale(pSpr, pXSpr);
+                SetScale(pSpr, pXSpr, (scl[0] == 1024 && scl[1] == scl[0] && pSrc->extra > 0) ? &xsprite[pSrc->extra] : NULL);
         }
 };
 
@@ -629,31 +787,48 @@ class CUSTOMDUDE_WEAPON
     public:
         unsigned int  type                  : 4;
         unsigned int  numshots              : 6;
-        unsigned int  id                    : 10;
+        unsigned int  id                    : 16;
         unsigned int  sharedId              : 4;
         unsigned int  angle                 : 12;
         unsigned int  medium                : 3;
         unsigned int  pickChance            : 20;
         unsigned int  available             : 1;
-        unsigned int  posture               : 3;
+        unsigned int  posture               : 8;
         unsigned int  interruptable         : 1;
         unsigned int  turnToTarget          : 1;
         unsigned int  stateID               : 8;
         unsigned int  nextStateID           : 8;
         unsigned int  clipMask              : 32;
         unsigned int  group                 : 4;
+        unsigned int  inertia               : 1;
+        unsigned int  isDefault             : 1;
+        signed   int  data1                 : 32;
+        signed   int  data2                 : 32;
+        signed   int  data3                 : 32;
+        signed   int  data4                 : 32;
         unsigned int  dispersion[2];
         unsigned int  distRange[2];
+        signed   int  heighRange[4];
+        signed   int  slopeRange[2];
         unsigned char targHpRange[2];
         unsigned char dudeHpRange[2];
-        CUSTOMDUDE_SOUND sound;
+        CUSTOMDUDE_SOUND shotSound;
+        CUSTOMDUDE_SOUND attackSound;
+        IDLIST* pFrames;
+        struct PREDICTION
+        {
+            unsigned int distance           : 32;
+            unsigned int angle              : 12;
+            unsigned int accuracy           : 32;
+        }
+        prediction;
         struct SHOT
         {
-            unsigned int velocity           : 32;
+            signed   int velocity           : 32;
             signed   int slope              : 32;
             unsigned int targetFollow       : 12;
             unsigned int clipdist           : 8;
-            unsigned int impact             : 2;
+            unsigned int impact             : 1;
             signed   int remTime            : 14;
             APPEARANCE appearance;
             POINT3D offset;
@@ -671,33 +846,28 @@ class CUSTOMDUDE_WEAPON
         ammo;
         struct COOLDOWN
         {
-            unsigned int clock              : 32;
-            unsigned int delay              : 16;
-            unsigned int useCount           : 16;
-            unsigned int totalUseCount      : 16;
-            void SetTimer(void)
-            {
-                clock = ClipLow(delay * kTicsPerFrame, kTicsPerFrame);
-                clock += (unsigned int)gFrameClock;
-            }
-
+            CUSTOMDUDE_TIMER delay;
+            unsigned short useCount;
+            unsigned short totalUseCount;
+            unsigned short totalUseCountRng[2];
             char Check(void)
             {
-                if ((unsigned int)gFrameClock < clock)
+                if (!delay.Pass())
                     return 2;
                 
-                if (totalUseCount)
-                {
-                    useCount = ClipHigh(useCount + 1, totalUseCount);
-                    if (useCount < totalUseCount)
-                        return 0;
-                }
-                
-                if (delay)
-                {
-                    SetTimer();
+                if (totalUseCount && ++useCount < totalUseCount)
+                    return 0;
+
+                int a = totalUseCountRng[0];
+                int b = totalUseCountRng[1];
+
+                totalUseCount = a;
+                if (b)
+                    totalUseCount += Random(b - a);
+
+                delay.Set();
+                if (delay.Diff() > 0)
                     return 1;
-                }
 
                 return 0;
             }
@@ -712,26 +882,36 @@ class CUSTOMDUDE_WEAPON
         style;
         void Clear()
         {
+            if (pFrames)
+                delete(pFrames);
+            
             Bmemset(this, 0, sizeof(CUSTOMDUDE_WEAPON));
             
             angle           = kAng45;
             numshots        = 1;
-            pickChance      = 0x10000;
+            pickChance      = kChanceMax;
             stateID         = kCdudeStateAttackBase;
             turnToTarget    = true;
 
             distRange[1]    = 20000;
             dudeHpRange[1]  = 255;
             targHpRange[1]  = 255;
+            
+            heighRange[0]   = INT32_MIN;
+            heighRange[3]   = INT32_MAX;
+
+            slopeRange[0]   = INT32_MIN; 
+            slopeRange[1]   = INT32_MAX;
 
             shot.remTime    = -1;
-            shot.velocity = INT32_MAX;
-            shot.slope    = INT32_MAX;
+            shot.velocity   = INT32_MAX;
+            shot.slope      = INT32_MAX;
+
+            cooldown.delay.mul = kTicsPerFrame;
         }
         char HaveAmmmo(void)        { return (!ammo.total || ammo.cur); }
         int  GetDistance(void)      { return ClipLow(distRange[1] - distRange[0], 0); }
         int  GetNumshots(void)      { return (ammo.total) ? ClipHigh(ammo.cur, numshots) : numshots; }
-        char IsTimeout(void)        { return ((unsigned int)gFrameClock < cooldown.clock); }
         char HaveSlope(void)        { return (shot.slope != INT32_MAX); }
         char HaveVelocity(void)     { return (shot.velocity != INT32_MAX); }
 
@@ -822,17 +1002,17 @@ class CUSTOMDUDE_EFFECT
 {
     public:
         unsigned short id[kCdudeMaxEffects];
-        unsigned int clock          : 32;
         signed   int liveTime       : 32;
         signed   int velocity       : 32;
         signed   int velocitySlope  : 32;
         signed   int angle          : 16;
-        unsigned int posture        : 3;
+        unsigned int posture        : 8;
         unsigned int medium         : 3;
         unsigned int allUnique      : 1;
         unsigned int srcVelocity    : 1;
         unsigned int chance         : 20;
-        unsigned short delay[2];
+        unsigned char hpRange[2];
+        CUSTOMDUDE_TIMER delay;
         CUSTOMDUDE_GIB spr2gib;
         APPEARANCE appearance;
         IDLIST* pAnims;
@@ -847,9 +1027,16 @@ class CUSTOMDUDE_EFFECT
 
             Bmemset(this, 0, sizeof(CUSTOMDUDE_EFFECT));
             angle       = kAng360;
+            chance      = kChanceMax;
             velocity    = -1;
-            chance      = 0x10000;
             srcVelocity = 1;
+
+            hpRange[0] = 0;
+            hpRange[1] = 255;
+
+            delay.rng[0] = 1;
+            delay.rng[1] = 0;
+            delay.mul    = kTicsPerFrame;
 
             pAnims  = new IDLIST(true);
             pFrames = new IDLIST(true);
@@ -861,6 +1048,16 @@ class CUSTOMDUDE_EFFECT
             int nFrame = 1;
             int nACount = pAnims->Length();
             int nFCount = pFrames->Length();
+
+            if (hpRange[1] != 255 && pSpr->extra > 0)
+            {
+                XSPRITE* pXSpr = &xsprite[pSpr->extra];
+                int nHealth = ClipLow(nnExtGetStartHealth(pSpr), 1);
+                int tHealth = ClipHigh((kPercFull * pXSpr->health) / nHealth, 255);
+                if (!irngok(tHealth, hpRange[0], hpRange[1]))
+                    return false;
+            }
+
             if (nACount || nFCount)
             {
                 SEQINST* pInst = GetInstance(OBJ_SPRITE, pSpr->extra);
@@ -888,21 +1085,6 @@ class CUSTOMDUDE_EFFECT
             return true;
         }
 
-        void SetDelay(void)
-        {
-            if (delay[1] > 0)
-            {
-                clock = ClipRange(delay[1] + Random2(delay[1] - delay[0]), delay[0], delay[1]);
-            }
-            else
-            {
-                clock = delay[0];
-            }
-
-            clock = ClipLow(clock * kTicsPerFrame, kTicsPerFrame);
-            clock += (unsigned int)gFrameClock;
-        }
-
         void Setup(spritetype* pSrc, spritetype* pEff, char relVel)
         {
             int dx = 0, dy = 0, dz = velocitySlope;
@@ -916,7 +1098,7 @@ class CUSTOMDUDE_EFFECT
             nAng += Random2(perc2val(rp>>1, nAng)) & kAngMask;
             pEff->ang = nAng;
 
-            appearance.Set(pEff);
+            appearance.Set(pEff, pSrc);
 
             if (nVel >= 0)
             {
@@ -1020,44 +1202,84 @@ class  CUSTOMDUDE_DAMAGE
 {
     public:
         unsigned short id[kDmgMax];
-        unsigned int ignoreSources : 8;
+        unsigned int ignoreSources  : 8;
+        unsigned int stompDamage    : 32;
         void Set(int nVal, int nFor) { id[nFor] = ClipRange(nVal, 0, kCdudeMaxDmgScale); }
         void Inc(int nVal, int nFor) { Set(id[nFor] + abs(nVal), nFor); }
         void Dec(int nVal, int nFor) { Set(id[nFor] - abs(nVal), nFor); }
 };
 
-class  CUSTOMDUDE_DODGE
+struct CUSTOMDUDE_EVENT_DAMAGE
 {
-    public:
-        struct
+    unsigned int amount         : 20;
+    unsigned int health         : 8;
+    unsigned int chance         : 20;
+    unsigned int hitcount       : 10;
+    unsigned int cumulative     : 1;
+    unsigned short statetime[2];
+    CUSTOMDUDE_TIMER cooldown;
+    
+    char Allow(XSPRITE* pXSpr, int nAmount)
+    {
+        int nHealth, nChance = chance;
+
+        if (nAmount > amount)
         {
-            unsigned int times  : 10;
-            unsigned int timer  : 32;
-            unsigned int chance : 20;
-            unsigned int dmgReq : 17;
-            char Allow(int nDamage)
+            if (health)
             {
-                if (nDamage > dmgReq)
+                nHealth = ClipLow(nnExtGetStartHealth(&sprite[pXSpr->reference]), 1);
+                nHealth = ClipHigh((100 * pXSpr->health) / nHealth, 255);
+                if (nHealth > health)
+                    return 0;
+            }
+            
+            if (hitcount)
+            {
+                if (!cooldown.Pass())
                 {
-                    unsigned int nClock = (unsigned int)gFrameClock;
-                    unsigned int nChance = chance;
-
-                    if (timer > nClock)
-                    {
-                        times += (5 - gGameOptions.nDifficulty);
-                        nChance = ClipHigh(perc2val(times, nChance), nChance);
-                        return Chance(nChance);
-                    }
-
-                    times = 0;
-                    timer = nClock + kCdudeDmgCheckDelay;
+                    hitcount += (5 - gGameOptions.nDifficulty);
+                    nChance = ClipHigh(perc2val(hitcount, nChance), nChance);
                     return Chance(nChance);
                 }
 
-                return 0;
+                hitcount = 1;
+                cooldown.Set();
+                return Chance(nChance);
+            }
+
+            if (cooldown.Pass())
+            {
+                cooldown.Set();
+                return Chance(nChance);
             }
         }
-        onDamage;
+
+        return 0;
+    }
+
+    int PickTime()
+    {
+        int n = statetime[0];
+        if (statetime[1])
+            n += Random(statetime[1] - n);
+        
+        return n;
+    }
+};
+
+
+class  CUSTOMDUDE_RECOIL
+{
+    public:
+        CUSTOMDUDE_EVENT_DAMAGE onDamage[kDmgMax];
+};
+
+class  CUSTOMDUDE_KNOCKOUT : public CUSTOMDUDE_RECOIL { };
+class  CUSTOMDUDE_CROUCH   : public CUSTOMDUDE_RECOIL { };
+class  CUSTOMDUDE_DODGE    : public CUSTOMDUDE_RECOIL
+{
+    public:
+        signed int zDir : 2;
         struct
         {
             unsigned int chance : 20;
@@ -1066,63 +1288,35 @@ class  CUSTOMDUDE_DODGE
         onAimMiss;
 };
 
-class  CUSTOMDUDE_RECOIL
+class CUSTOMDUDE_MORPH
 {
     public:
-        unsigned int times  : 10;
-        unsigned int timer  : 32;
-        unsigned int chance : 20;
-        unsigned int dmgReq : 17;
-        char Allow(int nDamage)
-        {
-            if (nDamage > dmgReq)
-            {
-                unsigned int nClock = (unsigned int)gFrameClock;
-                unsigned int nChance = chance;
-
-                if (timer > nClock)
-                {
-                    times += (5 - gGameOptions.nDifficulty);
-                    nChance = ClipHigh(perc2val(times, nChance), nChance);
-                    return Chance(nChance);
-                }
-
-                times = 0;
-                timer = nClock + kCdudeDmgCheckDelay;
-                return Chance(nChance);
-            }
-
-            return 0;
-        }
+        signed short id[kDmgMax];
 };
 
-class  CUSTOMDUDE_KNOCKOUT
+class  CUSTOMDUDE_FLIGHT
 {
     public:
-        unsigned int times  : 10;
-        unsigned int timer  : 32;
-        unsigned int chance : 20;
-        unsigned int dmgReq : 17;
-        char Allow(int nDamage)
+        struct TYPE
         {
-            if (nDamage > dmgReq)
-            {
-                unsigned int nClock = (unsigned int)gFrameClock;
-                unsigned int nChance = chance;
-
-                if (timer > nClock)
-                {
-                    times += (5 - gGameOptions.nDifficulty);
-                    nChance = ClipHigh(perc2val(times, nChance), nChance);
-                    return Chance(nChance);
-                }
-
-                times = 0;
-                timer = nClock + kCdudeDmgCheckDelay;
-                return Chance(nChance);
-            }
-
-            return 0;
+            unsigned int distance[3];
+            unsigned int chance         : 20;
+        }
+        type[kCdudeFlightMax];
+        unsigned int absGoalZ           : 1;
+        unsigned int mustReach          : 1;
+        unsigned int maxHeight          : 32;
+        signed   int cfDist             : 20;
+        unsigned int friction           : 10;
+        signed   int clipDist           : 32;
+        signed   int backOnTrackAccel   : 12;
+        void Clear()
+        {
+            Bmemset(this, 0, sizeof(CUSTOMDUDE_FLIGHT));
+            cfDist          = kCdudeMinCFDist;
+            maxHeight       = INT32_MAX;
+            mustReach       = 1;
+            clipDist        = 1024;
         }
 };
 
@@ -1130,6 +1324,7 @@ class CUSTOMDUDE_VELOCITY
 {
     public:
         unsigned int id[kParVelocityMax];
+        //unsigned short mod[kCdudeStateMoveMax - kCdudeStateMoveBase];
         void Set(int nVal, int nFor) { id[nFor] = ClipRange(nVal, 0, kCdudeMaxVelocity); }
         void Inc(int nVal, int nFor) { Set(id[nFor] + abs(nVal), nFor); }
         void Dec(int nVal, int nFor) { Set(id[nFor] - abs(nVal), nFor); }
@@ -1143,7 +1338,7 @@ class CUSTOMDUDE_DROPITEM
         void Clear()
         {
             Bmemset(this, 0, sizeof(CUSTOMDUDE_DROPITEM));
-            sprDropItemChance = 0x10000;
+            sprDropItemChance = kChanceMax;
         }
 
         int Pick(XSPRITE* pXSpr, IDLIST* pOut)
@@ -1176,7 +1371,7 @@ class CUSTOMDUDE_DROPITEM
                 nPerc = items[i][1];
                 if (nItem)
                 {
-                    if (nPerc < 100 && Chance(perc2val(nPerc, 0x10000)))
+                    if (nPerc < 100 && Chance(perc2val(nPerc, kChanceMax)))
                     {
                         pOut->AddIfNotExists(nItem);
                         break;
@@ -1188,6 +1383,14 @@ class CUSTOMDUDE_DROPITEM
         }
 };
 
+class CUSTOMDUDE_SUMMON
+{
+    public:
+        IDLIST* list;
+        unsigned int noSetTarget    : 1;
+        unsigned int killOnDeath    : 1;
+};
+
 class CUSTOMDUDE
 {
     public:
@@ -1195,8 +1398,10 @@ class CUSTOMDUDE
         unsigned int initialized                        : 1;
         unsigned int numEffects                         : 5;
         unsigned int numWeapons                         : 5;
+        unsigned int numAvailWeapons                    : 5;
         DUDEEXTRA* pExtra; DUDEINFO* pInfo;
         spritetype* pSpr; XSPRITE*pXSpr, *pXLeech;
+        CUSTOMDUDE* pTemplate;
         CUSTOMDUDE_WEAPON    weapons[kCdudeMaxWeapons];                             // the weapons it may have
         CUSTOMDUDE_WEAPON*   pWeapon;                                               // pointer to current weapon
         CUSTOMDUDE_DAMAGE    damage;                                                // damage control
@@ -1205,51 +1410,98 @@ class CUSTOMDUDE
         CUSTOMDUDE_DODGE     dodge;                                                 // dodge control
         CUSTOMDUDE_RECOIL    recoil;                                                // recoil control
         CUSTOMDUDE_KNOCKOUT  knockout;                                              // knock control
+        CUSTOMDUDE_CROUCH    crouch;                                                // crouch control
+        CUSTOMDUDE_MORPH     morph;                                                 // morph control
+        CUSTOMDUDE_FLIGHT    flight;                                                // flight control
         CUSTOMDUDE_DROPITEM  dropItem;                                              // drop item control
         CUSTOMDUDE_EFFECT    effects[kCdudeMaxEffectGroups];                        // fx, gib effect stuff
-        AISTATE states[kCdudeStateMax][kCdudePostureMax];                           // includes states for weapons
-        IDLIST* pSlaves;                                                            // summoned dudes under control of this dude
+        CUSTOMDUDE_SUMMON    slaves;                                                // summoned dudes under control of this dude
+        AISTATE states[kCdudeStateMax][kCdudePostureMax];                           // includes states for deaths and weapons                                                           
+        struct
+        {
+            CUSTOMDUDE_TIMER     fLaunch;
+            CUSTOMDUDE_TIMER     fLand;
+            CUSTOMDUDE_TIMER     goalZ;
+            CUSTOMDUDE_TIMER     crouch;
+            CUSTOMDUDE_TIMER     moveDir;
+            CUSTOMDUDE_TIMER     floor;
+        }
+        timer;
+        struct
+        {
+            // Yup, need to create templates
+            // eventually to store
+            // stuff like
+            // this...
+            
+            unsigned int statetime                      : 8;
+            unsigned int velocity                       : 8;
+            unsigned int thinktime                      : 8;
+            unsigned int animscale                      : 8;
+            unsigned int weapchance                     : 8;
+        }
+        randomness;
         unsigned int medium                             : 3;                        // medium in which it can live
-        unsigned int posture                            : 3;                        // current posture
+        unsigned int posture                            : 8;                        // current posture
         unsigned int mass                               : 20;                       // mass in KG
-        unsigned int largestPic                         : 16;                       // in all states to compare on crouching
-        unsigned int prevSector                         : 16;                       // the recent sector dude was in
-        unsigned int seeDist                            : 20;                       // dudeInfo duplicate for sleeping
-        unsigned int hearDist                           : 20;                       // dudeInfo duplicate for sleeping
-        unsigned int periphery                          : 12;                       // dudeInfo duplicate for sleeping
-        unsigned int fallHeight                         : 32;                       // in pixels
-        signed   int nextDude                           : 32;                       // -1: none, <-1: vdude, >=0: ins, >=kMaxSprites: cdude
+        unsigned int health                             : 20;                       // default health
+        signed   int seeDist                            : 32;                       // current see distance
+        signed   int hearDist                           : 32;                       // current hear distance
+        unsigned int periphery                          : 12;                       // current periphery
+        signed   int sleepDist                          : 32;                       // see / hear distance while sleeping
+        signed   int height                             : 32;                       // in z relative to largest pic
+        signed   int eyeHeight                          : 32;                       // in z relative to height
+        signed   int fallHeight                         : 32;                       // in z
+        signed   int goalZ                              : 32;                       // to where it must fly
+        unsigned int turnAng                            : 12;                       // max turn delta ang
+        unsigned int stopMoveOnTurn                     : 1;                        // clear velocity or not
+        unsigned int thinkClock                         : 8;                        // a period with the think functs gets called
+        signed   int nextDude                           : 16;                       // -1: none, <-1: vdude, >=0: ins, >=kMaxSprites: cdude
         //----------------------------------------------------------------------------------------------------
         FORCE_INLINE void PlaySound(int nState)                     { return (sound[nState].Play(pSpr)); }
+        FORCE_INLINE int  GetDistToFloor(void)                      { return pXSpr->height << 8; };
         FORCE_INLINE int  GetStateSeq(int nState, int nPosture)     { return states[nState][nPosture].seqId; }
         FORCE_INLINE int  GetVelocity(int nPosture, int nVelType)   { return velocity[nPosture].id[nVelType]; }
         FORCE_INLINE int  GetVelocity(int nVelType)                 { return GetVelocity(posture, nVelType); }
+        //----------------------------------------------------------------------------------------------------
         FORCE_INLINE char IsUnderwater(void)                        { return (pXSpr->medium != kMediumNormal); }
+        FORCE_INLINE char IsStanding(void)                          { return (posture == kCdudePostureL); }
         FORCE_INLINE char IsCrouching(void)                         { return (posture == kCdudePostureC); }
+        FORCE_INLINE char IsSwimming(void)                          { return (posture == kCdudePostureW); }
+        FORCE_INLINE char IsFlying(void)                            { return (posture == kCdudePostureF); }
         FORCE_INLINE char SeqPlaying(void)                          { return (seqGetStatus(OBJ_SPRITE, pSpr->extra) >= 0); }
         FORCE_INLINE char IsAttacking(void)                         { return (pXSpr->aiState->stateType == kAiStateAttack); }
-        FORCE_INLINE char IsKnockout(void)                          { return (pXSpr->aiState->stateType == kAiStateKnockout); }
         FORCE_INLINE char IsRecoil(void)                            { return (pXSpr->aiState->stateType == kAiStateRecoil); }
+        FORCE_INLINE char IsChasing(void)                           { return (pXSpr->aiState->stateType == kAiStateChase); }
+        FORCE_INLINE char IsSearching(void)                         { return (pXSpr->aiState->stateType == kAiStateSearch); }
+        FORCE_INLINE char IsKnockout(void)                          { return StatusTest(kCdudeStatusKnocked); }
         FORCE_INLINE char IsBurning(void)                           { return StatusTest(kCdudeStatusBurning); }
         FORCE_INLINE char IsMorphing(void)                          { return StatusTest(kCdudeStatusMorph); }
         FORCE_INLINE char IsDying(void)                             { return StatusTest(kCdudeStatusDying); }
         FORCE_INLINE char IsSleeping(void)                          { return StatusTest(kCdudeStatusSleep); }
         FORCE_INLINE char IsLeechBroken(void)                       { return (pXLeech && pXLeech->locked); }
+        FORCE_INLINE char IsFlipped(void)                           { return ((pSpr->cstat & CSTAT_SPRITE_YFLIP) != 0 || (pSpr->flags & 2048) != 0); }
+        FORCE_INLINE char IsThinkTime(void)                         { return ((gFrame & thinkClock) == (pSpr->index & thinkClock)); }
         // ---------------------------------------------------------------------------------------------------
         FORCE_INLINE void StatusSet(int nStatus)                    { pXSpr->sysData3 |= nStatus; }
         FORCE_INLINE void StatusRem(int nStatus)                    { pXSpr->sysData3 &= ~nStatus; }
-        FORCE_INLINE char StatusTest(int nStatus)                   { return ((pXSpr->sysData3 & nStatus) > 0); }
+        FORCE_INLINE char StatusTest(int nStatus)                   { return ((pXSpr->sysData3 & nStatus) != 0); }
         //----------------------------------------------------------------------------------------------------
         FORCE_INLINE char CanRecoil(void)                           { return (GetStateSeq(kCdudeStateRecoil, posture) > 0); }
         FORCE_INLINE char CanElectrocute(void)                      { return (GetStateSeq(kCdudeStateRecoilT, posture) > 0); }
         FORCE_INLINE char CanKnockout(void)                         { return (GetStateSeq(kCdudeStateKnock, posture)); }
         FORCE_INLINE char CanBurn(void)                             { return (GetStateSeq(kCdudeBurnStateSearch, posture) > 0); }
+        FORCE_INLINE char CanStand(void)                            { return (GetStateSeq(kCdudeStateSearch, kCdudePostureL) > 0); }
         FORCE_INLINE char CanCrouch(void)                           { return (GetStateSeq(kCdudeStateSearch, kCdudePostureC) > 0); }
         FORCE_INLINE char CanSwim(void)                             { return (GetStateSeq(kCdudeStateSearch, kCdudePostureW) > 0); }
+        FORCE_INLINE char CanFly(void)                              { return (GetStateSeq(kCdudeStateSearch, kCdudePostureF) > 0); }
         FORCE_INLINE char CanSleep(void)                            { return (!StatusTest(kCdudeStatusAwaked) && GetStateSeq(kCdudeStateSleep, posture) > 0); }
         FORCE_INLINE char CanMove(void)                             { return (GetStateSeq(kCdudeStateSearch, posture) > 0); }
         //----------------------------------------------------------------------------------------------------
         int  GetDamage(int nSource, int nDmgType);
+        int  GetMaxFlyHeigh(char targClip);
+        int  GetStartFlyVel(void);
+        void ChangePosture(int nNewPosture);
         char IsPostureMatch(int nPosture);
         char IsMediumMatch(int nMedium);
         char IsTooTight(void);
@@ -1261,8 +1513,9 @@ class CUSTOMDUDE
         void InitSprite(void);
         void Activate(void);
         void Process(void);
+        void ProcessPosture(void);
         void ProcessEffects(void);
-        void Recoil(void);
+        void Recoil(int nStateTime = 0);
         int  Damage(int nFrom, int nDmgType, int nDmg);
         void Kill(int nFrom, int nDmgType, int nDmg);
         //----------------------------------------------------------------------------------------------------
@@ -1277,24 +1530,23 @@ class CUSTOMDUDE
         //----------------------------------------------------------------------------------------------------
         void LeechPickup(void);
         void LeechKill(char delSpr);
-        void UpdateSlaves(void);
+        void SlavesUpdate(void);
+        void SlavesKill(void);
         void DropItems(void);
         void ClearEffectCallbacks(void);
+        void Clear(void);
         //----------------------------------------------------------------------------------------------------
 };
 
-class CUSTOMDUDEV1_SETUP;
-class CUSTOMDUDEV2_SETUP;
 class CUSTOMDUDE_SETUP
 {
-        friend CUSTOMDUDEV1_SETUP;
-        friend CUSTOMDUDEV2_SETUP;
-    private:
+    protected:
         static const char* pValue;  static DICTNODE* hIni;
         static CUSTOMDUDE* pDude;   static IniFile* pIni;
         static PARAM* pGroup;       static PARAM* pParam;
         static char key[256];       static char val[256];
         static int nWarnings;       static char showWarnings;
+        static int nDefaultPosture; static char sortWeapons;
         /*------------------------------------------------------------*/
         static int FindParam(const char* str, PARAM* pDb);
         static PARAM* FindParam(int nParam, PARAM* pDb);
@@ -1328,19 +1580,21 @@ class CUSTOMDUDE_SETUP
         static void SoundFill(CUSTOMDUDE_SOUND* pSound, int nSnd);
         static void SoundFill(void);
         /*------------------------------------------------------------*/
-        static void FindLargestPic(void);
+        static void CountHeight(void);
         static void RandomizeDudeSettings(void);
         static void SetupSlaves(void);
         static void SetupLeech(void);
         /*------------------------------------------------------------*/
         static CUSTOMDUDE* SameDudeExist(CUSTOMDUDE* pCmp);
-        static CUSTOMDUDE* GetFirstDude(int nID);
-        static char IsFirst(CUSTOMDUDE* pCmp);
+        static CUSTOMDUDE* DudeTemplateFind(int nVer);
+        static spritetype* DudeTemplateFindEmpty(void);
+        static CUSTOMDUDE* DudeTemplateCreate();
     public:
         static char FindAiState(AISTATE stateArr[][kCdudePostureMax], int arrLen, AISTATE* pNeedle, int* nType, int* nPosture);
+        static inline void CopyListContents(IDLIST* pDst, IDLIST* pSrc) { for (int32_t* p=pSrc->First(); *p!=kListEndDefault; p++) pDst->Add(*p); }
         static void Setup(spritetype* pSpr, XSPRITE* pXSpr);
         static void Setup(CUSTOMDUDE* pOver = NULL);
-
+        static void SetupFromDude(CUSTOMDUDE* pSrc);
 };
 
 class CUSTOMDUDEV1_SETUP : CUSTOMDUDE_SETUP
@@ -1371,8 +1625,12 @@ class CUSTOMDUDEV2_SETUP : CUSTOMDUDE_SETUP
         static char ParseAttackSetup(const char* str, CUSTOMDUDE_WEAPON* pWeap);
         static char ParseWeaponStyle(const char* str, CUSTOMDUDE_WEAPON* pWeap);
         static char ParseWeaponBasicInfo(const char* str, CUSTOMDUDE_WEAPON* pWeap);
+        static char ParseWeaponPrediction(const char* str, CUSTOMDUDE_WEAPON* pWeap);
+        static char ParseWeaponHeight(const char* str, CUSTOMDUDE_WEAPON* pWeap);
+        static char ParseWeaponCooldown(const char* str, CUSTOMDUDE_WEAPON* pWeap);
         static char ParsePosture(const char* str);
         static char ParseOnEventDmg(const char* str, int* pOut, int nLen);
+        static char ParseOnEventDmgEx(const char* str, CUSTOMDUDE_EVENT_DAMAGE* pOut);
         static char ParseDropItem(const char* str, unsigned char out[2]);
         static char ParseSkill(const char* str);
         static int  ParseKeywords(const char* str, PARAM* pDb);
@@ -1381,6 +1639,11 @@ class CUSTOMDUDEV2_SETUP : CUSTOMDUDE_SETUP
         static int  ParseEffectIDs(const char* str, const char* paramName, unsigned short* pOut, int nLen = 0);
         static int  ParseStatesToList(const char* str, IDLIST* pOut);
         static char ParseGibSetup(const char* str, CUSTOMDUDE_GIB* pOut);
+        static char ParseFlyType(const char* str, CUSTOMDUDE_FLIGHT::TYPE* pOut, CUSTOMDUDE_TIMER* pTimer);
+        static int  ParseDudeType(const char* str);
+        static int  ParseMorphData(const char* str, int* pOut);
+        static int  ParseTimer(const char* str, CUSTOMDUDE_TIMER* pTimer);
+
         /*-------------------------------------------------*/
         static int  CheckArray(const char* str, int nMin = 0, int nMax = 0, int nDefault = 1);
         static int  CheckValue(const char* str, int nValType, int nDefault);
@@ -1394,15 +1657,23 @@ class CUSTOMDUDEV2_SETUP : CUSTOMDUDE_SETUP
         static void SetupAnimation(AISTATE* pState, char asPosture);
         static void SetupAnimation(void);
         static void SetupSound(CUSTOMDUDE_SOUND* pSound);
+        static void SetupEventDamage(CUSTOMDUDE_EVENT_DAMAGE* pEvn);
         static void SetupMovePattern(void);
+        static void SetupFlyPattern(void);
         static void SetupSound(void);
         static void SetupDamage(void);
         static void SetupRecoil(void);
         static void SetupDodge(void);
         static void SetupKnockout(void);
+        static void SetupCrouch(void);
         static void SetupWeapons(void);
         static void SetupEffect(void);
         static void SetupDropItem(void);
+        static void SetupMorphing(void);
+        static void SetupSleeping(void);
+        static void SetupSlaves(void);
+        static void SetupRandomness(void);
+        static void SetupTweaks(void);
     public:
         static void Setup(void);
 };
@@ -1414,4 +1685,6 @@ FORCE_INLINE char IsCustomDude(spritetype* pSpr)        { return (pSpr->type == 
 FORCE_INLINE CUSTOMDUDE* cdudeGet(spritetype* pSpr) { return cdudeGet(pSpr->index); };
 spritetype* cdudeSpawn(XSPRITE* pXSource, spritetype* pSprite, int nDist);
 void cdudeLeechOperate(spritetype* pSprite, XSPRITE* pXSprite);
+void cdudeSave(LoadSave* pSave);
+void cdudeLoad(LoadSave* pLoad);
 #endif
