@@ -1175,7 +1175,7 @@ static char cdudChkLeechDead(void)
 };
 static char cdudCmpSummoned(void)
 {
-    IDLIST* pSlaves = cdudeGet(pSpr)->pSlaves;
+    IDLIST* pSlaves = cdudeGet(pSpr)->slaves.list;
     if (!pSlaves)
         return Cmp(0);
 
