@@ -1695,6 +1695,7 @@ void aiInitSprite(spritetype *pSprite)
         pSprite->flags = 7;
         break;
     #ifdef NOONE_EXTENSIONS
+    case kDudeModernCustom: // flags alredy set
     case kDudePodMother: // FakeDude type
         if (gModernMap) break;
         fallthrough__;

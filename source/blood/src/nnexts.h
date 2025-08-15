@@ -46,6 +46,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "gib.h"
 #include "nnextcitem.h"
 
+// Resource system is buggy with a lot external files added
+//#define NNEXTS_USE_RES_SYS
+
 // CONSTANTS
 #define LENGTH(x)                           (int)(sizeof(x) / sizeof(x[0]))
 #define EVTIME2TICKS(x)                     ((x * 120) / 10)
@@ -266,11 +269,13 @@ struct TRPLAYERCTRL { // this one for controlling the player using triggers (mov
     QAVSCENE qavScene;
 };
 
+#ifdef NNEXTS_USE_RES_SYS
 struct EXTERNAL_FILES_LIST
 {
     const char* name;
     const char* ext;
 };
+#endif
 
 inline bool mapRev1() { return (gModernMap == 1); }
 inline bool mapRev2() { return (gModernMap == 2); }
@@ -700,6 +705,7 @@ FORCE_INLINE void nnExtOffsetPos(POINT3D* pOffs, int nAng, int* x, int* y, int* 
 }
 
 int nnExtDudeStartHealth(spritetype* pSpr, int nHealth);
+void nnExtFixDudeDrag(spritetype* pSpr, int nDrag);
 void nnExtScaleVelocity(spritetype* pSpr, int nVel, int dx, int dy, int dz, char which = 0x03);
 void nnExtScaleVelocityRel(spritetype* pSpr, int nVel, int dx, int dy, int dz, char which = 0x03);
 int nnExtGibSprite(spritetype* pSpr, IDLIST* pOut, GIBTYPE nGibType, CGibPosition* pPos, CGibVelocity* pVel);
@@ -708,8 +714,10 @@ spritetype* nnExtSpawnDude(spritetype* pSrc, int nType, int x, int y, int z);
 
 void nnExtSprScaleSet(spritetype* pSpr, int nScale);
 void nnExtCoSin(int nAng, int* x, int* y, int nShift = 16);
+#ifdef NNEXTS_USE_RES_SYS
 DICTNODE* nnExtResFileSearch(Resource* pIn, const char* pName, const char* pExt, char external = true);
 int nnExtResAddExternalFiles(Resource* pIn, const char* pPath, EXTERNAL_FILES_LIST* pList, int nLen);
+#endif
 void getSectorWalls(int nSect, int* swal, int* ewal);
 
 void nnExtTrInit();

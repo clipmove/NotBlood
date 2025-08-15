@@ -35,7 +35,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "mmulti.h"
 #include "view.h"
 
-#define SEQOFFS(x) (kCdudeDefaultSeq + x)
+#define SEQOFFSC(x) (kCdudeDefaultSeq + x)
+#define SEQOFFSG(x) (kCdudeDefaultSeqF + x)
+
+#define ATTACK_FAIL       -1
+#define ATTACK_CONTINUE   -2
 
 #pragma pack(push, 1)
 struct TARGET_INFO
@@ -50,9 +54,11 @@ struct TARGET_INFO
 #pragma pack(pop)
 
 static void resetTarget(spritetype*, XSPRITE* pXSpr)            { pXSpr->target = -1; }
-static void moveStop(spritetype* pSpr, XSPRITE*)                { xvel[pSpr->index] = yvel[pSpr->index] = 0; }
-static char THINK_CLOCK(int nSpr, int nClock = 3)               { return ((gFrame & nClock) == (nSpr & nClock)); }
+static void moveForwardStop(spritetype* pSpr, XSPRITE*)         { xvel[pSpr->index] = yvel[pSpr->index] = 0; }
 static int qsSortTargets(TARGET_INFO* ref1, TARGET_INFO* ref2)  { return ref1->nDist - ref2->nDist; }
+static char posObstructed(int x, int y, int z, int nRadius);
+static char clipFlying(spritetype* pSpr, XSPRITE* pXSpr);
+void helperPounce(spritetype* pSpr, spritetype* pHSpr, int nDmgType, int nDmg, int kickPow);
 
 static void thinkSearch(spritetype*, XSPRITE*);
 static void thinkChase(spritetype*, XSPRITE*);
@@ -60,17 +66,24 @@ static void thinkFlee(spritetype*, XSPRITE*);
 static void thinkTarget(spritetype* pSpr, XSPRITE*);
 static void thinkMorph(spritetype* pSpr, XSPRITE* pXSpr);
 static void thinkDying(spritetype* pSpr, XSPRITE* pXSpr);
+static void enterIdle(spritetype* pSpr, XSPRITE* pXSpr);
+static void enterSearch(spritetype* pSpr, XSPRITE* pXSpr);
+static void enterFlee(spritetype* pSpr, XSPRITE* pXSpr);
 static void enterBurnSearchWater(spritetype* pSpr, XSPRITE* pXSpr);
 static void enterMorph(spritetype* pSpr, XSPRITE* pXSpr);
 static void enterDying(spritetype* pSpr, XSPRITE* pXSpr);
 static void enterDeath(spritetype* pSpr, XSPRITE* pXSpr);
 static void enterSleep(spritetype* pSpr, XSPRITE* pXSpr);
 static void enterWake(spritetype* pSpr, XSPRITE*);
+static void enterAttack(spritetype* pSpr, XSPRITE* pXSpr);
+static void enterKnock(spritetype* pSpr, XSPRITE*);
+static void exitKnock(spritetype* pSpr, XSPRITE*);
+static void enterDodgeFly(spritetype* pSpr, XSPRITE*);
 static int getTargetAng(spritetype* pSpr, XSPRITE* pXSpr);
 static void turnToTarget(spritetype* pSpr, XSPRITE* pXSpr);
 static void moveTurn(spritetype* pSpr, XSPRITE* pXSpr);
 static void moveDodge(spritetype* pSpr, XSPRITE* pXSpr);
-static void moveForward(spritetype* pSpr, XSPRITE* pXSpr);
+static void moveNormal(spritetype* pSpr, XSPRITE* pXSpr);
 static void moveKnockout(spritetype* pSpr, XSPRITE* pXSpr);
 
 static void weaponShot(int, int);
@@ -78,12 +91,11 @@ static int nWeaponShot  = seqRegisterClient(weaponShot);
 static int weaponShotDummy(CUSTOMDUDE*, CUSTOMDUDE_WEAPON*, POINT3D*, int, int, int) { return -1; }
 static int weaponShotHitscan(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz);
 static int weaponShotMissile(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz);
-static int weaponShotThing(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int, int, int);
+static int weaponShotThing(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz);
 static int weaponShotSummon(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz);
 static int weaponShotKamikaze(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz);
-static int weaponShotSpecialBeastStomp(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON*, POINT3D* pOffs, int, int, int);
-
-int (*gWeaponShotFunc[])(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz) =
+static int weaponShotSpecial(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz);
+static int (*gWeaponShotFunc[])(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz) =
 {
     weaponShotDummy,    // none
     weaponShotHitscan,
@@ -92,136 +104,157 @@ int (*gWeaponShotFunc[])(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* p
     weaponShotSummon,   // vanilla dude
     weaponShotSummon,   // custom  dude
     weaponShotKamikaze,
-    weaponShotSpecialBeastStomp,
+    weaponShotSpecial,
 };
 
 static AISTATE gCdudeStateDeath = { kAiStateOther, -1, -1, 0, enterDeath, NULL, NULL, NULL }; // just turns dude to a gib
 
-// Land, Crouch, Swim (proper order matters!)
+
+
+
+
+// Land, Crouch, Swim, Fly (proper order matters!)
 AISTATE gCdudeStateTemplate[kCdudeStateNormalMax][kCdudePostureMax] =
 {
     // idle (don't change pos or patrol gets broken!)
     {
-        { kAiStateIdle,     SEQOFFS(0),   -1, 0, resetTarget, NULL, thinkTarget, NULL },
-        { kAiStateIdle,     SEQOFFS(17),  -1, 0, resetTarget, NULL, thinkTarget, NULL },
-        { kAiStateIdle,     SEQOFFS(13),  -1, 0, resetTarget, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSC(0),    -1, 0, enterIdle, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSC(17),   -1, 0, enterIdle, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSC(13),   -1, 0, enterIdle, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSG(0),    -1, 0, enterIdle, NULL, thinkTarget, NULL },
     },
 
     // search (don't change pos or patrol gets broken!)
     {
-        { kAiStateSearch,   SEQOFFS(9),  -1, 800, NULL, moveForward, thinkSearch, &gCdudeStateTemplate[kCdudeStateIdle][kCdudePostureL] },
-        { kAiStateSearch,   SEQOFFS(14), -1, 800, NULL, moveForward, thinkSearch, &gCdudeStateTemplate[kCdudeStateIdle][kCdudePostureC] },
-        { kAiStateSearch,   SEQOFFS(13), -1, 800, NULL, moveForward, thinkSearch, &gCdudeStateTemplate[kCdudeStateIdle][kCdudePostureW] },
+        { kAiStateSearch,   SEQOFFSC(9),    -1, 800, enterSearch,  moveNormal, thinkSearch, &gCdudeStateTemplate[kCdudeStateIdle][kCdudePostureL] },
+        { kAiStateSearch,   SEQOFFSC(14),   -1, 800, NULL,         moveNormal, thinkSearch, &gCdudeStateTemplate[kCdudeStateIdle][kCdudePostureC] },
+        { kAiStateSearch,   SEQOFFSC(13),   -1, 800, NULL,         moveNormal, thinkSearch, &gCdudeStateTemplate[kCdudeStateIdle][kCdudePostureW] },
+        { kAiStateSearch,   SEQOFFSG(0),    -1, 800, enterSearch,  moveNormal, thinkSearch, &gCdudeStateTemplate[kCdudeStateIdle][kCdudePostureF] },
     },
 
     // dodge
     {
-        { kAiStateMove,     SEQOFFS(9),  -1, 90, NULL,  moveDodge,	NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureL] },
-        { kAiStateMove,     SEQOFFS(14), -1, 90, NULL,  moveDodge,	NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureC] },
-        { kAiStateMove,     SEQOFFS(13), -1, 90, NULL,  moveDodge,	NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureW] },
+        { kAiStateMove,     SEQOFFSC(9),    -1, 90, NULL,           moveDodge,	NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureL] },
+        { kAiStateMove,     SEQOFFSC(14),   -1, 90, NULL,           moveDodge,	NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureC] },
+        { kAiStateMove,     SEQOFFSC(13),   -1, 90, NULL,           moveDodge,	NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureW] },
+        { kAiStateMove,     SEQOFFSG(0),    -1, 90, enterDodgeFly,  moveDodge,	NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureF] },
     },
 
     // chase
     {
-        { kAiStateChase,    SEQOFFS(9),  -1, 30, NULL,	moveForward, thinkChase, NULL },
-        { kAiStateChase,    SEQOFFS(14), -1, 30, NULL,	moveForward, thinkChase, NULL },
-        { kAiStateChase,    SEQOFFS(13), -1, 30, NULL,	moveForward, thinkChase, NULL },
+        { kAiStateChase,    SEQOFFSC(9),    -1, 30, NULL,	moveNormal, thinkChase, NULL },
+        { kAiStateChase,    SEQOFFSC(14),   -1, 30, NULL,	moveNormal, thinkChase, NULL },
+        { kAiStateChase,    SEQOFFSC(13),   -1, 30, NULL,	moveNormal, thinkChase, NULL },
+        { kAiStateChase,    SEQOFFSG(0),    -1, 30, NULL,	moveNormal, thinkChase, NULL },
     },
 
     // flee
     {
-        { kAiStateMove,    SEQOFFS(9),  -1, 256, NULL,	moveForward, thinkFlee, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureL] },
-        { kAiStateMove,    SEQOFFS(14), -1, 256, NULL,	moveForward, thinkFlee, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureC] },
-        { kAiStateMove,    SEQOFFS(13), -1, 256, NULL,	moveForward, thinkFlee, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureW] },
+        { kAiStateMove,    SEQOFFSC(9),     -1, 256, enterFlee,	moveNormal, thinkFlee, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureL] },
+        { kAiStateMove,    SEQOFFSC(14),    -1, 256, enterFlee,	moveNormal, thinkFlee, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureC] },
+        { kAiStateMove,    SEQOFFSC(13),    -1, 256, enterFlee,	moveNormal, thinkFlee, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureW] },
+        { kAiStateMove,    SEQOFFSG(0),     -1, 256, enterFlee,	moveNormal, thinkFlee, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureF] },
     },
 
     // recoil normal
     {
-        { kAiStateRecoil,   SEQOFFS(5), -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureL] },
-        { kAiStateRecoil,   SEQOFFS(5), -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureC] },
-        { kAiStateRecoil,   SEQOFFS(5), -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureW] },
+        { kAiStateRecoil,   SEQOFFSC(5),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureL] },
+        { kAiStateRecoil,   SEQOFFSC(5),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureC] },
+        { kAiStateRecoil,   SEQOFFSC(5),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureW] },
+        { kAiStateRecoil,   SEQOFFSG(5),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureF] },
     },
 
     // recoil tesla
     {
-        { kAiStateRecoil,   SEQOFFS(4), -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureL] },
-        { kAiStateRecoil,   SEQOFFS(4), -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureC] },
-        { kAiStateRecoil,   SEQOFFS(4), -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureW] },
+        { kAiStateRecoil,   SEQOFFSC(4),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureL] },
+        { kAiStateRecoil,   SEQOFFSC(4),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureC] },
+        { kAiStateRecoil,   SEQOFFSC(4),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureW] },
+        { kAiStateRecoil,   SEQOFFSG(4),    -1, 0, NULL, NULL, NULL, &gCdudeStateTemplate[kCdudeStateChase][kCdudePostureF] },
     },
 
     // burn search
     {
-        { kAiStateSearch,   SEQOFFS(3), -1, 3600, enterBurnSearchWater, aiMoveForward, NULL, &gCdudeStateTemplate[kCdudeBurnStateSearch][kCdudePostureL] },
-        { kAiStateSearch,   SEQOFFS(3), -1, 3600, enterBurnSearchWater, aiMoveForward, NULL, &gCdudeStateTemplate[kCdudeBurnStateSearch][kCdudePostureC] },
-        { kAiStateSearch,   SEQOFFS(3), -1, 3600, enterBurnSearchWater, aiMoveForward, NULL, &gCdudeStateTemplate[kCdudeBurnStateSearch][kCdudePostureW] },
+        { kAiStateSearch,   SEQOFFSC(3), -1, 3600, enterBurnSearchWater, moveNormal, NULL, &gCdudeStateTemplate[kCdudeBurnStateSearch][kCdudePostureL] },
+        { kAiStateSearch,   SEQOFFSC(3), -1, 3600, enterBurnSearchWater, moveNormal, NULL, &gCdudeStateTemplate[kCdudeBurnStateSearch][kCdudePostureC] },
+        { kAiStateSearch,   SEQOFFSC(3), -1, 3600, enterBurnSearchWater, moveNormal, NULL, &gCdudeStateTemplate[kCdudeBurnStateSearch][kCdudePostureW] },
+        { kAiStateSearch,   SEQOFFSG(3), -1, 3600, enterBurnSearchWater, moveNormal, NULL, &gCdudeStateTemplate[kCdudeBurnStateSearch][kCdudePostureF] },
     },
 
     // morph (put thinkFunc in moveFunc because it supposed to work fast)
     {
-        { kAiStateOther,   SEQOFFS(18), -1, 0, enterMorph, thinkMorph, NULL, NULL },
-        { kAiStateOther,   SEQOFFS(18), -1, 0, enterMorph, thinkMorph, NULL, NULL },
-        { kAiStateOther,   SEQOFFS(18), -1, 0, enterMorph, thinkMorph, NULL, NULL },
+        { kAiStateOther,   SEQOFFSC(18), -1, 0, enterMorph, thinkMorph, NULL, NULL },
+        { kAiStateOther,   SEQOFFSC(18), -1, 0, enterMorph, thinkMorph, NULL, NULL },
+        { kAiStateOther,   SEQOFFSC(18), -1, 0, enterMorph, thinkMorph, NULL, NULL },
+        { kAiStateOther,   SEQOFFSG(0),  -1, 0, enterMorph, thinkMorph, NULL, NULL },
     },
 
     // knock enter
     {
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnock][kCdudePostureL] },
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnock][kCdudePostureC] },
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, moveKnockout, NULL, &gCdudeStateTemplate[kCdudeStateKnock][kCdudePostureW] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, enterKnock, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnock][kCdudePostureL] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, enterKnock, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnock][kCdudePostureC] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, enterKnock, moveKnockout, NULL, &gCdudeStateTemplate[kCdudeStateKnock][kCdudePostureW] },
+        { kAiStateKnockout,   SEQOFFSG(0), -1, 0, enterKnock, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnock][kCdudePostureF] },
     },
 
     // knock
     {
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnockExit][kCdudePostureL] },
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnockExit][kCdudePostureC] },
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, moveKnockout, NULL, &gCdudeStateTemplate[kCdudeStateKnockExit][kCdudePostureW] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, NULL, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnockExit][kCdudePostureL] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, NULL, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnockExit][kCdudePostureC] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, NULL, moveKnockout, NULL, &gCdudeStateTemplate[kCdudeStateKnockExit][kCdudePostureW] },
+        { kAiStateKnockout,   SEQOFFSG(0), -1, 0, NULL, NULL,         NULL, &gCdudeStateTemplate[kCdudeStateKnockExit][kCdudePostureF] },
     },
 
     // knock exit
     {
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureL] },
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureC] },
-        { kAiStateKnockout,   SEQOFFS(0), -1, 0, NULL, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureW] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, exitKnock, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureL] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, exitKnock, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureC] },
+        { kAiStateKnockout,   SEQOFFSC(0), -1, 0, exitKnock, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureW] },
+        { kAiStateKnockout,   SEQOFFSG(0), -1, 0, exitKnock, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureF] },
     },
 
     // sleep
     {
-        { kAiStateIdle,     SEQOFFS(0),  -1, 0, enterSleep, NULL, thinkTarget, NULL },
-        { kAiStateIdle,     SEQOFFS(0),  -1, 0, enterSleep, NULL, thinkTarget, NULL },
-        { kAiStateIdle,     SEQOFFS(0),  -1, 0, enterSleep, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSC(0),  -1, 0, enterSleep, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSC(0),  -1, 0, enterSleep, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSC(0),  -1, 0, enterSleep, NULL, thinkTarget, NULL },
+        { kAiStateIdle,     SEQOFFSG(0),  -1, 0, enterSleep, NULL, thinkTarget, NULL },
     },
 
     // wake
     {
-        { kAiStateIdle,     SEQOFFS(0),  -1, 0, enterWake, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureL] },
-        { kAiStateIdle,     SEQOFFS(0),  -1, 0, enterWake, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureC] },
-        { kAiStateIdle,     SEQOFFS(0),  -1, 0, enterWake, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureW] },
+        { kAiStateIdle,     SEQOFFSC(0),  -1, 0, enterWake, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureL] },
+        { kAiStateIdle,     SEQOFFSC(0),  -1, 0, enterWake, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureC] },
+        { kAiStateIdle,     SEQOFFSC(0),  -1, 0, enterWake, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureW] },
+        { kAiStateIdle,     SEQOFFSG(0),  -1, 0, enterWake, turnToTarget, NULL, &gCdudeStateTemplate[kCdudeStateSearch][kCdudePostureF] },
     },
 
     // generic idle (ai fight compat.)
     {
-        { kAiStateGenIdle,     SEQOFFS(0),   -1, 0, resetTarget, NULL, NULL, NULL },
-        { kAiStateGenIdle,     SEQOFFS(17),  -1, 0, resetTarget, NULL, NULL, NULL },
-        { kAiStateGenIdle,     SEQOFFS(13),  -1, 0, resetTarget, NULL, NULL, NULL },
+        { kAiStateGenIdle,     SEQOFFSC(0),     -1, 0, resetTarget, NULL, NULL, NULL },
+        { kAiStateGenIdle,     SEQOFFSC(17),    -1, 0, resetTarget, NULL, NULL, NULL },
+        { kAiStateGenIdle,     SEQOFFSC(13),    -1, 0, resetTarget, NULL, NULL, NULL },
+        { kAiStateGenIdle,     SEQOFFSG(0),     -1, 0, resetTarget, NULL, NULL, NULL },
     },
 };
 
-// Land, Crouch, Swim
+// Land, Crouch, Swim, Fly
 AISTATE gCdudeStateAttackTemplate[kCdudePostureMax] =
 {
     // attack (put thinkFunc in moveFunc because it supposed to work fast)
-    { kAiStateAttack,   SEQOFFS(6), nWeaponShot, 0, moveStop, thinkChase, NULL, &gCdudeStateAttackTemplate[kCdudePostureL] },
-    { kAiStateAttack,   SEQOFFS(8), nWeaponShot, 0, moveStop, thinkChase, NULL, &gCdudeStateAttackTemplate[kCdudePostureC] },
-    { kAiStateAttack,   SEQOFFS(8), nWeaponShot, 0, moveStop, thinkChase, NULL, &gCdudeStateAttackTemplate[kCdudePostureW] },
+    { kAiStateAttack,   SEQOFFSC(6), nWeaponShot, 0, enterAttack, thinkChase, NULL, &gCdudeStateAttackTemplate[kCdudePostureL] },
+    { kAiStateAttack,   SEQOFFSC(8), nWeaponShot, 0, enterAttack, thinkChase, NULL, &gCdudeStateAttackTemplate[kCdudePostureC] },
+    { kAiStateAttack,   SEQOFFSC(8), nWeaponShot, 0, enterAttack, thinkChase, NULL, &gCdudeStateAttackTemplate[kCdudePostureW] },
+    { kAiStateAttack,   SEQOFFSG(6), nWeaponShot, 0, enterAttack, thinkChase, NULL, &gCdudeStateAttackTemplate[kCdudePostureF] },
 };
 
-// Random pick
+// Land, Crouch, Swim, Fly or random pick
 AISTATE gCdudeStateDyingTemplate[kCdudePostureMax] =
 {
     // dying
-    { kAiStateOther,   SEQOFFS(1), -1, 0, enterDying, NULL, thinkDying, &gCdudeStateDeath },
-    { kAiStateOther,   SEQOFFS(1), -1, 0, enterDying, NULL, thinkDying, &gCdudeStateDeath },
-    { kAiStateOther,   SEQOFFS(1), -1, 0, enterDying, NULL, thinkDying, &gCdudeStateDeath },
+    { kAiStateOther,   SEQOFFSC(1), -1, 0, enterDying, NULL, thinkDying, &gCdudeStateDeath },
+    { kAiStateOther,   SEQOFFSC(1), -1, 0, enterDying, NULL, thinkDying, &gCdudeStateDeath },
+    { kAiStateOther,   SEQOFFSC(1), -1, 0, enterDying, NULL, thinkDying, &gCdudeStateDeath },
+    { kAiStateOther,   SEQOFFSG(1), -1, 0, enterDying, NULL, thinkDying, &gCdudeStateDeath },
 };
 
 // for kModernThingThrowableRock
@@ -264,7 +297,7 @@ static int weaponShotMissile(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3
             nnExtScaleVelocity(pShot, pWeap->shot.velocity, dx, dy, dz);
         }
 
-        pWeap->shot.appearance.Set(pShot);
+        pWeap->shot.appearance.Set(pShot, pSpr);
 
         if (pWeap->shot.targetFollow)
         {
@@ -278,48 +311,26 @@ static int weaponShotMissile(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3
         return pShot->index;
     }
 
-    return -1;
+    return ATTACK_FAIL;
 }
 
-static int weaponShotThing(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int, int, int)
+static int weaponShotThing(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz)
 {
-    spritetype* pSpr   = pDude->pSpr; XSPRITE* pXSpr = pDude->pXSpr;
-    spritetype* pLeech = NULL, *pShot, *pTarget;
-    XSPRITE* pXShot;
-    
-    if (!spriRangeIsFine(pXSpr->target))
-        return -1;
+    spritetype* pSpr = pDude->pSpr, *pShot;
+    XSPRITE* pXSpr = pDude->pXSpr, * pXShot;
 
-    pTarget = &sprite[pXSpr->target];
-    int dx = pTarget->x - pSpr->x;
-    int dy = pTarget->y - pSpr->y;
-    int dz = pTarget->z - pSpr->z;
-    int nDist = approxDist(dx, dy);
-    int nDiv = 540, nVel, nSlope = 12000;
-    char impact = true;
-    int nHealth = 0;
+    int nTime = 120 * Random(2) + 120;
+    int nDist = approxDist(dx, dy), nSlope = 12000, nDiv = 540;
+    int nVel = divscale23(nDist / nDiv, 120);
+    int tx = pSpr->x + dx, ty = pSpr->y + dy;
+    int ta = pSpr->ang;
 
-    switch (pWeap->id)
-    {
-        case kModernThingEnemyLifeLeech:
-        case kThingDroppedLifeLeech:
-            if (!pDude->IsLeechBroken())
-            {
-                if (pLeech)
-                {
-                    if (xsprIsFine(pLeech))
-                        nHealth = pDude->pXLeech->health;
-
-                    pDude->LeechPickup(); // pickup it before throw
-                }
-            }
-            break;
-    }
-    
     nSlope = (pWeap->HaveSlope()) ? pWeap->shot.slope : ((dz / 128) - nSlope);
     
-    nVel = divscale23(nDist / nDiv, 120);
+    pSpr->ang = getangle(pSpr->x - tx, pSpr->y - ty);
     pShot = actFireThing(pSpr, -pOffs->x, pOffs->z, nSlope, pWeap->id, nVel);
+    pSpr->ang = ta;
+    
     if (pShot)
     {
         nnExtOffsetSprite(pShot, 0, pOffs->y, 0);
@@ -331,73 +342,75 @@ static int weaponShotThing(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D*
 
         switch (pWeap->id)
         {
-            case kModernThingTNTProx:
             case kThingArmedProxBomb:
+            case kModernThingTNTProx:
+                pXShot->state = 0;
+                fallthrough__;
+            case kThingArmedRemoteBomb:
+            case kThingArmedTNTBundle:
+            case kThingArmedTNTStick:
+            case kThingTNTBarrel:
+                if (pWeap->data1 > 0)
+                {
+                    nTime = pWeap->data1;
+                    if (pWeap->data2 > pWeap->data1)
+                        nTime += Random(pWeap->data2 - pWeap->data1);
+                }
+                break;
             case kModernThingThrowableRock:
-            case kModernThingEnemyLifeLeech:
-            case kThingDroppedLifeLeech:
+                pShot->picnum   = gCdudeDebrisPics[Random(LENGTH(gCdudeDebrisPics))];
+                pShot->xrepeat  = pShot->yrepeat = 24 + Random(42);
+                pShot->cstat    |= CSTAT_SPRITE_BLOCK;
+                pShot->pal      = 5;
+
+                if (Chance(0x5000)) pShot->cstat |= CSTAT_SPRITE_XFLIP;
+                if (Chance(0x5000)) pShot->cstat |= CSTAT_SPRITE_YFLIP;
+
+                if (pWeap->data1 > 0)
+                {
+                    pXShot->data1 = pWeap->data1;
+                    if (pWeap->data2 > pWeap->data1)
+                        pXShot->data1 += Random(pWeap->data2 - pWeap->data1);
+                }
+                else if (pShot->xrepeat > 60)  pXShot->data1 = 43;
+                else if (pShot->xrepeat > 40)  pXShot->data1 = 33;
+                else if (pShot->xrepeat > 30)  pXShot->data1 = 23;
+                else                           pXShot->data1 = 12;
+                break;
             case kThingBloodBits:
             case kThingBloodChunks:
-                switch (pWeap->id)
-                {
-                    case kModernThingThrowableRock:
-                        pShot->picnum   = gCdudeDebrisPics[Random(LENGTH(gCdudeDebrisPics))];
-                        pShot->xrepeat  = pShot->yrepeat = 24 + Random(42);
-                        pShot->cstat    |= CSTAT_SPRITE_BLOCK;
-                        pShot->pal      = 5;
-
-                        if (Chance(0x5000)) pShot->cstat |= CSTAT_SPRITE_XFLIP;
-                        if (Chance(0x5000)) pShot->cstat |= CSTAT_SPRITE_YFLIP;
-
-                        if (pShot->xrepeat > 60)       pXShot->data1 = 43;
-                        else if (pShot->xrepeat > 40)  pXShot->data1 = 33;
-                        else if (pShot->xrepeat > 30)  pXShot->data1 = 23;
-                        else                           pXShot->data1 = 12;
-                        break;
-                    case kThingArmedProxBomb:
-                    case kModernThingTNTProx:
-                        pXShot->state = 0;
-                        pXShot->Proximity = true;
-                        break;
-                    case kThingBloodBits:
-                    case kThingBloodChunks:
-                        DudeToGibCallback1(pShot->index, pShot->extra);
-                        break;
-                    default:
-                        if (pLeech)
-                        {
-                            pXShot->health = nHealth;
-                        }
-                        else
-                        {
-                            pXShot->health = ((pInfo->startHealth << 4) * ClipLow(gGameOptions.nDifficulty, 1)) >> 1;
-                        }
-
-                        pShot->cstat        &= ~CSTAT_SPRITE_BLOCK;
-                        pShot->pal          = 6;
-                        pShot->clipdist     = 0;
-                        pXShot->data3       = 512 / (gGameOptions.nDifficulty + 1);
-                        pXShot->target      = pTarget->index;
-                        pXShot->Proximity   = true;
-                        pXShot->stateTimer  = 1;
-
-                        evPost(pShot->index, 3, 80, kCallbackLeechStateTimer);
-                        pDude->pXLeech = &xsprite[pShot->extra];
-                        break;
-                }
-                impact = false;
+                DudeToGibCallback1(pShot->index, pShot->extra);
                 break;
             case kThingNapalmBall:
                 pShot->xrepeat = pShot->yrepeat = 24;
-                pXShot->data4 = 3 + Random2(2);
-                pXShot->Impact = true;
+                if (pWeap->data1 > 0)
+                {
+                    pXShot->data4 = pWeap->data1;
+                    if (pWeap->data2 > pWeap->data1)
+                        pXShot->data4 += Random(pWeap->data2 - pWeap->data1);
+                }
+                else pXShot->data4 = 3 + Random2(2);
+                break;
+            case kModernThingEnemyLifeLeech:
+            case kThingDroppedLifeLeech:
+                pXShot->health = ((pInfo->startHealth << 4) * ClipLow(gGameOptions.nDifficulty, 1)) >> 1;
+                pShot->cstat        &= ~CSTAT_SPRITE_BLOCK;
+                pShot->pal          = 6;
+                pShot->clipdist     = 0;
+                pXShot->data3       = 512 / (gGameOptions.nDifficulty + 1);
+                pXShot->target      = pXSpr->target;
+                pXShot->Proximity   = true;
+                pXShot->stateTimer  = 1;
+
+                evPost(pShot->index, 3, 80, kCallbackLeechStateTimer);
+                pDude->pXLeech = &xsprite[pShot->extra];
                 break;
         }
 
         if (pWeap->shot.clipdist)               pShot->clipdist = pWeap->shot.clipdist;
-        if (pWeap->HaveVelocity())              nnExtScaleVelocity(pShot, pWeap->shot.velocity << 3, dx, dy, dz, 0x01);
+        if (pWeap->HaveVelocity())              nnExtScaleVelocity(pShot, -(pWeap->shot.velocity<<3), dx, dy, dz, 0x01);
         
-        pWeap->shot.appearance.Set(pShot);
+        pWeap->shot.appearance.Set(pShot, pSpr);
 
         if (pWeap->shot.targetFollow)
         {
@@ -406,68 +419,23 @@ static int weaponShotThing(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D*
             gFlwSpritesList.Add(pShot->index);
         }
 
-        if (pWeap->shot.impact > 1)
-        {
-            if (impact)
-                pXShot->Impact = (pXShot->Impact && nDist <= 7680);
-        }
-        else
-        {
-            pXShot->Impact = pWeap->shot.impact;
-        }
+        pXShot->Impact = pWeap->shot.impact;
 
         if (!pXShot->Impact)
-            evPost(pShot->index, OBJ_SPRITE, 120 * Random(2) + 120, kCmdOn, pSpr->index);
+            evPost(pShot->index, OBJ_SPRITE, nTime, kCmdOn, pSpr->index);
 
         return pShot->index;
     }
 
-    return -1;
+    return ATTACK_FAIL;
 }
-
-static char posObstructed(int x, int y, int z, int nRadius)
-{
-    int i = numsectors;
-    while (--i >= 0 && !inside(x, y, i));
-    if (i < 0)
-        return true;
-
-    for (i = 0; i < kMaxSprites; i++)
-    {
-        spritetype* pSpr = &sprite[i];
-        if ((pSpr->flags & kHitagFree) || (pSpr->flags & kHitagRespawn)) continue;
-        if ((pSpr->cstat & CSTAT_SPRITE_ALIGNMENT_MASK) != CSTAT_SPRITE_ALIGNMENT_FACING)
-            continue;
-
-        if (!(pSpr->cstat & CSTAT_SPRITE_BLOCK))
-        {
-            if (!IsDudeSprite(pSpr) || !dudeIsAlive(pSpr))
-                continue;
-        }
-        else
-        {
-            int w = tilesiz[pSpr->picnum].x;
-            int h = tilesiz[pSpr->picnum].y;
-
-            if (w <= 0 || h <= 0)
-                continue;
-        }
-
-        if (CheckProximityPoint(pSpr->x, pSpr->y, pSpr->z, x, y, z, nRadius))
-            return true;
-    }
-
-    return false;
-}
-
-
 
 static int weaponShotSummon(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz)
 {
     spritetype* pShot, *pSpr = pDude->pSpr;
     XSPRITE *pXShot, *pXSpr = pDude->pXSpr;
 
-    int x = pSpr->x, y = pSpr->y, z = pSpr->z, a = 0;
+    int x = pSpr->x+dx, y = pSpr->y+dy, z = pSpr->z+dz, a = 0;
     
     int nDude = pWeap->id;
     if (pWeap->type == kCdudeWeaponSummonCdude)
@@ -491,9 +459,16 @@ static int weaponShotSummon(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D
                 if (pWeap->HaveVelocity())
                     nnExtScaleVelocity(pShot, pWeap->shot.velocity, dx, dy, dz);
 
-                pWeap->shot.appearance.Set(pShot);
+                if (pWeap->data1)
+                {
+                    int nHealth = ClipHigh(pWeap->data1, 65535);
+                    pXShot->health = ClipHigh(nHealth << 4, 65535);
+                    pXShot->data4 = pXShot->sysData2 = nHealth;
+                }
 
                 aiInitSprite(pShot);
+
+                pWeap->shot.appearance.Set(pShot, pSpr);
 
                 pXShot->targetX = pXSpr->targetX;
                 pXShot->targetY = pXSpr->targetY;
@@ -503,7 +478,7 @@ static int weaponShotSummon(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D
 
                 aiActivateDude(pShot, pXShot);
 
-                pDude->pSlaves->Add(pShot->index);
+                pDude->slaves.list->Add(pShot->index);
                 gKillMgr.AddCount(pShot);
                 return pShot->index;
             }
@@ -518,7 +493,7 @@ static int weaponShotSummon(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D
         break;
     }
 
-    return -1;
+    return ATTACK_FAIL;
 }
 
 static int weaponShotKamikaze(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int, int, int)
@@ -552,7 +527,7 @@ static int weaponShotKamikaze(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT
         if (pExtra->ground)
            pShot->z = getflorzofslope(pShot->sectnum, pShot->x, pShot->y);
 
-        pWeap->shot.appearance.Set(pShot);
+        pWeap->shot.appearance.Set(pShot, pSpr);
 
         clampSprite(pShot);
         nnExtOffsetSprite(pShot, pOffs->x, pOffs->y, pOffs->z); // offset after default sprite placement
@@ -614,7 +589,180 @@ static int weaponShotSpecialBeastStomp(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWe
     return kMaxSprites;
 }
 
+static int weaponShotSpecialRam(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz)
+{
+    UNREFERENCED_PARAMETER(pOffs);
+    
+    spritetype *pSpr = pDude->pSpr,   *pHSpr;
+    XSPRITE *pXSpr   = pDude->pXSpr,  *pXHSpr;
+    SPRITEHIT *pTouch = &gSpriteHit[pSpr->extra];
 
+    int cz, fz, cf, zt, zb, zv, x, y, z, s, d, k, m;
+    int tx = pXSpr->targetX - pSpr->x;
+    int ty = pXSpr->targetY - pSpr->y;
+    int nDist, nAng, nDAng, nTouch;
+
+    char targetOnly   = (pWeap->data1 & 0x001) == 0;
+    char touchOnce    = (pWeap->data1 & 0x002) != 0;
+    char absoluteVel  = (pWeap->data1 & 0x004) != 0;
+    char scaleDmg     = (pWeap->data1 & 0x008) == 0;
+    char checkCF      = (pWeap->data1 & 0x010) == 0;
+    char keepDrag     = (pWeap->data1 & 0x020) != 0;
+    char stopOnAng    = (pWeap->data1 & 0x040) != 0;
+    char scaleKick    = (pWeap->data1 & 0x080) != 0;
+    char stopOnDist   = (pWeap->data1 & 0x100) == 0;
+
+    nTouch = pXSpr->target;
+    nAng = getangle(tx, ty);
+
+    while ( 1 )
+    {
+        if ((pTouch->hit & 0xc000) == 0x8000)
+            break;
+
+        if ((pTouch->hit & 0xc000) == 0xc000)
+        {
+            pHSpr = &sprite[pTouch->hit & 0x3fff];
+            if (pHSpr->extra <= 0)
+                break;
+
+            if (targetOnly && pXSpr->target != pHSpr->index)
+                break;
+
+            pXHSpr = &xsprite[pHSpr->extra];
+            if ((pXHSpr->physAttr & kPhysDebrisTouch) == 0)
+            {
+                if (pHSpr->statnum != kStatDude && pHSpr->statnum != kStatThing)
+                    break;
+                
+                if ((pHSpr->flags & (kPhysMove | kPhysGravity)) == 0)
+                    break;
+            }
+
+            k = pWeap->data4 << 8;
+            if (scaleKick && k > 0)
+            {
+                if (IsDudeSprite(pHSpr))        m = getDudeInfo(pHSpr->type)->mass;
+                else if (IsCustomDude(pHSpr))   m = cdudeGet(pHSpr->index)->mass;
+                else                            m = 0;
+                
+                if (m)
+                    k = divscale4(k, m);
+            }
+
+            d = (scaleDmg) ? mulscale18(pWeap->data3, approxDist(xvel[pSpr->index], yvel[pSpr->index])) : pWeap->data3;
+            helperPounce(pSpr, pHSpr, pWeap->data2, d, k);
+            if (touchOnce)
+                break;
+
+            s = pHSpr->sectnum, x = pHSpr->x, y = pHSpr->y, z = pHSpr->z;
+            ClipMove(&x, &y, &z, &s, xvel[pHSpr->index] >> 12, yvel[pHSpr->index] >> 12, pHSpr->clipdist << 2, 0, 0, CLIPMASK0);
+            if (approxDist(x - pHSpr->x, y - pHSpr->y) <= 0)
+                break;
+            
+            pDude->goalZ = pXSpr->targetZ;
+            checkCF = (keepDrag == 0);
+            nTouch  = pHSpr->index;
+        }
+
+        nDist = pWeap->GetDistance();
+        nDAng = klabs(DANGLE(nAng, pXSpr->goalAng));
+        if (nDAng > kAng90 && (stopOnAng || (stopOnDist && approxDist(tx, ty) >= nDist)))   break;
+        else if (!CanMove(pSpr, nTouch, pSpr->ang, pSpr->clipdist << 2))                    break;
+        else if (checkCF && pDude->IsFlying())
+        {
+            cf = pDude->flight.cfDist, zv = zvel[pSpr->index];
+            getzsofslope(pSpr->sectnum, pSpr->x, pSpr->y, &cz, &fz); GetSpriteExtents(pSpr, &zt, &zb);
+            if ((zv > 0 && zb >= fz - cf) || (zv < 0 && zt <= cz + cf))
+                break;
+        }
+        
+        if (pWeap->HaveVelocity())
+        {
+            if (!pDude->IsFlying() && !pWeap->HaveSlope())
+                dz = 0;
+
+            if (!absoluteVel && !pDude->IsFlying())
+                nnExtScaleVelocityRel(pDude->pSpr, pWeap->shot.velocity, dx, dy, dz);
+            else
+                nnExtScaleVelocity(pDude->pSpr, pWeap->shot.velocity, dx, dy, dz);
+        }
+
+        // continue to move
+        return ATTACK_CONTINUE;
+    }
+
+    pXSpr->goalAng = (nAng + Random2(kAng45)) & kAngMask;
+    pDude->NewState(kCdudeStateSearch);
+    return ATTACK_FAIL;
+}
+
+static int weaponShotSpecialTeleport(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz)
+{
+    spritetype* pSpr = pDude->pSpr; XSPRITE* pXSpr = pDude->pXSpr;
+    int ox, rx, x, oy, ry, y, oz, z, s;
+    int c = 32;
+
+    x = ox = dx, y = oy = dy, z = oz = pXSpr->targetZ - dz;
+    s = pSpr->sectnum;
+
+    nnExtOffsetPos(pOffs, pSpr->ang, &x, &y, &z);
+    rx = ox - x, ry = oy - y;
+
+    while (--c >= 0)
+    {
+        if (!FindSector(x, y, z, &s))
+        {
+            if (c > 0)
+            {
+                x = ox + Random(rx);
+                y = oy + Random(ry);
+                z = oz;
+            }
+            else
+            {
+                x = pXSpr->targetX;
+                y = pXSpr->targetY;
+                z = pXSpr->targetZ;
+            }
+
+            continue;
+        }
+        
+        pSpr->x = x;
+        pSpr->y = y;
+        pSpr->z = z;
+
+        if (s != pSpr->sectnum)
+            ChangeSpriteSect(pSpr->index, s);
+
+        if (pWeap->turnToTarget)
+            pXSpr->goalAng = getTargetAng(pSpr, pXSpr), pSpr->ang = pXSpr->goalAng;
+
+        if (pWeap->HaveVelocity())
+            nnExtScaleVelocity(pDude->pSpr, pWeap->shot.velocity, dx, dy, dz);
+
+        clampSprite(pSpr);
+
+        if (!pDude->IsFlying() && pSpr->flags & kPhysGravity)
+            pSpr->flags |= kPhysFalling;
+        
+        break;
+    }
+
+    return kMaxSprites;
+}
+
+static int weaponShotSpecial(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D* pOffs, int dx, int dy, int dz)
+{
+    switch (pWeap->id)
+    {
+        case kCdudeWeaponIdSpecialBeastStomp:   return weaponShotSpecialBeastStomp(pDude, pWeap, pOffs, dx, dy, dz);
+        case kCdudeWeaponIdSpecialRam:          return weaponShotSpecialRam(pDude, pWeap, pOffs, dx, dy, dz);
+        case kCdudeWeaponIdSpecialTeleport:     return weaponShotSpecialTeleport(pDude, pWeap, pOffs, dx, dy, dz);
+        default:                                return ATTACK_FAIL;
+    }
+}
 
 static void weaponShot(int, int nXIndex)
 {
@@ -623,140 +771,213 @@ static void weaponShot(int, int nXIndex)
 
     XSPRITE* pXSpr = &xsprite[nXIndex];
     CUSTOMDUDE* pDude = cdudeGet(pXSpr->reference);
-    CUSTOMDUDE_WEAPON *pCurWeap = pDude->pWeapon, *pWeap;
-    spritetype* pSpr = pDude->pSpr, *pShot;
+    CUSTOMDUDE_WEAPON* pMainWeap = pDude->pWeapon, *pWeap;
+    spritetype* pSpr = pDude->pSpr, *pShot, *pTarg;
+    CUSTOMDUDE_WEAPON::PREDICTION* pPredict;
     POINT3D shotOffs, *pStyleOffs;
-
-    int nShots, nTime, nCode;
-    int dx1, dy1, dz1;
-    int dx2, dy2, dz2=0;
-    int dx3=0, dy3=0, dz3;
-    int i, j;
+    
+    int nAng, nDang, nShots, nTime, nCode, nDist;
+    int dx1, dy1, dz1, tx, ty, tx2, ty2;
+    int dx2, dy2, dz2=0, dx3=0, dy3=0, dz3;
+    int sx, sy, i, j, t;
 
     int txof; char hxof=0;
     int sang=0; int  hsht;
     int tang=0; char styled;
-    
 
-    nnExtCoSin(pSpr->ang, &dx1, &dy1);
+    if (!pMainWeap)
+        return;
 
-    if (pCurWeap)
+    for (i = 0; i < pDude->numWeapons && pDude->IsAttacking(); i++)
     {
-        for (i = 0; i < pDude->numWeapons; i++)
+        pWeap = &pDude->weapons[i];
+        if (!pWeap->available)
+            continue;
+        
+        if (pMainWeap != pWeap)
         {
-            pWeap = &pDude->weapons[i];
-            if (pWeap->available)
+            // check if this weapon could be used in conjunction with current
+            if (!pMainWeap->sharedId || pMainWeap->sharedId != pWeap->sharedId)
+                continue;
+        }
+
+        if (pDude->numAvailWeapons >= 2 // check if weapon must shot on this seq frame index
+            && pWeap->pFrames && !pWeap->pFrames->Exists(seqGetStatus(OBJ_SPRITE, pSpr->extra)))
+                    continue;
+
+        nShots = pWeap->GetNumshots(); pWeap->ammo.Dec(nShots);
+        styled = (nShots > 1 && pWeap->style.available);
+        shotOffs = pWeap->shot.offset;
+        pPredict = &pWeap->prediction;
+
+        nAng = pSpr->ang;
+        sx = pSpr->x, sy = pSpr->y;
+        tx = pXSpr->targetX, ty = pXSpr->targetY;
+        nDang = DANGLE(pSpr->ang, getangle(tx - sx, ty - sy));
+
+        if (klabs(nDang) < pWeap->angle)
+        {
+            nnExtOffsetPos(&shotOffs, nAng, &sx, &sy, NULL);
+            nAng = getangle(tx - sx, ty - sy);
+        }
+
+        if (pPredict->distance && spriRangeIsFine(pXSpr->target))
+        {
+            // this is similar to TARGETTRACK
+            pTarg = &sprite[pXSpr->target], tx = pTarg->x, ty = pTarg->y;
+            nDist = approxDist(tx-sx, ty-sy);
+
+            if ((xvel[pTarg->index] || yvel[pTarg->index]) && nDist < (int)pPredict->distance)
             {
-                if (pCurWeap != pWeap)
-                {
-                    // check if this weapon could be used in conjunction with current
-                    if (!pCurWeap->sharedId || pCurWeap->sharedId != pWeap->sharedId)
-                        continue;
-                }
-
-                nShots = pWeap->GetNumshots(); pWeap->ammo.Dec(nShots);
-                styled = (nShots > 1 && pWeap->style.available);
-                shotOffs = pWeap->shot.offset;
-
-                if (styled)
-                {
-                    pStyleOffs = &pWeap->style.offset; hsht = nShots >> 1;
-                    sang = pWeap->style.angle / nShots;
-                    hxof = 0;
-                    tang = 0;
-                }
-
-                dz1 = (pWeap->shot.slope == INT32_MAX) ?
-                        pDude->AdjustSlope(pXSpr->target, pWeap->shot.offset.z) : pWeap->shot.slope;
-
-                for (j = nShots; j > 0; j--)
-                {
-                    if (!styled || j == nShots)
-                    {
-                        dx3 = Random3(pWeap->dispersion[0]);
-                        dy3 = Random3(pWeap->dispersion[0]);
-                        dz3 = Random3(pWeap->dispersion[1]);
-
-                        dx2 = dx1 + dx3;
-                        dy2 = dy1 + dy3;
-                        dz2 = dz1 + dz3;
-                    }
-
-                    nCode = gWeaponShotFunc[pWeap->type](pDude, pWeap, &shotOffs, dx2, dy2, dz2);
-                    if (nCode >= 0)
-                    {
-                        pShot = (nCode < kMaxSprites) ? &sprite[nCode] : NULL;
-                        if (pShot)
-                        {
-                            // override removal timer
-                            if ((nTime = pWeap->shot.remTime) >= 0)
-                            {
-                                evKill(pShot->index, OBJ_SPRITE, kCallbackRemove);
-                                if (nTime)
-                                    evPost(pShot->index, OBJ_SPRITE, nTime, kCallbackRemove);
-                            }
-                        }
-
-                        // setup style
-                        if (styled)
-                        {
-                            if (pStyleOffs->x)
-                            {
-                                txof = pStyleOffs->x;
-                                if (j <= hsht)
-                                {
-                                    if (!hxof)
-                                    {
-                                        shotOffs.x = pWeap->shot.offset.x;
-                                        hxof = 1;
-                                    }
-
-                                    txof = -txof;
-                                }
-
-                                shotOffs.x += txof;
-                            }
-
-                            shotOffs.y += pStyleOffs->y;
-                            shotOffs.z += pStyleOffs->z;
-
-                            if (pWeap->style.angle)
-                            {
-                                // for sprites
-                                if (pShot)
-                                {
-                                    if (j <= hsht && sang > 0)
-                                    {
-                                        sang = -sang;
-                                        tang = 0;
-                                    }
-
-                                    tang += sang;
-                                    RotatePoint(&xvel[pShot->index], &yvel[pShot->index], tang, pSpr->x, pSpr->y);
-                                    pShot->ang = getVelocityAngle(pShot);
-                                }
-                                // for hitscan
-                                else
-                                {
-                                    if (j <= hsht && sang > 0)
-                                    {
-                                        nnExtCoSin(pSpr->ang, &dx2, &dy2);
-                                        dx2 += dx3; dy2 += dy3;
-                                        sang = -sang;
-                                    }
-                                    
-                                    RotatePoint(&dx2, &dy2, sang, pSpr->x, pSpr->y);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                pWeap->sound.Play(pSpr);
-                if (pWeap->cooldown.Check())
-                    pWeap->available = 0;
+                j = divscale12(nDist, pPredict->accuracy);
+                tx2 = tx + ((xvel[pTarg->index]*j) >> 12);
+                ty2 = ty + ((yvel[pTarg->index]*j) >> 12);
+                j = getangle(tx2 - sx, ty2 - sy);
+                        
+                nDang = DANGLE(j, nAng);
+                if (klabs(nDang) < pPredict->angle)
+                    nAng = j, tx = tx2, ty = ty2;
             }
         }
+
+        switch (pWeap->type)
+        {
+            case kCdudeWeaponSummon:
+            case kCdudeWeaponSummonCdude:
+                dx1 = 0;
+                dy1 = 0;
+                break;
+            case kCdudeWeaponThrow:
+                dx1 = sx - tx;
+                dy1 = sy - ty;
+                break;
+            default:
+                switch (pWeap->id)
+                {
+                    case kCdudeWeaponIdSpecialTeleport:
+                        dx1 = tx;
+                        dy1 = ty;
+                        break;
+                    default:
+                        dx1 = Cos(nAng) >> 16;
+                        dy1 = Sin(nAng) >> 16;
+                        break;
+                }
+                break;
+        }
+
+        if (styled)
+        {
+            t = nShots;
+            pStyleOffs = &pWeap->style.offset; hsht = t >> 1;
+            if (t % 2)
+                t++;
+            
+            sang = pWeap->style.angle / t;
+            hxof = 0;
+            tang = 0;
+        }
+
+        dz1 = (pWeap->shot.slope == INT32_MAX) ?
+                pDude->AdjustSlope(pXSpr->target, pWeap->shot.offset.z) : pWeap->shot.slope;
+
+        nCode = -1;
+        for (j = nShots; j > 0 && pDude->IsAttacking(); j--)
+        {      
+            if (!styled || j == nShots)
+            {
+                dx3 = Random3(pWeap->dispersion[0]);
+                dy3 = Random3(pWeap->dispersion[0]);
+                dz3 = Random3(pWeap->dispersion[1]);
+
+                dx2 = dx1 + dx3;
+                dy2 = dy1 + dy3;
+                dz2 = dz1 + dz3;
+            }
+
+            nCode = gWeaponShotFunc[pWeap->type](pDude, pWeap, &shotOffs, dx2, dy2, dz2);
+
+            if (nCode >= 0)
+            {
+                pShot = (nCode < kMaxSprites) ? &sprite[nCode] : NULL;
+                if (pShot)
+                {
+                    pShot->ang = nAng;
+                    if ((pShot->cstat & CSTAT_SPRITE_ALIGNMENT_MASK) == CSTAT_SPRITE_ALIGNMENT_WALL)
+                        pShot->ang = (pShot->ang + kAng90) & kAngMask;
+
+                    // override removal timer
+                    if ((nTime = pWeap->shot.remTime) >= 0)
+                    {
+                        evKill(pShot->index, OBJ_SPRITE, kCallbackRemove);
+                        if (nTime)
+                            evPost(pShot->index, OBJ_SPRITE, nTime, kCallbackRemove);
+                    }
+                }
+
+                // setup style
+                if (styled)
+                {
+                    if (pStyleOffs->x)
+                    {
+                        txof = pStyleOffs->x;
+                        if (j <= hsht)
+                        {
+                            if (!hxof)
+                            {
+                                shotOffs.x = pWeap->shot.offset.x;
+                                hxof = 1;
+                            }
+
+                            txof = -txof;
+                        }
+
+                        shotOffs.x += txof;
+                    }
+
+                    shotOffs.y += pStyleOffs->y;
+                    shotOffs.z += pStyleOffs->z;
+
+                    if (pWeap->style.angle)
+                    {
+                        // for sprites
+                        if (pShot)
+                        {
+                            if (j <= hsht && sang > 0)
+                            {
+                                sang = -sang;
+                                tang = sang;
+                            }
+                            
+                            RotatePoint(&xvel[pShot->index], &yvel[pShot->index], tang, pSpr->x, pSpr->y);
+                            
+                            pShot->ang = getVelocityAngle(pShot);
+                            if ((pShot->cstat & CSTAT_SPRITE_ALIGNMENT_MASK) == CSTAT_SPRITE_ALIGNMENT_WALL)
+                                pShot->ang = (pShot->ang + kAng90) & kAngMask;
+
+                            tang += sang;
+                            
+                        }
+                        // for hitscan
+                        else
+                        {
+                            if (j <= hsht && sang > 0)
+                            {
+                                nnExtCoSin(pSpr->ang, &dx2, &dy2);
+                                dx2 += dx3; dy2 += dy3;
+                                sang = -sang;
+                            }
+                                    
+                            RotatePoint(&dx2, &dy2, sang, pSpr->x, pSpr->y);
+                        }
+                    }
+                }
+            }
+        }
+
+        pWeap->shotSound.Play(pSpr);
+        if (nCode != ATTACK_CONTINUE && pWeap->cooldown.Check())
+            pWeap->available = 0;
     }
 }
 
@@ -784,14 +1005,15 @@ static int checkTarget(CUSTOMDUDE* pDude, spritetype* pTarget, TARGET_INFO* pOut
     int dx = x - pSpr->x;
     int dy = y - pSpr->y;
     int nDist = approxDist(dx, dy);
+    int nHeigh = pDude->eyeHeight;
     char s = (nDist < pDude->seeDist);
     char h = (nDist < pDude->hearDist);
     
     if (!s && !h)
         return -4;
 
-    DUDEINFO* pInfo = pDude->pInfo;
-    if (!cansee(x, y, z, nSector, pSpr->x, pSpr->y, pSpr->z - ((pInfo->eyeHeight * pSpr->yrepeat) << 2), pSpr->sectnum))
+    if (pDude->IsFlipped()) nHeigh = -nHeigh;
+    if (!cansee(x, y, z, nSector, pSpr->x, pSpr->y, pSpr->z - nHeigh, pSpr->sectnum))
         return -5;
 
     int nAng = getangle(dx, dy);
@@ -840,22 +1062,68 @@ static void thinkTarget(spritetype* pSpr, XSPRITE* pXSpr)
                 numTargets++;
         }
 
+#if 0
+        if (pDude->pExtra->stats.active && Chance(0x3000) && numTargets <= 0)
+        {
+            int nClosest = 0x7FFFFF;
+            int nChance = 0x800;
+
+            for (i = headspritestat[kStatDude]; i >= 0; i = nextspritestat[i])
+            {
+                pTarget = &sprite[i];
+                if (pTarget->type != kDudeInnocent)
+                    continue;
+
+                if (checkTarget(pDude, pTarget, &targets[1]) > 0)
+                {
+                    if (targets[1].nDist < nClosest)
+                    {
+                        Bmemcpy(pInfo, &targets[1], sizeof(targets[1]));
+                        nClosest = targets[1].nDist;
+                        numTargets = 1;
+
+                        if (Chance(nChance))
+                        {
+                            aiActivateDude(pInfo->pSpr, pInfo->pXSpr);
+                            break;
+                        }
+
+                        nChance += 0x1000;
+                    }
+                }
+            }
+        }
+#endif
+
         if (numTargets)
         {
             if (numTargets > 1) // closest first
                 qsort(targets, numTargets, sizeof(targets[0]), (int(*)(const void*, const void*))qsSortTargets);
 
             pTarget = pInfo->pSpr;
-            if (pDude->pExtra->stats.active)
-            {
-                if (pXSpr->target != pTarget->index || Chance(0x0400))
-                    pDude->PlaySound(kCdudeSndTargetSpot);
-            }
-            
+
+            if (pXSpr->target != pTarget->index || Chance(0x0400))
+                pDude->PlaySound(kCdudeSndTargetSpot);
+
             pXSpr->goalAng = pInfo->nAng & kAngMask;
             if (pInfo->nCode == 1) aiSetTarget(pXSpr, pTarget->index);
             else aiSetTarget(pXSpr, pTarget->x, pTarget->y, pTarget->z);
             aiActivateDude(pSpr, pXSpr);
+        }
+    }
+}
+
+static void enterFlee(spritetype* pSpr, XSPRITE*)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr);
+    if (pDude->pWeapon && pDude->pWeapon->type == kCdudeWeaponNone)
+    {
+        if (pDude->pWeapon->available)
+        {
+            pDude->pWeapon->ammo.Dec();
+
+            if (pDude->pWeapon->cooldown.Check())
+                pDude->pWeapon->available = 0;
         }
     }
 }
@@ -871,17 +1139,60 @@ static void thinkFlee(spritetype* pSpr, XSPRITE* pXSpr)
 
 }
 
+static void enterIdle(spritetype* pSpr, XSPRITE* pXSpr)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    pDude->pExtra->stats.thinkTime = 0;
+    pDude->pExtra->stats.active = 0;
+    resetTarget(pSpr, pXSpr);
+}
+
+static void enterSearch(spritetype* pSpr, XSPRITE* pXSpr)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    spritetype* pTarg;
+    int dz;
+
+    if (!pDude->CanFly())
+        return;
+
+    if (pDude->IsFlying())
+    {
+        pXSpr->goalAng = (pXSpr->goalAng + Random2(kAng45)) & kAngMask;
+        return;
+    }
+
+    dz = pXSpr->targetZ - pSpr->z;
+    if (dz >= 0 || klabs(dz) < perc2val(150, pDude->height))
+    {
+        pTarg = spriRangeIsFine(pXSpr->target) ? &sprite[pXSpr->target] : NULL;
+        if (!pTarg || cansee(pSpr->x, pSpr->y, pSpr->z, pSpr->sectnum, pTarg->x, pTarg->y, pTarg->z, pTarg->sectnum))
+            return;
+    }
+
+    zvel[pSpr->index] = pDude->GetStartFlyVel();
+    pDude->ChangePosture(kCdudePostureF);
+    pDude->timer.fLaunch.Set();
+}
+
 static void thinkSearch(spritetype* pSpr, XSPRITE* pXSpr)
 {
-    aiChooseDirection(pSpr, pXSpr, pXSpr->goalAng);
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    
+    if (pDude->timer.moveDir.Pass())
+        aiChooseDirection(pSpr, pXSpr, pXSpr->goalAng);
+
     thinkTarget(pSpr, pXSpr);
 }
 
 static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
 {
-    CUSTOMDUDE* pDude = cdudeGet(pSpr->index); HITINFO* pHit = &gHitInfo; DUDEINFO* pInfo = pDude->pInfo;
-    int nDist, nHeigh, dx, dy, nDAng, nSlope = 0;
-    char thinkTime = THINK_CLOCK(pSpr->index);
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index); HITINFO* pHit = &gHitInfo;
+    CUSTOMDUDE_WEAPON* pWeapon = pDude->pWeapon;
+    CUSTOMDUDE_FLIGHT::TYPE* pFly;
+
+    int nDist, nHeigh, dx, dy, dz, nDAng, nSlope = 0;
+    char thinkTime = pDude->IsThinkTime();
     char turn2target = 0, interrupt = 0;
     char inAttack = pDude->IsAttacking();
     char changePos = 0;
@@ -924,30 +1235,76 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
     // check target
     dx = pTarget->x - pSpr->x;
     dy = pTarget->y - pSpr->y;
-    nDist = approxDist(dx, dy);
+    dz = pTarget->z - pSpr->z;
 
-    nDAng = klabs(((getangle(dx, dy) + kAng180 - pSpr->ang) & kAngMask) - kAng180);
-    nHeigh = (pInfo->eyeHeight * pSpr->yrepeat) << 2;
+    if (dx == 0) dx = 1;
+    if (dy == 0) dy = 1;
 
-    if (thinkTime && !inAttack)
-        aiChooseDirection(pSpr, pXSpr, getangle(dx, dy));
+    nDist  = approxDist(dx, dy);
+    nDAng  = klabs(((getangle(dx, dy) + kAng180 - pSpr->ang) & kAngMask) - kAng180);
+    nHeigh = pDude->eyeHeight;
 
     // is the target visible?
-    if (nDist > pInfo->seeDist || !cansee(pTarget->x, pTarget->y, pTarget->z, pTarget->sectnum, pSpr->x, pSpr->y, pSpr->z - nHeigh, pSpr->sectnum))
+    if (pDude->IsFlipped()) nHeigh = -nHeigh;
+    if (nDist > pDude->seeDist || !cansee(pTarget->x, pTarget->y, pTarget->z, pTarget->sectnum, pSpr->x, pSpr->y, pSpr->z - nHeigh, pSpr->sectnum))
     {
         if (inAttack) pDude->NextState(kCdudeStateSearch);
         else pDude->NewState(kCdudeStateSearch);
         return;
     }
-    else if (nDAng > pInfo->periphery)
+    else if (nDAng > pDude->periphery)
     {
-        if (inAttack) pDude->NextState(kCdudeStateChase);
-        else pDude->NewState(kCdudeStateChase);
+        if (inAttack) pDude->NextState(kCdudeStateSearch);
+        else pDude->NewState(kCdudeStateSearch);
         return;
     }
 
-    ARG_PICK_WEAPON* pPickArg = new ARG_PICK_WEAPON(pSpr, pXSpr, pTarget, pXTarget, nDist, nDAng);
-    CUSTOMDUDE_WEAPON* pWeapon = pDude->pWeapon;
+    if (thinkTime)
+    {
+        aiSetTarget(pXSpr, pTarget->index);
+
+        if (!inAttack)
+        {
+           if (pDude->timer.moveDir.Pass() || !CanMove(pSpr, pXSpr->target, pSpr->ang, pSpr->clipdist<<2))
+           {
+               aiChooseDirection(pSpr, pXSpr, getangle(dx, dy));
+               pDude->timer.moveDir.Set();
+           }
+
+           if (pDude->IsFlying())
+           {
+               pFly = &pDude->flight.type[kCdudeFlyLand];
+               if (pDude->timer.fLand.Pass() && Chance(pFly->chance) && irngok(nDist, pFly->distance[0], pFly->distance[1]))
+               {
+                   if (!pFly->distance[2] || rngok(dz, -pFly->distance[2], pFly->distance[2]))
+                   {
+                       pDude->timer.fLand.Set();
+                       if (Chance(0x8000))
+                           return;
+                   }
+               }
+           }
+           else if (pDude->CanFly())
+           {
+               pFly = &pDude->flight.type[kCdudeFlyStart];
+               if (pDude->timer.fLaunch.Pass() && Chance(pFly->chance) && irngok(nDist, pFly->distance[0], pFly->distance[1]))
+               {
+                   if (!pFly->distance[2] || dz <= -(int)pFly->distance[2])
+                   {
+                       zvel[pSpr->index] = pDude->GetStartFlyVel();
+                       pDude->ChangePosture(kCdudePostureF);
+                       pDude->timer.fLaunch.Set();
+                       if (Chance(0x8000))
+                           return;
+                   }
+               }
+           }
+        }
+
+        if (Chance(0x2000))
+            pDude->PlaySound(kCdudeSndTargetChase);
+    }
+
     if (pWeapon)
     {
         nSlope      = pDude->AdjustSlope(pXSpr->target, pWeapon->shot.offset.z);
@@ -955,13 +1312,12 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
         interrupt   = pWeapon->interruptable;
     }
 
-    if (thinkTime && Chance(0x2000))
-        pDude->PlaySound(kCdudeSndTargetChase);
+    ARG_PICK_WEAPON weapData(pSpr, pXSpr, pTarget, pXTarget, nDist, nDAng, nSlope);
 
     // in attack
     if (inAttack)
     {
-        if (turn2target)
+        if (turn2target && thinkTime)
         {
             pXSpr->goalAng = getTargetAng(pSpr, pXSpr);
             moveTurn(pSpr, pXSpr);
@@ -971,7 +1327,7 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
         {
             if (!pXSpr->stateTimer)
             {
-                pWeapon = pDude->PickWeapon(pPickArg);
+                pWeapon = pDude->PickWeapon(&weapData);
                 if (pWeapon && pWeapon == pDude->pWeapon)
                 {
                     pDude->pWeapon = pWeapon;
@@ -982,7 +1338,7 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
             }
             else if (interrupt)
             {
-                pDude->PickWeapon(pPickArg);
+                pDude->PickWeapon(&weapData);
                 if (!pWeapon->available)
                     pDude->NewState(kCdudeStateChase);
             }
@@ -992,7 +1348,7 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
 
         if (!pDude->SeqPlaying()) // final frame
         {
-            pWeapon = pDude->PickWeapon(pPickArg);
+            pWeapon = pDude->PickWeapon(&weapData);
             if (!pWeapon)
             {
                 pDude->NewState(kCdudeStateChase);
@@ -1016,7 +1372,7 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
             }
             else
             {
-                pDude->PickWeapon(pPickArg);
+                pDude->PickWeapon(&weapData);
                 if (!pWeapon->available)
                 {
                     pDude->NewState(kCdudeStateChase);
@@ -1028,7 +1384,7 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
     else
     {
         // enter attack
-        pWeapon = pDude->PickWeapon(pPickArg);
+        pWeapon = pDude->PickWeapon(&weapData);
         if (pWeapon)
             pDude->pWeapon = pWeapon;
     }
@@ -1038,12 +1394,13 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
         switch (pWeapon->type)
         {
             case kCdudeWeaponNone:
-                if (pDude->CanMove()) pDude->NextState(kCdudeStateFlee);
-                else pDude->NextState(kCdudeStateSearch);
+                if (inAttack) pDude->NextState(pDude->CanMove() ? kCdudeStateFlee : kCdudeStateSearch);
+                else pDude->NewState(pDude->CanMove()  ? kCdudeStateFlee : kCdudeStateSearch);
                 return;
             case kCdudeWeaponHitscan:
             case kCdudeWeaponMissile:
             case kCdudeWeaponThrow:
+            case kCdudeWeaponSpecial:
                 if (pDude->CanMove())
                 {
                     HitScan(pSpr, pSpr->z, dx, dy, nSlope, pWeapon->clipMask, nDist);
@@ -1096,7 +1453,7 @@ static void thinkChase(spritetype* pSpr, XSPRITE* pXSpr)
                 fallthrough__;
             default:
                 pDude->NewState(pWeapon->stateID);
-                pDude->NextState(pWeapon->nextStateID);
+                if (pDude->IsAttacking()) pDude->NextState(pWeapon->nextStateID);
                 return;
         }
     }
@@ -1160,6 +1517,17 @@ static void moveDodge(spritetype* pSpr, XSPRITE* pXSpr)
 
         xvel[pSpr->index] = dmulscale30(t1, nCos, t2, nSin);
         yvel[pSpr->index] = dmulscale30(t1, nSin, -t2, nCos);
+        
+        if (pDude->IsFlying() && pDude->dodge.zDir)
+        {
+            int cz, fz, zt, zb, r = 4 + Random(2);
+            getzsofslope(pSpr->sectnum, pSpr->x, pSpr->y, &cz, &fz);
+            GetSpriteExtents(pSpr, &zt, &zb);
+
+            if (Chance(0x8000) && klabs(fz - zb) > pDude->flight.cfDist)    zvel[pSpr->index] = +(nVelDodge * r);
+            else if (klabs(zt - cz) > pDude->flight.cfDist)                 zvel[pSpr->index] = -(nVelDodge * r);
+            else                                                            zvel[pSpr->index] = 0;
+        }
     }
 }
 
@@ -1169,69 +1537,225 @@ static void moveKnockout(spritetype* pSpr, XSPRITE*)
     zvel[pSpr->index] = ClipRange(zv + mulscale16(zv, 0x3000), 0x1000, 0x40000);
 }
 
-static void moveForward(spritetype* pSpr, XSPRITE* pXSpr)
+static void moveNormalF(spritetype* pSpr, XSPRITE* pXSpr)
 {
     CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
-    int nVelTurn    = pDude->GetVelocity(kParVelocityTurn);
-    int nVelForward = pDude->GetVelocity(kParVelocityForward);
+    CUSTOMDUDE_FLIGHT* pFly = &pDude->flight;
+
+    int fwdVel = pDude->GetVelocity(kParVelocityForward);
+    int flyHg = pDude->GetMaxFlyHeigh(pFly->clipDist);
+    int cz, fz, z, cf = pFly->cfDist;
+    char stat;
+
+    stat = clipFlying(pSpr, pXSpr);
+    if (pDude->IsThinkTime())
+    {
+        if (!pDude->timer.fLand.Pass())
+        {
+            getzsofslope(pSpr->sectnum, pSpr->x, pSpr->y, &cz, &fz);
+            pDude->goalZ = ClipRange(pXSpr->targetZ, cz + cf, fz - cf);
+        }
+        else if (pDude->IsSearching() && pDude->timer.goalZ.Pass())
+        {
+            getzsofslope(pSpr->sectnum, pSpr->x, pSpr->y, &cz, &fz);
+            z = (pXSpr->targetZ > fz) ? fz : pXSpr->targetZ;
+            pDude->goalZ = z - (flyHg >> 1) - ((pFly->absGoalZ) ? Random(flyHg>>1) : perc2val(Random(50), flyHg));
+            pDude->goalZ = ClipRange(pDude->goalZ, cz + cf, fz - cf);
+            pDude->timer.goalZ.Set();
+        }
+        else if (pDude->timer.goalZ.Pass() && (stat == 0 || !pFly->mustReach || klabs(pXSpr->targetZ - pDude->goalZ) > flyHg))
+        {
+            getzsofslope(pSpr->sectnum, pSpr->x, pSpr->y, &cz, &fz);
+            pDude->goalZ = pXSpr->targetZ - ((pFly->absGoalZ) ? Random(flyHg) : perc2val(Random(100), flyHg));
+            pDude->goalZ = ClipRange(pDude->goalZ, cz + cf, fz - cf);
+            pDude->timer.goalZ.Set();
+        }
+    }
+
+    if (pFly->friction)
+        nnExtFixDudeDrag(pSpr, pFly->friction);
+
+    xvel[pSpr->index] += mulscale30(Cos(pSpr->ang), fwdVel);
+    yvel[pSpr->index] += mulscale30(Sin(pSpr->ang), fwdVel);
+}
+
+static void moveNormalW(spritetype* pSpr, XSPRITE* pXSpr)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    int fwdVel, dz = 0;
+
+    if (spriRangeIsFine(pXSpr->target))
+    {
+        spritetype* pTarg = &sprite[pXSpr->target];
+        if (spriteIsUnderwater(pTarg, true))
+            dz = (pTarg->z - pSpr->z) + (10 << Random(12));
+    }
+    else
+    {
+        dz = (pXSpr->targetZ - pSpr->z);
+    }
+
+    if (Chance(0x0500))
+        dz <<= 1;
+
+    fwdVel = pDude->GetVelocity(kParVelocityForward);
+    xvel[pSpr->index] += mulscale30(Cos(pSpr->ang), fwdVel);
+    yvel[pSpr->index] += mulscale30(Sin(pSpr->ang), fwdVel);
+    zvel[pSpr->index] += dz;
+}
+
+static void moveNormalL(spritetype* pSpr, XSPRITE* pXSpr)
+{
+    UNREFERENCED_PARAMETER(pXSpr);
+    
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    int fwdVel;
+
+    fwdVel = pDude->GetVelocity(kParVelocityForward);
+    xvel[pSpr->index] += mulscale30(Cos(pSpr->ang), fwdVel);
+    yvel[pSpr->index] += mulscale30(Sin(pSpr->ang), fwdVel);
+}
+
+static void moveNormal(spritetype* pSpr, XSPRITE* pXSpr)
+{
+    UNREFERENCED_PARAMETER(pXSpr);
+    
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
     int nAng = ((kAng180 + pXSpr->goalAng - pSpr->ang) & kAngMask) - kAng180;
-    pSpr->ang = ((pSpr->ang + ClipRange(nAng, -nVelTurn, nVelTurn)) & kAngMask);
-    int z = 0;
+
+    moveTurn(pSpr, pXSpr);
+
+    // don't move forward if trying to turn around
+    if (klabs(nAng) > pDude->turnAng)
+    {
+        if (pDude->stopMoveOnTurn)
+            moveForwardStop(pSpr, pXSpr);
+
+        return;
+    }
 
     if (pDude->CanMove())
     {
-        if (pDude->IsUnderwater())
-        {
-            if (spriRangeIsFine(pXSpr->target))
-            {
-                spritetype* pTarget = &sprite[pXSpr->target];
-                if (spriteIsUnderwater(pTarget, true))
-                    z = (pTarget->z - pSpr->z) + (10 << Random(12));
-            }
-            else
-            {
-                z = (pXSpr->targetZ - pSpr->z);
-            }
+        if (pDude->IsUnderwater())  moveNormalW(pSpr, pXSpr);
+        else if (pDude->IsFlying()) moveNormalF(pSpr, pXSpr);
+        else                        moveNormalL(pSpr, pXSpr);
+    }
+}
 
-            if (Chance(0x0500))
-                z <<= 1;
+static void enterDodgeFly(spritetype* pSpr, XSPRITE*)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    pDude->dodge.zDir = Chance(0x8000) ? 1 : 0;
+}
 
-            zvel[pSpr->index] += z;
-        }
+static void enterAttack(spritetype* pSpr, XSPRITE* pXSpr)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    CUSTOMDUDE_WEAPON* pWeap = pDude->pWeapon;
+    int tDist, bDist, flyHg, nVel, zt, zb, fz;
+
+    if (pXSpr->target >= 0)
+        aiSetTarget(pXSpr, pXSpr->target);
+
+    if (pWeap)
+    {
+        pWeap->attackSound.Play(pSpr);
         
-        // don't move forward if trying to turn around
-        if (klabs(nAng) <= kAng60)
+        if (pWeap->inertia == 0)
         {
-            xvel[pSpr->index] += mulscale30(Cos(pSpr->ang), nVelForward);
-            yvel[pSpr->index] += mulscale30(Sin(pSpr->ang), nVelForward);
+            moveForwardStop(pSpr, pXSpr);
+            if (pDude->IsFlying())
+                zvel[pSpr->index] = 0;
+        }
+        else if (pDude->IsFlying())
+        {
+            GetSpriteExtents(pSpr, &zt, &zb);
+            flyHg = pDude->GetMaxFlyHeigh(pDude->flight.clipDist);
+            nVel = perc2val(10, pDude->GetVelocity(kParVelocityZ));
+            fz = getflorzofslope(pSpr->sectnum, pSpr->x, pSpr->y);
+            tDist = klabs(zt - fz - flyHg);
+            bDist = klabs(fz - zb);
+
+            if (Chance(0x8000) && bDist > pDude->flight.cfDist)  zvel[pSpr->index] = nVel;
+            else if (tDist > pDude->flight.cfDist)               zvel[pSpr->index] = -nVel;
+            else                                                 zvel[pSpr->index] = 0;
         }
     }
+}
+
+static void enterKnock(spritetype* pSpr, XSPRITE*)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    pDude->StatusSet(kCdudeStatusKnocked);
+
+    if (pDude->IsFlying())
+    {
+        pSpr->flags |= (kPhysGravity | kPhysFalling);
+    }
+#if 0
+    else if (pDude->IsFlipped())
+    {
+        pSpr->flags |= (kPhysGravity | kPhysFalling);
+        pSpr->cstat &= ~CSTAT_SPRITE_YFLIP;
+    }
+#endif
+}
+
+static void exitKnock(spritetype* pSpr, XSPRITE*)
+{
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    pDude->StatusRem(kCdudeStatusKnocked);
+
+    if (pDude->IsFlying())
+    {
+        pSpr->flags &= ~(kPhysGravity | kPhysFalling);
+        if (zvel[pSpr->index] == 0)
+            zvel[pSpr->index] = -0x100;
+    }
+#if 0
+    else if (pDude->StatusTest(kCdudeStatusFlipped))
+    {
+        pSpr->flags &= ~(kPhysGravity | kPhysFalling);
+        pSpr->cstat |= CSTAT_SPRITE_YFLIP;
+    }
+#endif
 }
 
 static void enterSleep(spritetype* pSpr, XSPRITE* pXSpr)
 {
     CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
     pDude->StatusSet(kCdudeStatusSleep);
+    moveForwardStop(pSpr, pXSpr);
     resetTarget(pSpr, pXSpr);
-    moveStop(pSpr, pXSpr);
 
     // reduce distances while sleeping
-    pDude->seeDist      = kCdudeMinSeeDist;
-    pDude->hearDist     = kCdudeMinHearDist;
+    pDude->seeDist      = pDude->sleepDist;
+    pDude->hearDist     = pDude->sleepDist>>1;
     pDude->periphery    = kAng360;
 }
 
 static void enterWake(spritetype* pSpr, XSPRITE*)
 {
     CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    CUSTOMDUDE* pModel = pDude->pTemplate;
+
     if (pDude->StatusTest(kCdudeStatusSleep))
     {
         pDude->StatusRem(kCdudeStatusSleep);
-
+        
         // restore distances when awaked
-        pDude->seeDist      = pDude->pInfo->seeDist;
-        pDude->hearDist     = pDude->pInfo->hearDist;
-        pDude->periphery    = pDude->pInfo->periphery;
+        if (pModel)
+        {
+            pDude->seeDist      = pModel->seeDist;
+            pDude->hearDist     = pModel->hearDist;
+            pDude->periphery    = pModel->periphery;
+        }
+        else
+        {
+            pDude->seeDist      = pDude->pInfo->seeDist;
+            pDude->hearDist     = pDude->pInfo->hearDist;
+            pDude->periphery    = pDude->pInfo->periphery;
+        }
     }
 
     pDude->PlaySound(kCdudeSndWake);
@@ -1272,7 +1796,7 @@ static void enterMorph(spritetype* pSpr, XSPRITE* pXSpr)
         pXSpr->locked = 1; // lock it while morphing
 
         pSpr->flags &= ~kPhysMove;
-        moveStop(pSpr, pXSpr);
+        moveForwardStop(pSpr, pXSpr);
         if (pXSpr->aiState->seqId <= 0)
             seqKill(OBJ_SPRITE, pSpr->extra);
     }
@@ -1287,7 +1811,7 @@ static void thinkMorph(spritetype* pSpr, XSPRITE* pXSpr)
 
     if (pDude->SeqPlaying())
     {
-        moveStop(pSpr, pXSpr);
+        moveForwardStop(pSpr, pXSpr);
         return;
     }
     
@@ -1404,6 +1928,8 @@ static void thinkMorph(spritetype* pSpr, XSPRITE* pXSpr)
 // get closest visible underwater sector it can fall in
 static void enterBurnSearchWater(spritetype* pSpr, XSPRITE* pXSpr)
 {
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    
     int i = numsectors;
     int nClosest = 0x7FFFFF;
     int nDist, s, e;
@@ -1414,7 +1940,7 @@ static void enterBurnSearchWater(spritetype* pSpr, XSPRITE* pXSpr)
     int x2, y2;
 
     pXSpr->aiState->thinkFunc = NULL;
-    if (!Chance(0x8000))
+    if (!pDude->CanSwim() || pDude->IsFlying() || !Chance(0x8000))
     {
         pXSpr->aiState->thinkFunc = thinkSearch; // try follow to the target
         return;
@@ -1476,4 +2002,110 @@ void cdudeDoExplosion(CUSTOMDUDE* pDude)
         weaponShotKamikaze(pDude, pWeap, &pWeap->shot.offset, 0, 0, 0);
 }
 
+static char posObstructed(int x, int y, int z, int nRadius)
+{
+    int i = numsectors;
+    while (--i >= 0 && !inside(x, y, i));
+    if (i < 0)
+        return true;
+
+    for (i = 0; i < kMaxSprites; i++)
+    {
+        spritetype* pSpr = &sprite[i];
+        if ((pSpr->flags & kHitagFree) || (pSpr->flags & kHitagRespawn)) continue;
+        if ((pSpr->cstat & CSTAT_SPRITE_ALIGNMENT_MASK) != CSTAT_SPRITE_ALIGNMENT_FACING)
+            continue;
+
+        if (!(pSpr->cstat & CSTAT_SPRITE_BLOCK))
+        {
+            if (!IsDudeSprite(pSpr) || !dudeIsAlive(pSpr))
+                continue;
+        }
+        else
+        {
+            int w = tilesiz[pSpr->picnum].x;
+            int h = tilesiz[pSpr->picnum].y;
+
+            if (w <= 0 || h <= 0)
+                continue;
+        }
+
+        if (CheckProximityPoint(pSpr->x, pSpr->y, pSpr->z, x, y, z, nRadius))
+            return true;
+    }
+
+    return false;
+}
+
+static char clipFlying(spritetype* pSpr, XSPRITE* pXSpr)
+{
+    #define kCdudeMinHG 0x1000
+    
+    CUSTOMDUDE* pDude = cdudeGet(pSpr->index);
+    int flyVel = pDude->GetVelocity(kParVelocityZ), flyHg = pDude->GetMaxFlyHeigh(0);
+    int curz = pSpr->z, goalz = pDude->goalZ, &zv = zvel[pSpr->index];
+    int t, zt, zb, cz, fz, zs = klabs(zv) >> 8;
+    int cf = pDude->flight.cfDist;
+
+    getzsofslope(pSpr->sectnum, pSpr->x, pSpr->y, &cz, &fz);
+    GetSpriteExtents(pSpr, &zt, &zb);
+
+    if (pDude->flight.backOnTrackAccel)
+    {
+        if ((curz < pXSpr->targetZ && klabs(zb - pXSpr->targetZ) > flyHg) || (curz > pXSpr->targetZ && klabs(zt - pXSpr->targetZ) > flyHg))
+        {
+            flyVel += perc2val(pDude->flight.backOnTrackAccel, flyVel);
+        }
+    }
+
+    if (pDude->timer.fLand.Pass())
+    {
+        if ((zv > 0 && zb + zs >= fz - cf) || (zv < 0 && zt - zs <= cz + cf))
+        {
+            zv >>= 2;
+            return 0;
+        }
+    }
+
+    if (curz < goalz)
+    {
+        curz += zs; // Above max height
+        if (curz < goalz)
+        {
+            t = mulscale20(flyVel, ClipLow(klabs(goalz-curz), kCdudeMinHG));
+            zv = ClipHigh(zv + t, flyVel);
+            return 1;
+        }
+        
+        zv >>= 1;
+    }
+    else if (curz > goalz)
+    {
+        curz -= zs; // Below max height
+        if (curz > goalz)
+        {
+            t = mulscale20(flyVel, ClipLow(klabs(goalz-curz), kCdudeMinHG));
+            zv = ClipLow(zv - t, -flyVel);
+            return 2;
+        }
+        
+        zv >>= 1;
+    }
+
+    return 0;
+}
+
+void helperPounce(spritetype* pSpr, spritetype* pHSpr, int nDmgType, int nDmg, int kickPow)
+{
+    if (kickPow)
+    {
+        int nVel = ClipHigh(mulscale16(approxDist(xvel[pSpr->index], yvel[pSpr->index]), kickPow), kickPow);
+        xvel[pHSpr->index] += mulscale30(nVel, Cos(pSpr->ang + Random2(kAng15)));
+        yvel[pHSpr->index] += mulscale30(nVel, Sin(pSpr->ang + Random2(kAng15)));
+        pHSpr->flags |= kPhysFalling;
+    }
+
+    if (nDmg)
+        actDamageSprite(pSpr->index, pHSpr, (DAMAGE_TYPE)nDmgType, nDmg);
+}
 #endif
