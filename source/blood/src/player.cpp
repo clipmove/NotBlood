@@ -1337,6 +1337,16 @@ void playerStart(int nPlayer, int bNewLevel)
         playerResetAnnounceKillingSpree();
     if (bNewLevel)
         playerBackupItems(pPlayer);
+    if ((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[nPlayer].name, "spectator", 10)) // hardcode playername spectator as dedicated spectator
+    {
+        int bakPlayerScores[8];
+        int bakFragCount = pPlayer->fragCount;
+        memcpy(bakPlayerScores, gPlayerScores, sizeof(bakPlayerScores));
+        playerResetPowerUps(pPlayer);
+        playerDamageSprite(nPlayer, pPlayer, kDamageSpirit, 500<<4);
+        memcpy(gPlayerScores, bakPlayerScores, sizeof(bakPlayerScores));
+        pPlayer->fragCount = bakFragCount;
+    }
 }
 
 void playerReset(PLAYER *pPlayer)
