@@ -1307,7 +1307,8 @@ void playerStart(int nPlayer, int bNewLevel)
     pPlayer->hand = 0;
     pPlayer->nWaterPal = 0;
     playerResetPowerUps(pPlayer);
-    if ((gGameOptions.nGameType != kGameTypeSinglePlayer) && (gGameOptions.nSpawnProtection > 0))
+    const char bSpectatorPlayer = (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[nPlayer].name, "spectator", MAXPLAYERNAME);
+    if ((gGameOptions.nGameType != kGameTypeSinglePlayer) && (gGameOptions.nSpawnProtection > 0) && !bSpectatorPlayer)
         playerSpawnProtection(pPlayer, gGameOptions.nSpawnProtection*kTicRate);
 
     if (pPlayer == gMe)
@@ -1337,9 +1338,9 @@ void playerStart(int nPlayer, int bNewLevel)
         playerResetAnnounceKillingSpree();
     if (bNewLevel)
         playerBackupItems(pPlayer);
-    if ((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[nPlayer].name, "spectator", 10)) // hardcode playername spectator as dedicated spectator
+    if (bSpectatorPlayer)
     {
-        int bakPlayerScores[8];
+        int bakPlayerScores[kMaxPlayers];
         int bakFragCount = pPlayer->fragCount;
         memcpy(bakPlayerScores, gPlayerScores, sizeof(bakPlayerScores));
         playerResetPowerUps(pPlayer);
@@ -1979,6 +1980,7 @@ void ProcessInput(PLAYER *pPlayer)
         if (pInput->keyFlags.action || pInput->keyFlags.useItem)
         {
             char bAllowRespawn = 1;
+            const char bSpectator = (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME);
             if ((gGameOptions.nGameType == kGameTypeCoop) && (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags))
                 bAllowRespawn = gPlayerCoopLives[pPlayer->nPlayer] < gPlayerRoundLimit;
             if (bSeqStat)
@@ -1986,7 +1988,7 @@ void ProcessInput(PLAYER *pPlayer)
                 if (pPlayer->deathTime > 360)
                     seqSpawn(pPlayer->pDudeInfo->seqStartID+14, 3, pPlayer->pSprite->extra, nPlayerSurviveClient);
             }
-            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && bAllowRespawn)
+            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && bAllowRespawn && !bSpectator)
             {
                 if (pPlayer->pSprite)
                 {
@@ -2013,7 +2015,7 @@ void ProcessInput(PLAYER *pPlayer)
                 else
                     playerStart(pPlayer->nPlayer);
             }
-            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && !bAllowRespawn) // all players are dead, restart level
+            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && !bAllowRespawn && !bSpectator) // all players are dead, restart level
             {
                 char bAllPlayersDead = 1;
                 for (int i = connecthead; i >= 0 && bAllPlayersDead; i = connectpoint2[i])
@@ -3002,7 +3004,7 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             nDeathSeqID = 1;
             break;
         default:
-            if (nHealth < -20 && gGameOptions.nGameType >= kGameTypeBloodBath && Chance(0x4000))
+            if (nHealth < -20 && gGameOptions.nGameType >= kGameTypeBloodBath && Chance(0x4000) && !((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME)))
             {
                 DAMAGEINFO *pDamageInfo = &damageInfo[nDamageType];
                 sfxPlay3DSound(pSprite, pDamageInfo->at10[0], 0, 2);
