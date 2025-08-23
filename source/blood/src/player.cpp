@@ -1343,8 +1343,7 @@ void playerStart(int nPlayer, int bNewLevel)
         int bakPlayerScores[kMaxPlayers];
         int bakFragCount = pPlayer->fragCount;
         memcpy(bakPlayerScores, gPlayerScores, sizeof(bakPlayerScores));
-        playerResetPowerUps(pPlayer);
-        playerDamageSprite(nPlayer, pPlayer, kDamageSpirit, 500<<4);
+        actDamageSprite(pPlayer->pSprite->index, pSprite, kDamageFall, 500<<4);
         memcpy(gPlayerScores, bakPlayerScores, sizeof(bakPlayerScores));
         pPlayer->fragCount = bakFragCount;
     }
@@ -3004,7 +3003,7 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             nDeathSeqID = 1;
             break;
         default:
-            if (nHealth < -20 && gGameOptions.nGameType >= kGameTypeBloodBath && Chance(0x4000) && !((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME)))
+            if (nHealth < -20 && gGameOptions.nGameType >= kGameTypeBloodBath && Chance(0x4000))
             {
                 DAMAGEINFO *pDamageInfo = &damageInfo[nDamageType];
                 sfxPlay3DSound(pSprite, pDamageInfo->at10[0], 0, 2);
@@ -3016,7 +3015,8 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             }
             else
             {
-                sfxPlay3DSound(pSprite, 716, 0, 0);
+                if(!((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME)))
+                    sfxPlay3DSound(pSprite, 716, 0, 0);
                 nDeathSeqID = 1;
             }
             break;
