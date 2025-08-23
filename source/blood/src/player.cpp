@@ -3016,7 +3016,8 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             }
             else
             {
-                sfxPlay3DSound(pSprite, 716, 0, 0);
+                if(!((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME)))
+                    sfxPlay3DSound(pSprite, 716, 0, 0);
                 nDeathSeqID = 1;
             }
             break;
