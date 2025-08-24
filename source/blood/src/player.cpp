@@ -83,6 +83,8 @@ ClockTicks gMultiKillsTicks[kMaxPlayers];
 int gAnnounceKillingSpreePlayer;
 ClockTicks gAnnounceKillingSpreeTicks;
 
+int gPlayerSpeed = 0;
+
 // V = has effect in game, X = no effect in game
 POWERUPINFO gPowerUpInfo[kMaxPowerUps] = {
     { -1, 1, 1, 1 },            // 00: V keys
@@ -1343,8 +1345,7 @@ void playerStart(int nPlayer, int bNewLevel)
         int bakPlayerScores[kMaxPlayers];
         int bakFragCount = pPlayer->fragCount;
         memcpy(bakPlayerScores, gPlayerScores, sizeof(bakPlayerScores));
-        playerResetPowerUps(pPlayer);
-        playerDamageSprite(nPlayer, pPlayer, kDamageSpirit, 500<<4);
+        actDamageSprite(pPlayer->pSprite->index, pSprite, kDamageFall, 500<<4);
         memcpy(gPlayerScores, bakPlayerScores, sizeof(bakPlayerScores));
         pPlayer->fragCount = bakFragCount;
     }
@@ -2394,6 +2395,8 @@ void playerProcess(PLAYER *pPlayer)
     }
     ProcessInput(pPlayer);
     int nSpeed = approxDist(xvel[nSprite], yvel[nSprite]);
+    if (pPlayer == gMe)
+        gPlayerSpeed = nSpeed;
     pPlayer->zViewVel = interpolate(pPlayer->zViewVel, zvel[nSprite], 0x7000, 1);
     int dz = pPlayer->pSprite->z-pPosture->eyeAboveZ-pPlayer->zView;
     if (dz > 0)
@@ -3004,7 +3007,7 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             nDeathSeqID = 1;
             break;
         default:
-            if (nHealth < -20 && gGameOptions.nGameType >= kGameTypeBloodBath && Chance(0x4000) && !((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME)))
+            if (nHealth < -20 && gGameOptions.nGameType >= kGameTypeBloodBath && Chance(0x4000))
             {
                 DAMAGEINFO *pDamageInfo = &damageInfo[nDamageType];
                 sfxPlay3DSound(pSprite, pDamageInfo->at10[0], 0, 2);

@@ -299,6 +299,7 @@ extern int         gMultiKillsFrags[kMaxPlayers];
 extern ClockTicks  gMultiKillsTicks[kMaxPlayers];
 extern int         gAnnounceKillingSpreePlayer;
 extern ClockTicks  gAnnounceKillingSpreeTicks;
+extern int         gPlayerSpeed;
 extern AMMOINFO    gAmmoInfo[];
 extern POWERUPINFO gPowerUpInfo[kMaxPowerUps];
 
