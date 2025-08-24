@@ -83,6 +83,8 @@ ClockTicks gMultiKillsTicks[kMaxPlayers];
 int gAnnounceKillingSpreePlayer;
 ClockTicks gAnnounceKillingSpreeTicks;
 
+int gPlayerSpeed = 0;
+
 // V = has effect in game, X = no effect in game
 POWERUPINFO gPowerUpInfo[kMaxPowerUps] = {
     { -1, 1, 1, 1 },            // 00: V keys
@@ -2393,6 +2395,8 @@ void playerProcess(PLAYER *pPlayer)
     }
     ProcessInput(pPlayer);
     int nSpeed = approxDist(xvel[nSprite], yvel[nSprite]);
+    if (pPlayer == gMe)
+        gPlayerSpeed = nSpeed;
     pPlayer->zViewVel = interpolate(pPlayer->zViewVel, zvel[nSprite], 0x7000, 1);
     int dz = pPlayer->pSprite->z-pPosture->eyeAboveZ-pPlayer->zView;
     if (dz > 0)
