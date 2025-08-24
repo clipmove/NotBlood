@@ -227,6 +227,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable alt fire as reload for shotgun when fired one shell (always off in multiplayer)
 * cl_showloadsavebackdrop
    - Enable/disable the menu backdrop for loading/saving game
+* cl_showspeed
+   - Enable/disable showing player speed
 * cl_slopecrosshair
    - Enable/disable adjusting crosshair position for slope tilting
 * cl_slowroomflicker
