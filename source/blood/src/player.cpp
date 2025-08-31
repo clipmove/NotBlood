@@ -3020,7 +3020,10 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             else
             {
                 if(!((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME)))
-                    sfxPlay3DSound(pSprite, 716, 0, 0);
+                {
+                    const int nSound = (gGameOptions.nGameType != kGameTypeSinglePlayer) && !(gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly) && gProfile[pPlayer->nPlayer].nModel && !VanillaMode() ? 1018 + Random(2) : 716;
+                    sfxPlay3DSound(pSprite, nSound, 0, 0);
+                }
                 nDeathSeqID = 1;
             }
             break;
