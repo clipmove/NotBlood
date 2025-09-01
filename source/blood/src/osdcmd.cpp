@@ -1095,6 +1095,7 @@ int32_t registerosdcommands(void)
         { "hud_showweaponselecttimeend", "length of time for selected weapon weapon bar to disappear", (void*)&gShowWeaponSelectTimeEnd, CVAR_INT, 2, 25 },
         { "hud_showweaponselectposition", "position offset for selected weapon weapon bar", (void*)&gShowWeaponSelectPosition, CVAR_INT, 10, 50 },
         { "hud_showweaponselectscale", "sets scale for selected weapon weapon bar (default: 10, range: 5-20)", (void*)&gShowWeaponSelectScale, CVAR_INT, 5, 20 },
+        { "hud_teamscorestyle", "set the display style for the teams score display (0: original, 1: nblood)", (void *)&gTeamsScoreStyle, CVAR_BOOL, 0, 1 },
 //        { "hud_textscale", "sets multiplayer chat message size", (void *)&ud.textscale, CVAR_INT, 100, 400 },
 //        { "hud_weaponscale","changes the weapon scale", (void *)&ud.weaponscale, CVAR_INT, 10, 100 },
 //        { "hud_statusbarmode", "change overlay mode of status bar", (void *)&ud.statusbarmode, CVAR_BOOL|CVAR_FUNCPTR, 0, 1 },

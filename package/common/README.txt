@@ -287,6 +287,8 @@ If you have the GOG version of the game, do the following:
    - Position offset for selected weapon weapon bar
 * hud_showweaponselectscale
    - Sets scale for selected weapon weapon bar (default: 10, range: 5-20)
+* hud_teamscorestyle
+   - Set the display style for the teams score display (0: original, 1: nblood)
 * mus_redbookfallback
    - Enables/disables redbook audio if midi song is not specified for level (mus_redbook must already be enabled)
 * in_centerviewondrop
