@@ -1020,6 +1020,7 @@ void UpdatePlayerColorPreference(CGameMenuItemZCycle *pItem);
 void UpdatePlayerModel(CGameMenuItemZBool *pItem);
 void SetShowPlayerNames(CGameMenuItemZBool *);
 void SetShowWeapons(CGameMenuItemZCycle *);
+void UpdateTeamsScoreDisplay(CGameMenuItemZBool *pItem);
 void UpdatePlayerChatMessageSound(CGameMenuItemZBool *pItem);
 void UpdatePlayerColorMessages(CGameMenuItemZBool *pItem);
 void UpdatePlayerKillObituaryMessages(CGameMenuItemZBool *pItem);
@@ -1065,13 +1066,14 @@ const char *pzShowWeaponStrings[] = {
 };
 
 CGameMenuItemTitle itemOptionsPlayerTitle("PLAYER SETUP", 1, 160, 20, 2038);
-CGameMenuItemZEdit itemOptionsPlayerName("PLAYER NAME:", 3, 66, 40, 180, szPlayerName, MAXPLAYERNAME, 0, UpdatePlayerName, 0);
-CGameMenuItemZCycle itemOptionsPlayerSkill("HEALTH HANDICAP:", 3, 66, 50, 180, 0, UpdatePlayerSkill, pzPlayerSkillStrings, ARRAY_SIZE(pzPlayerSkillStrings), 0);
-CGameMenuItemZCycle itemOptionsPlayerTeamPreference("TEAM PREFERENCE:", 3, 66, 60, 180, 0, UpdatePlayerTeamPreference, pzPlayerTeamPreferenceStrings, ARRAY_SIZE(pzPlayerTeamPreferenceStrings), 0);
-CGameMenuItemZCycle itemOptionsPlayerColorPreference("COLOR PREFERENCE:", 3, 66, 70, 180, 0, UpdatePlayerColorPreference, pzPlayerColorPreferenceStrings, ARRAY_SIZE(pzPlayerColorPreferenceStrings), 0);
-CGameMenuItemZBool itemOptionsPlayerModel("PLAYER MODEL:", 3, 66, 80, 180, false, UpdatePlayerModel, "CULTIST", "CALEB");
-CGameMenuItemZBool itemOptionsPlayerBoolShowPlayerNames("SHOW PLAYER NAMES:", 3, 66, 100, 180, gShowPlayerNames, SetShowPlayerNames, NULL, NULL);
-CGameMenuItemZCycle itemOptionsPlayerShowWeapons("SHOW WEAPONS:", 3, 66, 110, 180, 0, SetShowWeapons, pzShowWeaponStrings, ARRAY_SSIZE(pzShowWeaponStrings), 0);
+CGameMenuItemZEdit itemOptionsPlayerName("PLAYER NAME:", 3, 66, 35, 180, szPlayerName, MAXPLAYERNAME, 0, UpdatePlayerName, 0);
+CGameMenuItemZCycle itemOptionsPlayerSkill("HEALTH HANDICAP:", 3, 66, 45, 180, 0, UpdatePlayerSkill, pzPlayerSkillStrings, ARRAY_SIZE(pzPlayerSkillStrings), 0);
+CGameMenuItemZCycle itemOptionsPlayerTeamPreference("TEAM PREFERENCE:", 3, 66, 55, 180, 0, UpdatePlayerTeamPreference, pzPlayerTeamPreferenceStrings, ARRAY_SIZE(pzPlayerTeamPreferenceStrings), 0);
+CGameMenuItemZCycle itemOptionsPlayerColorPreference("COLOR PREFERENCE:", 3, 66, 65, 180, 0, UpdatePlayerColorPreference, pzPlayerColorPreferenceStrings, ARRAY_SIZE(pzPlayerColorPreferenceStrings), 0);
+CGameMenuItemZBool itemOptionsPlayerModel("PLAYER MODEL:", 3, 66, 75, 180, false, UpdatePlayerModel, "CULTIST", "CALEB");
+CGameMenuItemZBool itemOptionsPlayerBoolShowPlayerNames("SHOW PLAYER NAMES:", 3, 66, 90, 180, gShowPlayerNames, SetShowPlayerNames, NULL, NULL);
+CGameMenuItemZCycle itemOptionsPlayerShowWeapons("SHOW WEAPONS:", 3, 66, 100, 180, 0, SetShowWeapons, pzShowWeaponStrings, ARRAY_SSIZE(pzShowWeaponStrings), 0);
+CGameMenuItemZBool itemOptionsPlayerTeamsScoreStyle("TEAMS SCORE STYLE:", 3, 66, 110, 180, true, UpdateTeamsScoreDisplay, "NBLOOD", "ORIGINAL");
 CGameMenuItemZBool itemOptionsPlayerChatSound("MESSAGE BEEP:", 3, 66, 120, 180, true, UpdatePlayerChatMessageSound, NULL, NULL);
 CGameMenuItemZBool itemOptionsPlayerColorMsg("COLORED MESSAGES:", 3, 66, 130, 180, true, UpdatePlayerColorMessages, NULL, NULL);
 CGameMenuItemZBool itemOptionsPlayerObituaryMsg("USE OBITUARY MESSAGES:", 3, 66, 140, 180, true, UpdatePlayerKillObituaryMessages, NULL, NULL);
@@ -2117,6 +2119,7 @@ void SetupOptionsMenu(void)
     menuOptionsPlayer.Add(&itemOptionsPlayerModel, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerBoolShowPlayerNames, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerShowWeapons, false);
+    menuOptionsPlayer.Add(&itemOptionsPlayerTeamsScoreStyle, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerChatSound, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerColorMsg, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerObituaryMsg, false);
@@ -2147,6 +2150,7 @@ void SetupOptionsMenu(void)
     itemOptionsPlayerModel.at20 = gPlayerModel;
     itemOptionsPlayerBoolShowPlayerNames.at20 = gShowPlayerNames;
     itemOptionsPlayerShowWeapons.m_nFocus = gShowWeapon;
+    itemOptionsPlayerTeamsScoreStyle.at20 = gTeamsScoreStyle;
     itemOptionsPlayerChatSound.at20 = gChatSnd;
     itemOptionsPlayerColorMsg.at20 = gColorMsg;
     itemOptionsPlayerObituaryMsg.at20 = gKillObituary;
@@ -3805,6 +3809,11 @@ void SetShowPlayerNames(CGameMenuItemZBool *pItem)
 void SetShowWeapons(CGameMenuItemZCycle *pItem)
 {
     gShowWeapon = pItem->m_nFocus;
+}
+
+void UpdateTeamsScoreDisplay(CGameMenuItemZBool *pItem)
+{
+    gTeamsScoreStyle = pItem->at20;
 }
 
 void UpdatePlayerChatMessageSound(CGameMenuItemZBool *pItem)

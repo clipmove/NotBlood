@@ -103,6 +103,7 @@ bool gAutosaveInCurLevel;
 int32_t gAutoDivingSuit;
 int32_t gAutoRun;
 int32_t gCalebTalk;
+int32_t gTeamsScoreStyle;
 int32_t gChatSnd;
 int32_t gColorMsg;
 int32_t gHealthBlink;
@@ -532,6 +533,7 @@ void CONFIG_SetDefaults(void)
     gAutoDivingSuit = 1;
     gAutoRun = 1;
     gCalebTalk = 0;
+    gTeamsScoreStyle = 1;
     gChatSnd = 1;
     gColorMsg = 1;
     gHealthBlink = 1;
