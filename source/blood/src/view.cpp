@@ -1997,9 +1997,9 @@ void viewDrawPlayerFlags(void)
     }
 }
 
-void viewDrawCtfHudVanilla(ClockTicks arg)
+void viewDrawCtfHudVanilla(ClockTicks arg, int yOffset)
 {
-    int x = 1, y = 1;
+    int x = 1, y = 1 + yOffset;
     if (gPlayerScoreTicks[0] == 0 || ((int)totalclock & 8))
     {
         viewDrawText(0, "BLUE", x, y, -128, kFlagBluePal, 0, 0, 256);
@@ -2536,11 +2536,21 @@ void UpdateStatusBar(ClockTicks arg)
     {
         if (VanillaMode())
         {
-            viewDrawCtfHudVanilla(arg);
+            viewDrawCtfHudVanilla(arg, 0);
         }
         else
         {
-            viewDrawCtfHud(arg);
+            if (!gTeamsScoreStyle)
+            {
+                int nY = 0;
+                for (int nRows = (gNetPlayers - 1) / 4; nRows >= 0; nRows--)
+                {
+                    nY += 9;
+                }
+                viewDrawCtfHudVanilla(arg, nY);
+            }
+            else
+                viewDrawCtfHud(arg);
             viewDrawPlayerFlags();
         }
     }
