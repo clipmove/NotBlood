@@ -2658,6 +2658,8 @@ void FragPlayer(PLAYER *pPlayer, int nSprite)
             else
                 evSend(0, 0, 15, kCmdToggle, pPlayer->nSprite);
         }
+        if ((pKiller == gMe) && (pPlayer != gMe) && gSoundDing)
+            sndStartSample("NOTKILL", gSoundDingKillVol, -1, gSoundDingKillPitch);
     }
     if (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags)
         playerProcessRoundCheck(pSprite && IsPlayerSprite(pSprite) ? &gPlayer[pSprite->type - kDudePlayer1] : pPlayer);

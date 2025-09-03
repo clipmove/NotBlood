@@ -348,6 +348,10 @@ If you have the GOG version of the game, do the following:
    - Set min damage frequency for hit sound (default: 22050, range: 11025-44100)
 * snd_dingmaxfreq
    - Set max damage frequency for hit sound (default: 22050, range: 11025-44100)
+* snd_dingkillvol
+   - Set volume for kill sound (default: 255, range: 1-255)
+* snd_dingkillfreq
+   - Set frequency for kill sound (default: 32000, range: 11025-44100)
 * snd_speed
    - Set the speed of sound m/s used for doppler calculation (default: 343, range: 10-1000)
 * snd_occlusion

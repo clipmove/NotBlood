@@ -62,6 +62,8 @@ int gSoundDing = 0;
 int gSoundDingVol = 75;
 int gSoundDingMinPitch = 22050;
 int gSoundDingMaxPitch = 22050;
+int gSoundDingKillVol = 255;
+int gSoundDingKillPitch = 32000;
 
 void sfxInit(void)
 {
@@ -703,7 +705,7 @@ void sfxPlayerDamageFeedback(void)
             continue;
 
         const int nRate = ClampScale(pSoundDmgSprite->nDamage, kMinDam, kMaxDam, gSoundDingMinPitch, gSoundDingMaxPitch);
-        sndStartSample("NOTHIT", min(gSoundDingVol, FXVolume), -1, nRate);
+        sndStartSample("NOTHIT", gSoundDingVol, -1, nRate);
         pSoundDmgSprite->nSprite = -1;
         pSoundDmgSprite->nDamage = 0;
         pSoundDmgSprite->nTick = gLevelTime;
