@@ -62,6 +62,8 @@ extern int gSoundDing;
 extern int gSoundDingVol;
 extern int gSoundDingMinPitch;
 extern int gSoundDingMaxPitch;
+extern int gSoundDingKillVol;
+extern int gSoundDingKillPitch;
 
 void sfxInit(void);
 void sfxTerm(void);
