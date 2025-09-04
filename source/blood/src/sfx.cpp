@@ -64,7 +64,7 @@ int gSoundDingMinPitch = 22050;
 int gSoundDingMaxPitch = 22050;
 int gSoundDingKill = 0;
 int gSoundDingKillVol = 255;
-int gSoundDingKillPitch = 32000;
+int gSoundDingKillPitch = 22050;
 
 void sfxInit(void)
 {
