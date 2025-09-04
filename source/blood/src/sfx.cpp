@@ -62,6 +62,7 @@ int gSoundDing = 0;
 int gSoundDingVol = 75;
 int gSoundDingMinPitch = 22050;
 int gSoundDingMaxPitch = 22050;
+int gSoundDingKill = 0;
 int gSoundDingKillVol = 255;
 int gSoundDingKillPitch = 32000;
 
