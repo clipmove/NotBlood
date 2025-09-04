@@ -2658,7 +2658,7 @@ void FragPlayer(PLAYER *pPlayer, int nSprite)
             else
                 evSend(0, 0, 15, kCmdToggle, pPlayer->nSprite);
         }
-        if ((pKiller == gMe) && (pPlayer != gMe) && gSoundDing)
+        if ((pKiller == gMe) && (pKiller != pPlayer) && gSoundDingKill) // if we killed someone
             sndStartSample("NOTKILL", gSoundDingKillVol, -1, gSoundDingKillPitch);
     }
     if (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags)
