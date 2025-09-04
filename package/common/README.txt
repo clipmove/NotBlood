@@ -349,7 +349,7 @@ If you have the GOG version of the game, do the following:
 * snd_dingmaxfreq
    - Set max damage frequency for hit sound (default: 22050, range: 11025-44100)
 * snd_dingkill
-   - Enable/disable kill noise when killing another player. The sound can be changed by replacing the 'notblood.pk3/NOTKILL.RAW' file
+   - Enable/disable kill noise when killing an enemy. The sound can be changed by replacing the 'notblood.pk3/NOTKILL.RAW' file
 * snd_dingkillvol
    - Set volume for kill sound (default: 255, range: 1-255)
 * snd_dingkillfreq
