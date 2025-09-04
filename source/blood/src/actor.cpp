@@ -4703,7 +4703,7 @@ void MoveDude(spritetype *pSprite)
     int nAiStateType = (pXSprite->aiState) ? pXSprite->aiState->stateType : -1;
 
     dassert(nSector >= 0 && nSector < kMaxSectors);
-    if (pPlayer && gFlyMode)
+    if (pPlayer && pPlayergFlyMode && pXSprite->health > 0)
     {
         static int nSpeed = 0;
         const char nShift = gSonicMode && !VanillaMode() ? 2 : 3;
