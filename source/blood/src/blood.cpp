@@ -1015,7 +1015,7 @@ void LocalKeys(void)
     if (BUTTON(gamefunc_See_Coop_View))
     {
         CONTROL_ClearButton(gamefunc_See_Coop_View);
-        if ((gGameOptions.nGameType == kGameTypeCoop) || (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && gMe && !gMe->pXSprite->health) // only allow spectating if co-op or spectating is allowed and player is dead
+        if ((gGameOptions.nGameType == kGameTypeCoop) || ((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && gMe && !gMe->pXSprite->health)) // only allow spectating if co-op or spectating is allowed and player is dead
         {
             gViewIndex = connectpoint2[gViewIndex];
             if ((gGameOptions.nGameType != kGameTypeCoop) && (gViewIndex == myconnectindex)) // always skip over self if spectating match while dead
