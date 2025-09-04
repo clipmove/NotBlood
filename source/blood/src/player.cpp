@@ -2658,8 +2658,13 @@ void FragPlayer(PLAYER *pPlayer, int nSprite)
             else
                 evSend(0, 0, 15, kCmdToggle, pPlayer->nSprite);
         }
-        if ((pKiller == gMe) && (pKiller != pPlayer) && gSoundDingKill) // if we killed someone
-            sndStartSample("NOTKILL", gSoundDingKillVol, -1, gSoundDingKillPitch);
+        if ((pKiller == gMe) && (pKiller != pPlayer) && gSoundDingKill) // if we killed another player
+        {
+            static int nLastDinged = 0;
+            if (klabs(nLastDinged - gLevelTime) > (kTicsPerSec>>2)) // only allow one ding every half second
+                sndStartSample("NOTKILL", gSoundDingKillVol, -1, gSoundDingKillPitch);
+            nLastDinged = gLevelTime;
+        }
     }
     if (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags)
         playerProcessRoundCheck(pSprite && IsPlayerSprite(pSprite) ? &gPlayer[pSprite->type - kDudePlayer1] : pPlayer);

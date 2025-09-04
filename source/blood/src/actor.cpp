@@ -3083,8 +3083,14 @@ void actKillDude(int nKillerSprite, spritetype *pSprite, DAMAGE_TYPE damageType,
                     pKillerPlayer->fragCount++;
                     break;
             }
-
-     }
+    }
+    if (gSoundDingKill && gMe && (pKillerSprite == gMe->pSprite) && (pSprite->statnum == kStatDude)) // if we killed an AI enemy
+    {
+        static int nLastDinged = 0;
+        if (klabs(nLastDinged - gLevelTime) > (kTicsPerSec>>2)) // only allow one ding every 1/4 second
+            sndStartSample("NOTKILL", gSoundDingKillVol, -1, gSoundDingKillPitch);
+        nLastDinged = gLevelTime;
+    }
 
     if (pXSprite->key > 0)
         actDropObject(pSprite, kItemKeyBase + pXSprite->key - 1);
