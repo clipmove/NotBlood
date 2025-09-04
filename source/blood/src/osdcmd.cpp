@@ -1169,7 +1169,7 @@ int32_t registerosdcommands(void)
         { "snd_dingmaxfreq", "set max damage frequency for hit sound (default: 22050, range: 11025-44100)", (void *)&gSoundDingMaxPitch, CVAR_INT, 11025, 44100 },
         { "snd_dingkill", "enable/disable kill noise when killing an enemy. the sound can be changed by replacing the 'notblood.pk3/NOTKILL.RAW' file", (void*)&gSoundDingKill, CVAR_BOOL, 0, 1 },
         { "snd_dingkillvol", "set volume for kill sound (default: 255, range: 1-255)", (void*)&gSoundDingKillVol, CVAR_INT, 1, 255 },
-        { "snd_dingkillfreq", "set frequency for kill sound (default: 32000, range: 11025-44100)", (void*)&gSoundDingKillPitch, CVAR_INT, 11025, 44100 },
+        { "snd_dingkillfreq", "set frequency for kill sound (default: 22050, range: 11025-44100)", (void*)&gSoundDingKillPitch, CVAR_INT, 11025, 44100 },
         { "snd_doppler", "enables/disables audio doppler effect (stereo only)", (void *)&DopplerToggle, CVAR_BOOL, 0, 1 },
         { "snd_enabled", "enables/disables sound effects", (void *)&SoundToggle, CVAR_BOOL, 0, 1 },
         { "snd_earangle", "set the listening ear offset (15-90 degrees)", (void *)&gSoundEarAng, CVAR_INT, 15, 90 },
