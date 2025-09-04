@@ -62,6 +62,7 @@ extern int gSoundDing;
 extern int gSoundDingVol;
 extern int gSoundDingMinPitch;
 extern int gSoundDingMaxPitch;
+extern int gSoundDingKill;
 extern int gSoundDingKillVol;
 extern int gSoundDingKillPitch;
 
