@@ -1383,11 +1383,10 @@ void viewDrawStats(PLAYER *pPlayer, int x, int y)
     viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStr);
 }
 
-void viewDrawSpeed(PLAYER *pPlayer)
+void viewDrawSpeed(void)
 {
     if (!gShowSpeed)
         return;
-    const int nFont = 3;
     char buffer[128];
 
     sprintf(buffer, "%d", gPlayerSpeed / 10000);
@@ -2329,7 +2328,7 @@ void UpdateStatusBar(ClockTicks arg)
         else
             viewDrawPack(pPlayer, 166, 200-tilesiz[2201].y/2-30);
         viewDrawStats(pPlayer, 2-xscalestats, 140);
-        viewDrawSpeed(pPlayer);
+        viewDrawSpeed();
         viewDrawPowerUps(pPlayer);
     }
     else if (gViewSize <= 3)
@@ -2422,7 +2421,7 @@ void UpdateStatusBar(ClockTicks arg)
             }
         }
         viewDrawStats(pPlayer, 2-xscalestats, 140);
-        viewDrawSpeed(pPlayer);
+        viewDrawSpeed();
         viewDrawPowerUps(pPlayer);
     }
     else if (gViewSize > 3)
@@ -2511,7 +2510,7 @@ void UpdateStatusBar(ClockTicks arg)
             TileHGauge(2260, 124, 175, nThrowPower, 65536);
         }
         viewDrawStats(pPlayer, 2-xscalestats, 140-yscalestats);
-        viewDrawSpeed(pPlayer);
+        viewDrawSpeed();
         viewDrawPowerUps(pPlayer);
     }
 
