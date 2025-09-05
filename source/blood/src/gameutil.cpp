@@ -490,19 +490,30 @@ int HitScan(spritetype *pSprite, int z, int dx, int dy, int dz, unsigned int nMa
     return -1;
 }
 
-int VectorScan(spritetype *pSprite, int nOffset, int nZOffset, int dx, int dy, int dz, int nRange, int ac, vec3_t *pAdjustedRORPos)
+int VectorScan(spritetype *pSprite, int nOffset, int nZOffset, int dx, int dy, int dz, int nRange, int ac, vec3_t *pAdjustedRORPos, int nAdjustedRORSect)
 {
     int nNum = 256;
     dassert(pSprite != NULL);
     gHitInfo.hitsect = -1;
     gHitInfo.hitwall = -1;
     gHitInfo.hitsprite = -1;
-    int x1 = pSprite->x+mulscale30(nOffset, Cos(pSprite->ang+512));
-    int y1 = pSprite->y+mulscale30(nOffset, Sin(pSprite->ang+512));
-    int z1 = pSprite->z+nZOffset;
+    vec3_t vPov;
+    int nSector;
+    if (pAdjustedRORPos) // check using ror sector position offset instead of absolute sprite location
+    {
+        vPov = *pAdjustedRORPos;
+        nSector = nAdjustedRORSect;
+    }
+    else
+    {
+        vPov = pSprite->xyz;
+        nSector = pSprite->sectnum;
+    }
+    int x1 = vPov.x+mulscale30(nOffset, Cos(pSprite->ang+512));
+    int y1 = vPov.y+mulscale30(nOffset, Sin(pSprite->ang+512));
+    int z1 = vPov.z+nZOffset;
     int bakCstat = pSprite->cstat;
     pSprite->cstat &= ~256;
-    int nSector = pSprite->sectnum;
     if (nRange)
     {
         hitscangoal.x = x1+mulscale30(nRange<<4, Cos(pSprite->ang));
@@ -528,14 +539,10 @@ int VectorScan(spritetype *pSprite, int nOffset, int nZOffset, int dx, int dy, i
     {
         if (gHitInfo.hitsprite >= kMaxSprites || gHitInfo.hitwall >= kMaxWalls || gHitInfo.hitsect >= kMaxSectors)
             return -1;
-        if (pAdjustedRORPos) // check using ror sector position offset instead of absolute sprite location
+        if (nRange)
         {
-            if (nRange && approxDist(gHitInfo.hitx - pAdjustedRORPos->x, gHitInfo.hity - pAdjustedRORPos->y) > nRange)
-                return -1;
-        }
-        else // original method - use sprite location (doesn't take into account ror sector position offset)
-        {
-            if (nRange && approxDist(gHitInfo.hitx - pSprite->x, gHitInfo.hity - pSprite->y) > nRange)
+            const vec3_t *pSourcePos = pAdjustedRORPos != NULL ? pAdjustedRORPos : &vPov; // check using ror sector position offset instead of absolute sprite location
+            if (approxDist(gHitInfo.hitx - pSourcePos->x, gHitInfo.hity - pSourcePos->y) > nRange)
                 return -1;
         }
         if (gHitInfo.hitsprite >= 0)
@@ -735,31 +742,20 @@ int VectorScanROR(spritetype *pSprite, int nOffset, int nZOffset, int dx, int dy
 {
     // this function operates the same as VectorScan() but it'll check if initial starting position is clipping into a ror sector, as well as accumulating offsets for every ror sector traversal
     dassert(pAdjustedRORPos != NULL);
-    const vec3_t bakPos = pSprite->xyz;
-    const short bakSect = pSprite->sectnum;
-    bool restorePosSect = false;
     int x = pSprite->x+mulscale30(nOffset, Cos(pSprite->ang+512));
     int y = pSprite->y+mulscale30(nOffset, Sin(pSprite->ang+512));
     int z = pSprite->z+nZOffset;
     int nSector = pSprite->sectnum;
     const int cX = x-pSprite->x, cY = y-pSprite->y, cZ = z-pSprite->z;
-    if (CheckLink(&x, &y, &z, &nSector)) // if hitscan start position is overlapping into ror sector, move sprite to ror sector
+    if (CheckLink(&x, &y, &z, &nSector)) // if hitscan start position is overlapping into ror sector, offset origin into ror sector
     {
-        restorePosSect = true;
-        pSprite->x = x-cX;
-        pSprite->y = y-cY;
-        pSprite->z = z-cZ;
-        pSprite->sectnum = nSector;
+        pAdjustedRORPos->x = x-cX;
+        pAdjustedRORPos->y = y-cY;
+        pAdjustedRORPos->z = z-cZ;
     }
-    if (pAdjustedRORPos)
+    else
         *pAdjustedRORPos = pSprite->xyz;
-    int hit = VectorScan(pSprite, nOffset, nZOffset, dx, dy, dz, nRange, ac, pAdjustedRORPos);
-    if (restorePosSect) // restore sprite position and sectnum
-    {
-        pSprite->xyz = bakPos;
-        pSprite->sectnum = bakSect;
-    }
-    return hit;
+    return VectorScan(pSprite, nOffset, nZOffset, dx, dy, dz, nRange, ac, pAdjustedRORPos, nSector);
 }
 
 void GetZRange(spritetype *pSprite, int *ceilZ, int *ceilHit, int *floorZ, int *floorHit, int nDist, unsigned int nMask, unsigned int nClipParallax)
