@@ -395,7 +395,7 @@ void UpdateAimVector(PLAYER * pPlayer)
     }
     if (bAutoAim || bAutoAimWeapon || bOnlyTargetRatsEels)
     {
-        if (gGameOptions.bSectorBehavior && !VanillaMode()) // check for ror so autoaim can work peering above water
+        if (!VanillaMode()) // check for ror so autoaim can work peering above water
             CheckLink(&x, &y, &z, &nSector);
         int nClosest = 0x7fffffff;
         int nWeapAng = pWeaponTrack->at8;
@@ -1657,7 +1657,7 @@ void FireVoodoo(int nTrigger, PLAYER *pPlayer)
 void AltFireVoodoo(int nTrigger, PLAYER *pPlayer)
 {
     vec3_t pos = pPlayer->pSprite->xyz;
-    if (gGameOptions.bSectorBehavior && !VanillaMode()) // check for ror so voodoo doll attack can work peering above water
+    if (!VanillaMode()) // check for ror so voodoo doll attack can work peering above water
     {
         pos.z = pPlayer->zWeapon; // offset view height to weapon level
         int nSector = pPlayer->pSprite->sectnum;

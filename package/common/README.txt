@@ -29,7 +29,6 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * Difficulty based invulnerability timer for player damage
 * Raymarching collision testing for player projectiles
 * Fix blood/bullet casings not being dragged with sectors
-* Fixed underwater issue with hitscan weapons
 * Fixed missiles colliding with water sector edges
 * Smaller hitboxes for player projectiles
 * NotBlood balance mod for weapons (see below for details)
@@ -130,7 +129,6 @@ If you have the GOG version of the game, do the following:
    - Voodoo doll alt fire attacks all targets visible on screen (like V1.X behavior) and consumes all ammo
 * Sector behavior
    - Fixes room over room sector handling with hitscan calculations
-   - Allow hitscan weapons to be fired when floating above water
    - Prevent missiles from colliding with water surface sectors
    - Fix water/blood droplets transitioning through underwater (e.g: the cave secret in CP01.MAP)
    - Fixes blood splatter not using closest sector
