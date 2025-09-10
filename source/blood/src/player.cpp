@@ -2356,11 +2356,15 @@ void ProcessInput(PLAYER *pPlayer)
     {
         pInput->keyFlags.holsterWeapon = 0;
         if (gGameOptions.uNetGameFlags&kNetGameFlagNoHolstering)
-            viewSetMessage("Holstering weapon is disabled in this match");
+        {
+            if (VanillaMode() || (pPlayer == gMe))
+                viewSetMessage("Holstering weapon is disabled in this match");
+        }
         else if (pPlayer->curWeapon)
         {
             WeaponLower(pPlayer);
-            viewSetMessage("Holstering weapon");
+            if (VanillaMode() || (pPlayer == gMe))
+                viewSetMessage("Holstering weapon");
         }
     }
     CheckPickUp(pPlayer);
