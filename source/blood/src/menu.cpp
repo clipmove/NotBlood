@@ -522,6 +522,8 @@ CGameMenuItemZCycle itemNetStart4("DIFFICULTY:", 3, 66, 65, 180, 0, SetNetMonste
 CGameMenuItemChain itemNetStart5("MONSTER SETTING:", 3, 66, 75, 180, 0, &menuNetworkGameMonsters, -1, NULL, 0);
 CGameMenuItemZCycle itemNetStart6("WEAPONS:", 3, 66, 85, 180, 0, 0, zWeaponStrings, 4, 0);
 CGameMenuItemZCycle itemNetStart7("ITEMS:", 3, 66, 95, 180, 0, 0, zItemStrings, 3, 0);
+CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, true, NULL, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, true, NULL, NULL, NULL);
 CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 132, 320, 1, &menuBannedItems, -1, NULL, 0);
 CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 145, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
 CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 158, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
@@ -571,7 +573,7 @@ CGameMenuItemZBool itemNetMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X D
 CGameMenuItemZCycle itemNetMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 55, 180, 0, NULL, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
 CGameMenuItemZCycle itemNetMutatorProjectileBehavior("PROJECTILES BEHAVIOR:", 3, 66, 65, 180, 0, NULL, pzProjectileBehaviorStrings, ARRAY_SSIZE(pzProjectileBehaviorStrings), 0);
 CGameMenuItemZBool itemNetMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 75, 180, false, NULL, NULL, NULL);
-CGameMenuItemZCycle itemNetMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 82, 180, false, NULL, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
+CGameMenuItemZCycle itemNetMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 85, 180, false, NULL, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
 CGameMenuItemZBool itemNetMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 95, 180, false, NULL, NULL, NULL);
 CGameMenuItemZCycle itemNetMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 105, 180, 0, NULL, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
 CGameMenuItemZBool itemNetMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 115, 180, false, NULL, "NOTBLOOD", "ORIGINAL");
@@ -1521,6 +1523,8 @@ void SetupNetStartMenu(void)
     menuNetStart.Add(&itemNetStart5, false);
     menuNetStart.Add(&itemNetStart6, false);
     menuNetStart.Add(&itemNetStart7, false);
+    menuNetStart.Add(&itemNetStartBoolChaseView, false);
+    menuNetStart.Add(&itemNetStartBoolHolstering, false);
     menuNetStart.Add(&itemNetStart8, false);
     menuNetStart.Add(&itemNetStart9, false);
     menuNetStart.Add(&itemNetStart10, false);
@@ -4505,6 +4509,10 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagMirrorVert;
     if (itemNetGameBoolSpectatorMode.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
+    if (!itemNetStartBoolChaseView.at20)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagNoChaseView;
+    if (!itemNetStartBoolHolstering.at20)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagNoHolstering;
     gPacketStartGame.episodeId = itemNetStart2.m_nFocus;
     gPacketStartGame.levelId = itemNetStart3.m_nFocus;
     gPacketStartGame.difficulty = itemNetStart4.m_nFocus;
