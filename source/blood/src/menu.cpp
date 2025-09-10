@@ -522,8 +522,8 @@ CGameMenuItemZCycle itemNetStart4("DIFFICULTY:", 3, 66, 65, 180, 0, SetNetMonste
 CGameMenuItemChain itemNetStart5("MONSTER SETTING:", 3, 66, 75, 180, 0, &menuNetworkGameMonsters, -1, NULL, 0);
 CGameMenuItemZCycle itemNetStart6("WEAPONS:", 3, 66, 85, 180, 0, 0, zWeaponStrings, 4, 0);
 CGameMenuItemZCycle itemNetStart7("ITEMS:", 3, 66, 95, 180, 0, 0, zItemStrings, 3, 0);
-CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, true, NULL, NULL, NULL);
-CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, true, NULL, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, false, NULL, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, false, NULL, NULL, NULL);
 CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 132, 320, 1, &menuBannedItems, -1, NULL, 0);
 CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 145, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
 CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 158, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
