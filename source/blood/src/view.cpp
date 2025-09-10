@@ -3932,7 +3932,10 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                     pTSprite->shade = -128;
                     pTSprite->pal = 5;
                 } else if (powerupCheck(pPlayer, kPwUpDoppleganger) && (VanillaMode() || !bIsTeammate)) {
-                    pTSprite->pal = !VanillaMode() && !(gGameOptions.uNetGameFlags&kNetGameFlagNoTeamColors) && (gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly || !gProfile[gView->nPlayer].nModel) ? playerColorPalSprite(gView->teamIdPal) : playerColorPalDefault(gView->teamIdPal);
+                    if (!VanillaMode() && !(gGameOptions.uNetGameFlags&kNetGameFlagNoTeamColors) && (gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly || !gProfile[gView->nPlayer].nModel))
+                        pTSprite->pal = playerColorPalSprite(gView->teamIdPal);
+                    else
+                        pTSprite->pal = playerColorPalDefault(gView->teamIdPal);
                 }
                 
                 if (powerupCheck(pPlayer, kPwUpReflectShots)) {
