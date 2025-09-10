@@ -2358,7 +2358,7 @@ void ProcessInput(PLAYER *pPlayer)
         if (gGameOptions.uNetGameFlags&kNetGameFlagNoHolstering)
         {
             if (VanillaMode() || (pPlayer == gMe))
-                viewSetMessage("Holstering weapon is disabled in this match");
+                viewSetMessage("Holstering is off in this match");
         }
         else if (pPlayer->curWeapon)
         {
