@@ -3570,7 +3570,8 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameBoolTeamFlags.bNoDraw = !itemNetGameBoolTeamFlags.bEnable;
         itemNetGameCycleSpawnLocation.bEnable = (pItem->m_nFocus+1) != kGameTypeCoop;
         itemNetGameCycleSpawnLocation.bNoDraw = !itemNetGameCycleSpawnLocation.bEnable;
-        itemNetStartBoolSpectatorMode.bNoDraw = (pItem->m_nFocus+1) == kGameTypeCoop;
+        itemNetStartBoolSpectatorMode.bEnable = (pItem->m_nFocus+1) != kGameTypeCoop;
+        itemNetStartBoolSpectatorMode.bNoDraw = !itemNetStartBoolSpectatorMode.bEnable;
         return;
     }
 
