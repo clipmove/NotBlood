@@ -2355,7 +2355,9 @@ void ProcessInput(PLAYER *pPlayer)
     if (pInput->keyFlags.holsterWeapon)
     {
         pInput->keyFlags.holsterWeapon = 0;
-        if (pPlayer->curWeapon)
+        if (gGameOptions.uNetGameFlags&kNetGameFlagNoHolstering)
+            viewSetMessage("Holstering weapon is disabled in this match");
+        else if (pPlayer->curWeapon)
         {
             WeaponLower(pPlayer);
             viewSetMessage("Holstering weapon");

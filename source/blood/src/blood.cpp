@@ -1007,7 +1007,12 @@ void LocalKeys(void)
     if (BUTTON(gamefunc_See_Chase_View) && !alt && !shift)
     {
         CONTROL_ClearButton(gamefunc_See_Chase_View);
-        if (gViewPos > VIEWPOS_0)
+        if (gGameOptions.uNetGameFlags&kNetGameFlagNoChaseView)
+        {
+            gViewPos = VIEWPOS_0;
+            viewSetMessage("Chase view is off in this match");
+        }
+        else if (gViewPos > VIEWPOS_0)
             gViewPos = VIEWPOS_0;
         else
             gViewPos = VIEWPOS_1;
