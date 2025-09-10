@@ -524,9 +524,10 @@ CGameMenuItemZCycle itemNetStart6("WEAPONS:", 3, 66, 85, 180, 0, 0, zWeaponStrin
 CGameMenuItemZCycle itemNetStart7("ITEMS:", 3, 66, 95, 180, 0, 0, zItemStrings, 3, 0);
 CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, false, NULL, NULL, NULL);
-CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 132, 320, 1, &menuBannedItems, -1, NULL, 0);
-CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 145, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
-CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 158, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
+CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 125, 180, false, 0, NULL, NULL);
+CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 134, 320, 1, &menuBannedItems, -1, NULL, 0);
+CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 147, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
+CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 160, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
 CGameMenuItemChain itemNetStart11("START GAME", 1, 0, 175, 320, 1, 0, -1, StartNetGame, 0);
 
 CGameMenuItemTitle itemNetGameTitle("GAME SETTINGS", 1, 160, 20, 2038);
@@ -538,18 +539,18 @@ CGameMenuItemZBool itemNetGameBoolExit("LEVEL EXIT:", 3, 66, 57, 180, true, NULL
 CGameMenuItemZBool itemNetGameBoolTeleFrag("TELEFRAGS:", 3, 66, 65, 180, true, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolSkillOverride("PLAYER HANDICAP:", 3, 66, 73, 180, true, NULL, "ALLOWED", "OFF");
 CGameMenuItemZBool itemNetGameBoolModelOverride("PLAYER MODEL:", 3, 66, 81, 180, true, NULL, "CULTISTS/CALEB", "CALEB ONLY");
-CGameMenuItemZBool itemNetGameBoolFriendlyFire("FRIENDLY FIRE:", 3, 66, 89, 180, true, 0, NULL, NULL);
-CGameMenuItemZCycle itemNetGameCycleKey("KEYS SETTING:", 3, 66, 97, 180, 0, 0, zKeyStrings, ARRAY_SSIZE(zKeyStrings), 0);
-CGameMenuItemZCycle itemNetGameCycleItemWeapon("ITEM/WEAPON SETTING:", 3, 66, 105, 180, 0, SetNetGameMode, zKeepItemWeaponStrings, ARRAY_SSIZE(zKeepItemWeaponStrings), 0);
-CGameMenuItemZBool itemNetGameBoolAutoTeams("AUTO TEAMS:", 3, 66, 97, 180, true, 0, NULL, NULL);
-CGameMenuItemZBool itemNetGameBoolTeamColors("TEAM COLORS:", 3, 66, 105, 180, true, 0, NULL, NULL);
+CGameMenuItemZBool itemNetGameBoolPlayerColors("PLAYER COLORS:", 3, 66, 89, 180, true, 0, "EXTENDED", "VANILLA");
+CGameMenuItemZBool itemNetGameBoolFriendlyFire("FRIENDLY FIRE:", 3, 66, 97, 180, true, 0, NULL, NULL);
+CGameMenuItemZCycle itemNetGameCycleKey("KEYS SETTING:", 3, 66, 105, 180, 0, 0, zKeyStrings, ARRAY_SSIZE(zKeyStrings), 0);
+CGameMenuItemZCycle itemNetGameCycleItemWeapon("ITEM/WEAPON SETTING:", 3, 66, 113, 180, 0, SetNetGameMode, zKeepItemWeaponStrings, ARRAY_SSIZE(zKeepItemWeaponStrings), 0);
+CGameMenuItemZBool itemNetGameBoolTeamColors("TEAM COLORS:", 3, 66, 89, 180, true, 0, NULL, NULL);
+CGameMenuItemZBool itemNetGameBoolAutoTeams("AUTO TEAMS:", 3, 66, 105, 180, true, 0, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolTeamFlags("TEAM FLAGS:", 3, 66, 113, 180, true, 0, NULL, NULL);
 CGameMenuItemZCycle itemNetGameCycleSpawnLocation("SPAWN AREA:", 3, 66, 121, 180, 0, 0, zRespawnStrings, ARRAY_SSIZE(zRespawnStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverride("ENEMY WEAPONS:", 3, 66, 129, 180, 0, 0, zShowWeapon, ARRAY_SSIZE(zShowWeapon), 0);
 CGameMenuItemZCycle itemNetGameCycleSpawnProtection("SPAWN PROTECTION:", 3, 66, 137, 180, 0, 0, zSpawnProtectStrings, ARRAY_SSIZE(zSpawnProtectStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleSpawnWeapon("SPAWN WITH WEAPON:", 3, 66, 145, 180, 0, SetNetGameMode, zSpawnWeaponStrings, ARRAY_SSIZE(zSpawnWeaponStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleMirrorModeOverride("MIRROR MODE:", 3, 66, 153, 180, 0, NULL, pzMirrorModeStrings, ARRAY_SSIZE(pzMirrorModeStrings), 0);
-CGameMenuItemZBool itemNetGameBoolSpectatorMode("SPECTATING:", 3, 66, 161, 180, false, 0, NULL, NULL);
 
 CGameMenuItemTitle itemNetMonsterTitle("MONSTERS", 1, 160, 20, 2038);
 CGameMenuItemZCycle itemNetMonsterSettings("MONSTERS:", 3, 66, 40, 180, 0, SetNetMonsterMenu, zMonsterStrings, ARRAY_SSIZE(zMonsterStrings), 0);
@@ -1525,6 +1526,7 @@ void SetupNetStartMenu(void)
     menuNetStart.Add(&itemNetStart7, false);
     menuNetStart.Add(&itemNetStartBoolChaseView, false);
     menuNetStart.Add(&itemNetStartBoolHolstering, false);
+    menuNetStart.Add(&itemNetStartBoolSpectatorMode, false);
     menuNetStart.Add(&itemNetStart8, false);
     menuNetStart.Add(&itemNetStart9, false);
     menuNetStart.Add(&itemNetStart10, false);
@@ -1541,18 +1543,18 @@ void SetupNetStartMenu(void)
     menuNetworkGameMode.Add(&itemNetGameBoolTeleFrag, false);
     menuNetworkGameMode.Add(&itemNetGameBoolSkillOverride, false);
     menuNetworkGameMode.Add(&itemNetGameBoolModelOverride, false);
+    menuNetworkGameMode.Add(&itemNetGameBoolPlayerColors, false);
+    menuNetworkGameMode.Add(&itemNetGameBoolTeamColors, false);
     menuNetworkGameMode.Add(&itemNetGameBoolFriendlyFire, false);
     menuNetworkGameMode.Add(&itemNetGameCycleKey, false);
     menuNetworkGameMode.Add(&itemNetGameCycleItemWeapon, false);
     menuNetworkGameMode.Add(&itemNetGameBoolAutoTeams, false);
-    menuNetworkGameMode.Add(&itemNetGameBoolTeamColors, false);
     menuNetworkGameMode.Add(&itemNetGameBoolTeamFlags, false);
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnLocation, false);
     menuNetworkGameMode.Add(&itemNetGameCycleShowWeaponsOverride, false);
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnProtection, false);
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnWeapon, false);
     menuNetworkGameMode.Add(&itemNetGameCycleMirrorModeOverride, false);
-    menuNetworkGameMode.Add(&itemNetGameBoolSpectatorMode, false);
     menuNetworkGameMode.Add(&itemBloodQAV, false);
     itemNetGameBoolExit.tooltip_pzTextUpper = "Toggle level exit switch functionality";
     itemNetGameBoolTeleFrag.tooltip_pzTextUpper = "Toggle telefrags kills";
@@ -1561,6 +1563,7 @@ void SetupNetStartMenu(void)
     itemNetGameBoolModelOverride.tooltip_pzTextUpper = "Set global setting for player models";
     itemNetGameBoolModelOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
     itemNetGameBoolAutoTeams.tooltip_pzTextUpper = "Automatically sort players into teams";
+    itemNetGameBoolPlayerColors.tooltip_pzTextUpper = "Allow non-vanilla player colors";
     itemNetGameBoolTeamColors.tooltip_pzTextUpper = "Highlight players with team colors";
     itemNetGameBoolTeamFlags.tooltip_pzTextUpper = "Toggle team flags for teams mode";
     itemNetGameCycleSpawnLocation.tooltip_pzTextUpper = "Set spawn location behavior";
@@ -1568,7 +1571,6 @@ void SetupNetStartMenu(void)
     itemNetGameCycleShowWeaponsOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
     itemNetGameCycleMirrorModeOverride.tooltip_pzTextUpper = "Set global setting for mirror mode";
     itemNetGameCycleMirrorModeOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
-    itemNetGameBoolSpectatorMode.tooltip_pzTextUpper = "Allow players to spectate on death";
 
     menuNetworkGameMonsters.Add(&itemNetMonsterTitle, false);
     menuNetworkGameMonsters.Add(&itemNetMonsterSettings, true);
@@ -3552,6 +3554,8 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetStart1.m_pzText2 = zNetGameTypes[pItem->m_nFocus];
         itemNetGameBoolExit.bEnable = ((itemNetGameMode.m_nFocus+1) != kGameTypeCoop);
         itemNetGameBoolExit.bNoDraw = !itemNetGameBoolExit.bEnable;
+        itemNetGameBoolPlayerColors.bEnable = (pItem->m_nFocus+1) != kGameTypeTeams;
+        itemNetGameBoolPlayerColors.bNoDraw = !itemNetGameBoolPlayerColors.bEnable;
         itemNetGameBoolFriendlyFire.bEnable = (pItem->m_nFocus+1) != kGameTypeBloodBath;
         itemNetGameBoolFriendlyFire.bNoDraw = !itemNetGameBoolFriendlyFire.bEnable;
         itemNetGameCycleKey.bEnable = (pItem->m_nFocus+1) == kGameTypeCoop;
@@ -3566,7 +3570,7 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameBoolTeamFlags.bNoDraw = !itemNetGameBoolTeamFlags.bEnable;
         itemNetGameCycleSpawnLocation.bEnable = (pItem->m_nFocus+1) != kGameTypeCoop;
         itemNetGameCycleSpawnLocation.bNoDraw = !itemNetGameCycleSpawnLocation.bEnable;
-        itemNetGameBoolSpectatorMode.bNoDraw = (pItem->m_nFocus+1) == kGameTypeCoop;
+        itemNetStartBoolSpectatorMode.bNoDraw = (pItem->m_nFocus+1) == kGameTypeCoop;
         return;
     }
 
@@ -4495,6 +4499,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagSkillIssue;
     if (!itemNetGameBoolModelOverride.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagCalebOnly;
+    if (!itemNetGameBoolPlayerColors.at20)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagVanillaColors;
     if (!itemNetGameBoolTeamColors.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamColors;
     if (!itemNetGameBoolTeamFlags.at20)
@@ -4507,12 +4513,12 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagMirrorHoriz;
     if (itemNetGameCycleMirrorModeOverride.m_nFocus & 2)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagMirrorVert;
-    if (itemNetGameBoolSpectatorMode.at20)
-        gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
     if (!itemNetStartBoolChaseView.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoChaseView;
     if (!itemNetStartBoolHolstering.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoHolstering;
+    if (itemNetStartBoolSpectatorMode.at20)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
     gPacketStartGame.episodeId = itemNetStart2.m_nFocus;
     gPacketStartGame.levelId = itemNetStart3.m_nFocus;
     gPacketStartGame.difficulty = itemNetStart4.m_nFocus;
