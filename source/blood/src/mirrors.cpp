@@ -290,6 +290,11 @@ void sub_557C4(int x, int y, int interpolation)
                             pTSprite->xoffset = pSprite->xoffset;
                             pTSprite->yoffset = pSprite->yoffset;
                             pTSprite->cstat = pSprite->cstat;
+                            if (!VanillaMode())
+                            {
+                                pTSprite->statnum = pSprite->statnum;
+                                viewReplacePlayerAsCultist(pTSprite, pSprite->picnum, pSprite->index, pSprite->extra);
+                            }
                             pTSprite->statnum = kStatDecoration;
                             pTSprite->owner = pSprite->index;
                             pTSprite->extra = pSprite->extra;
