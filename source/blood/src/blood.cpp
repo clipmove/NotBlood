@@ -147,6 +147,9 @@ int gMultiWeapons = -1;
 int gMultiItems = -1;
 int gMultiSpawnLocation = -1;
 int gMultiSpawnProtection = -1;
+bool gMultiChaseView = false;
+bool gMultiHolstering = false;
+bool gMultiSpectating = false;
 
 enum gametokens
 {
@@ -1442,10 +1445,13 @@ SWITCH switches[] = {
     { "mp_items", 54, 1 },
     { "mp_spawn", 55, 1 },
     { "mp_protect", 56, 1 },
-    { "mp_map", 57, 1 },
-    { "mp_mapclient", 58, 1 },
-    { "netretry", 59, 0 },
-    { "clientport", 60, 1 },
+    { "mp_chaseview", 57, 0 },
+    { "mp_holstering", 58, 0 },
+    { "mp_spectating", 59, 0 },
+    { "mp_map", 60, 1 },
+    { "mp_mapclient", 61, 1 },
+    { "netretry", 62, 0 },
+    { "clientport", 63, 1 },
     { NULL, 0, 0 }
 };
 
@@ -1501,6 +1507,9 @@ void PrintHelp(void)
         "-mp_items [0-2]\tSet item settings for multiplayer (0: don't respawn, 1: respawn, 2: respawn with markers)\n"
         "-mp_spawn [0-2]\tSet the spawn location logic for multiplayer (0: random, 1: smart random, 2: distance)\n"
         "-mp_protect [0-3]\tSet the spawn protect length for multiplayer\n"
+        "-mp_chaseview\tEnable chase view mode for multiplayer\n"
+        "-mp_holstering\tEnable holstering for multiplayer\n"
+        "-mp_spectating\tEnable spectating for multiplayer\n"
         "-mp_map [map]\tSet user map path for multiplayer (e.g: filename.map)\n"
         "-mp_mapclient [map]\tOverride user map for multiplayer clients (e.g: filename.map)\n"
         "-netretry\t\tReattempts client connection automatically (hold down escape to end loop)\n"
@@ -1847,20 +1856,29 @@ void ParseOptions(void)
                 ThrowError("Missing argument");
             gMultiSpawnProtection = ClipRange(atoi(OptArgv[0]), 0, 3);
             break;
-        case 57: // mp_map
+        case 57: // mp_chaseview
+            gMultiChaseView = true;
+            break;
+        case 58: // mp_holstering
+            gMultiHolstering = true;
+            break;
+        case 59: // mp_spectating
+            gMultiSpectating = true;
+            break;
+        case 60: // mp_map
             if (OptArgc < 1)
                 ThrowError("Missing argument");
             Bstrncpyz(zUserMapName, OptArgv[0], sizeof(zUserMapName));
             break;
-        case 58: // mp_mapclient
+        case 61: // mp_mapclient
             if (OptArgc < 1)
                 ThrowError("Missing argument");
             Bstrncpyz(gNetMapOverride, OptArgv[0], sizeof(gNetMapOverride));
             break;
-        case 59: // netretry
+        case 62: // netretry
             gNetRetry = true;
             break;
-        case 60: // clientport
+        case 63: // clientport
             gNetPortLocal = strtoul(OptArgv[0], NULL, 0);
             break;
         }
