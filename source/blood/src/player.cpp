@@ -255,7 +255,7 @@ KILLMSG gSuicide[] = {
 
 KILLMSG gKillingSpreeFrag = {"\r%s\r put a stop to \r%s\r's killing spree", 4110};
 
-KILLMSG gKillingSpreeSuicide = {"\r%s\r was looking good until they killed themselves", 4207};
+KILLMSG gKillingSpreeSuicide = {"\r%s\r was looking good until they suicided", 4207};
 
 struct DAMAGEINFO {
     int at0;
