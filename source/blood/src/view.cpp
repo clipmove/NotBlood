@@ -3470,40 +3470,42 @@ inline char viewApplyPlayerAsCultist(int *nTile)
     return 1;
 }
 
-int viewReplacePlayerAsCultist(tspritetype *pTSprite, int nTile, int nSpriteOrig, int nXSpriteOrig)
+void viewReplacePlayerAsCultist(tspritetype *pTSprite, int nSpriteOrig, int nXSpriteOrig)
 {
-    if ((pTSprite->statnum == kStatDude) || (pTSprite->type == kThingVoodooHead))
+    int nTile = pTSprite->picnum;
+    if (nTile < 0 || nTile >= kMaxTiles)
+        return;
+    if (!(pTSprite->statnum == kStatDude) && !(pTSprite->type == kThingVoodooHead))
+        return;
+    char bReplacedPlayerTile = 0;
+    while ((gGameOptions.nGameType != kGameTypeSinglePlayer) && !(gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly)) // replace player caleb sprite with cultist sprite
     {
-        char bReplacedPlayerTile = 0;
-        while ((gGameOptions.nGameType != kGameTypeSinglePlayer) && !(gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly)) // replace player caleb sprite with cultist sprite
-        {
-            if (!(IsPlayerSprite(pTSprite) && gProfile[pTSprite->type-kDudePlayer1].nModel) && !(pTSprite->type == kThingVoodooHead && sprite[nSpriteOrig].inittype >= kDudePlayer1 && sprite[nSpriteOrig].inittype <= kDudePlayer8)) // if profile uses caleb, don't replace sprite
-                break;
-            bReplacedPlayerTile = viewApplyPlayerAsCultist(&nTile);
-            if (bReplacedPlayerTile) // set TSprite picnum and adjust tile to floor
-            {
-                if (gSpriteHit[nXSpriteOrig].florhit) // only do this if player is standing on ground
-                {
-                    int topnew, topold, bottomnew, bottomold;
-                    GetSpriteExtents(pTSprite, &topold, &bottomold);
-                    pTSprite->picnum = nTile;
-                    GetSpriteExtents(pTSprite, &topnew, &bottomnew);
-                    if (bottomnew != bottomold) // align bottom of new tile to old tile
-                        pTSprite->z -= bottomnew - bottomold;
-                }
-                else
-                    pTSprite->picnum = nTile;
-            }
+        const int nPlayer = IsPlayerSprite(pTSprite) ? (pTSprite->type-kDudePlayer1)&7 : kMaxPlayers;
+        if (!(nPlayer < kMaxPlayers && gProfile[nPlayer].nModel) && !(pTSprite->type == kThingVoodooHead && sprite[nSpriteOrig].inittype >= kDudePlayer1 && sprite[nSpriteOrig].inittype <= kDudePlayer8)) // if profile uses caleb, don't replace sprite
             break;
-        }
-        if ((EnemiesNotBlood() || bReplacedPlayerTile) && !gSpriteHit[nXSpriteOrig].florhit && (zvel[nSpriteOrig] > 250000) && ((nTile == 2825) || (nTile >= 2860 && nTile <= 2885))) // replace tile with unused jump tile for falling cultists
+        bReplacedPlayerTile = viewApplyPlayerAsCultist(&nTile);
+        if (bReplacedPlayerTile) // set TSprite picnum and adjust tile to floor
         {
-            const char bReplaceTile = bReplacedPlayerTile || (pTSprite->type == kDudeCultistTommy) || (pTSprite->type == kDudeCultistShotgun) || (pTSprite->type == kDudeCultistTommyProne) || (pTSprite->type == kDudeCultistShotgunProne) || (pTSprite->type == kDudeCultistTesla) || (pTSprite->type == kDudeCultistTNT) || (pTSprite->type == kDudeCultistBeast);
-            if (bReplaceTile)
-                nTile = pTSprite->picnum = (zvel[nSpriteOrig] <= 500000) ? 2890 : ((zvel[nSpriteOrig] <= 750000) ? 2895 : 2900);
+            if (gSpriteHit[nXSpriteOrig].florhit) // only do this if player is standing on ground
+            {
+                int topnew, topold, bottomnew, bottomold;
+                GetSpriteExtents(pTSprite, &topold, &bottomold);
+                pTSprite->picnum = nTile;
+                GetSpriteExtents(pTSprite, &topnew, &bottomnew);
+                if (bottomnew != bottomold) // align bottom of new tile to old tile
+                    pTSprite->z -= bottomnew - bottomold;
+                break;
+            }
+            pTSprite->picnum = nTile;
         }
+        break;
     }
-    return nTile;
+    if ((EnemiesNotBlood() || bReplacedPlayerTile) && !gSpriteHit[nXSpriteOrig].florhit && (zvel[nSpriteOrig] > 250000) && ((nTile == 2825) || (nTile >= 2860 && nTile <= 2885))) // replace tile with unused jump tile for falling cultists
+    {
+        const char bReplaceTile = bReplacedPlayerTile || (pTSprite->type == kDudeCultistTommy) || (pTSprite->type == kDudeCultistShotgun) || (pTSprite->type == kDudeCultistTommyProne) || (pTSprite->type == kDudeCultistShotgunProne) || (pTSprite->type == kDudeCultistTesla) || (pTSprite->type == kDudeCultistTNT) || (pTSprite->type == kDudeCultistBeast);
+        if (bReplaceTile)
+            pTSprite->picnum = (zvel[nSpriteOrig] <= 500000) ? 2890 : ((zvel[nSpriteOrig] <= 750000) ? 2895 : 2900);
+    }
 }
 
 LOCATION gPrevSpriteLoc[kMaxSprites];
@@ -3566,7 +3568,10 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
             if ((pTSprite->statnum == kStatItem) && (pTSprite->type == kItemTwoGuns) && (pTSprite->picnum == gPowerUpInfo[kPwUpTwoGuns].picnum) && gGameOptions.bQuadDamagePowerup)
                 pTSprite->picnum = nTile = 9300; // if quad damage is enabled, replace guns akimbo icon with quad damage icon from notblood.pk3/TILES099.ART
             else
-                nTile = viewReplacePlayerAsCultist(pTSprite, nTile, nSprite, nXSprite);
+            {
+                viewReplacePlayerAsCultist(pTSprite, nSprite, nXSprite);
+                nTile = pTSprite->picnum;
+            }
         }
         int nAnim = 0;
         switch (picanm[nTile].extra & 7) {
