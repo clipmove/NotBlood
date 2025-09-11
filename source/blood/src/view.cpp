@@ -3472,10 +3472,10 @@ inline char viewApplyPlayerAsCultist(int *nTile)
 
 void viewReplacePlayerAsCultist(tspritetype *pTSprite, int nSpriteOrig, int nXSpriteOrig)
 {
+    if (!(pTSprite->statnum == kStatDude || pTSprite->type == kThingVoodooHead))
+        return;
     int nTile = pTSprite->picnum;
     if (nTile < 0 || nTile >= kMaxTiles)
-        return;
-    if (!(pTSprite->statnum == kStatDude) && !(pTSprite->type == kThingVoodooHead))
         return;
     char bReplacedPlayerTile = 0;
     while ((gGameOptions.nGameType != kGameTypeSinglePlayer) && !(gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly)) // replace player caleb sprite with cultist sprite
