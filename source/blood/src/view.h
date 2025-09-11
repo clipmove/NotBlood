@@ -158,7 +158,7 @@ void UpdateFrame(void);
 void viewDimScreen(void);
 void viewDrawInterface(ClockTicks arg);
 tspritetype *viewAddEffect(int nTSprite, VIEW_EFFECT nViewEffect);
-int viewReplacePlayerAsCultist(tspritetype *pTSprite, int nTile, int nSpriteOrig, int nXSpriteOrig);
+void viewReplacePlayerAsCultist(tspritetype *pTSprite, int nSpriteOrig, int nXSpriteOrig);
 void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t smooth);
 void CalcOtherPosition(spritetype *pSprite, int *pX, int *pY, int *pZ, int *vsectnum, int nAng, fix16_t zm);
 void CalcPosition(spritetype *pSprite, int *pX, int *pY, int *pZ, int *vsectnum, int nAng, int zm);
