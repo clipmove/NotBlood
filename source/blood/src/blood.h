@@ -90,6 +90,9 @@ extern int gMultiWeapons;
 extern int gMultiItems;
 extern int gMultiSpawnLocation;
 extern int gMultiSpawnProtection;
+extern bool gMultiChaseView;
+extern bool gMultiHolstering;
+extern bool gMultiSpectating;
 
 void QuitGame(void);
 void PreloadCache(void);
