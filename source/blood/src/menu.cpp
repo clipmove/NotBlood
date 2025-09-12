@@ -1618,8 +1618,7 @@ void SetupNetStartMenu(void)
     itemNetMutatorBoolEnemyRandomTNT.tooltip_pzTextLower = "throwing random projectiles";
     itemNetMutatorWeaponsVer.tooltip_pzTextUpper = "Check readme.txt for full";
     itemNetMutatorWeaponsVer.tooltip_pzTextLower = "list of weapon changes";
-    itemNetMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector handling";
-    itemNetMutatorSectorBehavior.tooltip_pzTextLower = "for hitscans (e.g: firing above water)";
+    itemNetMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector logic";
     itemNetMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to";
     itemNetMutatorHitscanProjectiles.tooltip_pzTextLower = "spawn bullet projectiles";
     itemNetMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
