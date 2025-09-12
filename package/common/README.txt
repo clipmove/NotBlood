@@ -128,7 +128,6 @@ If you have the GOG version of the game, do the following:
    - While quad damage is active, the pitchfork's alt fire max charge will fire a missile
    - Voodoo doll alt fire attacks all targets visible on screen (like V1.X behavior) and consumes all ammo
 * Sector behavior
-   - Fixes room over room sector handling with hitscan calculations
    - Prevent missiles from colliding with water surface sectors
    - Fix water/blood droplets transitioning through underwater (e.g: the cave secret in CP01.MAP)
    - Fixes blood splatter not using closest sector
