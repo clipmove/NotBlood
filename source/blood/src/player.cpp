@@ -83,6 +83,8 @@ ClockTicks gMultiKillsTicks[kMaxPlayers];
 int gAnnounceKillingSpreePlayer;
 ClockTicks gAnnounceKillingSpreeTicks;
 
+static char gDominationCount[kMaxPlayers][kMaxPlayers];
+
 int gPlayerSpeed = 0;
 
 // V = has effect in game, X = no effect in game
@@ -1341,6 +1343,8 @@ void playerStart(int nPlayer, int bNewLevel)
         playerResetKillMsg();
     if (bNewLevel || (nPlayer == gAnnounceKillingSpreePlayer))
         playerResetAnnounceKillingSpree();
+    if (bNewLevel)
+        memset(gDominationCount, 0, sizeof(gDominationCount));
     if (bNewLevel)
         playerBackupItems(pPlayer);
     if (bSpectatorPlayer)
@@ -2640,6 +2644,29 @@ void playerFrag(PLAYER *pKiller, PLAYER *pVictim)
     }
     if ((buffer[0] != '\0') || VanillaMode())
         viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal1, nPal2);
+    if (!VanillaMode() && (gGameOptions.nGameType >= kGameTypeBloodBath) && (nKiller != nVictim))
+    {
+        if ((gGameOptions.nGameType != kGameTypeTeams) || (pKiller->teamId != pVictim->teamId)) // not a teammate
+        {
+            const int kDominationCount = 4;
+            if (gDominationCount[nKiller][nVictim] < kDominationCount) // we haven't dominated this player yet
+            {
+                gDominationCount[nKiller][nVictim]++;
+                if (gDominationCount[nVictim][nKiller] >= kDominationCount) // we've gotten revenge, announce it
+                {
+                    sprintf(buffer, "\r%s\r got REVENGE on \r%s\r!", gProfile[nKiller].name, gProfile[nVictim].name);
+                    viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal1, nPal2);
+                }
+            }
+            else if (gDominationCount[nKiller][nVictim] == kDominationCount) // only announce our domination once
+            {
+                gDominationCount[nKiller][nVictim]++;
+                sprintf(buffer, "\r%s\r is DOMINATING \r%s\r!", gProfile[nKiller].name, gProfile[nVictim].name);
+                viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal1, nPal2);
+            }
+            gDominationCount[nVictim][nKiller] = 0; // reset victim's count for killer
+        }
+    }
 }
 
 void FragPlayer(PLAYER *pPlayer, int nSprite)
