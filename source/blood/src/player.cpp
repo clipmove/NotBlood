@@ -2652,7 +2652,7 @@ void playerFrag(PLAYER *pKiller, PLAYER *pVictim)
             if (gDominationCount[nKiller][nVictim] < kDominationCount) // we haven't dominated this player yet
             {
                 gDominationCount[nKiller][nVictim]++;
-                if (gDominationCount[nVictim][nKiller] >= kDominationCount) // we've gotten revenge, announce it
+                if (gMultiKill && gDominationCount[nVictim][nKiller] >= kDominationCount) // we've gotten revenge, announce it
                 {
                     sprintf(buffer, "\r%s\r got REVENGE on \r%s\r!", gProfile[nKiller].name, gProfile[nVictim].name);
                     viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal1, nPal2);
@@ -2661,8 +2661,11 @@ void playerFrag(PLAYER *pKiller, PLAYER *pVictim)
             else if (gDominationCount[nKiller][nVictim] == kDominationCount) // only announce our domination once
             {
                 gDominationCount[nKiller][nVictim]++;
-                sprintf(buffer, "\r%s\r is DOMINATING \r%s\r!", gProfile[nKiller].name, gProfile[nVictim].name);
-                viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal1, nPal2);
+                if (gMultiKill)
+                {
+                    sprintf(buffer, "\r%s\r is DOMINATING \r%s\r!", gProfile[nKiller].name, gProfile[nVictim].name);
+                    viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal1, nPal2);
+                }
             }
             gDominationCount[nVictim][nKiller] = 0; // reset victim's count for killer
         }
