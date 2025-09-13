@@ -524,6 +524,7 @@ CGameMenuItemZCycle itemNetStart6("WEAPONS:", 3, 66, 85, 180, 0, 0, zWeaponStrin
 CGameMenuItemZCycle itemNetStart7("ITEMS:", 3, 66, 95, 180, 0, 0, zItemStrings, 3, 0);
 CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, false, NULL, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 125, 180, false, 0, NULL, NULL);
 CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 134, 320, 1, &menuBannedItems, -1, NULL, 0);
 CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 147, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
 CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 160, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
@@ -1525,6 +1526,7 @@ void SetupNetStartMenu(void)
     menuNetStart.Add(&itemNetStart7, false);
     menuNetStart.Add(&itemNetStartBoolChaseView, false);
     menuNetStart.Add(&itemNetStartBoolHolstering, false);
+    menuNetStart.Add(&itemNetStartBoolSpectatorMode, false);
     menuNetStart.Add(&itemNetStart8, false);
     menuNetStart.Add(&itemNetStart9, false);
     menuNetStart.Add(&itemNetStart10, false);
@@ -1631,6 +1633,12 @@ void SetupNetStartMenu(void)
     itemNetStart4.SetTextIndex(gMultiDiffInit != -1 ? gMultiDiffInit : 2);
     itemNetStart6.SetTextIndex(gMultiWeapons != -1 ? gMultiWeapons : 1);
     itemNetStart7.SetTextIndex(gMultiItems != -1 ? gMultiItems : 1);
+    if (gMultiChaseView)
+        itemNetStartBoolChaseView.at20 = 1;
+    if (gMultiHolstering)
+        itemNetStartBoolHolstering.at20 = 1;
+    if (gMultiSpectating)
+        itemNetStartBoolSpectatorMode.at20 = 1;
 
     itemNetGameMode.SetTextIndex(gMultiModeInit != -1 ? gMultiModeInit : 1);
     itemNetGameCycleLength.SetTextIndex(gMultiLength != -1 ? gMultiLength : 0);
@@ -3567,6 +3575,8 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameBoolTeamFlags.bNoDraw = !itemNetGameBoolTeamFlags.bEnable;
         itemNetGameCycleSpawnLocation.bEnable = (pItem->m_nFocus+1) != kGameTypeCoop;
         itemNetGameCycleSpawnLocation.bNoDraw = !itemNetGameCycleSpawnLocation.bEnable;
+        itemNetStartBoolSpectatorMode.bEnable = (pItem->m_nFocus+1) != kGameTypeCoop;
+        itemNetStartBoolSpectatorMode.bNoDraw = !itemNetStartBoolSpectatorMode.bEnable;
         return;
     }
 
@@ -4513,6 +4523,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoChaseView;
     if (!itemNetStartBoolHolstering.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoHolstering;
+    if (itemNetStartBoolSpectatorMode.at20)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
     gPacketStartGame.episodeId = itemNetStart2.m_nFocus;
     gPacketStartGame.levelId = itemNetStart3.m_nFocus;
     gPacketStartGame.difficulty = itemNetStart4.m_nFocus;
