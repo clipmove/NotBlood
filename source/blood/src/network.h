@@ -66,7 +66,6 @@ extern bool gRobust;
 extern bool bOutOfSync;
 extern bool ready2send;
 extern bool gNetNotifyProfileUpdate;
-extern bool gNetNotifySpectating;
 extern NETWORKMODE gNetMode;
 extern char gNetAddress[32];
 extern int gNetPort;
@@ -157,7 +156,6 @@ inline void GetPacketBuffer(char *&p, void *pBuffer, int size)
 void netResetState(void);
 void netResetToSinglePlayer(void);
 void netBroadcastMessage(int nPlayer, const char *pzMessage);
-void netBroadcastNotifySpectating(int nPlayer);
 void netWaitForEveryone(char a1);
 void netBroadcastFrag(const char *pzString);
 void netGetPackets(void);
