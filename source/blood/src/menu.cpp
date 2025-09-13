@@ -1633,6 +1633,12 @@ void SetupNetStartMenu(void)
     itemNetStart4.SetTextIndex(gMultiDiffInit != -1 ? gMultiDiffInit : 2);
     itemNetStart6.SetTextIndex(gMultiWeapons != -1 ? gMultiWeapons : 1);
     itemNetStart7.SetTextIndex(gMultiItems != -1 ? gMultiItems : 1);
+    if (gMultiChaseView)
+        itemNetStartBoolChaseView.at20 = 1;
+    if (gMultiHolstering)
+        itemNetStartBoolHolstering.at20 = 1;
+    if (gMultiSpectating)
+        itemNetStartBoolSpectatorMode.at20 = 1;
 
     itemNetGameMode.SetTextIndex(gMultiModeInit != -1 ? gMultiModeInit : 1);
     itemNetGameCycleLength.SetTextIndex(gMultiLength != -1 ? gMultiLength : 0);
