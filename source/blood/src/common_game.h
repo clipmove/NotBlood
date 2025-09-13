@@ -157,10 +157,9 @@ kNetGameFlagNoTeamFlags         =  1 << 18,
 kNetGameFlagMirrorHoriz         =  1 << 19,
 kNetGameFlagMirrorVert          =  1 << 20,
 kNetGameFlagCalebOnly           =  1 << 21, // no items, caleb only, final destination
-kNetGameFlagSpectatingAllow     =  1 << 22,
-kNetGameFlagNoChaseView         =  1 << 23, // client sided limit that can be easily bypass by a compile smh
-kNetGameFlagNoHolstering        =  1 << 24,
-kNetGameFlagVanillaColors       =  1 << 25,
+kNetGameFlagNoChaseView         =  1 << 22, // client sided limit that can be easily bypass by a compile smh
+kNetGameFlagNoHolstering        =  1 << 23,
+kNetGameFlagVanillaColors       =  1 << 24,
 
 };
 
