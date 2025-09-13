@@ -863,7 +863,7 @@ void CCheatMgr::Process(CCheatMgr::CHEATCODE nCheatCode, char* pzArgs)
         break;
     }
     case kCheatSterno:
-        gMe->blindEffect = 250;
+        gMe->blindEffect = 240;
         break;
     case kCheat14: // quakeEffect (causing a little flickerEffect), not used by any cheat code (dead code)
         gMe->flickerEffect = 360;
