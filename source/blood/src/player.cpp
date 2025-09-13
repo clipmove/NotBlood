@@ -1085,12 +1085,6 @@ void playerStart(int nPlayer, int bNewLevel)
         gProfile[nPlayer] = gProfileNet[nPlayer];
 
     playerResetTeamId(nPlayer, bNewLevel);
-    if ((pPlayer == gMe) && (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow)) // force player out of spectating mode after respawning
-    {
-        gViewIndex = myconnectindex;
-        gView = &gPlayer[myconnectindex];
-        gNetNotifySpectating = false;
-    }
 
     // normal start position
     if (gGameOptions.nGameType <= kGameTypeCoop)
@@ -1314,8 +1308,7 @@ void playerStart(int nPlayer, int bNewLevel)
     pPlayer->hand = 0;
     pPlayer->nWaterPal = 0;
     playerResetPowerUps(pPlayer);
-    const char bSpectatorPlayer = (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[nPlayer].name, "spectator", MAXPLAYERNAME);
-    if ((gGameOptions.nGameType != kGameTypeSinglePlayer) && (gGameOptions.nSpawnProtection > 0) && !bSpectatorPlayer)
+    if ((gGameOptions.nGameType != kGameTypeSinglePlayer) && (gGameOptions.nSpawnProtection > 0))
         playerSpawnProtection(pPlayer, gGameOptions.nSpawnProtection*kTicRate);
 
     if (pPlayer == gMe)
@@ -1347,15 +1340,6 @@ void playerStart(int nPlayer, int bNewLevel)
         memset(gDominationCount, 0, sizeof(gDominationCount));
     if (bNewLevel)
         playerBackupItems(pPlayer);
-    if (bSpectatorPlayer)
-    {
-        int bakPlayerScores[kMaxPlayers];
-        int bakFragCount = pPlayer->fragCount;
-        memcpy(bakPlayerScores, gPlayerScores, sizeof(bakPlayerScores));
-        actDamageSprite(pPlayer->pSprite->index, pSprite, kDamageFall, 500<<4);
-        memcpy(gPlayerScores, bakPlayerScores, sizeof(bakPlayerScores));
-        pPlayer->fragCount = bakFragCount;
-    }
 }
 
 void playerReset(PLAYER *pPlayer)
@@ -1988,7 +1972,6 @@ void ProcessInput(PLAYER *pPlayer)
         if (pInput->keyFlags.action || pInput->keyFlags.useItem)
         {
             char bAllowRespawn = 1;
-            const char bSpectator = (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME);
             if ((gGameOptions.nGameType == kGameTypeCoop) && (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags))
                 bAllowRespawn = gPlayerCoopLives[pPlayer->nPlayer] < gPlayerRoundLimit;
             if (bSeqStat)
@@ -1996,7 +1979,7 @@ void ProcessInput(PLAYER *pPlayer)
                 if (pPlayer->deathTime > 360)
                     seqSpawn(pPlayer->pDudeInfo->seqStartID+14, 3, pPlayer->pSprite->extra, nPlayerSurviveClient);
             }
-            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && bAllowRespawn && !bSpectator)
+            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && bAllowRespawn)
             {
                 if (pPlayer->pSprite)
                 {
@@ -2023,7 +2006,7 @@ void ProcessInput(PLAYER *pPlayer)
                 else
                     playerStart(pPlayer->nPlayer);
             }
-            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && !bAllowRespawn && !bSpectator) // all players are dead, restart level
+            else if (!gDemo.bPlaying && (seqGetStatus(3, pPlayer->pSprite->extra) < 0) && !bAllowRespawn) // all players are dead, restart level
             {
                 char bAllPlayersDead = 1;
                 for (int i = connecthead; i >= 0 && bAllPlayersDead; i = connectpoint2[i])
@@ -3065,11 +3048,8 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             }
             else
             {
-                if(!((gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME)))
-                {
-                    const int nSound = (gGameOptions.nGameType != kGameTypeSinglePlayer) && !(gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly) && gProfile[pPlayer->nPlayer].nModel && !VanillaMode() ? 1018 + Random(2) : 716;
-                    sfxPlay3DSound(pSprite, nSound, 0, 0);
-                }
+                const int nSound = (gGameOptions.nGameType != kGameTypeSinglePlayer) && !(gGameOptions.uNetGameFlags&kNetGameFlagCalebOnly) && gProfile[pPlayer->nPlayer].nModel && !VanillaMode() ? 1018 + Random(2) : 716;
+                sfxPlay3DSound(pSprite, nSound, 0, 0);
                 nDeathSeqID = 1;
             }
             break;
