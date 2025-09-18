@@ -2757,6 +2757,7 @@ void playerProcessRoundCheck(PLAYER *pPlayer)
                 break;
             case kTicsPerSec*10:
                 nMessage = 6;
+                sndStartSample("NOTBLOOD3", 64, -1, 8259); // countdown alarm
                 break;
             default:
                 return;
