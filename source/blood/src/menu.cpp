@@ -2101,6 +2101,10 @@ void SetupOptionsMenu(void)
     itemOptionsSoundSpeakerAngle.tooltip_pzTextLower = "Set left/right speaker offset angle (in degrees)";
     itemOptionsSoundCDToggle.tooltip_pzTextUpper = "";
     itemOptionsSoundCDToggle.tooltip_pzTextLower = "Use blood##.ogg/flac files in base folder as redbook audio";
+#ifdef _WIN32
+    itemOptionsSoundMusicDevice.tooltip_pzTextUpper = "";
+    itemOptionsSoundMusicDevice.tooltip_pzTextLower = "For MIDI, use console cmd mus_mme_device # to choose output";
+#endif
 
     menuOptionsSound.Add(&itemOptionsSoundApplyChanges, false);
     menuOptionsSound.Add(&itemBloodQAV, false);
