@@ -2284,6 +2284,7 @@ RESTART:
             }
             if (numplayers == 1)
                 gBufferJitter = 0;
+            ctrlGetInput();
             if (totalclock >= gNetFifoClock && ready2send)
             {
                 do
@@ -2291,7 +2292,6 @@ RESTART:
                     if (!frameJustDrawn)
                         break;
                     frameJustDrawn = false;
-                    ctrlGetInput();
                     gNetInput = gInput;
                     gInput = {};
                     do
