@@ -2291,6 +2291,7 @@ RESTART:
                     if (!frameJustDrawn)
                         break;
                     frameJustDrawn = false;
+                    ctrlGetInput();
                     gNetInput = gInput;
                     gInput = {};
                     do
