@@ -538,11 +538,7 @@ void netGetPackets(void)
                 ThrowError("\nThese versions of Blood cannot play together.\n");
             gStartNewGame = 1;
             SetGameVanillaMode(0); // turn off vanilla mode for multiplayer so menus don't get bugged
-            if (gPlayerRoundEnding)
-            {
-                evKill(kLevelExitNormal, 3, kCallbackEndRound);
-                gPlayerRoundEnding = 0;
-            }
+            gPlayerRoundEnding = 0;
             break;
         case 255:
             keystatus[1] = 1;
