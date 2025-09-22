@@ -623,8 +623,8 @@ void ctrlGetInput(void)
 
     if (CONTROL_JoystickEnabled) // controller input
     {
-        input.strafe -= int(scaleAdjustmentToInterval(info.dx)/2.0);
-        input.forward -= int(scaleAdjustmentToInterval(info.dz)/2.0);
+        input.strafe -= int(scaleAdjustmentToInterval(info.dx)/2.f);
+        input.forward -= int(scaleAdjustmentToInterval(info.dz)/2.f);
         if (!run) // when autorun is off/run is not held, reduce overall speed for controller
         {
             input.strafe = clamp(input.strafe, -256, 256);
