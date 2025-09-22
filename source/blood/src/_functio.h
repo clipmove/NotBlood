@@ -352,7 +352,7 @@ static const int32_t joystickanalogscaledefaults[MAXJOYAXES] =
 
 static const int32_t joystickanalogdeaddefaults[MAXJOYAXES] =
    {
-   fix16_from_float(0.15f),
+   fix16_from_float(0.2f),
    fix16_from_float(0.15f),
    fix16_from_float(0.15f),
    fix16_from_float(0.15f),
