@@ -827,15 +827,6 @@ void fxPodGreenBloodSpray(int nSprite) // 24
 }
 #endif
 
-void TriggerEndRound(int bSecretExit) // kCallbackMax-1
-{
-    UNREFERENCED_PARAMETER(bSecretExit);
-
-    gGameOptions.nLevel = 0;
-    gGameOptions.uGameFlags |= (kGameFlagContinuing|kGameFlagEnding);
-    gPlayerRoundEnding = 0;
-}
-
 void(*gCallback[kCallbackMax])(int) =
 {
     fxFlameLick,
@@ -865,5 +856,4 @@ void(*gCallback[kCallbackMax])(int) =
     callbackMakeMissileBlocking, // the code is in nnexts.cpp
     fxPodGreenBloodSpray,
     #endif
-    TriggerEndRound,
 };

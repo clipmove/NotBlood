@@ -4449,8 +4449,6 @@ void NetClearUserMap(CGameMenuItemZCycle *pItem)
 void StartNetGame(CGameMenuItemChain *pItem)
 {
     UNREFERENCED_PARAMETER(pItem);
-    if (gPlayerRoundEnding) // do not allow player to start a new match while round is ending
-        return;
     gPacketStartGame.gameType = itemNetGameMode.m_nFocus+1;
     if (gPacketStartGame.gameType == kGameTypeSinglePlayer)
         gPacketStartGame.gameType = kGameTypeBloodBath;
