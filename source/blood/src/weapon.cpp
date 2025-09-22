@@ -1667,7 +1667,7 @@ void AltFireVoodoo(int nTrigger, PLAYER *pPlayer)
 
         // by NoOne: trying to simulate v1.0x voodoo here.
         // dunno how exactly it works, but at least it not spend all the ammo on alt fire
-        if ((WeaponsV10x() || WeaponsNotBlood()) && !VanillaMode()) {
+        if ((WeaponsV10x() || (gGameOptions.nGameType == kGameTypeSinglePlayer && WeaponsNotBlood())) && !VanillaMode()) {
             int nCount = ClipHigh(pPlayer->ammoCount[9], pPlayer->aimTargetsCount);
             if (nCount > 0)
             {
