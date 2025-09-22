@@ -623,8 +623,8 @@ void ctrlGetInput(void)
 
     if (CONTROL_JoystickEnabled) // controller input
     {
-        input.strafe -= info.dx>>1;
-        input.forward -= info.dz>>1;
+        input.strafe -= int(scaleAdjustmentToInterval(info.dx)/2.0);
+        input.forward -= int(scaleAdjustmentToInterval(info.dz)/2.0);
         if (!run) // when autorun is off/run is not held, reduce overall speed for controller
         {
             input.strafe = clamp(input.strafe, -256, 256);
@@ -633,12 +633,11 @@ void ctrlGetInput(void)
         if (info.mousey == 0)
         {
             if (gMouseAim)
-                input.q16mlook = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_int(info.dpitch>>4), F16(128)));
+                input.q16mlook = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(info.dpitch)/16.0), F16(128)));
             else
-                input.forward -= info.dpitch>>1;
+                input.forward -= int(scaleAdjustmentToInterval(info.dpitch)/2.0);
         }
-        if (input.q16turn == 0)
-            input.q16turn = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_int(info.dyaw>>4), F16(32)));
+        input.q16turn = fix16_sadd(input.q16turn, fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(info.dyaw)/16.0), F16(32)));
         if (gTargetAimAssist && !info.mousex && !info.mousey && gMe && gMe->pSprite)
         {
             static int nLastLevelTick = 0;
