@@ -606,7 +606,7 @@ void ctrlGetInput(void)
         input.q16turn = fix16_sadd(input.q16turn, fix16_sdiv(fix16_from_int(info.mousex), F16(32)));
 
     if (gMouseAim)
-        input.q16mlook = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_int(info.mousey), F16(128)));
+        input.q16mlook = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_int(gMouseAimingFlipped ? info.mousey : -info.mousey), F16(128)));
     else
         input.forward -= info.mousey;
 
@@ -633,11 +633,11 @@ void ctrlGetInput(void)
         if (info.mousey == 0)
         {
             if (gMouseAim)
-                input.q16mlook = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(info.dpitch)/16.f), F16(128)));
+                input.q16mlook = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(gMouseAimingFlipped ? info.dpitch : -info.dpitch)/16.f), F16(128)));
             else
                 input.forward -= int(scaleAdjustmentToInterval(info.dpitch)/2.f);
         }
-        input.q16turn = fix16_sadd(input.q16turn, fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(info.dyaw)/16.f), F16(32)));
+        fix16_t q16turn = fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(info.dyaw)/16.f), F16(32));
         if (gTargetAimAssist && !info.mousex && !info.mousey && gMe && gMe->pSprite)
         {
             static int nLastLevelTick = 0;
@@ -649,16 +649,15 @@ void ctrlGetInput(void)
                 nLastLevelTick = gLevelTime;
             }
             if (bLookingAtTarget)
-                input.q16turn >>= 1, input.q16mlook >>= 1;
+                q16turn >>= 1;
         }
+        input.q16turn = fix16_sadd(input.q16turn, q16turn);
         if (gCenterViewOnDrop == 2)
         {
             gInput.keyFlags.lookCenter = 1;
             gCenterViewOnDrop = 1;
         }
     }
-    if (!gMouseAimingFlipped)
-        input.q16mlook = -input.q16mlook;
 
     if (KB_KeyPressed(sc_Pause)) // 0xc5 in disassembly
     {
