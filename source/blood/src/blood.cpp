@@ -2388,7 +2388,8 @@ RESTART:
 
             OSD_DispatchQueued();
 
-            ctrlGetInput();
+            if (!gGameStarted)
+                ctrlGetInput();
 
             switch (gInputMode)
             {
