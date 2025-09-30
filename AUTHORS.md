@@ -17,6 +17,7 @@
   * Hendricks266
   * NY00123
   * NoOne
+  * tmyqlfpir
 
 ### NBlood/Rednukem widescreen tiles:
   * Maxi Clouds
