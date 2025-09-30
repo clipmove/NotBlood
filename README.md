@@ -2,9 +2,11 @@
 Reverse-engineered ports of Build games using EDuke32 engine technology and development principles
 
 ## NBlood
-Blood port based on EDuke32
+Blood port based on EDuke32.
 
 ### Installing
+If you have a digital copy of Blood installed, such as from Steam or GOG, no installation is necessary! Otherwise:
+
 1. Extract NBlood to a new directory
 2. Copy the following files from Blood 1.21 to NBlood folder:
    * BLOOD.INI
@@ -36,15 +38,17 @@ If you have the GOG version of the game, do the following:
 NBlood now uses nblood_cvars.cfg instead of settings.cfg. Please rename your settings.cfg if you need to retain settings from a previous version.
 
 ## PCExhumed
-A port of the PC version of Exhumed based on EDuke32
+A port of the PC version of Exhumed based on EDuke32.
 
 ### Installing
+If you have a digital copy of PowerSlave (DOS Classic Edition) installed, such as from Steam or GOG, no installation is necessary! Otherwise:
+
 1. Extract PCExhumed to a new directory.
 2. Copy the following files from the PC retail version of Exhumed or Powerslave (Exhumed preferred), or the Powerslave demo available at http://www.jonof.id.au/build.games/ps. Beta, pre-release or other demo versions not supported.
 
-   STUFF.DAT
-   DEMO.VCR
-   BOOK.MOV
+   * STUFF.DAT
+   * DEMO.VCR
+   * BOOK.MOV
 
 3. Recommended (but optional) - Add the games CD audio tracks as OGG files in the format exhumedXX.ogg or trackXX.ogg (where XX is the track number) to the same folder as
    pcexhumed.exe. The game includes tracks 02 to 19.
@@ -62,7 +66,7 @@ To invert the mouse, add the line 'in_mouseflip 0' to settings.cfg.
 To change the FOV, add a new line to settings.cfg, e.g. 'fov "120"' where 120 is the desired FOV value between 60 and 140.
 
 ## Rednukem
-A port of BUILD engine games based on Duke Nukem 3D codebase using EDuke32 engine
+A port of several BUILD Engine games derived from the Duke Nukem 3D codebase, based on EDuke32.
 
 ### Supported games
 
@@ -88,3 +92,4 @@ See: https://wiki.eduke32.com/wiki/Main_Page
 
 ## Acknowledgments
   See AUTHORS.md
+
