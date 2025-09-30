@@ -3672,11 +3672,13 @@ static void Menu_PreDraw(MenuID_t cm, MenuEntry_t *entry, const vec2_t origin)
         mgametextcenter(origin.x, MENU_INCREMENT(MENU_YOFFSET), "Developers");
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(11), "Richard \"TerminX\" Gobeille", 8);
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Evan \"Hendricks266\" Ramos", 8);
-        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Alex \"pogokeen\" Dawson", 8);
+        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Alexey \"Nuke.YKT\" Skrybykin", 8);
+        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Dino \"Doom64hunter\" Bollinger", 8);
 
         mgametextcenter(origin.x, MENU_INCREMENT(11), "Retired developers");
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(11), "Pierre-Loup \"Plagman\" Griffais", 8);
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Philipp \"Helixhorned\" Kutin", 8);
+        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Alex \"pogokeen\" Dawson", 8);
 
         mgametextcenter(origin.x, MENU_INCREMENT(11), "Special thanks to");
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(11), "Jonathon \"JonoF\" Fowler", 8);
@@ -3703,9 +3705,9 @@ static void Menu_PreDraw(MenuID_t cm, MenuEntry_t *entry, const vec2_t origin)
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(11), "Evan \"Hendricks266\" Ramos", 8);
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Richard \"TerminX\" Gobeille", 8);
         creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Sergey \"Maxi Clouds\" Skrybykin", 8);
-        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "\"NY00123\"", 8);
-        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "\"MetHy\"", 8);
-        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "\"sirlemonhead\"", 8);
+        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Yoav \"NY00123\" N.", 8);
+        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Corentin \"MetHy\" Dallay", 8);
+        creditsminitext(origin.x + (160 << 16), MENU_INCREMENT(7), "Barry \"sirlemonhead\" Duncan", 8);
 
 #undef MENU_INCREMENT
 #undef MENU_YOFFSET
@@ -3729,36 +3731,42 @@ static void Menu_PreDraw(MenuID_t cm, MenuEntry_t *entry, const vec2_t origin)
             };
             static const char *body[] =
             {
-                "Alexey Skrybykin",  // Nuke.YKT - Polymost fixes
+                "Alexey Lysiuk",     // "_mental_" - bugfixes, shader build step in Xcode project
+                "Barry Duncan",      // "sirlemonhead" - engine version compatibility
                 "Bioman",            // GTK work, APT repository and package upkeep
                 "Brandon Bergren",   // "Bdragon" - tiles.cfg
                 "Charlie Honig",     // "CONAN" - showview command
-                "Dan Gaskill",       // "DeeperThought" - testing
+                "CL102",             // "CommonLoon102" - mdposoff
+                "Dan Gaskill",       // "Danukem" - testing
                 "David Koenig",      // "Bargle" - Merged a couple of things from duke3d_w32
                 "Ed Coolidge",       // Mapster32 improvements
-                "Emile Belanger",    // original Android work
-                "Fox",               // various patches
+                "Emile Belanger",    // "Beloko" - original Android work
+                "Fox Martins",       // "Fox666" - various patches, Polymost shading and aspect fixes
                 "Hunter_rus",        // tons of stuff
                 "James Bentler",     // Mapster32 improvements
                 "Jasper Foreman",    // netcode contributions
                 "Javier Martinez",   // "Malone3D" - EDuke 2.1.1 components
                 "Jeff Hart",         // website graphics
                 "Jonathan Strander", // "Mblackwell" - testing and feature speccing
-                "Jordon Moss",       // "Striker" - various patches, OldMP work
+                "Jordon Moss",       // "Striker" - various patches, NetDuke32 work
                 "Jose del Castillo", // "Renegado" - EDuke 2.1.1 components
                 "Lachlan McDonald",  // official EDuke32 icon
+                "LeoD",              // bugfixes
                 "LSDNinja",          // OS X help and testing
                 "Marcus Herbert",    // "rhoenie" - OS X compatibility work
+                "Martijn van Antwerpen", // "LittleTijn" - patches, NetDuke32 fixes
                 "Matthew Palmer",    // "Usurper" - testing and eduke32.com domain
-                "Matt Saettler",     // original DOS EDuke/WW2GI enhancements
-                "NY00123",           // Linux / SDL usability patches
+                "Matt Saettler",     // "Matteus" - NAM, WWII GI, DOS EDuke 2.0 enhancements
+                "Mitchell Richters", // "mjr4077au" - audiolib ALSA improvements
                 "Ozkan Sezer",       // SDL/GTK version checking improvements
                 "Peter Green",       // "Plugwash" - dynamic remapping, custom gametypes
                 "Peter Veenstra",    // "Qbix" - port to 64-bit
                 "Robin Green",       // CON array support
                 "Ryan Gordon",       // "icculus" - icculus.org Duke3D port sound code
                 "Stephen Anthony",   // early 64-bit porting work
+                "tmyqlfpir",         // patches
                 "tueidj",            // Wii port
+                "Yoav N.",           // "NY00123" - Linux / SDL patches, engine version compatibility
             };
             EDUKE32_STATIC_ASSERT(ARRAY_SIZE(body) % 3 == 0);
             static const char *footer[] =
