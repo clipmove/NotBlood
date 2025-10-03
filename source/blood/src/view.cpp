@@ -4978,7 +4978,7 @@ RORHACKOTHER:
         }
         q16horiz = ClipRange(q16horiz, F16(-200), F16(200));
         int nRORLimit = 32; // limit ROR rendering to 32 times
-        ClearInterpolateSectorFX();
+        ClearGotSectorSectorFX();
 RORHACK:
         int ror_status[16];
         for (int i = 0; i < 16; i++)
@@ -5000,7 +5000,7 @@ RORHACK:
 #endif
         yax_preparedrawrooms();
         renderDrawRoomsQ16(cX, cY, cZ, cA, q16horiz + fix16_from_int(defaultHoriz) + deliriumPitchI, nSectnum);
-        UpdateInterpolateSectorFX();
+        UpdateGotSectorSectorFX();
         yax_drawrooms(viewProcessSprites, nSectnum, 0, gInterpolate);
         viewProcessSprites(cX, cY, cZ, fix16_to_int(cA), gInterpolate);
         for (int i = 0; nRORLimit && (i < 16); i++) // check if ror needs to be rendered
