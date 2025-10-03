@@ -407,7 +407,7 @@ void DrawMirrors(int x, int y, int z, fix16_t a, fix16_t horiz, int smooth, int 
 #endif
                 yax_preparedrawrooms();
                 int32_t didmirror = renderDrawRoomsQ16(cx, cy, z, ca,horiz,mirrorsector|MAXSECTORS);
-                UpdateInterpolateSectorFX();
+                UpdateGotSectorSectorFX();
                 yax_drawrooms(viewProcessSprites, mirrorsector, didmirror, smooth);
                 viewProcessSprites(cx,cy,z,fix16_to_int(ca),smooth);
                 renderDrawMasks();
@@ -445,7 +445,7 @@ void DrawMirrors(int x, int y, int z, fix16_t a, fix16_t horiz, int smooth, int 
 #endif
                 yax_preparedrawrooms();
                 renderDrawRoomsQ16(x+mirror[i].at8, y+mirror[i].atc, z+mirror[i].at10, a, horiz, nSector|MAXSECTORS);
-                UpdateInterpolateSectorFX();
+                UpdateGotSectorSectorFX();
                 yax_drawrooms(viewProcessSprites, nSector, 0, smooth);
                 viewProcessSprites(x+mirror[i].at8, y+mirror[i].atc, z+mirror[i].at10, fix16_to_int(a), smooth);
                 short fstat = sector[nSector].floorstat;
@@ -488,7 +488,7 @@ void DrawMirrors(int x, int y, int z, fix16_t a, fix16_t horiz, int smooth, int 
 #endif
                 yax_preparedrawrooms();
                 renderDrawRoomsQ16(x+mirror[i].at8, y+mirror[i].atc, z+mirror[i].at10, a, horiz, nSector|MAXSECTORS);
-                UpdateInterpolateSectorFX();
+                UpdateGotSectorSectorFX();
                 yax_drawrooms(viewProcessSprites, nSector, 0, smooth);
                 viewProcessSprites(x+mirror[i].at8, y+mirror[i].atc, z+mirror[i].at10, fix16_to_int(a), smooth);
                 short cstat = sector[nSector].ceilingstat;

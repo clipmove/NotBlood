@@ -33,5 +33,5 @@ void DoSectorLighting(void);
 void UndoSectorLighting(void);
 void DoSectorPanning(void);
 void InitSectorFX(void);
-void ClearInterpolateSectorFX(void);
-void UpdateInterpolateSectorFX(void);
+void ClearGotSectorSectorFX(void);
+void UpdateGotSectorSectorFX(void);
