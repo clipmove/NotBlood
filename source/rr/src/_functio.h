@@ -167,6 +167,7 @@ char keydefaults[NUMGAMEFUNCTIONS*2][MAXGAMEFUNCLEN] =
    "X", "",
    "F6", "",
    "F9", "",
+   "", "",
    "F7", "",
    "", "",
    };
@@ -233,6 +234,7 @@ char oldkeydefaults[NUMGAMEFUNCTIONS*2][MAXGAMEFUNCLEN] =
    "", "",
    "F6", "",
    "F9", "",
+   "", "",
    "F7", "",
    "", "",
    };
