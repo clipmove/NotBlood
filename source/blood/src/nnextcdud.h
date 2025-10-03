@@ -942,6 +942,9 @@ class CUSTOMDUDE_GIB
             int nStat = pSpr->statnum;
             if (pSpr->statnum != kStatThing)
             {
+                if (pSpr->statnum >= kMaxStatus)
+                    return;
+                
                 if (!force)
                     return;
 

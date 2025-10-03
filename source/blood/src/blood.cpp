@@ -125,7 +125,13 @@ int gQuitRequest;
 bool gPaused;
 bool gSaveGameActive;
 int gCacheMiss;
+
 int gMenuPicnum = 2518; // default menu picnum
+char gMenuColor = 0;
+int gStatsPicnum = kLoadScreen;
+char gStatsColor = 0;
+
+char gGameTitle[32] = "BLOOD";
 
 char bVanilla = 0;
 char bDemoState = 0;
@@ -653,110 +659,117 @@ int16_t startang, startsectnum;
 
 int gDoQuickSave = 0;
 
-void StartLevel(GAMEOPTIONS *gameOptions)
+void StartLevel(GAMEOPTIONS *pOpt)
 {
-    const char bTriggerAutosave = gAutosave && !gDemo.bRecording && !gDemo.bPlaying && (gGameOptions.nGameType == kGameTypeSinglePlayer) && (gameOptions->uGameFlags&kGameFlagContinuing); // if demo isn't active and not in multiplayer session and we switched to new level
+    const char bTriggerAutosave = gAutosave && !gDemo.bRecording && !gDemo.bPlaying && (pOpt->nGameType == kGameTypeSinglePlayer) && (pOpt->uGameFlags&kGameFlagContinuing); // if demo isn't active and not in multiplayer session and we switched to new level
     EndLevel();
     gInput = {};
     gStartNewGame = 0;
     ready2send = 0;
-    gMusicPrevLoadedEpisode = gGameOptions.nEpisode;
-    gMusicPrevLoadedLevel = gGameOptions.nLevel;
+    gMusicPrevLoadedEpisode = pOpt->nEpisode;
+    gMusicPrevLoadedLevel = pOpt->nLevel;
     if (gDemo.bRecording && gGameStarted)
         gDemo.Close();
     netWaitForEveryone(0);
     VanillaModeUpdate();
     r_mirrormodemulti = 0;
-    if (gGameOptions.nGameType == kGameTypeSinglePlayer)
+    if (pOpt->nGameType == kGameTypeSinglePlayer)
     {
-        if (!(gGameOptions.uGameFlags&kGameFlagContinuing))
-            levelSetupOptions(gGameOptions.nEpisode, gGameOptions.nLevel);
-        if (gEpisodeInfo[gGameOptions.nEpisode].cutALevel == gGameOptions.nLevel
-            && gEpisodeInfo[gGameOptions.nEpisode].cutsceneASmkPath[0])
-            gGameOptions.uGameFlags |= kGameFlagPlayIntro;
-        if ((gGameOptions.uGameFlags&kGameFlagPlayIntro) && !gDemo.bPlaying && !gDemo.bRecording && !Bstrlen(gGameOptions.szUserMap))
-            levelPlayIntroScene(gGameOptions.nEpisode);
+        if (!(pOpt->uGameFlags&kGameFlagContinuing))
+            levelSetupOptions(pOpt->nEpisode, pOpt->nLevel);
+
+        EPISODEINFO* pEpis = &gEpisodeInfo[pOpt->nEpisode];
+        LEVELINFO* pMap = &pEpis->levelsInfo[pOpt->nLevel];
+
+        if (pEpis->cutsceneASmkPath[0] && pEpis->cutALevel == pOpt->nLevel)  pOpt->uGameFlags |= kGameFlagPlayIntro;
+        if (pMap->cutVideo[0])                                               pOpt->uGameFlags |= kGameFlagPlayScene;
+
+        if ((pOpt->uGameFlags & kGameFlagPlayIntro) || (pOpt->uGameFlags & kGameFlagPlayScene))
+        {
+            if (gDemo.bPlaying == 0 && !Bstrlen(pOpt->szUserMap))
+                levelPlayIntroScene(pOpt->nEpisode, pOpt->nLevel);
+        }
 
         ///////
-        gGameOptions.bQuadDamagePowerup = gQuadDamagePowerup;
-        gGameOptions.nDamageInvul = gDamageInvul;
-        gGameOptions.nProjectileBehavior = gProjectileBehavior;
-        gGameOptions.bNapalmFalloff = gNapalmFalloff;
-        gGameOptions.nEnemyBehavior = gEnemyBehavior;
-        gGameOptions.bEnemyRandomTNT = gEnemyRandomTNT;
-        gGameOptions.nWeaponsVer = gWeaponsVer;
-        gGameOptions.bSectorBehavior = gSectorBehavior;
-        gGameOptions.nHitscanProjectiles = gHitscanProjectiles;
-        gGameOptions.bGoreBehavior = gGoreBehavior;
-        gGameOptions.nRandomizerMode = gRandomizerMode;
-        Bstrncpyz(gGameOptions.szRandomizerSeed, gzRandomizerSeed, sizeof(gGameOptions.szRandomizerSeed));
-        gGameOptions.nRandomizerCheat = -1;
+        pOpt->bQuadDamagePowerup = gQuadDamagePowerup;
+        pOpt->nDamageInvul = gDamageInvul;
+        pOpt->nProjectileBehavior = gProjectileBehavior;
+        pOpt->bNapalmFalloff = gNapalmFalloff;
+        pOpt->nEnemyBehavior = gEnemyBehavior;
+        pOpt->bEnemyRandomTNT = gEnemyRandomTNT;
+        pOpt->nWeaponsVer = gWeaponsVer;
+        pOpt->bSectorBehavior = gSectorBehavior;
+        pOpt->nHitscanProjectiles = gHitscanProjectiles;
+        pOpt->bGoreBehavior = gGoreBehavior;
+        pOpt->nRandomizerMode = gRandomizerMode;
+        Bstrncpyz(pOpt->szRandomizerSeed, gzRandomizerSeed, sizeof(pOpt->szRandomizerSeed));
+        pOpt->nRandomizerCheat = -1;
         ///////
     }
-    else if (gGameOptions.nGameType != kGameTypeSinglePlayer && !(gGameOptions.uGameFlags&kGameFlagContinuing))
+    else if (!(pOpt->uGameFlags&kGameFlagContinuing))
     {
-        gGameOptions.nEpisode = gPacketStartGame.episodeId;
-        gGameOptions.nLevel = gPacketStartGame.levelId;
-        gGameOptions.nGameType = gPacketStartGame.gameType;
-        gGameOptions.uNetGameFlags = gPacketStartGame.uNetGameFlags;
-        gGameOptions.nDifficulty = gPacketStartGame.difficulty;
-        gGameOptions.nMonsterSettings = gPacketStartGame.monsterSettings;
-        if (gGameOptions.nMonsterSettings <= 1)
-            gGameOptions.nMonsterRespawnTime = 3600; // default (30 secs)
-        else if (gGameOptions.nMonsterSettings == 2)
-            gGameOptions.nMonsterRespawnTime = 15 * kTicRate; // 15 secs
+        pOpt->nEpisode = gPacketStartGame.episodeId;
+        pOpt->nLevel = gPacketStartGame.levelId;
+        pOpt->nGameType = gPacketStartGame.gameType;
+        pOpt->uNetGameFlags = gPacketStartGame.uNetGameFlags;
+        pOpt->nDifficulty = gPacketStartGame.difficulty;
+        pOpt->nMonsterSettings = gPacketStartGame.monsterSettings;
+        if (pOpt->nMonsterSettings <= 1)
+            pOpt->nMonsterRespawnTime = 3600; // default (30 secs)
+        else if (pOpt->nMonsterSettings == 2)
+            pOpt->nMonsterRespawnTime = 15 * kTicRate; // 15 secs
         else
-            gGameOptions.nMonsterRespawnTime = (gGameOptions.nMonsterSettings - 2) * 30 * kTicRate, gGameOptions.nMonsterSettings = ClipRange(gGameOptions.nMonsterSettings, 0, 2);
-        gGameOptions.nEnemyQuantity = gPacketStartGame.monsterQuantity;
-        gGameOptions.nEnemyHealth = gPacketStartGame.monsterHealth;
-        gGameOptions.nEnemySpeed = gPacketStartGame.monsterSpeed;
-        gGameOptions.nWeaponSettings = gPacketStartGame.weaponSettings;
-        gGameOptions.nItemSettings = gPacketStartGame.itemSettings;
-        gGameOptions.nRespawnSettings = gPacketStartGame.respawnSettings;
-        gGameOptions.bFriendlyFire = gPacketStartGame.bFriendlyFire;
-        gGameOptions.nKeySettings = gPacketStartGame.keySettings;
-        gGameOptions.bItemWeaponSettings = gPacketStartGame.itemWeaponSettings;
-        gGameOptions.bAutoTeams = gPacketStartGame.bAutoTeams;
-        gGameOptions.nSpawnProtection = gPacketStartGame.nSpawnProtection;
-        gGameOptions.nSpawnWeapon = gPacketStartGame.nSpawnWeapon;
+            pOpt->nMonsterRespawnTime = (pOpt->nMonsterSettings - 2) * 30 * kTicRate, pOpt->nMonsterSettings = ClipRange(pOpt->nMonsterSettings, 0, 2);
+        pOpt->nEnemyQuantity = gPacketStartGame.monsterQuantity;
+        pOpt->nEnemyHealth = gPacketStartGame.monsterHealth;
+        pOpt->nEnemySpeed = gPacketStartGame.monsterSpeed;
+        pOpt->nWeaponSettings = gPacketStartGame.weaponSettings;
+        pOpt->nItemSettings = gPacketStartGame.itemSettings;
+        pOpt->nRespawnSettings = gPacketStartGame.respawnSettings;
+        pOpt->bFriendlyFire = gPacketStartGame.bFriendlyFire;
+        pOpt->nKeySettings = gPacketStartGame.keySettings;
+        pOpt->bItemWeaponSettings = gPacketStartGame.itemWeaponSettings;
+        pOpt->bAutoTeams = gPacketStartGame.bAutoTeams;
+        pOpt->nSpawnProtection = gPacketStartGame.nSpawnProtection;
+        pOpt->nSpawnWeapon = gPacketStartGame.nSpawnWeapon;
         if (gPacketStartGame.userMap)
             levelAddUserMap(gNetMapOverride[0] != '\0' ? gNetMapOverride : gPacketStartGame.userMapName);
         else
-            levelSetupOptions(gGameOptions.nEpisode, gGameOptions.nLevel);
+            levelSetupOptions(pOpt->nEpisode, pOpt->nLevel);
 
         ///////
-        gGameOptions.bQuadDamagePowerup = gPacketStartGame.bQuadDamagePowerup;
-        gGameOptions.nDamageInvul = gPacketStartGame.nDamageInvul;
-        gGameOptions.nProjectileBehavior = gPacketStartGame.nProjectileBehavior;
-        gGameOptions.bNapalmFalloff = gPacketStartGame.bNapalmFalloff;
-        gGameOptions.nEnemyBehavior = gPacketStartGame.nEnemyBehavior;
-        gGameOptions.bEnemyRandomTNT = gPacketStartGame.bEnemyRandomTNT;
-        gGameOptions.nWeaponsVer = gPacketStartGame.nWeaponsVer;
-        gGameOptions.bSectorBehavior = gPacketStartGame.bSectorBehavior;
-        gGameOptions.nHitscanProjectiles = gPacketStartGame.nHitscanProjectiles;
-        gGameOptions.bGoreBehavior = gPacketStartGame.bGoreBehavior;
-        gGameOptions.nRandomizerMode = gPacketStartGame.randomizerMode;
-        Bstrncpyz(gGameOptions.szRandomizerSeed, gPacketStartGame.szRandomizerSeed, sizeof(gGameOptions.szRandomizerSeed));
-        gGameOptions.nRandomizerCheat = -1;
-        gGameOptions.bEnemyShuffle = false;
-        gGameOptions.bPitchforkOnly = false;
-        gGameOptions.bPermaDeath = false;
-        gGameOptions.uSpriteBannedFlags = gPacketStartGame.uSpriteBannedFlags;
+        pOpt->bQuadDamagePowerup = gPacketStartGame.bQuadDamagePowerup;
+        pOpt->nDamageInvul = gPacketStartGame.nDamageInvul;
+        pOpt->nProjectileBehavior = gPacketStartGame.nProjectileBehavior;
+        pOpt->bNapalmFalloff = gPacketStartGame.bNapalmFalloff;
+        pOpt->nEnemyBehavior = gPacketStartGame.nEnemyBehavior;
+        pOpt->bEnemyRandomTNT = gPacketStartGame.bEnemyRandomTNT;
+        pOpt->nWeaponsVer = gPacketStartGame.nWeaponsVer;
+        pOpt->bSectorBehavior = gPacketStartGame.bSectorBehavior;
+        pOpt->nHitscanProjectiles = gPacketStartGame.nHitscanProjectiles;
+        pOpt->bGoreBehavior = gPacketStartGame.bGoreBehavior;
+        pOpt->nRandomizerMode = gPacketStartGame.randomizerMode;
+        Bstrncpyz(pOpt->szRandomizerSeed, gPacketStartGame.szRandomizerSeed, sizeof(pOpt->szRandomizerSeed));
+        pOpt->nRandomizerCheat = -1;
+        pOpt->bEnemyShuffle = false;
+        pOpt->bPitchforkOnly = false;
+        pOpt->bPermaDeath = false;
+        pOpt->uSpriteBannedFlags = gPacketStartGame.uSpriteBannedFlags;
         ///////
     }
-    if (gGameOptions.nGameType != kGameTypeSinglePlayer)
+    if (pOpt->nGameType != kGameTypeSinglePlayer)
     {
         gBlueFlagDropped = false;
         gRedFlagDropped = false;
         gView = gMe;
         gViewIndex = myconnectindex;
         r_mirrormodemulti = 4; // set active flag
-        if (gGameOptions.uNetGameFlags&kNetGameFlagMirrorHoriz)
+        if (pOpt->uNetGameFlags&kNetGameFlagMirrorHoriz)
             r_mirrormodemulti |= 1;
-        if (gGameOptions.uNetGameFlags&kNetGameFlagMirrorVert)
+        if (pOpt->uNetGameFlags&kNetGameFlagMirrorVert)
             r_mirrormodemulti |= 2;
     }
-    if (gameOptions->uGameFlags&kGameFlagContinuing) // if episode is in progress, remember player stats
+    if (pOpt->uGameFlags&kGameFlagContinuing) // if episode is in progress, remember player stats
     {
         for (int i = connecthead; i >= 0; i = connectpoint2[i])
         {
@@ -764,15 +777,15 @@ void StartLevel(GAMEOPTIONS *gameOptions)
             gHealthTemp[i] = xsprite[gPlayer[i].pSprite->extra].health;
         }
     }
-    drawLoadingScreen();
-    if (dbLoadMap(gameOptions->zLevelName,(int*)&startpos.x,(int*)&startpos.y,(int*)&startpos.z,&startang,&startsectnum,(unsigned int*)&gameOptions->uMapCRC))
+    drawLoadingScreen(gStatsPicnum);
+    if (dbLoadMap(pOpt->zLevelName,(int*)&startpos.x,(int*)&startpos.y,(int*)&startpos.z,&startang,&startsectnum,(unsigned int*)&pOpt->uMapCRC))
     {
         gQuitGame = true;
         return;
     }
     char levelName[BMAX_PATH];
-    G_LoadMapHack(levelName, gameOptions->zLevelName);
-    wsrand(gameOptions->uMapCRC);
+    G_LoadMapHack(levelName, pOpt->zLevelName);
+    wsrand(pOpt->uMapCRC);
     gKillMgr.Clear();
     gSecretMgr.Clear();
     gLevelTime = 0;
@@ -787,14 +800,14 @@ void StartLevel(GAMEOPTIONS *gameOptions)
             pXSprite = &xsprite[pSprite->extra];
         if (pSprite->statnum < kMaxStatus && pSprite->extra > 0) {
             
-            if ((pXSprite->lSkill & (1 << gameOptions->nEnemyQuantity)) || (pXSprite->lS && gameOptions->nGameType == kGameTypeSinglePlayer)
-                || (pXSprite->lB && gameOptions->nGameType == kGameTypeBloodBath) || (pXSprite->lT && gameOptions->nGameType == kGameTypeTeams)
-                || (pXSprite->lC && gameOptions->nGameType == kGameTypeCoop)) {
+            if ((pXSprite->lSkill & (1 << pOpt->nEnemyQuantity)) || (pXSprite->lS && pOpt->nGameType == kGameTypeSinglePlayer)
+                || (pXSprite->lB && pOpt->nGameType == kGameTypeBloodBath) || (pXSprite->lT && pOpt->nGameType == kGameTypeTeams)
+                || (pXSprite->lC && pOpt->nGameType == kGameTypeCoop)) {
                 
                 DeleteSprite(i);
                 continue;
             }
-            if ((gGameOptions.uNetGameFlags&kNetGameFlagNoTeamFlags) && (pSprite->type == kItemFlagABase || pSprite->type == kItemFlagBBase || pSprite->type == kItemFlagA || pSprite->type == kItemFlagB)) {
+            if ((pOpt->uNetGameFlags&kNetGameFlagNoTeamFlags) && (pSprite->type == kItemFlagABase || pSprite->type == kItemFlagBBase || pSprite->type == kItemFlagA || pSprite->type == kItemFlagB)) {
                 DeleteSprite(i);
                 continue;
             }
@@ -809,8 +822,8 @@ void StartLevel(GAMEOPTIONS *gameOptions)
         }
         if (!VanillaMode() && (pSprite->statnum >= 0) && (pSprite->statnum < kMaxStatus)) // randomize sprites and replace guns akimbo with quad damage icon
         {
-            const bool bRandomEnemy = (gGameOptions.nRandomizerMode & 1) && IsDudeSprite(pSprite) && !IsPlayerSprite(pSprite); // if randomizer is set to enemies or enemies+weapons mode and sprite is a dude
-            const bool bRandomItem = gGameOptions.nRandomizerMode > 0;
+            const bool bRandomEnemy = (pOpt->nRandomizerMode & 1) && IsDudeSprite(pSprite) && !IsPlayerSprite(pSprite); // if randomizer is set to enemies or enemies+weapons mode and sprite is a dude
+            const bool bRandomItem = pOpt->nRandomizerMode > 0;
             if (bRandomEnemy) // if randomizer enemy, randomize non-player enemy
             {
                 dbRandomizerMode(pSprite);
@@ -826,7 +839,7 @@ void StartLevel(GAMEOPTIONS *gameOptions)
             continue;
         }
     }
-    if (gGameOptions.bEnemyShuffle)
+    if (pOpt->bEnemyShuffle)
         dbShuffleEnemy();
 
     #ifdef NOONE_EXTENSIONS
@@ -866,9 +879,9 @@ void StartLevel(GAMEOPTIONS *gameOptions)
     evInit();
     for (int i = connecthead; i >= 0; i = connectpoint2[i])
     {
-        if ((numplayers > 1) || (gGameOptions.nGameType != kGameTypeSinglePlayer))
+        if ((numplayers > 1) || (pOpt->nGameType != kGameTypeSinglePlayer))
             gProfile[i] = gProfileNet[i]; // gProfileNet should always be the latest profile from remote players
-        if (!(gameOptions->uGameFlags&kGameFlagContinuing)) // if new game
+        if (!(pOpt->uGameFlags&kGameFlagContinuing)) // if new game
         {
             if (numplayers == 1)
             {
@@ -879,18 +892,18 @@ void StartLevel(GAMEOPTIONS *gameOptions)
             }
             playerInit(i,0);
         }
-        else if ((gGameOptions.nGameType == kGameTypeTeams) && !VanillaMode()) // if ctf mode and went to next level, reset scores
+        else if ((pOpt->nGameType == kGameTypeTeams) && !VanillaMode()) // if ctf mode and went to next level, reset scores
             playerResetScores(i);
         playerStart(i, 1);
         gChokeCounter[i] = 0;
     }
     playerInitRoundCheck();
-    if (gameOptions->uGameFlags&kGameFlagContinuing) // if episode is in progress, restore player stats
+    if (pOpt->uGameFlags&kGameFlagContinuing) // if episode is in progress, restore player stats
     {
         for (int i = connecthead; i >= 0; i = connectpoint2[i])
         {
             PLAYER *pPlayer = &gPlayer[i];
-            if ((gHealthTemp[i] == 0) || gameOptions->bPitchforkOnly) // if player is dead, or if pitchfork start mode is on, reset player between levels
+            if ((gHealthTemp[i] == 0) || pOpt->bPitchforkOnly) // if player is dead, or if pitchfork start mode is on, reset player between levels
             {
                 playerReset(pPlayer); // reset ammo, weapons, etc
                 if (pPlayer->pDudeInfo != NULL) // if dude info is available, reset health
@@ -912,7 +925,7 @@ void StartLevel(GAMEOPTIONS *gameOptions)
                 playerResetWeaponState(pPlayer, false);
         }
     }
-    gameOptions->uGameFlags &= ~(kGameFlagContinuing|kGameFlagEnding);
+    pOpt->uGameFlags &= ~(kGameFlagContinuing|kGameFlagEnding);
     scrSetDac();
     PreloadCache();
     InitMirrors();
@@ -926,7 +939,7 @@ void StartLevel(GAMEOPTIONS *gameOptions)
     gFrame = 0;
     if (!gDemo.bPlaying)
         gGameMenuMgr.Deactivate();
-    levelTryPlayMusicOrNothing(gGameOptions.nEpisode, gGameOptions.nLevel);
+    levelTryPlayMusicOrNothing(pOpt->nEpisode, pOpt->nLevel);
     viewSetMessage("");
     viewSetErrorMessage("");
     viewResizeView(gViewSize);
@@ -939,7 +952,7 @@ void StartLevel(GAMEOPTIONS *gameOptions)
     gGameStarted = 1;
     ready2send = 1;
     gAutosaveInCurLevel = false;
-    if (bTriggerAutosave && !gGameOptions.bPermaDeath)
+    if (bTriggerAutosave && !pOpt->bPermaDeath)
         AutosaveGame(true); // create autosave at start of the new level
 }
 
@@ -1365,7 +1378,7 @@ void ProcessFrame(void)
             if (gGameOptions.nGameType == kGameTypeSinglePlayer)
             {
                 if (gGameOptions.uGameFlags&kGameFlagPlayOutro)
-                    levelPlayEndScene(gGameOptions.nEpisode);
+                    levelPlayEndScene(gGameOptions.nEpisode, gGameOptions.nLevel);
                 gGameMenuMgr.Deactivate();
                 gGameMenuMgr.Push(&menuCredits,-1);
             }
@@ -2108,11 +2121,11 @@ int app_main(int argc, char const * const * argv)
     }
 
     LoadExtraArts();
-
-    levelLoadDefaults();
-
+    
     if (!Bstrcmp(pINISelected->zName, "CRYPTIC.INI")) // if currently selected cryptic passage
         gMenuPicnum = 2046;
+
+    levelLoadDefaults();
 
     loaddefinitionsfile(BLOODWIDESCREENDEF);
     loaddefinitions_game(BLOODWIDESCREENDEF, FALSE);
@@ -2347,12 +2360,14 @@ RESTART:
             bDraw = engineFPSLimit() != 0;
             if (bDraw)
             {
-                videoClearScreen(0);
+                videoClearScreen(gMenuColor);
                 if (gGameMenuMgr.m_bActive && (nGammaMenu < 40))
                     nGammaMenu += 5;
                 else if (!gGameMenuMgr.m_bActive && (nGammaMenu > 0))
                     nGammaMenu -= 1;
-                rotatesprite(160<<16,100<<16,65536,0,gMenuPicnum,gViewDim ? nGammaMenu : 0,0,0x4a,0,0,xdim-1,ydim-1);
+                static ClockTicks oclock = gFrameClock; gFrameClock = totalclock;
+                rotatesprite(160<<16,100<<16,65536,0,gMenuPicnum,gViewDim ? nGammaMenu : 0,0,0xa,0,0,xdim-1,ydim-1);
+                gFrameClock = oclock;
             }
             if (gQuitRequest && !gQuitGame)
                 netBroadcastMyLogoff(gQuitRequest == 2);
@@ -2416,11 +2431,37 @@ RESTART:
                 gPlayerMsg.Draw();
                 break;
             case INPUT_MODE_3:
-                gEndGameMgr.ProcessKeys();
+            {
+                EPISODEINFO* pEpis = &gEpisodeInfo[gGameOptions.nEpisode];
+                LEVELINFO* pMap = &pEpis->levelsInfo[gGameOptions.nLevel];
+                if (!pMap->showEndScr)
+                {
+                    switch (gGameOptions.nGameType)
+                    {
+                        case kGameTypeSinglePlayer:
+                        case kGameTypeCoop:
+                            if (numplayers > 1)
+                                netWaitForEveryone(0);
+
+                            gEndGameMgr.Finish();
+                            break;
+                        default:
+                            gEndGameMgr.ProcessKeys();
 #ifndef NORENDER
-                gEndGameMgr.Draw();
+                            gEndGameMgr.Draw();
 #endif
+                            break;
+                    }
+                }
+                else
+                {
+                    gEndGameMgr.ProcessKeys();
+#ifndef NORENDER
+                    gEndGameMgr.Draw();
+#endif
+                }
                 break;
+            }
             default:
                 break;
             }

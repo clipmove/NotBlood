@@ -71,6 +71,10 @@ extern int gQuitRequest;
 extern int gCacheMiss;
 extern int gDoQuickSave;
 extern int gMenuPicnum;
+extern char gMenuColor;
+extern int gStatsPicnum;
+extern char gStatsColor;
+extern char gGameTitle[32];
 
 extern char bVanilla;
 extern char bDemoState;
