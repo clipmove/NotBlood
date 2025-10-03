@@ -50,6 +50,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "nnexts.h"
 #endif
 #include "view.h"
+#include "warp.h"
 
 #define kQAVEndVanilla  125
 #define kQAVCanDown2Fix 125 // custom qav for spray can unequip animation fix
@@ -345,6 +346,7 @@ void UpdateAimVector(PLAYER * pPlayer)
     int x = pPSprite->x;
     int y = pPSprite->y;
     int z = pPlayer->zWeapon;
+    int nSector = pPSprite->sectnum;
     Aim aim;
     aim.dx = Cos(pPSprite->ang)>>16;
     aim.dy = Sin(pPSprite->ang)>>16;
@@ -356,6 +358,8 @@ void UpdateAimVector(PLAYER * pPlayer)
     if (gProfile[pPlayer->nPlayer].nAutoAim == 1 || (gProfile[pPlayer->nPlayer].nAutoAim == 2 && !pWeaponTrack->bIsProjectile) || bAutoAimWeapon)
     {
         int nClosest = 0x7fffffff;
+        if (!VanillaMode()) // check for ror so autoaim can work peering above water
+            CheckLink(&x, &y, &z, &nSector);
         for (nSprite = headspritestat[kStatDude]; nSprite >= 0; nSprite = nextspritestat[nSprite])
         {
             pSprite = &sprite[nSprite];
@@ -391,7 +395,7 @@ void UpdateAimVector(PLAYER * pPlayer)
             int angle = getangle(x2-x,y2-y);
             if (klabs(((angle-pPSprite->ang+1024)&2047)-1024) > pWeaponTrack->at8)
                 continue;
-            if (pPlayer->aimTargetsCount < 16 && cansee(x,y,z,pPSprite->sectnum,x2,y2,z2,pSprite->sectnum))
+            if (pPlayer->aimTargetsCount < 16 && cansee(x,y,z,nSector,x2,y2,z2,pSprite->sectnum))
                 pPlayer->aimTargets[pPlayer->aimTargetsCount++] = nSprite;
             // Inlined?
             int dz = (lz-z2)>>8;
@@ -403,7 +407,7 @@ void UpdateAimVector(PLAYER * pPlayer)
             DUDEINFO *pDudeInfo = getDudeInfo(pSprite->type);
             int center = (pSprite->yrepeat*pDudeInfo->aimHeight)<<2;
             int dzCenter = (z2-center)-z;
-            if (cansee(x, y, z, pPSprite->sectnum, x2, y2, z2, pSprite->sectnum))
+            if (cansee(x, y, z, nSector, x2, y2, z2, pSprite->sectnum))
             {
                 nClosest = nDist2;
                 aim.dx = Cos(angle)>>16;
@@ -441,7 +445,7 @@ void UpdateAimVector(PLAYER * pPlayer)
                 int angle = getangle(dx,dy);
                 if (klabs(((angle-pPSprite->ang+1024)&2047)-1024) > pWeaponTrack->atc)
                     continue;
-                if (pPlayer->aimTargetsCount < 16 && cansee(x,y,z,pPSprite->sectnum,pSprite->x,pSprite->y,pSprite->z,pSprite->sectnum))
+                if (pPlayer->aimTargetsCount < 16 && cansee(x,y,z,nSector,pSprite->x,pSprite->y,pSprite->z,pSprite->sectnum))
                     pPlayer->aimTargets[pPlayer->aimTargetsCount++] = nSprite;
                 // Inlined?
                 int dz2 = (lz-z2)>>8;
@@ -450,7 +454,7 @@ void UpdateAimVector(PLAYER * pPlayer)
                 int nDist2 = ksqrt(dx2*dx2+dy2*dy2+dz2*dz2);
                 if (nDist2 >= nClosest)
                     continue;
-                if (cansee(x, y, z, pPSprite->sectnum, pSprite->x, pSprite->y, pSprite->z, pSprite->sectnum))
+                if (cansee(x, y, z, nSector, pSprite->x, pSprite->y, pSprite->z, pSprite->sectnum))
                 {
                     nClosest = nDist2;
                     aim.dx = Cos(angle)>>16;
@@ -684,23 +688,17 @@ void WeaponLower(PLAYER *pPlayer)
             WeaponRaise(pPlayer);
             return;
         case 4:
-            pPlayer->weaponState = 1;
-            StartQAV(pPlayer, 11, -1, 0);
-            if (VanillaMode())
-            {
-                pPlayer->input.newWeapon = kWeaponNone;
-                WeaponLower(pPlayer);
-            }
-            else if (pPlayer->input.newWeapon == kWeaponTNT)
+            if (pPlayer->input.newWeapon == kWeaponTNT && !VanillaMode())
             {
                 pPlayer->weaponState = 2;
                 StartQAV(pPlayer, 11, -1, 0);
                 return;
             }
-            else
-            {
-                WeaponLower(pPlayer);
-            }
+            pPlayer->weaponState = 1;
+            StartQAV(pPlayer, 11, -1, 0);
+            if (VanillaMode())
+                pPlayer->input.newWeapon = kWeaponNone;
+            WeaponLower(pPlayer);
             break;
         case 0:
             if ((pPlayer->input.newWeapon == kWeaponTNT) && !VanillaMode()) // if switched to tnt before lighter is ignited, don't execute spray can equip qav
@@ -1497,6 +1495,13 @@ void FireVoodoo(int nTrigger, PLAYER *pPlayer)
 
 void AltFireVoodoo(int nTrigger, PLAYER *pPlayer)
 {
+    vec3_t pos = pPlayer->pSprite->xyz;
+    if (!VanillaMode()) // check for ror so voodoo doll attack can work peering above water
+    {
+        pos.z = pPlayer->zWeapon; // offset view height to weapon level
+        int nSector = pPlayer->pSprite->sectnum;
+        CheckLink(&pos.x, &pos.y, &pos.z, &nSector);
+    }
     if (nTrigger == 2) {
 
         // by NoOne: trying to simulate v1.0x voodoo here.
@@ -1511,7 +1516,7 @@ void AltFireVoodoo(int nTrigger, PLAYER *pPlayer)
                     spritetype* pTarget = &sprite[nTarget];
                     if (!gGameOptions.bFriendlyFire && IsTargetTeammate(pPlayer, pTarget))
                         continue;
-                    int nDist = approxDist(pTarget->x - pPlayer->pSprite->x, pTarget->y - pPlayer->pSprite->y);
+                    int nDist = approxDist(pTarget->x - pos.x, pTarget->y - pos.y);
                     if (nDist > 0 && nDist < 51200)
                     {
                         int vc = pPlayer->ammoCount[9] >> 3;
@@ -1549,7 +1554,7 @@ void AltFireVoodoo(int nTrigger, PLAYER *pPlayer)
                     continue;
                 if (v4 > 0)
                     v4--;
-                int nDist = approxDist(pTarget->x - pPlayer->pSprite->x, pTarget->y - pPlayer->pSprite->y);
+                int nDist = approxDist(pTarget->x - pos.x, pTarget->y - pos.y);
                 if (nDist > 0 && nDist < 51200)
                 {
                     int vc = pPlayer->ammoCount[9] >> 3;
@@ -1759,6 +1764,23 @@ void FireBeast(int nTrigger, PLAYER * pPlayer)
     int r2 = Random2(2000);
     int r3 = Random2(2000);
     actFireVector(pPlayer->pSprite, 0, pPlayer->zWeapon-pPlayer->pSprite->z, pPlayer->aim.dx+r1, pPlayer->aim.dy+r2, pPlayer->aim.dz+r3, kVectorBeastSlash);
+}
+
+char WeaponIsEquipable(PLAYER *pPlayer, int nWeapon, char checkUnderwater = true)
+{
+    if (!(nWeapon >= kWeaponPitchfork && nWeapon <= kWeaponRemoteTNT)) // invalid weapon
+        return 0;
+    if (checkUnderwater && pPlayer->isUnderwater && BannedUnderwater(nWeapon))
+        return 0;
+    if (pPlayer->hasWeapon[nWeapon])
+    {
+        for (int j = 0; j < weaponModes[nWeapon].at0; j++)
+        {
+            if (CheckWeaponAmmo(pPlayer, nWeapon, weaponModes[nWeapon].at4, 1))
+                return 1;
+        }
+    }
+    return 0;
 }
 
 char gWeaponUpgrade[][13] = {
@@ -2042,6 +2064,7 @@ void WeaponProcess(PLAYER *pPlayer) {
     }
     #endif
 
+    char bAlreadySetLastWeapon = 0;
     char bTNTRemoteProxyCycling = 1;
     if (pPlayer->pXSprite->health == 0)
     {
@@ -2050,6 +2073,7 @@ void WeaponProcess(PLAYER *pPlayer) {
     }
     if (pPlayer->isUnderwater && BannedUnderwater(pPlayer->curWeapon))
     {
+        pPlayer->lastWeapon = pPlayer->curWeapon;
         if (checkLitSprayOrTNT(pPlayer))
         {
             if (pPlayer->curWeapon == kWeaponSprayCan)
@@ -2122,20 +2146,44 @@ void WeaponProcess(PLAYER *pPlayer) {
             return;
         break;
     }
-    if (VanillaMode())
+    if (pPlayer->nextWeapon && VanillaMode())
     {
-        if (pPlayer->nextWeapon)
-        {
-            sfxKill3DSound(pPlayer->pSprite, -1, 441);
-            pPlayer->weaponState = 0;
-            pPlayer->input.newWeapon = pPlayer->nextWeapon;
-            pPlayer->nextWeapon = kWeaponNone;
-        }
+        sfxKill3DSound(pPlayer->pSprite, -1, 441);
+        pPlayer->weaponState = 0;
+        pPlayer->input.newWeapon = pPlayer->nextWeapon;
+        pPlayer->nextWeapon = kWeaponNone;
     }
     if ((pPlayer->curWeapon == kWeaponNone) && (pPlayer->input.newWeapon != kWeaponNone) && !VanillaMode()) // if player is switching weapon (and not holstered), clear next/prev keyflags
     {
         pPlayer->input.keyFlags.nextWeapon = 0;
         pPlayer->input.keyFlags.prevWeapon = 0;
+        pPlayer->input.keyFlags.lastWeapon = 0;
+    }
+    if (pPlayer->input.keyFlags.lastWeapon)
+    {
+        pPlayer->input.keyFlags.lastWeapon = 0;
+        if (!VanillaMode())
+        {
+            const int weapon = pPlayer->curWeapon;
+            if (weapon && (weapon != pPlayer->lastWeapon)) // if current weapon is different to last weapon
+            {
+                if (WeaponIsEquipable(pPlayer, pPlayer->lastWeapon)) // if last weapon can be switched to
+                {
+                    pPlayer->input.keyFlags.nextWeapon = 0;
+                    pPlayer->input.keyFlags.prevWeapon = 0;
+                    pPlayer->nextWeapon = kWeaponNone;
+                    pPlayer->weaponMode[pPlayer->lastWeapon] = 0;
+                    pPlayer->input.newWeapon = pPlayer->lastWeapon;
+                    pPlayer->lastWeapon = weapon;
+                    bAlreadySetLastWeapon = 1;
+                    bTNTRemoteProxyCycling = 0;
+                }
+            }
+        }
+        else
+        {
+            viewSetMessage("Last weapon button disabled for vanilla mode...", 0, MESSAGE_PRIORITY_PICKUP);
+        }
     }
     const KEYFLAGS oldKeyFlags = pPlayer->input.keyFlags; // used to fix next/prev weapon issue for banned weapons
     if (pPlayer->input.keyFlags.nextWeapon)
@@ -2190,14 +2238,11 @@ void WeaponProcess(PLAYER *pPlayer) {
         }
         pPlayer->input.newWeapon = weapon;
     }
-    if (!VanillaMode())
+    if (pPlayer->nextWeapon && !VanillaMode())
     {
-        if (pPlayer->nextWeapon)
-        {
-            sfxKill3DSound(pPlayer->pSprite, -1, 441);
-            pPlayer->input.newWeapon = pPlayer->nextWeapon;
-            pPlayer->nextWeapon = kWeaponNone;
-        }
+        sfxKill3DSound(pPlayer->pSprite, -1, 441);
+        pPlayer->input.newWeapon = pPlayer->nextWeapon;
+        pPlayer->nextWeapon = kWeaponNone;
     }
     if (pPlayer->weaponState == -1)
     {
@@ -2207,6 +2252,7 @@ void WeaponProcess(PLAYER *pPlayer) {
         pPlayer->weaponMode[weapon] = t;
         if (pPlayer->curWeapon)
         {
+            pPlayer->lastWeapon = pPlayer->curWeapon;
             WeaponLower(pPlayer);
             pPlayer->nextWeapon = weapon;
             return;
@@ -2331,6 +2377,8 @@ void WeaponProcess(PLAYER *pPlayer) {
             int v6c = (pPlayer->weaponMode[nWeapon]+i)%v4c;
             if (CheckWeaponAmmo(pPlayer, nWeapon, weaponModes[nWeapon].at4, 1))
             {
+                if (!bAlreadySetLastWeapon) // set new weapon to last weapon slot
+                    pPlayer->lastWeapon = pPlayer->curWeapon;
                 WeaponLower(pPlayer);
                 pPlayer->weaponMode[nWeapon] = v6c;
                 return;

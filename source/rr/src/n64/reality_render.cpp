@@ -1050,7 +1050,10 @@ void RT_EnablePolymost()
     glLoadIdentity();
     buildgl_setDisabled(GL_CULL_FACE);
     if (rt_renderactive & 2)
+    {
         polymost_resetVertexPointers();
+        polymost_resetProgram();
+    }
     polymost_setClamp(0);
     polymost_setFogEnabled(true);
     polymost_usePaletteIndexing(true);

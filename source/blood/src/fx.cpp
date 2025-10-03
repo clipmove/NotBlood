@@ -185,9 +185,9 @@ spritetype * CFX::fxSpawn(FX_ID nFx, int nSector, int x, int y, int z, unsigned 
     if (pFX->yrepeat > 0)
         pSprite->yrepeat = pFX->yrepeat;
     if ((pFX->flags & 1) && Chance(0x8000))
-        pSprite->cstat |= 4;
+        pSprite->cstat ^= 4;
     if ((pFX->flags & 2) && Chance(0x8000))
-        pSprite->cstat |= 8;
+        pSprite->cstat ^= 8;
     if (pFX->seq)
     {
         int nXSprite = dbInsertXSprite(pSprite->index);

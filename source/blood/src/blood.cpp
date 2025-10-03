@@ -788,6 +788,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
             pPlayer->qavLoop = gPlayerTemp[i].qavLoop;
             pPlayer->weaponTimer = gPlayerTemp[i].weaponTimer;
             pPlayer->nextWeapon = gPlayerTemp[i].nextWeapon;
+            pPlayer->lastWeapon = gPlayerTemp[i].lastWeapon;
         }
     }
     pOpt->uGameFlags &= ~(kGameFlagContinuing|kGameFlagEnding);
@@ -1911,6 +1912,7 @@ RESTART:
             }
             if (numplayers == 1)
                 gBufferJitter = 0;
+            ctrlGetInput();
             if (totalclock >= gNetFifoClock && ready2send)
             {
                 do
@@ -1998,7 +2000,8 @@ RESTART:
 
             OSD_DispatchQueued();
 
-            ctrlGetInput();
+            if (!gGameStarted)
+                ctrlGetInput();
 
             switch (gInputMode)
             {
