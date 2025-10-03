@@ -389,12 +389,12 @@ void InitSectorFX(void)
     }
 }
 
-void ClearInterpolateSectorFX(void)
+void ClearGotSectorSectorFX(void)
 {
     Bmemset(gotsectorROR, 0, sizeof(gotsectorROR));
 }
 
-void UpdateInterpolateSectorFX(void)
+void UpdateGotSectorSectorFX(void)
 {
     for(int i = sizeof(gotsectorROR); i > 3; i -= 4)
     {
