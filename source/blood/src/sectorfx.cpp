@@ -72,8 +72,6 @@ char strobe[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-char gotsectorROR[bitmap_size(kMaxSectors)]; // this is the same as gotsector, except it includes any ROR drawn sectors
-
 int GetWaveValue(int a, int b, int c)
 {
     b &= 2047;
@@ -113,6 +111,7 @@ int shadeCount = 0;
 short shadeList[kMaxXSectors];
 int panCount = 0;
 short panList[kMaxXSectors];
+char gotsectorROR[bitmap_size(kMaxSectors)]; // this is the same as gotsector, except it includes any ROR drawn sectors
 
 void DoSectorLighting(void)
 {
