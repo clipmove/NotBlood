@@ -3633,6 +3633,10 @@ GAMEEXEC_STATIC void RT_VM_Execute(native_t loop)
                 if (picnum == DN64TILE2598 || picnum == DN64TILE2597)
                     picnum = SHOTSPARK1;
 
+                // Note: this check is missing in original DN64 code
+                if (picnum == DN64TILE2596)
+                    picnum = SHOTSPARK1;
+
                 RT_VM_CONDITIONAL(picnum == *insptr);
                 continue;
             }
