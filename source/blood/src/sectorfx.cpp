@@ -111,6 +111,7 @@ int shadeCount = 0;
 short shadeList[kMaxXSectors];
 int panCount = 0;
 short panList[kMaxXSectors];
+char gotsectorROR[bitmap_size(kMaxSectors)]; // this is the same as gotsector, except it includes any ROR drawn sectors
 
 void DoSectorLighting(void)
 {
@@ -289,7 +290,7 @@ void DoSectorPanning(void)
                 px += mulscale30(speed<<2, Cos(angle))>>xBits;
                 int yBits = (picsiz[nTile]/16)-((pSector->floorstat&8)!=0);
                 py -= mulscale30(speed<<2, Sin(angle))>>yBits;
-                if (!VanillaMode() && TestBitString(gotsector, nSector))
+                if (!VanillaMode() && TestBitString(gotsectorROR, nSector))
                     viewInterpolatePanningFloor(nSector, pSector);
                 pSector->floorxpanning = px>>8;
                 pSector->floorypanning = py>>8;
@@ -307,7 +308,7 @@ void DoSectorPanning(void)
                 px += mulscale30(speed<<2, Cos(-angle))>>xBits;
                 int yBits = (picsiz[nTile]/16)-((pSector->ceilingstat&8)!=0);
                 py -= mulscale30(speed<<2, Sin(-angle))>>yBits;
-                if (!VanillaMode() && TestBitString(gotsector, nSector))
+                if (!VanillaMode() && TestBitString(gotsectorROR, nSector))
                     viewInterpolatePanningCeiling(nSector, pSector);
                 pSector->ceilingxpanning = px>>8;
                 pSector->ceilingypanning = py>>8;
@@ -336,7 +337,7 @@ void DoSectorPanning(void)
             int py = (wall[nWall].ypanning<<8)+pXWall->ypanFrac;
             px += (psx<<2)>>((uint8_t)picsiz[nTile]&15);
             py += (psy<<2)>>((uint8_t)picsiz[nTile]/16);
-            if (!VanillaMode() && (TestBitString(gotsector, wallPanListSect[i]) || (wallPanListNextSect[i] >= 0 && TestBitString(gotsector, wallPanListNextSect[i]))))
+            if (!VanillaMode() && (TestBitString(gotsectorROR, wallPanListSect[i]) || (wallPanListNextSect[i] >= 0 && TestBitString(gotsectorROR, wallPanListNextSect[i]))))
                 viewInterpolatePanningWall(nWall, &wall[nWall]);
             wall[nWall].xpanning = px>>8;
             wall[nWall].ypanning = py>>8;
@@ -385,6 +386,22 @@ void InitSectorFX(void)
                 wallPanList[wallPanCount++] = nXWall;
             }
         }
+    }
+}
+
+void ClearInterpolateSectorFX(void)
+{
+    Bmemset(gotsectorROR, 0, sizeof(gotsectorROR));
+}
+
+void UpdateInterpolateSectorFX(void)
+{
+    for(int i = sizeof(gotsectorROR); i > 3; i -= 4)
+    {
+        gotsectorROR[i-1] |= gotsector[i-1];
+        gotsectorROR[i-2] |= gotsector[i-2];
+        gotsectorROR[i-3] |= gotsector[i-3];
+        gotsectorROR[i-4] |= gotsector[i-4];
     }
 }
 
