@@ -352,6 +352,7 @@ void InitSectorFX(void)
     shadeCount = 0;
     panCount = 0;
     wallPanCount = 0;
+    ClearGotSectorSectorFX();
     for (int i = 0; i < numsectors; i++)
     {
         int nXSector = sector[i].extra;
