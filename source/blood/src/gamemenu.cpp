@@ -901,7 +901,7 @@ void CGameMenuItemBitmapLS::Draw(void)
     int picnum;
     if (at24 == -1)
     {
-        stat = 66;
+        stat = 2;
         ang = 0;
         picnum = at28;
     }

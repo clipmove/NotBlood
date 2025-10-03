@@ -174,6 +174,13 @@ inline void Calc3DOcclude(const BONKLE *pBonkle, int *nDist, const int posX, con
 
 void Calc3DValues(BONKLE *pBonkle)
 {
+    // For SEQs with frame sound enabled after
+    // loading a save and before player
+    // is initialized
+
+    if (!gMe || !gMe->pSprite)
+        return;
+
     int nCanSeeSect = -1;
     int posX = pBonkle->curPos.x;
     int posY = pBonkle->curPos.y;

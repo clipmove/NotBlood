@@ -5431,7 +5431,7 @@ void useSectorLigthChanger(XSPRITE* pXSource, sectortype* pSect) {
     XSECTOR* pXSector = NULL;
     spritetype* pSource = &sprite[pXSource->reference];
     bool relative = (pSource->flags & kModernTypeFlag16);
-    int i, nExtra;
+    int i, s, e, nExtra;
     
     if (pSect != NULL)
     {
@@ -5451,6 +5451,12 @@ void useSectorLigthChanger(XSPRITE* pXSource, sectortype* pSect) {
         pXSector = &xsector[nExtra];
     }
     
+    char paintNow = (pXSector->shadeAlways || pXSector->busy); // i don't understand why just xsector pal is not working
+    int cstat = pSource->cstat;
+    char status = 0x0;
+
+    getSectorWalls(pXSector->reference, &s, &e);
+
     if (valueIsBetween(pXSource->data1, -1, 32767))
     {
         if (relative)
@@ -5487,33 +5493,70 @@ void useSectorLigthChanger(XSPRITE* pXSource, sectortype* pSect) {
     {
         if (pSource->flags != kModernTypeFlag1)
         {
-            pXSector->shadeAlways   = (pSource->flags & kModernTypeFlag1) ? true : false;
-            pXSector->shadeFloor    = (pSource->flags & kModernTypeFlag2) ? true : false;
-            pXSector->shadeCeiling  = (pSource->flags & kModernTypeFlag4) ? true : false;
-            pXSector->shadeWalls    = (pSource->flags & kModernTypeFlag8) ? true : false;
-            pXSector->color         = (pSource->pal) ? true : false;
+            pXSector->shadeAlways = (pSource->flags & kModernTypeFlag1) ? true : false;
+            pXSector->shadeFloor = (pSource->flags & kModernTypeFlag2) ? true : false;
+            pXSector->shadeCeiling = (pSource->flags & kModernTypeFlag4) ? true : false;
+            pXSector->shadeWalls = (pSource->flags & kModernTypeFlag8) ? true : false;
+            pXSector->color = (pSource->pal) ? true : false;
 
-            short cstat = pSource->cstat;
             if ((cstat & CSTAT_SPRITE_ALIGNMENT) == CSTAT_SPRITE_ALIGNMENT_FLOOR)
             {
-                // !!! xsector pal bits must be extended
-                if (cstat & CSTAT_SPRITE_ONE_SIDED)
+                if (pXSector->color)
                 {
-                    if (cstat & CSTAT_SPRITE_YFLIP)
-                        pXSector->ceilpal = pSource->pal;
+                    // !!! xsector pal bits must be extended
+                    if ((cstat & CSTAT_SPRITE_ONE_SIDED) == 0)  status = 0x03;
+                    else if (cstat & CSTAT_SPRITE_YFLIP)        status = 0x02;
+                    else                                        status = 0x01;
+                }
+
+                if (pXSector->shadeFloor && (status & 0x01))
+                {
+                    if (paintNow)
+                    {
+                        if (!pXSector->shade)
+                            pXSector->floorpal = pSect->floorpal;
+
+                        pSect->floorpal = pSource->pal;
+                    }
                     else
                         pXSector->floorpal = pSource->pal;
                 }
                 else
+                    status &= ~0x01;
+
+                if (pXSector->shadeCeiling && (status & 0x02))
                 {
-                    pXSector->floorpal = pSource->pal;
-                    pXSector->ceilpal  = pSource->pal;
+                    if (paintNow)
+                    {
+                        if (!pXSector->shade)
+                            pXSector->ceilpal = pSect->ceilingpal;
+
+                        pSect->ceilingpal = pSource->pal;
+
+                    }
+                    else
+                        pSect->ceilingpal = pSource->pal;
                 }
+                else
+                    status &= ~0x02;
+            }
+
+            if (paintNow && pXSector->shade)
+            {
+                if ((status & 0x01) == 0)
+                {
+                    pSect->floorpal = pXSector->floorpal;
+                    if (pXSector->shadeWalls)
+                        for (i = s; i <= e; i++) wall[i].pal = pSect->floorpal;
+                }
+
+                if ((status & 0x02) == 0)
+                    pSect->ceilingpal = pXSector->ceilpal;
             }
         }
         else
         {
-            pXSector->shadeAlways   = true;
+            pXSector->shadeAlways = true;
         }
     }
 

@@ -5098,7 +5098,7 @@ void MoveDude(spritetype *pSprite)
                         evPost(nSprite, 3, 0, kCallbackEnemeyBubble);
                         if (!cdudeGet(pSprite)->CanSwim())
                         {
-                            actKillDude(pSprite->index, pSprite, kDamageFall, 1000 << 4);
+                            actKillDude(pSprite->index, pSprite, kDamageDrown, 1000 << 4);
                             return;
                         }
                     }
