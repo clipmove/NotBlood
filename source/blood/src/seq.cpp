@@ -515,7 +515,7 @@ void seqProcess(int nTicks)
                             evKill(nSprite, 3);
                             if ((sprite[nSprite].flags & kHitagRespawn) && sprite[nSprite].inittype >= kDudeBase && sprite[nSprite].inittype < kDudeMax)
                                 evPost(nSprite, 3, gGameOptions.nMonsterRespawnTime, kCallbackRespawn);
-                            else
+                            else if (VanillaMode() || sprite[nSprite].statnum < kMaxStatus)
                                 DeleteSprite(nSprite);
                             break;
                         }
@@ -589,6 +589,11 @@ void SeqLoadSave::Load(void)
                 ThrowError("Invalid sequence %d", nSeq);
             if ((pSeq->version & 0xff00) != 0x300)
                 ThrowError("Sequence %d is obsolete version", nSeq);
+
+            // Edited SEQ and loading old savegame...
+            if (pInst->frameIndex >= pSeq->nFrames)
+                pInst->frameIndex = pSeq->nFrames - 1;
+               
             pInst->hSeq = hSeq;
             pInst->pSequence = pSeq;
         }

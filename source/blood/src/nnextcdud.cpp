@@ -811,7 +811,7 @@ void CUSTOMDUDE::Process(void)
     {
         if (!IsMediumMatch(medium))
         {
-            Kill(pSpr->index, kDamageFall, pXSpr->health << 4);
+            Kill(pSpr->index, (IsUnderWater(pSpr)) ? kDamageDrown : kDamageFall, pXSpr->health << 4);
             return;
         }
 
@@ -1388,6 +1388,9 @@ void CUSTOMDUDE::Kill(int nFrom, int nDmgType, int nDmg)
         return;
     }
 
+    if (nDmgType == kDamageDrown && !IsSwimming() && IsUnderWater(pSpr))
+        ChangePosture(kCdudePostureW); // for DeathChoke animations access
+
     if (pWeapon && pWeapon->type == kCdudeWeaponKamikaze)
     {
         if (!IsAttacking())
@@ -1429,7 +1432,7 @@ void CUSTOMDUDE::Kill(int nFrom, int nDmgType, int nDmg)
         {
             pXSpr->burnTime = 0;
             pXSpr->burnSource = -1;
-            nDmgType = kDamageFall;
+            nDmgType = kDamageDrown;
         }
     }
     else if (IsBurning())
