@@ -94,7 +94,10 @@ struct LEVELINFO
     char Messages[kMaxMessages][64];
     char Fog;
     char Weather;
-}; // 0x8ee bytes
+    char cutVideo[BMAX_PATH];
+    char cutSound[BMAX_PATH];
+    char showEndScr;
+};
 
 struct EPISODEINFO
 {
@@ -125,8 +128,8 @@ extern int gLevelTime;
 
 void levelInitINI(const char *pzIni);
 void levelOverrideINI(const char *pzIni);
-void levelPlayIntroScene(int nEpisode);
-void levelPlayEndScene(int nEpisode);
+void levelPlayIntroScene(int nEpisode, int nLevel);
+void levelPlayEndScene(int nEpisode, int nLevel);
 void levelClearSecrets(void);
 void levelSetupSecret(int nCount);
 void levelTriggerSecret(int nSecret);

@@ -123,7 +123,13 @@ int gQuitRequest;
 bool gPaused;
 bool gSaveGameActive;
 int gCacheMiss;
+
 int gMenuPicnum = 2518; // default menu picnum
+char gMenuColor = 0;
+int gStatsPicnum = kLoadScreen;
+char gStatsColor = 0;
+
+char gGameTitle[32] = "BLOOD";
 
 bool bVanilla = 0;
 
@@ -597,63 +603,70 @@ int gChokeCounter[kMaxPlayers];
 vec3_t startpos;
 int16_t startang, startsectnum;
 
-void StartLevel(GAMEOPTIONS *gameOptions)
+void StartLevel(GAMEOPTIONS *pOpt)
 {
     EndLevel();
     gInput = {};
     gStartNewGame = 0;
     ready2send = 0;
-    gMusicPrevLoadedEpisode = gGameOptions.nEpisode;
-    gMusicPrevLoadedLevel = gGameOptions.nLevel;
+    gMusicPrevLoadedEpisode = pOpt->nEpisode;
+    gMusicPrevLoadedLevel = pOpt->nLevel;
     if (gDemo.at0 && gGameStarted)
         gDemo.Close();
     netWaitForEveryone(0);
     VanillaModeUpdate();
-    if (gGameOptions.nGameType == kGameTypeSinglePlayer)
+    if (pOpt->nGameType == kGameTypeSinglePlayer)
     {
-        if (!(gGameOptions.uGameFlags&kGameFlagContinuing))
-            levelSetupOptions(gGameOptions.nEpisode, gGameOptions.nLevel);
-        if (gEpisodeInfo[gGameOptions.nEpisode].cutALevel == gGameOptions.nLevel
-            && gEpisodeInfo[gGameOptions.nEpisode].cutsceneASmkPath[0])
-            gGameOptions.uGameFlags |= kGameFlagPlayIntro;
-        if ((gGameOptions.uGameFlags&kGameFlagPlayIntro) && gDemo.at1 == 0 && !Bstrlen(gGameOptions.szUserMap))
-            levelPlayIntroScene(gGameOptions.nEpisode);
+        if (!(pOpt->uGameFlags&kGameFlagContinuing))
+            levelSetupOptions(pOpt->nEpisode, pOpt->nLevel);
+
+        EPISODEINFO* pEpis = &gEpisodeInfo[pOpt->nEpisode];
+        LEVELINFO* pMap = &pEpis->levelsInfo[pOpt->nLevel];
+
+        if (pEpis->cutsceneASmkPath[0] && pEpis->cutALevel == pOpt->nLevel)  pOpt->uGameFlags |= kGameFlagPlayIntro;
+        if (pMap->cutVideo[0])                                               pOpt->uGameFlags |= kGameFlagPlayScene;
+
+        if ((pOpt->uGameFlags & kGameFlagPlayIntro) || (pOpt->uGameFlags & kGameFlagPlayScene))
+        {
+            if (gDemo.at1 == 0 && !Bstrlen(pOpt->szUserMap))
+                levelPlayIntroScene(pOpt->nEpisode, pOpt->nLevel);
+        }
 
         ///////
-        gGameOptions.weaponsV10x = gWeaponsV10x;
+        pOpt->weaponsV10x = gWeaponsV10x;
         ///////
     }
-    else if (gGameOptions.nGameType != kGameTypeSinglePlayer && !(gGameOptions.uGameFlags&kGameFlagContinuing))
+    else if (pOpt->nGameType != kGameTypeSinglePlayer && !(pOpt->uGameFlags&kGameFlagContinuing))
     {
-        gGameOptions.nEpisode = gPacketStartGame.episodeId;
-        gGameOptions.nLevel = gPacketStartGame.levelId;
-        gGameOptions.nGameType = gPacketStartGame.gameType;
-        gGameOptions.nDifficulty = gPacketStartGame.difficulty;
-        gGameOptions.nDifficultyQuantity = gPacketStartGame.difficulty;
-        gGameOptions.nDifficultyHealth = gPacketStartGame.difficulty;
-        gGameOptions.nMonsterSettings = gPacketStartGame.monsterSettings;
-        gGameOptions.nWeaponSettings = gPacketStartGame.weaponSettings;
-        gGameOptions.nItemSettings = gPacketStartGame.itemSettings;
-        gGameOptions.nRespawnSettings = gPacketStartGame.respawnSettings;
-        gGameOptions.bFriendlyFire = gPacketStartGame.bFriendlyFire;
-        gGameOptions.bPlayerKeys = gPacketStartGame.bPlayerKeys;
+        pOpt->nEpisode = gPacketStartGame.episodeId;
+        pOpt->nLevel = gPacketStartGame.levelId;
+        pOpt->nGameType = gPacketStartGame.gameType;
+        pOpt->nDifficulty = gPacketStartGame.difficulty;
+        pOpt->nDifficultyQuantity = gPacketStartGame.difficulty;
+        pOpt->nDifficultyHealth = gPacketStartGame.difficulty;
+        pOpt->nMonsterSettings = gPacketStartGame.monsterSettings;
+        pOpt->nWeaponSettings = gPacketStartGame.weaponSettings;
+        pOpt->nItemSettings = gPacketStartGame.itemSettings;
+        pOpt->nRespawnSettings = gPacketStartGame.respawnSettings;
+        pOpt->bFriendlyFire = gPacketStartGame.bFriendlyFire;
+        pOpt->bPlayerKeys = gPacketStartGame.bPlayerKeys;
         if (gPacketStartGame.userMap)
             levelAddUserMap(gPacketStartGame.userMapName);
         else
-            levelSetupOptions(gGameOptions.nEpisode, gGameOptions.nLevel);
+            levelSetupOptions(pOpt->nEpisode, pOpt->nLevel);
 
         ///////
-        gGameOptions.weaponsV10x = gPacketStartGame.weaponsV10x;
+        pOpt->weaponsV10x = gPacketStartGame.weaponsV10x;
         ///////
     }
-    if (gGameOptions.nGameType != kGameTypeSinglePlayer)
+    if (pOpt->nGameType != kGameTypeSinglePlayer)
     {
         gBlueFlagDropped = false;
         gRedFlagDropped = false;
         gView = gMe;
         gViewIndex = myconnectindex;
     }
-    if (gameOptions->uGameFlags&kGameFlagContinuing) // if episode is in progress, remember player stats
+    if (pOpt->uGameFlags&kGameFlagContinuing) // if episode is in progress, remember player stats
     {
         for (int i = connecthead; i >= 0; i = connectpoint2[i])
         {
@@ -661,15 +674,15 @@ void StartLevel(GAMEOPTIONS *gameOptions)
             gHealthTemp[i] = xsprite[gPlayer[i].pSprite->extra].health;
         }
     }
-    drawLoadingScreen();
-    if (dbLoadMap(gameOptions->zLevelName,(int*)&startpos.x,(int*)&startpos.y,(int*)&startpos.z,&startang,&startsectnum,(unsigned int*)&gameOptions->uMapCRC))
+    drawLoadingScreen(gStatsPicnum);
+    if (dbLoadMap(pOpt->zLevelName,(int*)&startpos.x,(int*)&startpos.y,(int*)&startpos.z,&startang,&startsectnum,(unsigned int*)&pOpt->uMapCRC))
     {
         gQuitGame = true;
         return;
     }
     char levelName[BMAX_PATH];
-    G_LoadMapHack(levelName, gameOptions->zLevelName);
-    wsrand(gameOptions->uMapCRC);
+    G_LoadMapHack(levelName, pOpt->zLevelName);
+    wsrand(pOpt->uMapCRC);
     gKillMgr.Clear();
     gSecretMgr.Clear();
     gLevelTime = 0;
@@ -682,9 +695,9 @@ void StartLevel(GAMEOPTIONS *gameOptions)
         if (pSprite->statnum < kMaxStatus && pSprite->extra > 0) {
             
             XSPRITE *pXSprite = &xsprite[pSprite->extra];
-            if ((pXSprite->lSkill & (1 << gameOptions->nDifficultyQuantity)) || (pXSprite->lS && gameOptions->nGameType == kGameTypeSinglePlayer)
-                || (pXSprite->lB && gameOptions->nGameType == kGameTypeBloodBath) || (pXSprite->lT && gameOptions->nGameType == kGameTypeTeams)
-                || (pXSprite->lC && gameOptions->nGameType == kGameTypeCoop)) {
+            if ((pXSprite->lSkill & (1 << pOpt->nDifficultyQuantity)) || (pXSprite->lS && pOpt->nGameType == kGameTypeSinglePlayer)
+                || (pXSprite->lB && pOpt->nGameType == kGameTypeBloodBath) || (pXSprite->lT && pOpt->nGameType == kGameTypeTeams)
+                || (pXSprite->lC && pOpt->nGameType == kGameTypeCoop)) {
                 
                 DeleteSprite(i);
                 continue;
@@ -738,7 +751,7 @@ void StartLevel(GAMEOPTIONS *gameOptions)
     evInit();
     for (int i = connecthead; i >= 0; i = connectpoint2[i])
     {
-        if (!(gameOptions->uGameFlags&kGameFlagContinuing)) // if new game
+        if (!(pOpt->uGameFlags&kGameFlagContinuing)) // if new game
         {
             if (numplayers == 1)
             {
@@ -748,12 +761,12 @@ void StartLevel(GAMEOPTIONS *gameOptions)
             }
             playerInit(i,0);
         }
-        else if ((gGameOptions.nGameType == kGameTypeTeams) && !VanillaMode()) // if ctf mode and went to next level, reset scores
+        else if ((pOpt->nGameType == kGameTypeTeams) && !VanillaMode()) // if ctf mode and went to next level, reset scores
             playerResetScores(i);
         playerStart(i, 1);
         gChokeCounter[i] = 0;
     }
-    if (gameOptions->uGameFlags&kGameFlagContinuing) // if episode is in progress, restore player stats
+    if (pOpt->uGameFlags&kGameFlagContinuing) // if episode is in progress, restore player stats
     {
         for (int i = connecthead; i >= 0; i = connectpoint2[i])
         {
@@ -777,7 +790,7 @@ void StartLevel(GAMEOPTIONS *gameOptions)
             pPlayer->nextWeapon = gPlayerTemp[i].nextWeapon;
         }
     }
-    gameOptions->uGameFlags &= ~(kGameFlagContinuing|kGameFlagEnding);
+    pOpt->uGameFlags &= ~(kGameFlagContinuing|kGameFlagEnding);
     scrSetDac();
     PreloadCache();
     InitMirrors();
@@ -791,11 +804,11 @@ void StartLevel(GAMEOPTIONS *gameOptions)
     gFrame = 0;
     if (!gDemo.at1)
         gGameMenuMgr.Deactivate();
-    levelTryPlayMusicOrNothing(gGameOptions.nEpisode, gGameOptions.nLevel);
+    levelTryPlayMusicOrNothing(pOpt->nEpisode, pOpt->nLevel);
     viewSetMessage("");
     viewSetErrorMessage("");
     viewResizeView(gViewSize);
-    if ((gGameOptions.nGameType == kGameTypeTeams) && VanillaMode())
+    if ((pOpt->nGameType == kGameTypeTeams) && VanillaMode())
         gGameMessageMgr.SetCoordinates(gViewX0S+1,gViewY0S+15);
     if (!VanillaMode())
         viewClearInterpolations();
@@ -1176,7 +1189,7 @@ void ProcessFrame(void)
             if (gGameOptions.nGameType == kGameTypeSinglePlayer)
             {
                 if (gGameOptions.uGameFlags&kGameFlagPlayOutro)
-                    levelPlayEndScene(gGameOptions.nEpisode);
+                    levelPlayEndScene(gGameOptions.nEpisode, gGameOptions.nLevel);
                 gGameMenuMgr.Deactivate();
                 gGameMenuMgr.Push(&menuCredits,-1);
             }
@@ -1751,11 +1764,11 @@ int app_main(int argc, char const * const * argv)
     }
 
     LoadExtraArts();
-
-    levelLoadDefaults();
-
+    
     if (!Bstrcmp(pINISelected->zName, "CRYPTIC.INI")) // if currently selected cryptic passage
         gMenuPicnum = 2046;
+
+    levelLoadDefaults();
 
     loaddefinitionsfile(BLOODWIDESCREENDEF);
     loaddefinitions_game(BLOODWIDESCREENDEF, FALSE);
@@ -1951,8 +1964,10 @@ RESTART:
             bDraw = engineFPSLimit() != 0;
             if (bDraw)
             {
-                videoClearScreen(0);
-                rotatesprite(160<<16,100<<16,65536,0,gMenuPicnum,gGameMenuMgr.m_bActive ? 40 : 0,0,0x4a,0,0,xdim-1,ydim-1);
+                videoClearScreen(gMenuColor);
+                static ClockTicks oclock = gFrameClock; gFrameClock = totalclock;
+                rotatesprite(160<<16,100<<16,65536,0,gMenuPicnum,gGameMenuMgr.m_bActive ? 40 : 0,0,0xa,0,0,xdim-1,ydim-1);
+                gFrameClock = oclock;
             }
             if (gQuitRequest && !gQuitGame)
                 netBroadcastMyLogoff(gQuitRequest == 2);
@@ -1996,9 +2011,33 @@ RESTART:
                 gPlayerMsg.Draw();
                 break;
             case INPUT_MODE_3:
-                gEndGameMgr.ProcessKeys();
-                gEndGameMgr.Draw();
+            {
+                EPISODEINFO* pEpis = &gEpisodeInfo[gGameOptions.nEpisode];
+                LEVELINFO* pMap = &pEpis->levelsInfo[gGameOptions.nLevel];
+                if (!pMap->showEndScr)
+                {
+                    switch (gGameOptions.nGameType)
+                    {
+                        case kGameTypeSinglePlayer:
+                        case kGameTypeCoop:
+                            if (numplayers > 1)
+                                netWaitForEveryone(0);
+
+                            gEndGameMgr.Finish();
+                            break;
+                        default:
+                            gEndGameMgr.ProcessKeys();
+                            gEndGameMgr.Draw();
+                            break;
+                    }
+                }
+                else
+                {
+                    gEndGameMgr.ProcessKeys();
+                    gEndGameMgr.Draw();
+                }
                 break;
+            }
             default:
                 break;
             }

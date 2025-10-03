@@ -85,21 +85,41 @@ void levelOverrideINI(const char *pzIni)
 
 static char zSmkPath[BMAX_PATH], zWavPath[BMAX_PATH];
 
-void levelPlayIntroScene(int nEpisode)
+void levelPlayIntroScene(int nEpisode, int nLevel)
 {
-    gGameOptions.uGameFlags &= ~kGameFlagPlayIntro;
     sndStopSong();
     sndKillAllSounds();
     sfxKillAllSounds();
     ambKillAll();
     seqKillAll();
-    EPISODEINFO *pEpisode = &gEpisodeInfo[nEpisode];
-    if (!credPlaySmk(pEpisode->cutsceneASmkPath, pEpisode->cutsceneAWavPath, pEpisode->cutsceneAWavRsrcID)) // if failed (files not found), reattempt in movie directory
+    
+    GAMEOPTIONS* pOpt = &gGameOptions;
+    EPISODEINFO* pEpisode = &gEpisodeInfo[nEpisode];
+    LEVELINFO* pMap = &pEpisode->levelsInfo[nLevel];
+
+    if (pOpt->uGameFlags & kGameFlagPlayIntro)
     {
-        snprintf(zSmkPath, BMAX_PATH, "movie/%s", pEpisode->cutsceneASmkPath);
-        snprintf(zWavPath, BMAX_PATH, "movie/%s", pEpisode->cutsceneAWavPath);
-        credPlaySmk(zSmkPath, zWavPath, pEpisode->cutsceneAWavRsrcID);
+        // this is episode enter cutscene
+        pOpt->uGameFlags &= ~kGameFlagPlayIntro;
+        if (!credPlaySmk(pEpisode->cutsceneASmkPath, pEpisode->cutsceneAWavPath, pEpisode->cutsceneAWavRsrcID)) // if failed (files not found), reattempt in movie directory
+        {
+            snprintf(zSmkPath, BMAX_PATH, "movie/%s", pEpisode->cutsceneASmkPath);
+            snprintf(zWavPath, BMAX_PATH, "movie/%s", pEpisode->cutsceneAWavPath);
+            credPlaySmk(zSmkPath, zWavPath, pEpisode->cutsceneAWavRsrcID);
+        }
     }
+
+    if (pOpt->uGameFlags & kGameFlagPlayScene)
+    {
+        // this is map enter cutscene
+        pOpt->uGameFlags &= ~kGameFlagPlayScene;
+        if (pMap->cutVideo[0])
+        {
+            sndKillAllSounds();
+            credPlaySmk(pMap->cutVideo, pMap->cutSound, 0);
+        }
+    }
+
     scrSetDac();
     viewResizeView(gViewSize);
     credReset();
@@ -109,8 +129,10 @@ void levelPlayIntroScene(int nEpisode)
     ctrlClearAllInput();
 }
 
-void levelPlayEndScene(int nEpisode)
+void levelPlayEndScene(int nEpisode, int nLevel)
 {
+    UNREFERENCED_PARAMETER(nLevel);
+
     gGameOptions.uGameFlags &= ~kGameFlagPlayOutro;
     sndStopSong();
     sndKillAllSounds();
@@ -232,6 +254,16 @@ void levelLoadMapInfo(IniFile *pIni, LEVELINFO *pLevelInfo, const char *pzSectio
     pLevelInfo->EndingB = pIni->GetKeyInt(pzSection, "EndingB", -1);
     pLevelInfo->Fog = pIni->GetKeyInt(pzSection, "Fog", -0);
     pLevelInfo->Weather = pIni->GetKeyInt(pzSection, "Weather", -0);
+
+#ifdef NOONE_EXTENSIONS
+    strncpy(pLevelInfo->cutVideo, pIni->GetKeyString(pzSection, "CutScene", ""), BMAX_PATH);
+    strncpy(pLevelInfo->cutSound, pIni->GetKeyString(pzSection, "CutWav",   ""), BMAX_PATH);
+    pLevelInfo->showEndScr = pIni->GetKeyBool(pzSection, "ShowEndingScreen", 1);
+    if (gGameOptions.nGameType != kGameTypeSinglePlayer)
+        pLevelInfo->showEndScr = 1;
+
+#endif
+
     for (int i = 0; i < kMaxMessages; i++)
     {
         sprintf(buffer, "Message%d", i+1);
@@ -249,6 +281,19 @@ void levelLoadDefaults(void)
     memset(gEpisodeInfo, 0, sizeof(gEpisodeInfo));
     strncpy(gEpisodeInfo[MUS_INTRO/kMaxLevels].levelsInfo[MUS_INTRO%kMaxLevels].Song, "PESTIS", BMAX_PATH);
     int i;
+#ifdef NOONE_EXTENSIONS
+    const char* pTitle = BloodINI->GetKeyString("General", "Title");
+    if (pTitle)
+        strncpy(gGameTitle, pTitle, 31);
+
+    gMenuColor  = ClipRange(BloodINI->GetKeyInt("General", "MainBackgroundColor", gMenuColor), 0, 255);
+    gMenuPicnum = ClipRange(BloodINI->GetKeyInt("General", "MainBackgroundTile", gMenuPicnum), 0, MAXUSERTILES);
+
+    gStatsPicnum = BloodINI->GetKeyInt("General", "StatsBackgroundTile", gStatsPicnum);
+    i = BloodINI->GetKeyInt("General", "StatsBackgroundColor", gStatsColor);
+    gStatsColor  = rngok(i, 0, 255) ? i : 255;
+#endif
+
     for (i = 0; i < kMaxEpisodes; i++)
     {
         sprintf(buffer, "Episode%d", i+1);

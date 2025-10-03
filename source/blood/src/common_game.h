@@ -127,6 +127,7 @@ kGameFlagContinuing             =  1 << 0,
 kGameFlagEnding                 =  1 << 1,
 kGameFlagPlayIntro              =  1 << 2,
 kGameFlagPlayOutro              =  1 << 3,
+kGameFlagPlayScene              =  1 << 4,
 };
 
 // MEDIUM /////////////////////////////////////////////////////

@@ -134,7 +134,8 @@ void credLogosDos(void)
 
     credReset();
 
-    rotatesprite(160<<16, 100<<16, 65536, 0, gMenuPicnum, 0, 0, 0x4a, 0, 0, xdim-1, ydim-1);
+    videoClearScreen(gMenuColor);
+    rotatesprite(160<<16, 100<<16, 65536, 0, gMenuPicnum, 0, 0, 0xa, 0, 0, xdim-1, ydim-1);
     scrNextPage();
     sndStartSample("THUNDER2", 128, -1);
     sndPlaySpecialMusicOrNothing(MUS_INTRO);

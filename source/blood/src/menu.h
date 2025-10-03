@@ -57,7 +57,7 @@ extern const char *zDiffStrings[];
 extern char zNetAddressBuffer[16];
 extern char zNetPortBuffer[6];
 extern char zUserMapName[BMAX_PATH];
-void drawLoadingScreen(void);
+void drawLoadingScreen(int nTile);
 void SetupMenus(void);
 void UpdateNetworkMenus(void);
 void QuickSaveGame(void);

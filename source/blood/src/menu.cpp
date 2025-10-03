@@ -220,7 +220,7 @@ CGameMenuItemQAV itemHelp3BQAV("", 3, 160, 100, "HELP3B", false, false);
 CGameMenuItemQAV itemHelp4QAV("", 3, 160, 100, "HELP4", false, true);
 CGameMenuItemQAV itemHelp5QAV("", 3, 160, 100, "HELP5", false, true);
 
-CGameMenuItemTitle itemMainTitle("BLOOD", 1, 160, 20, 2038);
+CGameMenuItemTitle itemMainTitle(gGameTitle, 1, 160, 20, 2038);
 CGameMenuItemChain itemMain1("NEW GAME", 1, 0, 45, 320, 1, &menuEpisode, -1, NULL, 0);
 //CGameMenuItemChain itemMain2("PLAY ONLINE", 1, 0, 65, 320, 1, &menuPlayOnline, -1, NULL, 0);
 CGameMenuItemChain itemMain2("MULTIPLAYER", 1, 0, 65, 320, 1, &menuNetwork, -1, NULL, 0);
@@ -230,7 +230,7 @@ CGameMenuItemChain itemMain5("HELP", 1, 0, 125, 320, 1, &menuOrder, -1, NULL, 0)
 CGameMenuItemChain itemMain6("CREDITS", 1, 0, 145, 320, 1, &menuCredits, -1, NULL, 0);
 CGameMenuItemChain itemMain7("QUIT", 1, 0, 165, 320, 1, &menuQuit, -1, NULL, 0);
 
-CGameMenuItemTitle itemMainSaveTitle("BLOOD", 1, 160, 20, 2038);
+CGameMenuItemTitle itemMainSaveTitle(gGameTitle, 1, 160, 20, 2038);
 CGameMenuItemChain itemMainSave1("NEW GAME", 1, 0, 45, 320, 1, &menuEpisode, -1, NULL, 0);
 //CGameMenuItemChain itemMainSave2("PLAY ONLINE", 1, 0, 60, 320, 1, &menuPlayOnline, -1, NULL, 0);
 CGameMenuItemChain itemMainSave2("OPTIONS", 1, 0, 60, 320, 1, &menuOptions, -1, NULL, 0);
@@ -2976,7 +2976,7 @@ void MenuSetupEpisodeInfo(void)
     }
 }
 
-void drawLoadingScreen(void)
+void drawLoadingScreen(int nTile)
 {
     char buffer[80];
     if (gGameOptions.nGameType == kGameTypeSinglePlayer)
@@ -2988,5 +2988,5 @@ void drawLoadingScreen(void)
     }
     else
         sprintf(buffer, "%s", zNetGameTypes[gGameOptions.nGameType-1]);
-    viewLoadingScreen(kLoadScreen, buffer, levelGetTitle(), NULL);
+    viewLoadingScreen(nTile, buffer, levelGetTitle(), NULL);
 }

@@ -63,6 +63,13 @@ int Vol3d(int angle, int dist)
 
 void Calc3DValues(BONKLE *pBonkle)
 {
+    // For SEQs with frame sound enabled after
+    // loading a save and before player
+    // is initialized
+
+    if (!gMe || !gMe->pSprite)
+        return;
+    
     int dx = pBonkle->curPos.x - gMe->pSprite->x;
     int dy = pBonkle->curPos.y - gMe->pSprite->y;
     int dz = pBonkle->curPos.z - gMe->pSprite->z;
