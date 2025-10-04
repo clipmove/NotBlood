@@ -632,6 +632,9 @@ void netBroadcastTaunt(int nPlayer, int nTaunt)
 {
     if (gPlayer[nPlayer].pXSprite && (gPlayer[nPlayer].pXSprite->health == 0) && !VanillaMode()) // if player is dead, don't send taunt message
         return;
+    if (gPlayer[nPlayer].tauntTime == (gLevelTime>>6))
+        return;
+    gPlayer[nPlayer].tauntTime = (gLevelTime>>6);
     if (numplayers > 1)
     {
         char *pPacket = packet;
@@ -646,6 +649,9 @@ void netBroadcastTauntRandom(int nPlayer)
 {
     if (gPlayer[nPlayer].pXSprite && (gPlayer[nPlayer].pXSprite->health == 0) && !VanillaMode()) // if player is dead, don't send taunt message
         return;
+    if (gPlayer[nPlayer].tauntTime == (gLevelTime>>6))
+        return;
+    gPlayer[nPlayer].tauntTime = (gLevelTime>>6);
     const int nTaunt = QRandom(5);
     if (numplayers > 1)
     {
