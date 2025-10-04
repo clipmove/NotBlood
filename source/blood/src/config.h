@@ -92,7 +92,6 @@ extern int32_t gMultiKill;
 extern int32_t gViewDim;
 extern int32_t gViewInterpolate;
 extern int32_t gViewInterpolateMethod;
-extern int32_t gPanningInterpolate;
 extern int32_t gWeaponInterpolate;
 extern int32_t gViewHBobbing;
 extern int32_t gViewVBobbing;

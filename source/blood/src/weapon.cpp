@@ -387,9 +387,9 @@ void UpdateAimVector(PLAYER * pPlayer)
     const char bAutoAimWeapon = pPlayer->curWeapon == kWeaponVoodoo || pPlayer->curWeapon == kWeaponLifeLeech || (gProfile[pPlayer->nPlayer].nAutoAim == 4 && pPlayer->curWeapon == kWeaponPitchfork && !bPitchforkFireBallReady); // always autoaim for these weapons
     char bAutoAim = (gProfile[pPlayer->nPlayer].nAutoAim == 1) || (gProfile[pPlayer->nPlayer].nAutoAim == 2 && !pWeaponTrack->bIsProjectile && !bPitchforkFireBallReady);
     char bOnlyTargetRatsEels = (gProfile[pPlayer->nPlayer].nAutoAim == 3) && !pWeaponTrack->bIsProjectile && (pPlayer->curWeapon != kWeaponVoodoo) && (pPlayer->curWeapon != kWeaponLifeLeech);
-    if (!bAutoAim && WeaponsNotBlood() && !VanillaMode()) // use autoaim for pitchfork, or tommygun alt fire
+    if (!bAutoAim && WeaponsNotBlood() && !VanillaMode()) // use autoaim for tommygun alt fire
     {
-        bAutoAim = (pPlayer->curWeapon == kWeaponPitchfork && !bPitchforkFireBallReady) || ((pPlayer->curWeapon == kWeaponTommy) && (pPlayer->weaponQav == 73 || pPlayer->weaponQav == 67));
+        bAutoAim = (pPlayer->curWeapon == kWeaponTommy) && (pPlayer->weaponQav == 73 || pPlayer->weaponQav == 67);
         if (bAutoAim)
             bOnlyTargetRatsEels = 0; // overrides rats/eels only targeting mode
     }

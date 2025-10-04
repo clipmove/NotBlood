@@ -5,11 +5,9 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * Switch to last active weapon if TNT/spray can is active when entering water
 * Basic room over room support for positional audio
 * Autosaving support for collecting keys and start of level
-* New last weapon key binding (default Q)
 * BloodGDX style difficulty options for singleplayer
 * Set item box selection to activated item
 * Ability to record DOS compatible demos
-* Interpolated level texture panning
 * Drag and drop folder mod support
 * Customizable palette adjustment
 * New singleplayer cheats
@@ -116,7 +114,6 @@ If you have the GOG version of the game, do the following:
 * Weapon behavior
    - Select between original weapon behavior, NBlood's V1.X behavior or NotBlood's tweaked weapon set which include:
    - Tommy gun alt fire uses autoaim
-   - Autoaim is always enabled for pitchfork
    - Make beast vision see through nearby walls
    - Adjust pitch offset for spray/missile firing
    - Adds a charge up stab for pitchfork's alt fire
