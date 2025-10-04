@@ -1017,7 +1017,7 @@ void viewAddInterpolation(void *data, INTERPOLATE_TYPE type)
         viewSetSystemMessage("Warning: Interpolations over vanilla limit (%d/%d)\n", nInterpolations, kMaxInterpolationsVanilla);
         bInterpWarnVanilla = 1;
     }
-    if ((nInterpolationsPanning == kMaxInterpolationsPanning) && (type == INTERPOLATE_TYPE_CHAR)) // too many texture panning interpolations, don't add anymore
+    if ((nInterpolationsPanning == kMaxInterpolationsPanning) && (type == INTERPOLATE_TYPE_CHAR_PANNING)) // too many texture panning interpolations, don't add anymore
         return;
     INTERPOLATE *pInterpolate = &gInterpolation[nInterpolations++];
     pInterpolate->pointer = data;
@@ -1030,9 +1030,11 @@ void viewAddInterpolation(void *data, INTERPOLATE_TYPE type)
     case INTERPOLATE_TYPE_SHORT:
         pInterpolate->value = *((short*)data);
         break;
+    case INTERPOLATE_TYPE_CHAR_PANNING:
+        nInterpolationsPanning++;
+        fallthrough__;
     case INTERPOLATE_TYPE_CHAR:
         pInterpolate->value = *((char*)data);
-        nInterpolationsPanning++;
         break;
     }
 }
@@ -1062,6 +1064,7 @@ void CalcInterpolations(void)
                 *((short*)pInterpolate->pointer) = (short)interpolate(value, value2, gInterpolate);
             break;
         }
+        case INTERPOLATE_TYPE_CHAR_PANNING:
         case INTERPOLATE_TYPE_CHAR:
         {
             const int value2 = *((char*)pInterpolate->pointer);
@@ -1094,6 +1097,7 @@ void RestoreInterpolations(void)
         case INTERPOLATE_TYPE_SHORT:
             *((short*)pInterpolate->pointer) = pInterpolate->value2;
             break;
+        case INTERPOLATE_TYPE_CHAR_PANNING:
         case INTERPOLATE_TYPE_CHAR:
             *((char*)pInterpolate->pointer) = pInterpolate->value2;
             break;
