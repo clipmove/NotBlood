@@ -116,7 +116,6 @@ If you have the GOG version of the game, do the following:
 * Weapon behavior
    - Select between original weapon behavior, NBlood's V1.X behavior or NotBlood's tweaked weapon set which include:
    - Tommy gun alt fire uses autoaim
-   - Autoaim is always enabled for pitchfork
    - Make beast vision see through nearby walls
    - Adjust pitch offset for spray/missile firing
    - Adds a charge up stab for pitchfork's alt fire
