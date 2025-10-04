@@ -2266,9 +2266,6 @@ void UpdateStatusBar(ClockTicks arg)
     XSPRITE *pXSprite = pPlayer->pXSprite;
 
     const int nPalette = playerColorPalHud(pPlayer->teamId);
-    int nThrowPower = pPlayer->throwPower;
-    if (!VanillaMode() && gViewInterpolate && (pPlayer->throwPower > 0) && (pPlayer->throwPower > pPlayer->throwPowerOld))
-        nThrowPower = interpolate(pPlayer->throwPowerOld, pPlayer->throwPower, gInterpolate);
 
     if (gViewSize < 0) return;
 
@@ -2328,7 +2325,7 @@ void UpdateStatusBar(ClockTicks arg)
         }
 
         if (pPlayer->throwPower && pXSprite->health > 0)
-            TileHGauge(2260, 124, 175-10, nThrowPower, 65536);
+            TileHGauge(2260, 124, 175-10, pPlayer->throwPower, 65536);
         else
             viewDrawPack(pPlayer, 166, 200-tilesiz[2201].y/2-30);
         viewDrawStats(pPlayer, 2-xscalestats, 140);
@@ -2338,7 +2335,7 @@ void UpdateStatusBar(ClockTicks arg)
     else if (gViewSize <= 3)
     {
         if (pPlayer->throwPower && pXSprite->health > 0)
-            TileHGauge(2260, 124, 175, nThrowPower, 65536);
+            TileHGauge(2260, 124, 175, pPlayer->throwPower, 65536);
         else
             viewDrawPack(pPlayer, 166, 200-tilesiz[2201].y/2);
     }
@@ -2511,7 +2508,7 @@ void UpdateStatusBar(ClockTicks arg)
         DrawStatMaskedSprite(2202, 201, 185, pPlayer->isRunning ? 16 : 40);
         if (pPlayer->throwPower && pXSprite->health > 0)
         {
-            TileHGauge(2260, 124, 175, nThrowPower, 65536);
+            TileHGauge(2260, 124, 175, pPlayer->throwPower, 65536);
         }
         viewDrawStats(pPlayer, 2-xscalestats, 140-yscalestats);
         viewDrawSpeed();
