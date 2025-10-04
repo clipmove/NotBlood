@@ -238,7 +238,7 @@ inline void viewInterpolateWall(int nWall, walltype *pWall)
 
 inline void viewInterpolatePanningWall(int nWall, walltype *pWall)
 {
-    if (gViewInterpolate && gPanningInterpolate && !TestBitString(gInterpolatePanningWall, nWall))
+    if (gViewInterpolate && !TestBitString(gInterpolatePanningWall, nWall))
     {
         viewAddInterpolation(&pWall->xpanning, INTERPOLATE_TYPE_CHAR);
         viewAddInterpolation(&pWall->ypanning, INTERPOLATE_TYPE_CHAR);
@@ -248,7 +248,7 @@ inline void viewInterpolatePanningWall(int nWall, walltype *pWall)
 
 inline void viewInterpolatePanningCeiling(int nSector, sectortype *pSector)
 {
-    if (gViewInterpolate && gPanningInterpolate && !TestBitString(gInterpolatePanningCeiling, nSector))
+    if (gViewInterpolate && !TestBitString(gInterpolatePanningCeiling, nSector))
     {
         viewAddInterpolation(&pSector->ceilingxpanning, INTERPOLATE_TYPE_CHAR);
         viewAddInterpolation(&pSector->ceilingypanning, INTERPOLATE_TYPE_CHAR);
@@ -258,7 +258,7 @@ inline void viewInterpolatePanningCeiling(int nSector, sectortype *pSector)
 
 inline void viewInterpolatePanningFloor(int nSector, sectortype *pSector)
 {
-    if (gViewInterpolate && gPanningInterpolate && !TestBitString(gInterpolatePanningFloor, nSector))
+    if (gViewInterpolate && !TestBitString(gInterpolatePanningFloor, nSector))
     {
         viewAddInterpolation(&pSector->floorxpanning, INTERPOLATE_TYPE_CHAR);
         viewAddInterpolation(&pSector->floorypanning, INTERPOLATE_TYPE_CHAR);
