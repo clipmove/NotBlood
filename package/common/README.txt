@@ -197,8 +197,6 @@ If you have the GOG version of the game, do the following:
    - Enable/disable dimming background when menu is active
 * cl_interpolatemethod
    - Set view interpolation method (0: original [integer], 1: notblood [floating-point])"
-* cl_interpolatepanning
-   - Enable/disable sector texture panning interpolation (cl_interpolate must be set on)
 * cl_interpolateweapon
    - Enable/disable view interpolation for drawn weapon (0: disable, 1: position, 2: position/qav animation)
 * cl_colormsg
