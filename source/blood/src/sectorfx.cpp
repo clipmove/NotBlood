@@ -265,6 +265,7 @@ int wallPanCount;
 void DoSectorPanning(void)
 {
     const char bInterp = (gViewMode == 3) && !VanillaMode();
+    const char bInterpFloor = ((gViewMode == 3) || (gViewMode == 4)) && !VanillaMode(); // map view sees floor sectors, allow them to be interpolated
     for (int i = 0; i < panCount; i++)
     {
         int nXSector = panList[i];
@@ -291,7 +292,7 @@ void DoSectorPanning(void)
                 px += mulscale30(speed<<2, Cos(angle))>>xBits;
                 int yBits = (picsiz[nTile]/16)-((pSector->floorstat&8)!=0);
                 py -= mulscale30(speed<<2, Sin(angle))>>yBits;
-                if (bInterp && TestBitString(gotsectorROR, nSector))
+                if (bInterpFloor && TestBitString(gotsectorROR, nSector))
                     viewInterpolatePanningFloor(nSector, pSector);
                 pSector->floorxpanning = px>>8;
                 pSector->floorypanning = py>>8;
@@ -403,11 +404,12 @@ void UpdateGotSectorSectorFX(void)
 {
     if (bGotsectorCleared) // fresh start, don't bother doing compare
     {
-        memcpy(gotsectorROR, gotsector, sizeof(gotsector));
+        Bmemcpy(gotsectorROR, gotsector, bitmap_size(numsectors));
         bGotsectorCleared = 0;
         return;
     }
-    for(int i = sizeof(gotsectorROR); i > 3; i -= 4)
+    int i = ((bitmap_size(numsectors))+0x3|0x3) ^ 0x3; // align to upper 4 bytes
+    for (i = ClipHigh(i, sizeof(gotsectorROR)); i >= 4; i -= 4)
     {
         gotsectorROR[i-1] |= gotsector[i-1];
         gotsectorROR[i-2] |= gotsector[i-2];
