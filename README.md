@@ -17,7 +17,6 @@ Download for Windows/Linux/MacOS can be found on [https://github.com/clipmove/No
 * Switch to last active weapon if TNT/spray can is active when entering water
 * Basic room over room support for positional audio ([before](https://web.archive.org/web/20220319193715if_/https://files.catbox.moe/qca0k4.mp4)/[after](https://web.archive.org/web/20220514202908if_/https://files.catbox.moe/wq1so4.mp4))
 * Autosaving support for collecting keys and start of level
-* New last weapon key binding (default Q) ([demo](https://web.archive.org/web/20220319193716if_/https://files.catbox.moe/28cirg.mp4))
 * BloodGDX style difficulty options for singleplayer
 * Set item box selection to activated item
 * Ability to record DOS compatible demos

@@ -5,7 +5,6 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * Switch to last active weapon if TNT/spray can is active when entering water
 * Basic room over room support for positional audio
 * Autosaving support for collecting keys and start of level
-* New last weapon key binding (default Q)
 * BloodGDX style difficulty options for singleplayer
 * Set item box selection to activated item
 * Ability to record DOS compatible demos
