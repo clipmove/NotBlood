@@ -20,7 +20,6 @@ Download for Windows/Linux/MacOS can be found on [https://github.com/clipmove/No
 * BloodGDX style difficulty options for singleplayer
 * Set item box selection to activated item
 * Ability to record DOS compatible demos
-* Interpolated level texture panning
 * Drag and drop folder mod support ([demo](https://web.archive.org/web/20220514203004if_/https://files.catbox.moe/lb7nxb.mp4))
 * Customizable palette adjustment
 * New singleplayer cheats

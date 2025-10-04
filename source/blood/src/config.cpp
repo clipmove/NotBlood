@@ -114,7 +114,6 @@ int32_t gPlayerModel;
 int32_t gViewDim;
 int32_t gViewInterpolate;
 int32_t gViewInterpolateMethod;
-int32_t gPanningInterpolate;
 int32_t gWeaponInterpolate;
 int32_t gViewHBobbing;
 int32_t gViewVBobbing;
@@ -539,7 +538,6 @@ void CONFIG_SetDefaults(void)
     gViewDim = 1;
     gViewInterpolate = 1;
     gViewInterpolateMethod = 0;
-    gPanningInterpolate = 1;
     gWeaponInterpolate = 2;
     gViewHBobbing = 1;
     gViewVBobbing = 1;
