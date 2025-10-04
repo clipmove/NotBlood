@@ -264,6 +264,7 @@ int wallPanCount;
 
 void DoSectorPanning(void)
 {
+    const char bInterp = (gViewMode == 3) && !VanillaMode();
     for (int i = 0; i < panCount; i++)
     {
         int nXSector = panList[i];
@@ -290,7 +291,7 @@ void DoSectorPanning(void)
                 px += mulscale30(speed<<2, Cos(angle))>>xBits;
                 int yBits = (picsiz[nTile]/16)-((pSector->floorstat&8)!=0);
                 py -= mulscale30(speed<<2, Sin(angle))>>yBits;
-                if (!VanillaMode() && TestBitString(gotsectorROR, nSector))
+                if (bInterp && TestBitString(gotsectorROR, nSector))
                     viewInterpolatePanningFloor(nSector, pSector);
                 pSector->floorxpanning = px>>8;
                 pSector->floorypanning = py>>8;
@@ -308,7 +309,7 @@ void DoSectorPanning(void)
                 px += mulscale30(speed<<2, Cos(-angle))>>xBits;
                 int yBits = (picsiz[nTile]/16)-((pSector->ceilingstat&8)!=0);
                 py -= mulscale30(speed<<2, Sin(-angle))>>yBits;
-                if (!VanillaMode() && TestBitString(gotsectorROR, nSector))
+                if (bInterp && TestBitString(gotsectorROR, nSector))
                     viewInterpolatePanningCeiling(nSector, pSector);
                 pSector->ceilingxpanning = px>>8;
                 pSector->ceilingypanning = py>>8;
@@ -337,7 +338,7 @@ void DoSectorPanning(void)
             int py = (wall[nWall].ypanning<<8)+pXWall->ypanFrac;
             px += (psx<<2)>>((uint8_t)picsiz[nTile]&15);
             py += (psy<<2)>>((uint8_t)picsiz[nTile]/16);
-            if (!VanillaMode() && (TestBitString(gotsectorROR, wallPanListSect[i]) || (wallPanListNextSect[i] >= 0 && TestBitString(gotsectorROR, wallPanListNextSect[i]))))
+            if (bInterp && (TestBitString(gotsectorROR, wallPanListSect[i]) || (wallPanListNextSect[i] >= 0 && TestBitString(gotsectorROR, wallPanListNextSect[i]))))
                 viewInterpolatePanningWall(nWall, &wall[nWall]);
             wall[nWall].xpanning = px>>8;
             wall[nWall].ypanning = py>>8;
@@ -390,13 +391,22 @@ void InitSectorFX(void)
     }
 }
 
+static char bGotsectorCleared = 0;
+
 void ClearGotSectorSectorFX(void)
 {
     Bmemset(gotsectorROR, 0, sizeof(gotsectorROR));
+    bGotsectorCleared = 1;
 }
 
 void UpdateGotSectorSectorFX(void)
 {
+    if (bGotsectorCleared) // fresh start, don't bother doing compare
+    {
+        memcpy(gotsectorROR, gotsector, sizeof(gotsector));
+        bGotsectorCleared = 0;
+        return;
+    }
     for(int i = sizeof(gotsectorROR); i > 3; i -= 4)
     {
         gotsectorROR[i-1] |= gotsector[i-1];

@@ -5204,7 +5204,6 @@ RORHACK:
     }
     if (gViewMode == 4)
     {
-        ClearGotSectorSectorFX();
         int cX = 0, cY = 0, nAng = 0;
         if (gViewMap.bFollowMode) // calculate get current player position for 2d map for follow mode
         {
@@ -5233,7 +5232,9 @@ RORHACK:
                 nAng = fix16_to_int(cA);
             }
         }
+        ClearGotSectorSectorFX();
         gViewMap.Process(cX, cY, nAng);
+        UpdateGotSectorSectorFX();
     }
     viewDrawInterface(delta);
     if (IsPlayerSprite(gView->pSprite) && (gView->hand == 1))
