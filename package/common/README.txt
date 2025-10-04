@@ -8,7 +8,6 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * BloodGDX style difficulty options for singleplayer
 * Set item box selection to activated item
 * Ability to record DOS compatible demos
-* Interpolated level texture panning
 * Drag and drop folder mod support
 * Customizable palette adjustment
 * New singleplayer cheats
