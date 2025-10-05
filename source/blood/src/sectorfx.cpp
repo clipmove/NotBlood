@@ -354,7 +354,7 @@ void InitSectorFX(void)
     shadeCount = 0;
     panCount = 0;
     wallPanCount = 0;
-    ClearGotSectorSectorFX();
+    ClearGotSectorSectorFX(true);
     for (int i = 0; i < numsectors; i++)
     {
         int nXSector = sector[i].extra;
@@ -394,9 +394,9 @@ void InitSectorFX(void)
 
 static char bGotsectorCleared = 0;
 
-void ClearGotSectorSectorFX(void)
+void ClearGotSectorSectorFX(const bool bClearAll)
 {
-    Bmemset(gotsectorROR, 0, sizeof(gotsectorROR));
+    Bmemset(gotsectorROR, 0, bClearAll ? sizeof(gotsectorROR) : bitmap_size(numsectors));
     bGotsectorCleared = 1;
 }
 
@@ -408,13 +408,9 @@ void UpdateGotSectorSectorFX(void)
         bGotsectorCleared = 0;
         return;
     }
-    int i = ((bitmap_size(numsectors))+0x3|0x3) ^ 0x3; // align to upper 4 bytes
-    for (i = ClipHigh(i, sizeof(gotsectorROR)); i >= 4; i -= 4)
+    for (int i = 0; i < bitmap_size(numsectors); i++)
     {
-        gotsectorROR[i-1] |= gotsector[i-1];
-        gotsectorROR[i-2] |= gotsector[i-2];
-        gotsectorROR[i-3] |= gotsector[i-3];
-        gotsectorROR[i-4] |= gotsector[i-4];
+        gotsectorROR[i] |= gotsector[i];
     }
 }
 
