@@ -234,8 +234,13 @@ static int osdcmd_demorecord(osdcmdptr_t parm)
     int32_t volume,level;
     char *p;
 
+    if (numplayers > 1)
+    {
+        OSD_Printf("Command not allowed in multiplayer\n");
+        return OSDCMD_OK;
+    }
+
     if (parm->numparms != 3) return OSDCMD_SHOWHELP;
-    if (numplayers > 1) return OSDCMD_SHOWHELP;
 
     volume = strtol(parm->parms[0], &p, 10) - 1;
     if (p[0]) return OSDCMD_SHOWHELP;
