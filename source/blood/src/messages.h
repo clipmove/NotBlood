@@ -184,3 +184,4 @@ void SetGodMode(bool god);
 void SetClipMode(bool noclip);
 void SetTargetMode(bool notarget);
 void SetFlyMode(bool fly);
+void LevelWarpAndRecord(int nEpisode, int nLevel);

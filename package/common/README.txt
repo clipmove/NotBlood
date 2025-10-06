@@ -328,6 +328,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable position quantizing for interpolate repeated rotatesprite calls
 * r_shadowvoxels
    - Enable/disable wall/floor aligned transparent voxels
+* record
+   - record <episode> <map> <difficulty 1-5>: start a demo recording
 * skill
    - Changes the skill handicap for multiplayer (default: 2, range: 0-4)
 * snd_earangle
