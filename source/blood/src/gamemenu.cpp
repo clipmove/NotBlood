@@ -1229,7 +1229,7 @@ bool CGameMenuItemKeyList::Event(CGameMenuEvent &event)
         }
         if (nTopDelta == 0)
         {
-            nFocus -= 15;
+            nFocus -= 16;
             if (nFocus < 0)
                 nFocus = 0;
             return false;
