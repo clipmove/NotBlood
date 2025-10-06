@@ -408,9 +408,12 @@ void UpdateGotSectorSectorFX(void)
         bGotsectorCleared = 0;
         return;
     }
-    for (int i = 0; i < bitmap_size(numsectors); i++)
+    for (int i = 0; i < bitmap_size(numsectors); i += 4)
     {
-        gotsectorROR[i] |= gotsector[i];
+        gotsectorROR[i]   |= gotsector[i];
+        gotsectorROR[i+1] |= gotsector[i+1];
+        gotsectorROR[i+2] |= gotsector[i+2];
+        gotsectorROR[i+3] |= gotsector[i+3];
     }
 }
 
