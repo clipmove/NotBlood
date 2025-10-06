@@ -4400,7 +4400,7 @@ bool modernTypeOperateSprite(int nSprite, spritetype* pSprite, XSPRITE* pXSprite
                 }
                 break;
             case kCmdDudeFlagsSet:
-                if (!xspriRangeIsFine(sprite[event.index].extra)) break;
+                if (!dudeIsAlive(pSprite)) break;
                 else aiPatrolFlagsMgr(&sprite[event.index], &xsprite[sprite[event.index].extra], pSprite, pXSprite, false, true); // initialize patrol dude with possible new flags
                 break;
             default:
