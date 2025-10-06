@@ -156,6 +156,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset);
 void ctrlGetInput(void)
 {
     ControlInfo info;
+    static char bFlushInput = 0;
 
     if (!gGameStarted || gInputMode != INPUT_MODE_0)
     {
@@ -163,7 +164,13 @@ void ctrlGetInput(void)
         gInput.keyFlags.isTyping = (gInputMode == INPUT_MODE_2) && gGameStarted && !VanillaMode(); // only show typing indicator for non-vanilla mode
         CONTROL_GetInput(&info);
         ctrlRadialWeaponMenu(NULL, true);
+        bFlushInput = gInputMode == INPUT_MODE_2;
         return;
+    }
+    if (bFlushInput) // clear held down keys if player was typing a message
+    {
+        KB_ClearKeysDown();
+        bFlushInput = 0;
     }
 
     GINPUT input = {};

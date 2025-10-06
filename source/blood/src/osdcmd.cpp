@@ -229,6 +229,46 @@ static int osdcmd_demo(osdcmdptr_t parm)
     return OSDCMD_OK;
 }
 
+static int osdcmd_demorecord(osdcmdptr_t parm)
+{
+    int32_t volume,level;
+    char *p;
+
+    if (parm->numparms != 3) return OSDCMD_SHOWHELP;
+    if (numplayers > 1) return OSDCMD_SHOWHELP;
+
+    volume = strtol(parm->parms[0], &p, 10) - 1;
+    if (p[0]) return OSDCMD_SHOWHELP;
+    level = strtol(parm->parms[1], &p, 10) - 1;
+    if (p[0]) return OSDCMD_SHOWHELP;
+
+    if (volume < 0) return OSDCMD_SHOWHELP;
+    if (level < 0) return OSDCMD_SHOWHELP;
+
+    if (volume >= 6)
+    {
+        OSD_Printf("changelevel: invalid volume number (range 1-%d)\n",6);
+        return OSDCMD_OK;
+    }
+
+    if (level >= gEpisodeInfo[volume].nLevels)
+    {
+        OSD_Printf("changelevel: invalid level number\n");
+        return OSDCMD_SHOWHELP;
+    }
+
+    if (gDemo.bPlaying)
+        gDemo.StopPlayback();
+    else if (gDemo.bRecording)
+        gDemo.Close();
+
+    gGameOptions.nDifficulty = ClipRange(strtol(parm->parms[2], &p, 10) - 1, 0, 4);
+    LevelWarpAndRecord(volume, level);
+    gGameMenuMgr.Deactivate();
+
+    return OSDCMD_OK;
+}
+
 int osdcmd_restartvid(osdcmdptr_t UNUSED(parm))
 {
     UNREFERENCED_CONST_PARAMETER(parm);
@@ -1292,6 +1332,7 @@ int32_t registerosdcommands(void)
     OSD_RegisterFunction("exit","exit: exits the game immediately", osdcmd_quit);
 //
 //    OSD_RegisterFunction("restartmap", "restartmap: restarts the current map", osdcmd_restartmap);
+    OSD_RegisterFunction("record", "record <episode> <map> <difficulty 1-5>: start a demo recording", osdcmd_demorecord);
     OSD_RegisterFunction("restartsound","restartsound: reinitializes the sound system",osdcmd_restartsound);
     OSD_RegisterFunction("restartvid","restartvid: reinitializes the video mode",osdcmd_restartvid);
 //#if !defined LUNATIC
