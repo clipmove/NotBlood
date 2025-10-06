@@ -1085,7 +1085,7 @@ void LocalKeys(void)
     {
         keyFlushScans();
         CONTROL_ClearButton(gamefunc_Quick_Save);
-        if (gGameOptions.nGameType == kGameTypeSinglePlayer)
+        if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && !gDemo.bPlaying && !gDemo.bRecording)
             return DoQuickSave();
     }
     if (BUTTON(gamefunc_Quick_Load))
@@ -1152,7 +1152,7 @@ void LocalKeys(void)
             break;
         case sc_F2:
             keyFlushScans();
-            if (!gGameMenuMgr.m_bActive && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !gLockManualSaving && !gGameOptions.bPermaDeath)
+            if (!gGameMenuMgr.m_bActive && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !gLockManualSaving && !gGameOptions.bPermaDeath && !gDemo.bRecording)
                 gGameMenuMgr.Push(&menuSaveGame,-1);
             else if ((gLockManualSaving || gGameOptions.bPermaDeath) && (gGameOptions.nGameType == kGameTypeSinglePlayer)) // if manual saving is locked and not currently in multiplayer
             {
@@ -1178,7 +1178,7 @@ void LocalKeys(void)
         case sc_F6:
             keyFlushScans();
             CONTROL_ClearButton(gamefunc_Quick_Save);
-            if (gGameOptions.nGameType == kGameTypeSinglePlayer)
+            if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && !gDemo.bPlaying && !gDemo.bRecording)
                 DoQuickSave();
             break;
         case sc_F8:
