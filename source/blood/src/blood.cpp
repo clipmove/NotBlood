@@ -1313,7 +1313,7 @@ void ProcessFrame(void)
     viewClearInterpolations();
     if (!gDemo.bPlaying)
     {
-        if (gPaused || gEndGameMgr.at0 || (gGameOptions.nGameType == kGameTypeSinglePlayer && (gGameMenuMgr.m_bActive || !gDemo.bRecording && ((osd->flags & OSD_DRAW) == OSD_DRAW))))
+        if (gPaused || gEndGameMgr.at0 || (gGameOptions.nGameType == kGameTypeSinglePlayer && (gGameMenuMgr.m_bActive || (!gDemo.bRecording && ((osd->flags & OSD_DRAW) == OSD_DRAW)))))
             return;
         if (gDemo.bRecording)
             gDemo.Write(gFifoInput[(gNetFifoTail-1)&255]);
