@@ -57,9 +57,9 @@ struct DEMOVALIDATE {
     int nAutoAim;
 };
 
-const char gDemoInvalid[][BMAX_PATH] = { // compiler hall of shame
+const char *gDemoInvalid[] = { // compiler hall of shame
 #ifdef __GNUC__
-#if __GNUC__ >= 15.0
+#if __GNUC__ >= 15
 #else
     "TEST085.DEM",
     "TEST096.DEM",
@@ -765,7 +765,7 @@ void CDemo::LoadDemoInfo(void)
         if (gDemoRunValidation)
         {
             char bSkipBadDemo = 0;
-            for (int i = 0; i < ARRAY_SIZE(gDemoInvalid); i++)
+            for (size_t i = 0; i < ARRAY_SIZE(gDemoInvalid); i++)
             {
                 if (!strcmp(pIterator->name, gDemoInvalid[i]))
                 {
