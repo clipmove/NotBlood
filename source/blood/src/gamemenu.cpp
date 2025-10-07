@@ -3093,8 +3093,6 @@ bool CGameMenuFileSelect::Event(CGameMenuEvent &event)
         {
             for (i = 0; i < 13; i++) // go to top of current list
             {
-                const int nOldTopDelta = nTopDelta[currentList];
-                auto OldFindhigh = findhigh[currentList];
                 if (findhigh[currentList] != NULL)
                 {
                     if (findhigh[currentList]->prev)
@@ -3135,8 +3133,6 @@ bool CGameMenuFileSelect::Event(CGameMenuEvent &event)
         {
             for (i = 0; i < 13; i++)
             {
-                const int nOldTopDelta = nTopDelta[currentList];
-                auto OldFindhigh = findhigh[currentList];
                 if (findhigh[currentList] != NULL)
                 {
                     if (findhigh[currentList]->next)
