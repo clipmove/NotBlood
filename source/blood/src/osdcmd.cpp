@@ -212,6 +212,8 @@ static int osdcmd_demo(osdcmdptr_t parm)
         OSD_Printf("Command not allowed in multiplayer\n");
         return OSDCMD_OK;
     }
+    if (gDemo.bRecording)
+        gDemo.Close();
 
     //if (g_player[myconnectindex].ps->gm & MODE_GAME)
     //{
@@ -263,13 +265,18 @@ static int osdcmd_demorecord(osdcmdptr_t parm)
     }
 
     if (gDemo.bPlaying)
+    {
         gDemo.StopPlayback();
-    else if (gDemo.bRecording)
+        OSD_Printf("Cannot record while playing back demo, stopping demo...\n");
+        return OSDCMD_OK;
+    }
+    if (gDemo.bRecording)
         gDemo.Close();
+    gGameStarted = 0;
 
+    gGameMenuMgr.Deactivate();
     gGameOptions.nDifficulty = ClipRange(strtol(parm->parms[2], &p, 10) - 1, 0, 4);
     LevelWarpAndRecord(volume, level);
-    gGameMenuMgr.Deactivate();
 
     return OSDCMD_OK;
 }
