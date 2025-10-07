@@ -58,13 +58,10 @@ struct DEMOVALIDATE {
 };
 
 const char *gDemoInvalid[] = { // compiler hall of shame
-#ifdef __GNUC__
-#if __GNUC__ >= 15
-#else
+#if defined(__GNUC__) && __GNUC__ >= 15
     "TEST085.DEM",
     "TEST096.DEM",
     "TEST098.DEM",
-#endif
 #else
     ""
 #endif
