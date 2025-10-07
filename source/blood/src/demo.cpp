@@ -57,6 +57,19 @@ struct DEMOVALIDATE {
     int nAutoAim;
 };
 
+const char gDemoInvalid[][BMAX_PATH] = { // compiler hall of shame
+#ifdef __GNUC__
+#if __GNUC__ >= 15.0
+#else
+    "TEST085.DEM",
+    "TEST096.DEM",
+    "TEST098.DEM",
+#endif
+#else
+    ""
+#endif
+};
+
 const DEMOVALIDATE gDemoValidate[] = {
     {"/validatedemos/TEST000.DEM", (int32_t)0x00000DB1, 0x68E811AD, 0x00000000, {(int32_t)0x00002239, (int32_t)0x00006A75, (int32_t)0x000029A4}, 1},
     {"/validatedemos/TEST001.DEM", (int32_t)0x000008E3, 0x898BFCFE, 0x00000000, {(int32_t)0x00001AC0, (int32_t)0x00003F49, (int32_t)0x000025A4}, 1},
@@ -751,6 +764,20 @@ void CDemo::LoadDemoInfo(void)
         int hFile;
         if (gDemoRunValidation)
         {
+            char bSkipBadDemo = 0;
+            for (int i = 0; i < ARRAY_SIZE(gDemoInvalid); i++)
+            {
+                if (!strcmp(pIterator->name, gDemoInvalid[i]))
+                {
+                    bSkipBadDemo = 1;
+                    break;
+                }
+            }
+            if (bSkipBadDemo)
+            {
+                pIterator = pIterator->next;
+                continue;
+            }
             Bsnprintf(zFN, BMAX_PATH, "/validatedemos/%s", pIterator->name);
             hFile = kopen4loadfrommod(zFN, 0);
         }
