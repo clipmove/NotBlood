@@ -57,7 +57,7 @@ struct DEMOVALIDATE {
     int nAutoAim;
 };
 
-const char *gDemoInvalid[BMAX_PATH] = { // compiler hall of shame
+const char *gDemoInvalid[] = { // compiler hall of shame
 #ifdef __GNUC__
 #if __GNUC__ >= 15
 #else
