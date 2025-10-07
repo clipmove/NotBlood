@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "blood.h"
 #include "config.h"
 #include "controls.h"
+#include "demo.h"
 #include "globals.h"
 #include "levels.h"
 #include "map2d.h"
@@ -668,7 +669,13 @@ void ctrlGetInput(void)
 
     if (KB_KeyPressed(sc_Pause)) // 0xc5 in disassembly
     {
-        gInput.keyFlags.pause = 1;
+        if (gDemo.bRecording) // hack - open the menu instead of pausing as pausing is broken for demo playback (yes, even for v1.21)
+        {
+            keyFlushScans();
+            keySetState(sc_Escape, 1);
+        }
+        else
+            gInput.keyFlags.pause = 1;
         KB_ClearKeyDown(sc_Pause);
     }
 
