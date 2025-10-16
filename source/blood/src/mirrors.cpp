@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "player.h"
 #include "sectorfx.h"
 #include "trig.h"
+#include "sectorfx.h"
 #include "view.h"
 #include "warp.h"
 
