@@ -5004,7 +5004,7 @@ getinput(SW_PACKET *loc, SWBOOL tied)
     extern SWBOOL MenuButtonAutoRun;
     extern SWBOOL MenuButtonAutoAim;
 
-    if (Prediction && CommEnabled)
+    if (PredictionOn && CommEnabled)
     {
         newpp = ppp;
     }
@@ -5315,15 +5315,18 @@ getinput(SW_PACKET *loc, SWBOOL tied)
     SET_LOC_KEY(loc->bits, SK_LOOK_UP, BUTTON(gamefunc_Look_Up));
     SET_LOC_KEY(loc->bits, SK_LOOK_DOWN, BUTTON(gamefunc_Look_Down));
 
+    SET(loc->bits, (pp->Flags2&PF2_INPUT_WEAPON_MASK) / PF2_INPUT_WEAPON_BIT0);
+    RESET(pp->Flags2, PF2_INPUT_WEAPON_MASK);
 
-    for (i = 0; i < MAX_WEAPONS_KEYS; i++)
-    {
-        if (BUTTON(gamefunc_Weapon_1 + i))
+    if (!(loc->bits & SK_WEAPON_MASK))
+        for (i = 0; i < MAX_WEAPONS_KEYS; i++)
         {
-            SET(loc->bits, i + 1);
-            break;
+            if (BUTTON(gamefunc_Weapon_1 + i))
+            {
+                SET(loc->bits, i + 1);
+                break;
+            }
         }
-    }
 
     if (BUTTON(gamefunc_Next_Weapon))
     {

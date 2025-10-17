@@ -1279,6 +1279,16 @@ extern PLAYER Player[MAX_SW_PLAYERS_REG+1];
 #define PF2_TELEPORTED        (BIT(0))
 #define PF2_INPUT_CAN_TURN    (BIT(1)) // Allow calling DoPlayerTurn from getinput
 #define PF2_INPUT_CAN_AIM     (BIT(2)) // Allow calling DoPlayerHorizon from getinput
+// Allow conditional weapon auto-switching
+// in multiplayer games without breaking sync.
+#define PF2_INPUT_WEAPON_BIT0 (BIT(3))
+#define PF2_INPUT_WEAPON_BIT1 (BIT(4))
+#define PF2_INPUT_WEAPON_BIT2 (BIT(5))
+#define PF2_INPUT_WEAPON_BIT3 (BIT(6))
+#define PF2_INPUT_WEAPON_MASK (PF2_INPUT_WEAPON_BIT0| \
+                               PF2_INPUT_WEAPON_BIT1| \
+                               PF2_INPUT_WEAPON_BIT2| \
+                               PF2_INPUT_WEAPON_BIT3)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //

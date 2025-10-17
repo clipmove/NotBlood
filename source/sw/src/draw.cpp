@@ -862,6 +862,11 @@ analyzesprites(int viewx, int viewy, int viewz, SWBOOL mirror)
                 SET(tsp->cstat, CSTAT_SPRITE_ALIGNMENT_WALL);
             }
 
+        if (tsp->statnum == STAT_FAF_COPY) // see FAF_COPY_FROM_SPRITE
+        {
+            tsp->clipdist = sprite[SpriteNum].clipdist;
+        }
+
         // Call my sprite handler
         // Does autosizing and voxel handling
         JAnalyzeSprites(tsp);
@@ -1531,6 +1536,7 @@ void PrintSpriteInfo(PLAYERp pp)
 }
 
 
+#if 0
 void SpriteSortList2D(int tx, int ty)
 {
     SPRITEp sp;
@@ -1558,6 +1564,7 @@ void SpriteSortList2D(int tx, int ty)
         }
     }
 }
+#endif
 
 int COVERsetgamemode(int mode, int xdim, int ydim, int bpp)
 {
@@ -2056,6 +2063,7 @@ int CopySprite(uspritetype const * tsp, short newsector)
     sp->yvel = tsp->yvel;
     sp->zvel = tsp->zvel;
     sp->shade = tsp->shade;
+    sp->clipdist = tsp->clipdist; // see FAF_COPY_FROM_SPRITE
 
     RESET(sp->cstat, CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_BLOCK_HITSCAN);
 
@@ -2386,7 +2394,7 @@ drawscreen(PLAYERp pp)
     {
         tz += bob_amt;
         tz += PedanticMode ? camerapp->bob_z :
-                             pp->obob_z + mulscale16(pp->bob_z - pp->obob_z, smoothratio);
+                             camerapp->obob_z + mulscale16(camerapp->bob_z - camerapp->obob_z, smoothratio);
 
         // recoil only when not in camera
         //tq16horiz = tq16horiz + fix16_from_int(camerapp->recoil_horizoff);

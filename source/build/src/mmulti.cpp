@@ -57,7 +57,9 @@ static int GetTickCount(void)
 #endif
 
 #define MAXPLAYERS 16
-#define MAXPAKSIZ 576
+// Note that size is restricted by how much is allowed in a UDP packet.
+#define MAXPAKSIZ 2048
+//#define MAXPAKSIZ 576
 
 
 #define PAKRATE 250  //Packet rate/sec limit ... necessary?
@@ -78,6 +80,7 @@ int connecthead, connectpoint2[MAXPLAYERS];
 
 static int tims, lastsendtims[MAXPLAYERS];
 static char pakbuf[MAXPAKSIZ];
+static int fullpakbufsignals[MAXPLAYERS];
 
 #define FIFSIZ 512 //16384/40 = 6min:49sec
 static int ipak[MAXPLAYERS][FIFSIZ], icnt0[MAXPLAYERS];
@@ -626,12 +629,23 @@ void dosendpackets(int other)  //Host to send intially, client to send to others
     for (i=ocnt0[other];i<ocnt1[other];i++)
     {
         j = *(short *)&pakmem[opak[other][i&(FIFSIZ-1)]]; if (!j) continue; //packet already acked
-        if (k+6+j+4 > (int)sizeof(pakbuf)) break;
+        if (k+6+j+4 > (int)sizeof(pakbuf))
+        {
+            if (!fullpakbufsignals[other])
+            {
+                LOG_F(WARNING, "mmulti: output pakbuf filled for peer %d.", other);
+                fullpakbufsignals[other] = 16;
+            }
+            break;
+        }
 
         *(unsigned short *)&pakbuf[k] = (unsigned short)j; k += 2;
         *(int *)&pakbuf[k] = i; k += 4;
         memcpy(&pakbuf[k],&pakmem[opak[other][i&(FIFSIZ-1)]+2],j); k += j;
     }
+    if (i == ocnt1[other])
+        fullpakbufsignals[other] = max(fullpakbufsignals[other] - 1, 0);
+
     *(unsigned short *)&pakbuf[k] = 0; k += 2;
     *(unsigned short *)&pakbuf[0] = (unsigned short)k;
     *(unsigned short *)&pakbuf[k] = getcrc16(pakbuf,k); k += 2;
