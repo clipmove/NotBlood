@@ -141,8 +141,8 @@ char gNetMapOverride[BMAX_PATH] = "";
 bool gNetRetry = false;
 
 int gMultiModeInit = -1;
-int gMultiLength = -1;
-int gMultiLimit = -1;
+int gMultiScoreLimit = -1;
+int gMultiTimeLimit = -1;
 bool gMultiModeNoExit = false;
 bool gMultiModeNoFlag = false;
 int gMultiEpisodeInit = -1;
@@ -1447,8 +1447,8 @@ SWITCH switches[] = {
     { "conf", 43, 1 },
     { "noconsole", 43, 0 },
     { "mp_mode", 45, 1 },
-    { "mp_length", 46, 1 },
-    { "mp_limit", 47, 1 },
+    { "mp_score", 46, 1 },
+    { "mp_time", 47, 1 },
     { "mp_noexit", 48, 0 },
     { "mp_noflag", 49, 0 },
     { "mp_level", 50, 2 },
@@ -1509,8 +1509,8 @@ void PrintHelp(void)
         "Files can be of type [grp|zip|map|def]\n"
         "\n"
         "-mp_mode [0-2]\tSet game mode for multiplayer (0: co-op, 1: bloodbath, 2: teams)\n"
-        "-mp_length [0-2]\tSet score/time length for multiplayer (0: unlimited, 1: minutes, 2: frags)\n"
-        "-mp_limit [1-255]\tSet limit setting for multiplayer\n"
+        "-mp_score [1-255]\tSet score/lives limit for multiplayer\n"
+        "-mp_time [1-60]\tSet the time length for multiplayer\n"
         "-mp_noexit\tDisables the exit button for multiplayer\n"
         "-mp_noflag\tRemoves the flag for multiplayer teams mode\n"
         "-mp_level [E M]\tSet level for multiplayer (e.g: 1 3)\n"
@@ -1813,15 +1813,15 @@ void ParseOptions(void)
                 ThrowError("Missing argument");
             gMultiModeInit = ClipRange(atoi(OptArgv[0]), 0, 2);
             break;
-        case 46: // mp_length
+        case 46: // mp_score
             if (OptArgc < 1)
                 ThrowError("Missing argument");
-            gMultiLength = ClipRange(atoi(OptArgv[0]), 0, 2);
+            gMultiScoreLimit = ClipRange(atoi(OptArgv[0]), 1, 255);
             break;
-        case 47: // mp_limit
+        case 47: // mp_time
             if (OptArgc < 1)
                 ThrowError("Missing argument");
-            gMultiLimit = ClipRange(atoi(OptArgv[0]), 1, 255);
+            gMultiTimeLimit = ClipRange(atoi(OptArgv[0]), 1, 60);
             break;
         case 48: // mp_noexit
             gMultiModeNoExit = true;

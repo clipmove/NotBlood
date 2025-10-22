@@ -69,9 +69,10 @@ int gPlayerScores[kMaxPlayers];
 int gPlayerCoopLives[kMaxPlayers];
 ClockTicks gPlayerScoreTicks[kMaxPlayers];
 
-int gPlayerRoundLimit = 0;
+int gPlayerRoundScoreLimit = 0;
+int gPlayerRoundTimeLimit = 0;
 char gPlayerRoundEnding = 0;
-char gPlayerRoundLimitAnnounce = -1;
+static char gPlayerRoundLimitAnnounce = -1;
 
 int gPlayerLastKiller;
 int gPlayerLastVictim;
@@ -1516,7 +1517,7 @@ char PickupItem(PLAYER *pPlayer, spritetype *pItem) {
                         sprintf(buffer, "\r%s\r captured \rRed Flag\r!", gProfile[pPlayer->nPlayer].name);
                         sndStartSample(8001, 255, 2, 0);
                         viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal, kFlagRedPal);
-                        if (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags)
+                        if (gGameOptions.uNetGameFlags&kNetGameFlagScoresLimitMask)
                             playerProcessRoundCheck(pPlayer);
 #if 0
                         if (dword_28E3D4 == 3 && myconnectindex == connecthead)
@@ -1562,7 +1563,7 @@ char PickupItem(PLAYER *pPlayer, spritetype *pItem) {
                         sprintf(buffer, "\r%s\r captured \rBlue Flag\r!", gProfile[pPlayer->nPlayer].name);
                         sndStartSample(8000, 255, 2, 0);
                         viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal, kFlagBluePal);
-                        if (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags)
+                        if (gGameOptions.uNetGameFlags&kNetGameFlagScoresLimitMask)
                             playerProcessRoundCheck(pPlayer);
 #if 0
                         if (dword_28E3D4 == 3 && myconnectindex == connecthead)
@@ -1990,8 +1991,8 @@ void ProcessInput(PLAYER *pPlayer)
         {
             char bAllowRespawn = 1;
             const char bSpectator = (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[pPlayer->nPlayer].name, "spectator", MAXPLAYERNAME);
-            if ((gGameOptions.nGameType == kGameTypeCoop) && (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags))
-                bAllowRespawn = gPlayerCoopLives[pPlayer->nPlayer] < gPlayerRoundLimit;
+            if ((gGameOptions.nGameType == kGameTypeCoop) && (gGameOptions.uNetGameFlags&kNetGameFlagScoresLimitMask))
+                bAllowRespawn = gPlayerCoopLives[pPlayer->nPlayer] < gPlayerRoundScoreLimit;
             if (bSeqStat)
             {
                 if (pPlayer->deathTime > 360)
@@ -2029,7 +2030,7 @@ void ProcessInput(PLAYER *pPlayer)
                 char bAllPlayersDead = 1;
                 for (int i = connecthead; i >= 0 && bAllPlayersDead; i = connectpoint2[i])
                 {
-                    if (gPlayerCoopLives[i] < gPlayerRoundLimit)
+                    if (gPlayerCoopLives[i] < gPlayerRoundScoreLimit)
                         bAllPlayersDead = 0;
                 }
                 if (bAllPlayersDead) // trigger level restart
@@ -2501,7 +2502,7 @@ void playerProcess(PLAYER *pPlayer)
             seqSpawn(dudeInfo[nType].seqStartID+8, 3, nXSprite, -1);
         break;
     }
-    if (gGameOptions.uNetGameFlags&kNetGameFlagLimitMinutes) // check every tick
+    if (gGameOptions.uNetGameFlags&kNetGameFlagTimeLimitMask) // check every tick
         playerProcessRoundCheck(NULL);
 }
 
@@ -2706,20 +2707,18 @@ void FragPlayer(PLAYER *pPlayer, int nSprite)
             nLastDinged = gLevelTime;
         }
     }
-    if (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags)
+    if (gGameOptions.uNetGameFlags&kNetGameFlagScoresLimitMask)
         playerProcessRoundCheck(pSprite && IsPlayerSprite(pSprite) ? &gPlayer[pSprite->type - kDudePlayer1] : pPlayer);
 }
 
 void playerInitRoundCheck(void)
 {
-    gPlayerRoundLimit = gPlayerRoundEnding = 0;
+    gPlayerRoundScoreLimit = gPlayerRoundTimeLimit = gPlayerRoundEnding = 0;
     gPlayerRoundLimitAnnounce = -1;
-    if (gGameOptions.uNetGameFlags&kNetGameFlagLimitMask)
-    {
-        gPlayerRoundLimit = (gGameOptions.uNetGameFlags&kNetGameFlagLimitMask)>>kNetGameFlagLimitBase;
-        if (gGameOptions.uNetGameFlags&kNetGameFlagLimitMinutes) // convert to minutes
-            gPlayerRoundLimit *= kTicsPerSec*60;
-    }
+    if (gGameOptions.uNetGameFlags&kNetGameFlagScoresLimitMask)
+        gPlayerRoundScoreLimit = (gGameOptions.uNetGameFlags&kNetGameFlagScoresLimitMask)>>kNetGameFlagScoresLimitBase;
+    if (gGameOptions.uNetGameFlags&kNetGameFlagTimeLimitMask) // convert to minutes
+        gPlayerRoundTimeLimit = ((gGameOptions.uNetGameFlags&kNetGameFlagTimeLimitMask)>>kNetGameFlagTimeLimitBase)*kTicsPerSec*60;
     memset(gPlayerCoopLives, 0, sizeof(gPlayerCoopLives));
 }
 
@@ -2730,13 +2729,13 @@ void playerProcessRoundCheck(PLAYER *pPlayer)
     if (gPlayerRoundEnding) // we're already ending the round, don't trigger this again
         return;
 
-    if (gGameOptions.uNetGameFlags&kNetGameFlagLimitMinutes)
+    if (!pPlayer) // if we're checking time limit only
     {
-        if (gLevelTime <= gPlayerRoundLimit) // if time limit has not been reached
+        if (gLevelTime <= gPlayerRoundTimeLimit) // if time limit has not been reached
         {
             const char *pzTimeMessage[7] = {"20 minutes left", "10 minutes left", "5 minutes left", "2 minutes left", "1 minute left", "30 seconds left", "10 seconds left"};
             char nMessage;
-            switch (gPlayerRoundLimit-gLevelTime-1)
+            switch (gPlayerRoundTimeLimit-gLevelTime-1)
             {
             case kTicsPerSec*60*20:
                 nMessage = 0;
@@ -2807,12 +2806,10 @@ void playerProcessRoundCheck(PLAYER *pPlayer)
 
     char buffer[80] = "Ending round...";
     int nPal = 0;
-    if ((gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags) && (nScoreMax < gPlayerRoundLimit)) // if frag/score limit has not been reached
+    if (pPlayer && (nScoreMax < gPlayerRoundScoreLimit)) // if frag/score limit has not been reached (and not checking time limit)
     {
-        if (!pPlayer)
-            return;
         const int nPlayerScore = gGameOptions.nGameType == kGameTypeBloodBath ? pPlayer->fragCount : gPlayerScores[pPlayer->teamId];
-        const int nScoreRemaining = gPlayerRoundLimit-nPlayerScore;
+        const int nScoreRemaining = gPlayerRoundScoreLimit-nPlayerScore;
         if (nPlayerScore < 0)
             return;
         if (nScoreRemaining == 1 && pPlayer != gMe) // announce player's last point to all players
@@ -2844,9 +2841,9 @@ void playerProcessRoundCheck(PLAYER *pPlayer)
     if (nWinners > 1) // if there is more than one winner, count as tie
     {
         if (gGameOptions.nGameType == kGameTypeTeams)
-            sprintf(buffer, "Both teams tied score! Ending round...");
+            sprintf(buffer, "Both teams tied score!");
         else
-            sprintf(buffer, "It's a tie of %d! Ending round...", nWinners);
+            sprintf(buffer, "It's a tie of %d!", nWinners);
     }
     else if (gGameOptions.nGameType == kGameTypeBloodBath)
     {
@@ -3092,7 +3089,7 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
         FragPlayer(pPlayer, nSource);
         trTriggerSprite(nSprite, pXSprite, kCmdOff, nSource);
 
-        if ((gGameOptions.nGameType == kGameTypeCoop) && (gGameOptions.uNetGameFlags&kNetGameFlagLimitFrags) && (pPlayer->pXSprite->health <= 0) && !gDemo.bPlaying && !gDemo.bRecording)
+        if ((gGameOptions.nGameType == kGameTypeCoop) && (gGameOptions.uNetGameFlags&kNetGameFlagScoresLimitMask) && (pPlayer->pXSprite->health <= 0) && !gDemo.bPlaying && !gDemo.bRecording)
         {
             gPlayerCoopLives[pPlayer->nPlayer]++;
             char buffer[80];
@@ -3100,16 +3097,16 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             char bAllPlayersDead = 1;
             for (int i = connecthead; i >= 0 && bAllPlayersDead; i = connectpoint2[i])
             {
-                if (gPlayerCoopLives[i] < gPlayerRoundLimit)
+                if (gPlayerCoopLives[i] < gPlayerRoundScoreLimit)
                     bAllPlayersDead = 0;
             }
             const int nPal = gColorMsg && !VanillaMode() ? playerColorPalMessage(pPlayer->teamId) : 0;
-            if (gPlayerCoopLives[pPlayer->nPlayer] >= gPlayerRoundLimit)
+            if (gPlayerCoopLives[pPlayer->nPlayer] >= gPlayerRoundScoreLimit)
                 sprintf(buffer, "\r%s\r is outta lives!", gProfile[pPlayer->nPlayer].name);
-            else if (gPlayerRoundLimit - 1 == gPlayerCoopLives[pPlayer->nPlayer])
+            else if (gPlayerRoundScoreLimit - 1 == gPlayerCoopLives[pPlayer->nPlayer])
                 sprintf(buffer, "\r%s\r is on their last life!", gProfile[pPlayer->nPlayer].name);
             else if (pPlayer == gMe)
-                sprintf(buffer, "You have %d lives left!", gPlayerRoundLimit - gPlayerCoopLives[pPlayer->nPlayer]);
+                sprintf(buffer, "You have %d lives left!", gPlayerRoundScoreLimit - gPlayerCoopLives[pPlayer->nPlayer]);
             if (buffer[0] != '\0')
                 viewSetMessageColor(buffer, 0, MESSAGE_PRIORITY_NORMAL, nPal, 0);
             if (bAllPlayersDead)

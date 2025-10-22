@@ -290,7 +290,8 @@ extern bool gRedFlagDropped;
 
 extern int         gPlayerScores[kMaxPlayers];
 extern ClockTicks  gPlayerScoreTicks[kMaxPlayers];
-extern int         gPlayerRoundLimit;
+extern int         gPlayerRoundScoreLimit;
+extern int         gPlayerRoundTimeLimit;
 extern char        gPlayerRoundEnding;
 extern int         gPlayerLastKiller;
 extern int         gPlayerLastVictim;
