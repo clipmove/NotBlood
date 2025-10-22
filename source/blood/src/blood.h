@@ -82,7 +82,8 @@ extern char bDemoState;
 extern bool gNetRetry;
 
 extern int gMultiModeInit;
-extern int gMultiLength;
+extern int gMultiScoreLimit;
+extern int gMultiTimeLimit;
 extern int gMultiLimit;
 extern bool gMultiModeNoExit;
 extern bool gMultiModeNoFlag;

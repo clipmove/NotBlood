@@ -247,19 +247,6 @@ const char *zRespawnStrings[] =
     "Farthest From Enemies",
 };
 
-const char *zLengthStrings[] =
-{
-    "Unlimited",
-    "Minutes",
-    "Frags",
-};
-
-const char *zLengthStringsCoop[] =
-{
-    "Unlimited",
-    "Lives",
-};
-
 const char *pzMirrorModeStrings[] = {
     "OFF",
     "HORIZONTAL",
@@ -528,9 +515,9 @@ CGameMenuItemChain itemNetStart11("START GAME", 1, 0, 175, 320, 1, 0, -1, StartN
 
 CGameMenuItemTitle itemNetGameTitle("GAME SETTINGS", 1, 160, 20, 2038);
 CGameMenuItemZCycle itemNetGameMode("GAME:", 3, 66, 35, 180, 0, SetNetGameMode, zNetGameTypes, ARRAY_SSIZE(zNetGameTypes), 0);
-CGameMenuItemZCycle itemNetGameCycleLength("LENGTH:", 3, 66, 43, 180, 0, SetNetGameMode, zLengthStrings, ARRAY_SSIZE(zLengthStrings), 0);
-CGameMenuItemZCycle itemNetGameCycleLengthCoop("LENGTH:", 3, 66, 43, 180, 0, SetNetGameMode, zLengthStringsCoop, ARRAY_SSIZE(zLengthStringsCoop), 0);
-CGameMenuItemSlider itemNetGameSliderLimit("LIMIT:", 3, 66, 51, 180, 1, 1, 255, 1, NULL, -1, -1, kMenuSliderValue);
+CGameMenuItemSlider itemNetGameSliderScoreLimit("SCORES:", 3, 66, 44, 180, 0, 0, 255, 1, NULL, -1, -1, kMenuSliderValue);
+CGameMenuItemSlider itemNetGameSliderLivesLimit("LIVES:", 3, 66, 44, 180, 0, 0, 255, 1, NULL, -1, -1, kMenuSliderValue);
+CGameMenuItemSlider itemNetGameSliderTimeLimit("TIME:", 3, 66, 54, 180, 0, 0, 60, 1, NULL, -1, -1, kMenuSliderValue);
 CGameMenuItemZBool itemNetGameBoolExit("LEVEL EXIT:", 3, 66, 65, 180, true, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolTeleFrag("TELEFRAGS:", 3, 66, 73, 180, true, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolSkillOverride("PLAYER HANDICAP:", 3, 66, 81, 180, true, NULL, "ALLOWED", "OFF");
@@ -1526,9 +1513,9 @@ void SetupNetStartMenu(void)
 
     menuNetworkGameMode.Add(&itemNetGameTitle, false);
     menuNetworkGameMode.Add(&itemNetGameMode, true);
-    menuNetworkGameMode.Add(&itemNetGameCycleLength, false);
-    menuNetworkGameMode.Add(&itemNetGameCycleLengthCoop, false);
-    menuNetworkGameMode.Add(&itemNetGameSliderLimit, false);
+    menuNetworkGameMode.Add(&itemNetGameSliderScoreLimit, false);
+    menuNetworkGameMode.Add(&itemNetGameSliderTimeLimit, false);
+    menuNetworkGameMode.Add(&itemNetGameSliderLivesLimit, false);
     menuNetworkGameMode.Add(&itemNetGameBoolExit, false);
     menuNetworkGameMode.Add(&itemNetGameBoolTeleFrag, false);
     menuNetworkGameMode.Add(&itemNetGameBoolSkillOverride, false);
@@ -1546,6 +1533,12 @@ void SetupNetStartMenu(void)
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnWeapon, false);
     menuNetworkGameMode.Add(&itemNetGameCycleMirrorModeOverride, false);
     menuNetworkGameMode.Add(&itemBloodQAV, false);
+    itemNetGameSliderScoreLimit.tooltip_pzTextUpper = "Set score limit";
+    itemNetGameSliderScoreLimit.tooltip_pzTextLower = "(0 = no limit)";
+    itemNetGameSliderTimeLimit.tooltip_pzTextUpper = "Set round limt (in minutes)";
+    itemNetGameSliderTimeLimit.tooltip_pzTextLower = "(0 = no limit)";
+    itemNetGameSliderLivesLimit.tooltip_pzTextUpper = "Set number of respawns allowed";
+    itemNetGameSliderLivesLimit.tooltip_pzTextLower = "(0 = no limit)";
     itemNetGameBoolExit.tooltip_pzTextUpper = "Toggle level exit switch functionality";
     itemNetGameBoolTeleFrag.tooltip_pzTextUpper = "Toggle telefrags kills";
     itemNetGameBoolSkillOverride.tooltip_pzTextUpper = "Toggle player health handicap";
@@ -1631,8 +1624,9 @@ void SetupNetStartMenu(void)
         itemNetStartBoolSpectatorMode.at20 = 1;
 
     itemNetGameMode.SetTextIndex(gMultiModeInit != -1 ? gMultiModeInit : 1);
-    itemNetGameCycleLength.SetTextIndex(gMultiLength != -1 ? gMultiLength : 0);
-    itemNetGameSliderLimit.nValue = gMultiLimit != -1 ? gMultiLimit : itemNetGameSliderLimit.nValue;
+    itemNetGameSliderScoreLimit.nValue = gMultiScoreLimit != -1 ? gMultiScoreLimit : itemNetGameSliderScoreLimit.nValue;
+    itemNetGameSliderLivesLimit.nValue = gMultiScoreLimit != -1 ? gMultiScoreLimit : itemNetGameSliderLivesLimit.nValue;
+    itemNetGameSliderTimeLimit.nValue = gMultiTimeLimit != -1 ? gMultiTimeLimit : itemNetGameSliderTimeLimit.nValue;
     if (gMultiModeNoExit)
         itemNetGameBoolExit.at20 = 0;
     itemNetGameBoolAutoTeams.at20 = !gPlayerTeamPreference;
@@ -3527,21 +3521,21 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
 {
     if ((itemNetGameMode.m_nFocus+1) == kGameTypeCoop) // hide multiplayer game length settings
     {
-        itemNetGameCycleLength.bEnable = 0;
-        itemNetGameCycleLength.bNoDraw = !itemNetGameCycleLength.bEnable;
-        itemNetGameCycleLengthCoop.bEnable = 1;
-        itemNetGameCycleLengthCoop.bNoDraw = !itemNetGameCycleLengthCoop.bEnable;
-        itemNetGameSliderLimit.bEnable = itemNetGameCycleLengthCoop.m_nFocus != 0; // don't show limit option if set to unlimited
-        itemNetGameSliderLimit.bNoDraw = !itemNetGameSliderLimit.bEnable;
+        itemNetGameSliderTimeLimit.bEnable = 0;
+        itemNetGameSliderTimeLimit.bNoDraw = !itemNetGameSliderTimeLimit.bEnable;
+        itemNetGameSliderScoreLimit.bEnable = 0;
+        itemNetGameSliderScoreLimit.bNoDraw = !itemNetGameSliderScoreLimit.bEnable;
+        itemNetGameSliderLivesLimit.bEnable = 1;
+        itemNetGameSliderLivesLimit.bNoDraw = !itemNetGameSliderLivesLimit.bEnable;
     }
     else // hide co-op game length settings
     {
-        itemNetGameCycleLength.bEnable = 1;
-        itemNetGameCycleLength.bNoDraw = !itemNetGameCycleLength.bEnable;
-        itemNetGameCycleLengthCoop.bEnable = 0;
-        itemNetGameCycleLengthCoop.bNoDraw = !itemNetGameCycleLengthCoop.bEnable;
-        itemNetGameSliderLimit.bEnable = itemNetGameCycleLength.m_nFocus != 0; // don't show limit option if set to unlimited
-        itemNetGameSliderLimit.bNoDraw = !itemNetGameSliderLimit.bEnable;
+        itemNetGameSliderTimeLimit.bEnable = 1;
+        itemNetGameSliderTimeLimit.bNoDraw = !itemNetGameSliderTimeLimit.bEnable;
+        itemNetGameSliderScoreLimit.bEnable = 1;
+        itemNetGameSliderScoreLimit.bNoDraw = !itemNetGameSliderScoreLimit.bEnable;
+        itemNetGameSliderLivesLimit.bEnable = 0;
+        itemNetGameSliderLivesLimit.bNoDraw = !itemNetGameSliderLivesLimit.bEnable;
     }
 
     if (pItem == &itemNetGameMode)
@@ -4453,16 +4447,15 @@ void StartNetGame(CGameMenuItemChain *pItem)
     if (gPacketStartGame.gameType == kGameTypeSinglePlayer)
         gPacketStartGame.gameType = kGameTypeBloodBath;
     gPacketStartGame.uNetGameFlags = kNetGameFlagNone;
-    if ((itemNetGameCycleLength.m_nFocus > 0) && (gPacketStartGame.gameType != kGameTypeCoop))
+    if (gPacketStartGame.gameType != kGameTypeCoop) // bloodbath/teams score and time limits
     {
-        gPacketStartGame.uNetGameFlags |= itemNetGameCycleLength.m_nFocus == 1 ? kNetGameFlagLimitMinutes : kNetGameFlagLimitFrags;
-        gPacketStartGame.uNetGameFlags |= (ClipRange(itemNetGameSliderLimit.nValue, 1, 255)<<kNetGameFlagLimitBase)&kNetGameFlagLimitMask;
+        if (itemNetGameSliderScoreLimit.nValue > 0)
+            gPacketStartGame.uNetGameFlags |= (ClipRange(itemNetGameSliderScoreLimit.nValue, 1, 255)<<kNetGameFlagScoresLimitBase)&kNetGameFlagScoresLimitMask;
+        if (itemNetGameSliderTimeLimit.nValue > 0)
+            gPacketStartGame.uNetGameFlags |= (ClipRange(itemNetGameSliderTimeLimit.nValue, 1, 63)<<kNetGameFlagTimeLimitBase)&kNetGameFlagTimeLimitMask;
     }
-    else if ((itemNetGameCycleLengthCoop.m_nFocus > 0) && (gPacketStartGame.gameType == kGameTypeCoop))
-    {
-        gPacketStartGame.uNetGameFlags |= kNetGameFlagLimitFrags;
-        gPacketStartGame.uNetGameFlags |= (ClipRange(itemNetGameSliderLimit.nValue, 1, 255)<<kNetGameFlagLimitBase)&kNetGameFlagLimitMask;
-    }
+    else if (itemNetGameSliderLivesLimit.nValue > 0) // co-op lives
+        gPacketStartGame.uNetGameFlags |= (ClipRange(itemNetGameSliderLivesLimit.nValue, 1, 255)<<kNetGameFlagScoresLimitBase)&kNetGameFlagScoresLimitMask;
     if (!itemNetGameBoolExit.at20 && (gPacketStartGame.gameType != kGameTypeCoop))
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoLevelExit;
     if (!itemNetGameBoolTeleFrag.at20)

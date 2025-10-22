@@ -1378,7 +1378,7 @@ void viewDrawStats(PLAYER *pPlayer, int x, int y)
         viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStrKills);
         y -= (nHeight + 1);
     }
-    const int nLevelTime = (gGameOptions.nGameType >= kGameTypeBloodBath) && (gGameOptions.uNetGameFlags & kNetGameFlagLimitMinutes) ? ClipLow(gPlayerRoundLimit - gLevelTime, 0) : gLevelTime;
+    const int nLevelTime = (gGameOptions.nGameType >= kGameTypeBloodBath) && (gGameOptions.uNetGameFlags&kNetGameFlagTimeLimitMask) ? ClipLow(gPlayerRoundTimeLimit - gLevelTime, 0) : gLevelTime;
     sprintf(buffer, "T:%d:%02d.%02d",
         (nLevelTime / (kTicsPerSec * 60)),
         (nLevelTime / kTicsPerSec) % 60,
@@ -2244,7 +2244,7 @@ void viewDrawWinner(const char *pString, int nPal)
     if (!gPlayerRoundEnding)
         return;
 
-    if ((int)totalclock & 16) // flash multi kill message
+    if ((int)totalclock & 64) // flash winner
         return;
 
     int nY = 40;

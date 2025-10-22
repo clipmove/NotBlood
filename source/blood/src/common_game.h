@@ -144,24 +144,25 @@ kNetGameFlagNoLevelExit         =  1 << 0,
 kNetGameFlagNoTeleFrag          =  1 << 1, // this is the only flag that is part of the original v1.21 DOS binary (do not change this enum)
 kNetGameFlagSkillIssue          =  1 << 2,
 kNetGameFlagNoTeamColors        =  1 << 3,
-kNetGameFlagLimitMinutes        =  1 << 4,
-kNetGameFlagLimitFrags          =  1 << 5,
-kNetGameFlagHideWeaponsCloak    =  1 << 6,
-kNetGameFlagHideWeaponsAlways   =  1 << 7,
+kNetGameFlagHideWeaponsCloak    =  1 << 4,
+kNetGameFlagHideWeaponsAlways   =  1 << 5,
 
-kNetGameFlagLimitBase           =  8, // this bit range stores our limit value (0-255)
-kNetGameFlagLimitMask           =  1 << 8|1 << 9|1 << 10|1 << 11|1 << 12|1 << 13|1 << 14|1 << 15,
+kNetGameFlagScoresLimitBase     =  6, // this bit range stores our limit value (0-255)
+kNetGameFlagScoresLimitMask     =  1 << 6|1 << 7|1 << 8|1 << 9|1 << 10|1 << 11|1 << 12|1 << 13,
 
-kNetGameFlagSpawnSmart          =  1 << 16,
-kNetGameFlagSpawnDist           =  1 << 17,
-kNetGameFlagNoTeamFlags         =  1 << 18,
-kNetGameFlagMirrorHoriz         =  1 << 19,
-kNetGameFlagMirrorVert          =  1 << 20,
-kNetGameFlagCalebOnly           =  1 << 21, // no items, caleb only, final destination
-kNetGameFlagSpectatingAllow     =  1 << 22,
-kNetGameFlagNoChaseView         =  1 << 23, // client sided limit that can be easily bypass by a compile smh
-kNetGameFlagNoHolstering        =  1 << 24,
-kNetGameFlagVanillaColors       =  1 << 25,
+kNetGameFlagTimeLimitBase       =  14, // this bit range stores our limit value (0-63)
+kNetGameFlagTimeLimitMask       =  1 << 14|1 << 15|1 << 16|1 << 17|1 << 18|1 << 19,
+
+kNetGameFlagSpawnSmart          =  1 << 20,
+kNetGameFlagSpawnDist           =  1 << 21,
+kNetGameFlagNoTeamFlags         =  1 << 22,
+kNetGameFlagMirrorHoriz         =  1 << 23,
+kNetGameFlagMirrorVert          =  1 << 24,
+kNetGameFlagCalebOnly           =  1 << 25, // no items, caleb only, final destination
+kNetGameFlagSpectatingAllow     =  1 << 26,
+kNetGameFlagNoChaseView         =  1 << 27, // client sided limit that can be easily bypass by a compile smh
+kNetGameFlagNoHolstering        =  1 << 28,
+kNetGameFlagVanillaColors       =  1 << 29,
 
 };
 
