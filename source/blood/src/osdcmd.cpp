@@ -875,7 +875,7 @@ static int osdcmd_say_team(osdcmdptr_t parm)
         return OSDCMD_SHOWHELP;
     else
     {
-        gPlayerMsg.bTeamMessage = 1;
+        gPlayerMsg.bTeamMessage = gGameOptions.nGameType == kGameTypeTeams;
         gPlayerMsg.Set(parm->parms[0]);
         gPlayerMsg.Send();
     }
