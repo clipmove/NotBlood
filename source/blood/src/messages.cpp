@@ -570,6 +570,7 @@ void CPlayerMsg::Clear(void)
 {
     text[0] = 0;
     at0 = 0;
+    bTeamMessage = 0;
 }
 
 void CPlayerMsg::Term(void)
@@ -588,7 +589,8 @@ void CPlayerMsg::Draw(void)
     int y = gViewY0S;
     if (gViewSize >= 1)
         y += tilesiz[2229].y*((gNetPlayers+3)/4);
-    viewDrawText(0, buffer, x+1,y+1, -128, 0, 0, false, 256);
+    const int nPal = bTeamMessage && gColorMsg && (gGameOptions.nGameType == kGameTypeTeams) ? playerColorPalMessage(gPlayer[myconnectindex].teamId) : 0;
+    viewDrawText(0, buffer, x+1,y+1, -128, nPal, 0, false, 256);
 }
 
 bool CPlayerMsg::AddChar(char ch)
@@ -619,13 +621,14 @@ void CPlayerMsg::Send(void)
 {
     if (VanillaMode() || !IsWhitespaceOnly(text))
     {
-        netBroadcastMessage(myconnectindex, text);
+        netBroadcastMessage(myconnectindex, text, bTeamMessage);
         if (!VanillaMode() && (gGameOptions.nGameType != kGameTypeSinglePlayer))
         {
-            ChatPipe_SendMessage(text);
+            if (!bTeamMessage)
+                ChatPipe_SendMessage(text);
             char *myName = gProfile[myconnectindex].name;
             char szTemp[128];
-            sprintf(szTemp, "%s: %s", myName, text);
+            sprintf(szTemp, "%s%s: %s", myName, bTeamMessage ? " (TEAM)" : "", text);
             int nPalette = gColorMsg ? playerColorPalMessage(gPlayer[myconnectindex].teamId) : 0;
             viewSetMessage(szTemp, nPalette);
         }
