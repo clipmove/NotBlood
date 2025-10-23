@@ -78,7 +78,7 @@ char gNetAddress[32];
 int gNetPort = kNetDefaultPort;
 int gNetPortLocal = -1;
 
-const short kNetVersion = 0x234;
+const short kNetVersion = 0x235;
 
 #ifdef NORENDER
 #ifdef _WIN32
@@ -557,11 +557,13 @@ void netGetPackets(void)
             }
             break;
         }
+        case 8: // team message
         case 3:
             pPacket += 4;
             if (pPacket[0] != '/' || (pPacket[0] == '/' && (!pPacket[1] || (pPacket[1] >= '1' && pPacket[1] <= '8' && pPacket[1] - '1' == myconnectindex))))
             {
-                sprintf(buffer, !VanillaMode() ? "%s: %s" : "%s : %s", gProfile[nPlayer].name, pPacket);
+                const char bTeamMessage = pPacket[-5] == 8;
+                sprintf(buffer, !VanillaMode() ? "%s%s: %s" : "%s%s : %s", gProfile[nPlayer].name, bTeamMessage ? " (TEAM)" : "", pPacket);
                 viewSetMessage(buffer, gColorMsg && !VanillaMode() ? playerColorPalMessage(gPlayer[nPlayer].teamId) : 0);
                 if (gChatSnd) // trigger message beep
                     sndStartSample("DMRADIO", 128, -1);
@@ -744,16 +746,27 @@ void netBroadcastTauntRandom(int nPlayer)
     sndStartSample(1008+nTaunt, 2, 1, 0);
 }
 
-void netBroadcastMessage(int nPlayer, const char *pzMessage)
+void netBroadcastMessage(int nPlayer, const char *pzMessage, const char bTeamMessage)
 {
     if (numplayers > 1)
     {
         int nSize = strlen(pzMessage);
         char *pPacket = packet;
-        PutPacketByte(pPacket, 3);
+        PutPacketByte(pPacket, !bTeamMessage ? 3 : 8);
         PutPacketDWord(pPacket, nPlayer);
         PutPacketBuffer(pPacket, pzMessage, nSize+1);
-        netSendPacketAll(packet, pPacket-packet);
+        if (!bTeamMessage)
+        {
+            netSendPacketAll(packet, pPacket-packet);
+        }
+        else
+        {
+            for (int p = connecthead; p >= 0; p = connectpoint2[p])
+            {
+                if ((p != myconnectindex) && (gPlayer[p].teamId == gPlayer[myconnectindex].teamId))
+                    netSendPacket(p, packet, pPacket-packet);
+            }
+        }
     }
 }
 
