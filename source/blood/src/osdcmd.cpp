@@ -870,7 +870,7 @@ static int osdcmd_say_team(osdcmdptr_t parm)
     if (parm->numparms != 1) return OSDCMD_SHOWHELP;
 
     if (!gGameStarted)
-        OSD_Printf("say: game not started.\n");
+        OSD_Printf("say_team: game not started.\n");
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
     else
