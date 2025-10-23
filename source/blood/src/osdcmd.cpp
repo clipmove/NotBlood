@@ -1176,6 +1176,7 @@ int32_t registerosdcommands(void)
         { "in_radialmenutoggle", "sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon)", (void*)&gRadialMenuToggle, CVAR_INT, 0, 2 },
         { "in_radialmenuposition", "sets the radial menu position", (void*)&gRadialMenuPosition, CVAR_INT, 0, 320 },
         { "in_radialmenudim", "enable/disable radial menu dimming background", (void*)&gRadialMenuDimBackground, CVAR_BOOL, 0, 1 },
+        { "in_radialmenudimhud", "enable/disable radial menu dimming hud", (void*)&gRadialMenuDimHud, CVAR_BOOL, 0, 1 },
         { "in_radialmenuyaw", "sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)", (void*)&gRadialMenuYaw, CVAR_INT, 0, 5 },
         { "in_radialmenuyawinvert", "enable/disable invert radial menu yaw input", (void*)&gRadialMenuYawInvert, CVAR_BOOL, 0, 1 },
         { "in_radialmenupitch", "sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)", (void*)&gRadialMenuPitch, CVAR_INT, 0, 5 },

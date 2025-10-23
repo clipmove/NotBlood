@@ -83,6 +83,7 @@ int32_t gRadialMenuThreshold;
 int32_t gRadialMenuToggle;
 int32_t gRadialMenuPosition;
 int32_t gRadialMenuDimBackground;
+int32_t gRadialMenuDimHud;
 int32_t gRadialMenuSlowDown;
 int32_t gRadialMenuYaw;
 int32_t gRadialMenuYawInvert;
@@ -516,6 +517,7 @@ void CONFIG_SetDefaults(void)
     gRadialMenuToggle = 0;
     gRadialMenuPosition = 240;
     gRadialMenuDimBackground = 1;
+    gRadialMenuDimHud = 1;
     gRadialMenuThreshold = 128;
     gRadialMenuSlowDown = 1;
     gRadialMenuYaw = 4;
