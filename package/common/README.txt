@@ -299,6 +299,8 @@ If you have the GOG version of the game, do the following:
    - Sets the radial menu position
 * in_radialmenudim
    - Enable/disable radial menu dimming background
+* in_radialmenudimhud
+   - Enable/disable radial menu dimming hud
 * in_radialmenuyaw
    - Sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)
 * in_radialmenuyawinvert

@@ -1813,14 +1813,17 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
 
     if (gRadialMenuDimBackground)
         viewDimScreen();
+    if (!gRadialMenuDimHud)
+        DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, nPal, RS_AUTO, fix16_from_float(0.56f));
     if (gWeaponRadialMenuChoice != -1) // render reticle
     {
         const int nSlot = weaponRadialInfo[nWeaponCur].nSlot;
         const int nX = (int)nWeaponRadialReticlePos[nSlot][0];
         const int nY = (int)nWeaponRadialReticlePos[nSlot][1];
-        DrawStatMaskedSprite(624, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, 0, 9, RS_AUTO, fix16_from_float(71.f / 64.f * 0.25f));
+        DrawStatMaskedSprite(624, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, gRadialMenuDimHud ? -128 : 0, 9, gRadialMenuDimHud ? RS_AUTO : RS_AUTO|RS_TRANS_MASK, fix16_from_float(71.f / 64.f * 0.25f));
     }
-    DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
+    if (gRadialMenuDimHud)
+        DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
     for (int i = kWeaponPitchfork; i <= kWeaponRemoteTNT; i++)
     {
         if (!WeaponIsEquipable(pPlayer, i))
