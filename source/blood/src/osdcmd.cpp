@@ -859,7 +859,7 @@ static int osdcmd_say(osdcmdptr_t parm)
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
     else if (gLastMessageTick == nSecond)
-        OSD_Printf("say: say is on cooldown.\n");
+        return OSDCMD_OK; // on cooldown
     else
     {
         gLastMessageTick = nSecond;
@@ -881,7 +881,7 @@ static int osdcmd_say_team(osdcmdptr_t parm)
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
     else if (gLastMessageTick == nSecond)
-        OSD_Printf("say_team: say_team is on cooldown.\n");
+        return OSDCMD_OK; // on cooldown
     else
     {
         gLastMessageTick = nSecond;
