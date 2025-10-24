@@ -332,6 +332,10 @@ If you have the GOG version of the game, do the following:
    - Enable/disable wall/floor aligned transparent voxels
 * record
    - record <episode> <map> <difficulty 1-5>: start a demo recording
+* say
+   - Display player message
+* say_team
+   - Display player message to team
 * skill
    - Changes the skill handicap for multiplayer (default: 2, range: 0-4)
 * snd_earangle
