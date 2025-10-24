@@ -852,12 +852,17 @@ static int osdcmd_say(osdcmdptr_t parm)
 {
     if (parm->numparms != 1) return OSDCMD_SHOWHELP;
 
+    static int gLastMessageTick = 0;
+    const int nSecond = gLevelTime > 0 ? gLevelTime / kTicsPerSec : 0;
     if (!gGameStarted)
         OSD_Printf("say: game not started.\n");
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
+    else if (gLastMessageTick == nSecond)
+        OSD_Printf("say: say is on cooldown.\n");
     else
     {
+        gLastMessageTick = nSecond;
         gPlayerMsg.Set(parm->parms[0]);
         gPlayerMsg.Send();
     }
@@ -869,12 +874,17 @@ static int osdcmd_say_team(osdcmdptr_t parm)
 {
     if (parm->numparms != 1) return OSDCMD_SHOWHELP;
 
+    static int gLastMessageTick = 0;
+    const int nSecond = gLevelTime > 0 ? gLevelTime / kTicsPerSec : 0;
     if (!gGameStarted)
-        OSD_Printf("say: game not started.\n");
+        OSD_Printf("say_team: game not started.\n");
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
+    else if (gLastMessageTick == nSecond)
+        OSD_Printf("say_team: say_team is on cooldown.\n");
     else
     {
+        gLastMessageTick = nSecond;
         gPlayerMsg.bTeamMessage = gGameOptions.nGameType == kGameTypeTeams;
         gPlayerMsg.Set(parm->parms[0]);
         gPlayerMsg.Send();
