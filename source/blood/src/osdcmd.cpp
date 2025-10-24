@@ -848,41 +848,6 @@ static int osdcmd_quickload(osdcmdptr_t UNUSED(parm))
     return OSDCMD_OK;
 }
 
-static int osdcmd_say(osdcmdptr_t parm)
-{
-    if (parm->numparms != 1) return OSDCMD_SHOWHELP;
-
-    if (!gGameStarted)
-        OSD_Printf("say: game not started.\n");
-    else if (parm->parms[0][0] == '\0')
-        return OSDCMD_SHOWHELP;
-    else
-    {
-        gPlayerMsg.Set(parm->parms[0]);
-        gPlayerMsg.Send();
-    }
-
-    return OSDCMD_OK;
-}
-
-static int osdcmd_say_team(osdcmdptr_t parm)
-{
-    if (parm->numparms != 1) return OSDCMD_SHOWHELP;
-
-    if (!gGameStarted)
-        OSD_Printf("say: game not started.\n");
-    else if (parm->parms[0][0] == '\0')
-        return OSDCMD_SHOWHELP;
-    else
-    {
-        gPlayerMsg.bTeamMessage = gGameOptions.nGameType == kGameTypeTeams;
-        gPlayerMsg.Set(parm->parms[0]);
-        gPlayerMsg.Send();
-    }
-
-    return OSDCMD_OK;
-}
-
 static int osdcmd_screenshot(osdcmdptr_t parm)
 {
     static const char *fn = "blud0000.png";
@@ -1391,8 +1356,6 @@ int32_t registerosdcommands(void)
 //#else
 //    OSD_RegisterFunction("lua", "lua \"Lua code...\": runs Lunatic code", osdcmd_lua);
 //#endif
-    OSD_RegisterFunction("say","display player message", osdcmd_say);
-    OSD_RegisterFunction("say_team","display player message to team", osdcmd_say_team);
     OSD_RegisterFunction("screenshot","screenshot [format]: takes a screenshot.", osdcmd_screenshot);
 //
 //    OSD_RegisterFunction("spawn","spawn <picnum> [palnum] [cstat] [ang] [x y z]: spawns a sprite with the given properties",osdcmd_spawn);
