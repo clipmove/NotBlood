@@ -477,12 +477,20 @@ void netGetPackets(void)
             break;
         }
         case 8: // team message
+            pPacket += 4;
+            if (pPacket[0] != '/' || (pPacket[0] == '/' && (!pPacket[1] || (pPacket[1] >= '1' && pPacket[1] <= '8' && pPacket[1] - '1' == myconnectindex))))
+            {
+                sprintf(buffer, !VanillaMode() ? "%s (TEAM): %s" : "%s (TEAM) : %s", gProfile[nPlayer].name, pPacket);
+                viewSetMessage(buffer, gColorMsg && !VanillaMode() ? playerColorPalMessage(gPlayer[nPlayer].teamId) : 0);
+                if (gChatSnd) // trigger message beep
+                    sndStartSample("DMRADIO", 128, -1);
+            }
+            break;
         case 3:
             pPacket += 4;
             if (pPacket[0] != '/' || (pPacket[0] == '/' && (!pPacket[1] || (pPacket[1] >= '1' && pPacket[1] <= '8' && pPacket[1] - '1' == myconnectindex))))
             {
-                const char bTeamMessage = pPacket[-5] == 8;
-                sprintf(buffer, !VanillaMode() ? "%s%s: %s" : "%s%s : %s", gProfile[nPlayer].name, bTeamMessage ? " (TEAM)" : "", pPacket);
+                sprintf(buffer, !VanillaMode() ? "%s: %s" : "%s : %s", gProfile[nPlayer].name, pPacket);
                 viewSetMessage(buffer, gColorMsg && !VanillaMode() ? playerColorPalMessage(gPlayer[nPlayer].teamId) : 0);
                 if (gChatSnd) // trigger message beep
                     sndStartSample("DMRADIO", 128, -1);
