@@ -2743,6 +2743,11 @@ bool CGameMenuItemYesNoQuit::Event(CGameMenuEvent &event)
     switch (event.at0)
     {
     case kMenuEventKey:
+        KB_FlushKeyboardQueue();
+        KB_FlushKeyboardQueueScans();
+        KB_ClearKeysDown();
+        keyFlushScans();
+        keyFlushChars();
         if (event.at2 == sc_Y)
         {
             if (m_nRestart)
@@ -2754,6 +2759,11 @@ bool CGameMenuItemYesNoQuit::Event(CGameMenuEvent &event)
             gGameMenuMgr.Pop();
         return false;
     case kMenuEventEnter:
+        KB_FlushKeyboardQueue();
+        KB_FlushKeyboardQueueScans();
+        KB_ClearKeysDown();
+        keyFlushScans();
+        keyFlushChars();
         if (m_nRestart)
             Restart(NULL);
         else
