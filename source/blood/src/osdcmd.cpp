@@ -850,7 +850,7 @@ static int osdcmd_quickload(osdcmdptr_t UNUSED(parm))
 
 static int osdcmd_say(osdcmdptr_t parm)
 {
-    if (parm->numparms != 1) return OSDCMD_SHOWHELP;
+    if (parm->numparms < 1) return OSDCMD_SHOWHELP;
 
     static int gLastMessageTick = 0;
     const int nSecond = gLevelTime > 0 ? gLevelTime / kTicsPerSec : 0;
@@ -863,7 +863,15 @@ static int osdcmd_say(osdcmdptr_t parm)
     else
     {
         gLastMessageTick = nSecond;
-        gPlayerMsg.Set(parm->parms[0]);
+        char sMsg[MAXRIDECULELENGTH];
+        sMsg[0] = '\0';
+        for (int32_t i = 0; i < parm->numparms; i++)
+            snprintf(sMsg, MAXRIDECULELENGTH, "%s%s ", sMsg, parm->parms[i]);
+        sMsg[MAXRIDECULELENGTH-1] = '\0';
+        size_t nLen = strlen(sMsg);
+        if (nLen > 0)
+            sMsg[nLen-1] = '\0';
+        gPlayerMsg.Set(sMsg);
         gPlayerMsg.Send();
     }
 
@@ -872,7 +880,7 @@ static int osdcmd_say(osdcmdptr_t parm)
 
 static int osdcmd_say_team(osdcmdptr_t parm)
 {
-    if (parm->numparms != 1) return OSDCMD_SHOWHELP;
+    if (parm->numparms < 1) return OSDCMD_SHOWHELP;
 
     static int gLastMessageTick = 0;
     const int nSecond = gLevelTime > 0 ? gLevelTime / kTicsPerSec : 0;
@@ -885,6 +893,14 @@ static int osdcmd_say_team(osdcmdptr_t parm)
     else
     {
         gLastMessageTick = nSecond;
+        char sMsg[MAXRIDECULELENGTH];
+        sMsg[0] = '\0';
+        for (int32_t i = 0; i < parm->numparms; i++)
+            snprintf(sMsg, MAXRIDECULELENGTH, "%s%s ", sMsg, parm->parms[i]);
+        sMsg[MAXRIDECULELENGTH-1] = '\0';
+        size_t nLen = strlen(sMsg);
+        if (nLen > 0)
+            sMsg[nLen-1] = '\0';
         gPlayerMsg.bTeamMessage = gGameOptions.nGameType == kGameTypeTeams;
         gPlayerMsg.Set(parm->parms[0]);
         gPlayerMsg.Send();
