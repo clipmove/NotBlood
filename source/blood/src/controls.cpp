@@ -35,7 +35,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "globals.h"
 #include "levels.h"
 #include "map2d.h"
-#include "messages.h"
 #include "trig.h"
 #include "view.h"
 #include "weapon.h"
@@ -122,7 +121,6 @@ void ctrlInit(void)
     CONTROL_DefineFlag(gamefunc_Shrink_Screen, false);
     CONTROL_DefineFlag(gamefunc_Enlarge_Screen, false);
     CONTROL_DefineFlag(gamefunc_Send_Message, false);
-    CONTROL_DefineFlag(gamefunc_Send_Message_Team, false);
     CONTROL_DefineFlag(gamefunc_See_Coop_View, false);
     CONTROL_DefineFlag(gamefunc_See_Chase_View, false);
     CONTROL_DefineFlag(gamefunc_Mouse_Aiming, false);
@@ -243,16 +241,6 @@ void ctrlGetInput(void)
         CONTROL_ClearButton(gamefunc_Send_Message);
         keyFlushScans();
         gInputMode = INPUT_MODE_2;
-        gPlayerMsg.bTeamMessage = 0;
-    }
-
-    if (gGameStarted && gInputMode != INPUT_MODE_2 && gInputMode != INPUT_MODE_1
-        && BUTTON(gamefunc_Send_Message_Team))
-    {
-        CONTROL_ClearButton(gamefunc_Send_Message_Team);
-        keyFlushScans();
-        gInputMode = INPUT_MODE_2;
-        gPlayerMsg.bTeamMessage = gGameOptions.nGameType == kGameTypeTeams;
     }
 
     if (BUTTON(gamefunc_AutoRun))
