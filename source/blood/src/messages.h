@@ -90,8 +90,9 @@ class CPlayerMsg
 public:
     int at0;
     char text[41];
+    char bTeamMessage;
     int xoffset;
-    CPlayerMsg() { at0 = 0; text[0] = 0; }
+    CPlayerMsg() { at0 = 0; text[0] = 0; bTeamMessage = 0; }
     void Clear(void);
     void Term(void);
     void Draw(void);
