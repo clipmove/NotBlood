@@ -182,6 +182,7 @@ extern char gzRandomizerSeed[9];
 
 int  CONFIG_ReadSetup(void);
 void CONFIG_WriteSetup(uint32_t flags);
+void CONFIG_SetDefaultPlayerName(char *pzStr);
 void CONFIG_SetDefaults(void);
 void CONFIG_SetupMouse(void);
 void CONFIG_SetupJoystick(void);
