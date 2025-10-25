@@ -848,29 +848,39 @@ static int osdcmd_quickload(osdcmdptr_t UNUSED(parm))
     return OSDCMD_OK;
 }
 
+static int gLastSayTick = 0;
+
 static int osdcmd_say(osdcmdptr_t parm)
 {
     if (parm->numparms < 1) return OSDCMD_SHOWHELP;
 
-    static int gLastMessageTick = 0;
     const int nSecond = gLevelTime > 0 ? gLevelTime / kTicsPerSec : 0;
     if (!gGameStarted)
         OSD_Printf("say: game not started.\n");
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
-    else if (gLastMessageTick == nSecond)
+    else if (gLastSayTick == nSecond)
         return OSDCMD_OK; // on cooldown
     else
     {
-        gLastMessageTick = nSecond;
+        gLastSayTick = nSecond;
         char sMsg[MAXRIDECULELENGTH];
-        sMsg[0] = '\0';
-        for (int32_t i = 0; i < parm->numparms; i++)
-            snprintf(sMsg, MAXRIDECULELENGTH, "%s%s ", sMsg, parm->parms[i]);
-        sMsg[MAXRIDECULELENGTH-1] = '\0';
-        size_t nLen = strlen(sMsg);
-        if (nLen > 0)
-            sMsg[nLen-1] = '\0';
+        for (int32_t i = 0, nLength = 0; i < parm->numparms; i++)
+        {
+            int nParmLength = 0;
+            while (parm->parms[i][nParmLength] != '\0')
+            {
+                if (nLength == MAXRIDECULELENGTH - 1)
+                    break;
+                sMsg[nLength++] = parm->parms[i][nParmLength++];
+            }
+            if ((i == parm->numparms - 1) || (nLength == MAXRIDECULELENGTH - 1))
+            {
+                sMsg[nLength] = '\0';
+                break;
+            }
+            sMsg[nLength++] = ' ';
+        }
         gPlayerMsg.Set(sMsg);
         gPlayerMsg.Send();
     }
@@ -882,27 +892,35 @@ static int osdcmd_say_team(osdcmdptr_t parm)
 {
     if (parm->numparms < 1) return OSDCMD_SHOWHELP;
 
-    static int gLastMessageTick = 0;
     const int nSecond = gLevelTime > 0 ? gLevelTime / kTicsPerSec : 0;
     if (!gGameStarted)
         OSD_Printf("say_team: game not started.\n");
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
-    else if (gLastMessageTick == nSecond)
+    else if (gLastSayTick == nSecond)
         return OSDCMD_OK; // on cooldown
     else
     {
-        gLastMessageTick = nSecond;
+        gLastSayTick = nSecond;
         char sMsg[MAXRIDECULELENGTH];
-        sMsg[0] = '\0';
-        for (int32_t i = 0; i < parm->numparms; i++)
-            snprintf(sMsg, MAXRIDECULELENGTH, "%s%s ", sMsg, parm->parms[i]);
-        sMsg[MAXRIDECULELENGTH-1] = '\0';
-        size_t nLen = strlen(sMsg);
-        if (nLen > 0)
-            sMsg[nLen-1] = '\0';
+        for (int32_t i = 0, nLength = 0; i < parm->numparms; i++)
+        {
+            int nParmLength = 0;
+            while (parm->parms[i][nParmLength] != '\0')
+            {
+                if (nLength == MAXRIDECULELENGTH - 1)
+                    break;
+                sMsg[nLength++] = parm->parms[i][nParmLength++];
+            }
+            if ((i == parm->numparms - 1) || (nLength == MAXRIDECULELENGTH - 1))
+            {
+                sMsg[nLength] = '\0';
+                break;
+            }
+            sMsg[nLength++] = ' ';
+        }
         gPlayerMsg.bTeamMessage = gGameOptions.nGameType == kGameTypeTeams;
-        gPlayerMsg.Set(parm->parms[0]);
+        gPlayerMsg.Set(sMsg);
         gPlayerMsg.Send();
     }
 
