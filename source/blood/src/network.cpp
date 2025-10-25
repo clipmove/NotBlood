@@ -584,10 +584,22 @@ void netBroadcastMyLogoff(bool bRestart)
     netResetToSinglePlayer();
 }
 
+inline bool IsWhitespace(char *pzStr)
+{
+    while (*pzStr != '\0')
+    {
+        if (*pzStr++ != ' ')
+            return false;
+    }
+    return true;
+}
+
 void netBroadcastPlayerInfo(int nPlayer)
 {
     PROFILE *pProfile = &gProfile[nPlayer];
     Bstrncpyz(pProfile->name, szPlayerName, sizeof(szPlayerName));
+    if (IsWhitespace(pProfile->name))
+        CONFIG_SetDefaultPlayerName(pProfile->name);
     pProfile->nAutoAim = gAutoAim;
     pProfile->nWeaponSwitch = gWeaponSwitch;
     pProfile->bWeaponFastSwitch = gWeaponFastSwitch;
@@ -609,6 +621,8 @@ void netBroadcastPlayerInfoUpdate(int nPlayer)
 {
     PROFILE *pProfile = &gProfileNet[nPlayer];
     Bstrncpyz(pProfile->name, szPlayerName, sizeof(szPlayerName));
+    if (IsWhitespace(pProfile->name))
+        CONFIG_SetDefaultPlayerName(pProfile->name);
     pProfile->nAutoAim = gAutoAim;
     pProfile->nWeaponSwitch = gWeaponSwitch;
     pProfile->bWeaponFastSwitch = gWeaponFastSwitch;
