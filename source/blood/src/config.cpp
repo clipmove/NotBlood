@@ -323,23 +323,22 @@ void CONFIG_SetDefaultKeys(const char (*keyptr)[MAXGAMEFUNCLEN], bool lazy/*=fal
     }
 }
 
-
-void CONFIG_SetDefaultPlayerName(char *pzStr)
+const char *gPlayerNames[kMaxPlayers] =
 {
-    const char *gPlayerNames[8] = 
-    {
-        "Caleb",
-        "Cultist",
-        "Gargoyle",
-        "Fanatic",
-        "Tchernobog",
-        "Zealot",
-        "Phantasm",
-        "Cerberus",
-    };
+    "Caleb",
+    "Cultist",
+    "Gargoyle",
+    "Fanatic",
+    "Tchernobog",
+    "Zealot",
+    "Phantasm",
+    "Cerberus",
+};
 
+void CONFIG_SetDefaultPlayerName()
+{
     time_t rawtime = time(NULL);
-    Bstrcpy(pzStr, gPlayerNames[rawtime&7]);
+    Bstrcpy(szPlayerName, gPlayerNames[rawtime&7]);
 }
 
 
@@ -592,7 +591,7 @@ void CONFIG_SetDefaults(void)
     gRandomizerScaleMode = 1;
     Bmemset(gzRandomizerSeed, 0, sizeof(gzRandomizerSeed));
 
-    CONFIG_SetDefaultPlayerName(szPlayerName);
+    CONFIG_SetDefaultPlayerName();
 
     Bstrcpy(CommbatMacro[0], "I love the smell of napalm...");
     Bstrcpy(CommbatMacro[1], "Is that gasoline I smell?");
