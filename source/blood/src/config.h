@@ -162,6 +162,7 @@ extern int32_t gSmokeTrail3D;
 extern int32_t gProjectileOldSprite;
 extern int32_t gPackSlotSwitch;
 extern int32_t gFMPianoFix;
+extern const char *gPlayerNames[];
 
 ///////
 extern int gVanilla;
@@ -182,7 +183,6 @@ extern char gzRandomizerSeed[9];
 
 int  CONFIG_ReadSetup(void);
 void CONFIG_WriteSetup(uint32_t flags);
-void CONFIG_SetDefaultPlayerName(char *pzStr);
 void CONFIG_SetDefaults(void);
 void CONFIG_SetupMouse(void);
 void CONFIG_SetupJoystick(void);

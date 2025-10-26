@@ -101,7 +101,6 @@ public:
     void Set(const char *pzString);
     void Send(void);
     void ProcessKeys(void);
-private:
     bool IsWhitespaceOnly(const char* const pzString);
 };
 
