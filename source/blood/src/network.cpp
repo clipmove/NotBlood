@@ -536,10 +536,14 @@ void netGetPackets(void)
             break;
         case 251:
             memcpy(&gProfile[nPlayer], pPacket, sizeof(PROFILE));
+            if (gPlayerMsg.IsWhitespaceOnly(gProfile[nPlayer].name))
+                Bstrncpyz(gProfile[nPlayer].name, gPlayerNames[nPlayer], MAXPLAYERNAME);
             gProfileNet[nPlayer] = gProfile[nPlayer];
             break;
         case 253:
             memcpy(&gProfileNet[nPlayer], pPacket, sizeof(PROFILE));
+            if (gPlayerMsg.IsWhitespaceOnly(gProfileNet[nPlayer].name))
+                Bstrncpyz(gProfileNet[nPlayer].name, gPlayerNames[nPlayer], MAXPLAYERNAME);
             break;
         case 252:
             pPacket += 4;
@@ -584,22 +588,12 @@ void netBroadcastMyLogoff(bool bRestart)
     netResetToSinglePlayer();
 }
 
-inline bool IsWhitespace(char *pzStr)
-{
-    while (*pzStr != '\0')
-    {
-        if (*pzStr++ != ' ')
-            return false;
-    }
-    return true;
-}
-
 void netBroadcastPlayerInfo(int nPlayer)
 {
     PROFILE *pProfile = &gProfile[nPlayer];
     Bstrncpyz(pProfile->name, szPlayerName, sizeof(szPlayerName));
-    if (IsWhitespace(pProfile->name))
-        CONFIG_SetDefaultPlayerName(pProfile->name);
+    if (gPlayerMsg.IsWhitespaceOnly(pProfile->name))
+        Bstrncpyz(pProfile->name, gPlayerNames[nPlayer], MAXPLAYERNAME);
     pProfile->nAutoAim = gAutoAim;
     pProfile->nWeaponSwitch = gWeaponSwitch;
     pProfile->bWeaponFastSwitch = gWeaponFastSwitch;
@@ -621,8 +615,8 @@ void netBroadcastPlayerInfoUpdate(int nPlayer)
 {
     PROFILE *pProfile = &gProfileNet[nPlayer];
     Bstrncpyz(pProfile->name, szPlayerName, sizeof(szPlayerName));
-    if (IsWhitespace(pProfile->name))
-        CONFIG_SetDefaultPlayerName(pProfile->name);
+    if (gPlayerMsg.IsWhitespaceOnly(pProfile->name))
+        Bstrncpyz(pProfile->name, gPlayerNames[nPlayer], MAXPLAYERNAME);
     pProfile->nAutoAim = gAutoAim;
     pProfile->nWeaponSwitch = gWeaponSwitch;
     pProfile->bWeaponFastSwitch = gWeaponFastSwitch;

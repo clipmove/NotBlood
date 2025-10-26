@@ -3748,7 +3748,7 @@ void UpdatePlayerName(CGameMenuItemZEdit *pItem, CGameMenuEvent *pEvent)
 {
     UNREFERENCED_PARAMETER(pItem);
     if (pEvent->at0 == kMenuEventEnter)
-        netBroadcastPlayerInfo(myconnectindex);
+        netBroadcastPlayerInfoUpdate(myconnectindex);
 }
 
 void UpdatePlayerSkill(CGameMenuItemZCycle *pItem)
