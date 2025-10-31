@@ -15,15 +15,15 @@ Download for Windows/Linux/MacOS can be found on [https://github.com/clipmove/No
 
 ### Features
 * Switch to last active weapon if TNT/spray can is active when entering water
-* Basic room over room support for positional audio ([before](https://web.archive.org/web/20220319193715if_/https://files.catbox.moe/qca0k4.mp4)/[after](https://web.archive.org/web/20220514202908if_/https://files.catbox.moe/wq1so4.mp4))
+* Basic room over room support for positional audio ([before](https://clipmove.github.io/notbloodvids/roomoverroomaudio_before.mp4)/[after](https://clipmove.github.io/notbloodvids/roomoverroomaudio_after.mp4))
 * Autosaving support for collecting keys and start of level
 * BloodGDX style difficulty options for singleplayer
 * Set item box selection to activated item
 * Ability to record DOS compatible demos
-* Drag and drop folder mod support ([demo](https://web.archive.org/web/20220514203004if_/https://files.catbox.moe/lb7nxb.mp4))
+* Drag and drop folder mod support ([demo](https://clipmove.github.io/notbloodvids/draganddropsupport.mp4))
 * Customizable palette adjustment
 * New singleplayer cheats
-* Weapon selection bar ([demo](https://web.archive.org/web/20220514203005if_/https://files.catbox.moe/0zh37q.mp4))
+* Weapon selection bar ([demo](https://clipmove.github.io/notbloodvids/weaponselectbar.mp4))
 * Mirror mode
 * Auto crouch
 
@@ -37,11 +37,11 @@ Download for Windows/Linux/MacOS can be found on [https://github.com/clipmove/No
 * Uneven teams support
 
 ### Mutators (Optional)
-* Difficulty based invulnerability timer for player damage ([before](https://web.archive.org/web/20220319193718if_/https://files.catbox.moe/ucs7gp.mp4)/[after](https://web.archive.org/web/20220514201922if_/https://files.catbox.moe/8hyaqm.mp4))
-* Raymarching collision testing for player projectiles ([before](https://web.archive.org/web/20220514202239if_/https://files.catbox.moe/qxtv05.mp4)/[after](https://web.archive.org/web/20220319193719if_/https://files.catbox.moe/vo03ck.mp4))
-* Fix blood/bullet casings not being dragged with sectors ([before](https://web.archive.org/web/20220514202751if_/https://files.catbox.moe/4q9rc3.mp4)/[after](https://web.archive.org/web/20220514202840if_/https://files.catbox.moe/7n76gv.mp4))
-* Fixed missiles colliding with water sector edges ([before](https://web.archive.org/web/20220514202908if_/https://files.catbox.moe/38t9t8.mp4)/[after](https://web.archive.org/web/20220514202910if_/https://files.catbox.moe/smvi92.mp4))
-* Smaller hitboxes for player projectiles ([before](https://web.archive.org/web/20220319193738if_/https://files.catbox.moe/3peiru.mp4)/[after](https://web.archive.org/web/20220514201943if_/https://files.catbox.moe/zso8g4.mp4))
+* Difficulty based invulnerability timer for player damage ([demo](https://clipmove.github.io/notbloodvids/invultimer.mp4))
+* Raymarching collision testing for player projectiles ([before](https://clipmove.github.io/notbloodvids/raymarchbefore.mp4)/[after](https://clipmove.github.io/notbloodvids/raymarchafter.mp4))
+* Fix blood/bullet casings not being dragged with sectors ([before](https://clipmove.github.io/notbloodvids/decalsbefore.mp4)/[after](https://clipmove.github.io/notbloodvids/decalsafter.mp4))
+* Fixed missiles colliding with water sector edges ([before](https://clipmove.github.io/notbloodvids/sectorbefore.mp4)/[after](https://clipmove.github.io/notbloodvids/sectorafter.mp4))
+* Smaller hitboxes for player projectiles ([before](https://clipmove.github.io/notbloodvids/projectilesizebefore.mp4)/[after](https://clipmove.github.io/notbloodvids/projectilesizeafter.mp4))
 * NotBlood balance mod for weapons (see README.txt for details)
 * Randomize mode for enemies and pickups (multiplayer supported)
 * Quad damage replacement for guns akimbo powerup
