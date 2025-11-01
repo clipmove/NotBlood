@@ -1800,16 +1800,16 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
     const char bPlayerIsDead = !pXSprite || (pXSprite->health == 0);
     if (bPlayerIsDead)
         return;
-    const int lerpTime = gViewInterpolate ? rotatespritesmoothratio / (65536 / kTicsPerFrame) : 0; // don't use interpolate value if view interpolation is disabled
+    const int lerpTime = gViewInterpolate ? rotatespritesmoothratio : 0; // don't use interpolate value if view interpolation is disabled
     const int curClock = numplayers > 1 ? int(totalclock)/4U : gLevelTime; // use totalclock for multiplayer (lag friendly 120-based timer)
-    const int curTime = (curClock*kTicsPerFrame)+lerpTime;
+    int curTime = (curClock<<16)+lerpTime;
     const char nWeaponCur = ClipRange(gWeaponRadialMenuChoice, kWeaponNone, kWeaponBeast);
 
-    const int nPingPongTicks = 75;
-    char nPingPong = (char)(curTime%nPingPongTicks)-(nPingPongTicks>>1);
-    if (nPingPong > (nPingPongTicks>>1)) // ping-pong fade effect
-        nPingPong = -nPingPong;
-    nPingPong = (nPingPong>>2)+(nPingPong>>3); // decrease overall shade difference by 37.5%
+    if (gRadialMenuSlowDown && (gGameOptions.nGameType == kGameTypeSinglePlayer))
+        curTime >>= 6; // speedup
+    else
+        curTime >>= 10; // slowdown
+    const int nPingPong = Sin(curTime&2047)>>20;
 
     if (gRadialMenuDimBackground)
         viewDimScreen();
@@ -1830,10 +1830,10 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
             continue;
         const int nWheelSlot = weaponRadialInfo[i].nSlot;
         const int nTile = weaponRadialInfo[i].nTile;
-        const int nShade = i == nWeaponCur ? nPingPong : 28;
+        const int nShade = i == nWeaponCur ? ClipLow(-8-(nPingPong>>5), -128) : 28;
         const int nPal = i == nWeaponCur ? 0 : 5;
         const int nFlags = i == nWeaponCur ? RS_AUTO : RS_AUTO|RS_TRANS_MASK;
-        const int nScale = (int)weaponRadialInfo[i].nScale+(i == nWeaponCur ? nPingPong<<5 : 0);
+        const int nScale = (int)weaponRadialInfo[i].nScale+(i == nWeaponCur ? nPingPong+0x1800 : 0);
         const char bMirror = weaponRadialInfo[i].bMirror;
 
         int nX = (int)nWeaponRadialPos[nWheelSlot][0];
