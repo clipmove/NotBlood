@@ -1800,15 +1800,15 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
     const char bPlayerIsDead = !pXSprite || (pXSprite->health == 0);
     if (bPlayerIsDead)
         return;
-    const int lerpTime = gViewInterpolate ? rotatespritesmoothratio / (65536 / kTicsPerFrame) : 0; // don't use interpolate value if view interpolation is disabled
+    const int lerpTime = gViewInterpolate ? rotatespritesmoothratio : 0; // don't use interpolate value if view interpolation is disabled
     const int curClock = numplayers > 1 ? int(totalclock)/4U : gLevelTime; // use totalclock for multiplayer (lag friendly 120-based timer)
-    int curTime = (curClock*kTicsPerFrame)+lerpTime;
+    int curTime = (curClock<<16)+lerpTime;
     const char nWeaponCur = ClipRange(gWeaponRadialMenuChoice, kWeaponNone, kWeaponBeast);
 
     if (gRadialMenuSlowDown && (gGameOptions.nGameType == kGameTypeSinglePlayer))
-        curTime <<= 8; // speedup
+        curTime >>= 6; // speedup
     else
-        curTime = (curTime<<4)-(curTime<<1); // slowdown
+        curTime >>= 10; // slowdown
     const int nPingPong = Sin(curTime&2047)>>20;
 
     if (gRadialMenuDimBackground)
