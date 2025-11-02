@@ -381,12 +381,12 @@ inline int thinkChaseGetTargetHeight(spritetype *pSprite, DUDEINFO *pDudeInfo, s
     return height-height2;
 }
 
-inline void thinkAirBreaks(int nSprite)
+inline void thinkAirBrakes(int nSprite)
 {
     if (VanillaMode() || !EnemiesNotBlood() || !spriRangeIsFine(nSprite))
         return;
-    xvel[nSprite] >>= 1;
-    yvel[nSprite] >>= 1;
+    xvel[nSprite] -= (xvel[nSprite]>>1)+(xvel[nSprite]>>2);
+    yvel[nSprite] -= (yvel[nSprite]>>1)+(yvel[nSprite]>>2);
 }
 
 static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
@@ -466,19 +466,21 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                         switch (hit)
                         {
                         case -1:
-                            thinkAirBreaks(pSprite->index);
+                            thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &ghostSlash);
                             break;
                         case 0:
                         case 4:
                             break;
                         case 3:
-                            thinkAirBreaks(pSprite->index);
                             if (pSprite->type != sprite[gHitInfo.hitsprite].type && sprite[gHitInfo.hitsprite].type != kDudePhantasm)
+                            {
+                                thinkAirBrakes(pSprite->index);
                                 aiNewState(pSprite, pXSprite, &ghostSlash);
+                            }
                             break;
                         default:
-                            thinkAirBreaks(pSprite->index);
+                            thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &ghostSlash);
                             break;
                         }
