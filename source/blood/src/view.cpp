@@ -1740,7 +1740,7 @@ void viewDrawWeaponSelect(PLAYER* pPlayer, XSPRITE *pXSprite)
         DrawStatMaskedSprite(1142, x+xoffset, ySecondary, 256, 12, 0, 0x2000);
 }
 
-void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal)
+void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal)
 {
     const struct WEAPONICON
     {
@@ -1797,20 +1797,28 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         {(short)mulscale30(45, Sin(short( 7.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 7.f * (kAng360 / 12.f))))},
         {(short)mulscale30(45, Sin(short( 6.f * (kAng360 / 12.f)))), (short)mulscale30(45, Cos(short( 6.f * (kAng360 / 12.f))))},
     };
+    static int nOldValScale[kWeaponMax] = {0};
 
     const char bPlayerIsDead = !pXSprite || (pXSprite->health == 0);
     if (bPlayerIsDead)
         return;
-    const int lerpTime = gViewInterpolate ? rotatespritesmoothratio : 0; // don't use interpolate value if view interpolation is disabled
-    const int curClock = numplayers > 1 ? int(totalclock)/4U : gLevelTime; // use totalclock for multiplayer (lag friendly 120-based timer)
-    int curTime = (curClock<<16)+lerpTime;
-    const char nWeaponCur = ClipRange(gWeaponRadialMenuChoice, kWeaponNone, kWeaponBeast);
 
-    if (gRadialMenuSlowDown && (gGameOptions.nGameType == kGameTypeSinglePlayer))
-        curTime >>= 6; // speedup
+    static int nLastLerpTime = 0, nLastLerpDelta = 0;
+    int tempLerp = rotatespritesmoothratio;
+    if (tempLerp > nLastLerpTime)
+        tempLerp = (65536+tempLerp)-nLastLerpTime;
     else
-        curTime >>= 10; // slowdown
-    const int nPingPong = Sin(curTime&2047)>>20;
+        tempLerp = nLastLerpTime-tempLerp;
+    int nLerpTime = tempLerp&65535;
+    if (nLerpTime > 65536>>1) // fix weird overflow
+        nLerpTime = 65536-nLerpTime;
+    if (!gRadialMenuSlowDown || (gGameOptions.nGameType > kGameTypeSinglePlayer)) // not slowed down
+        nLerpTime = divscale16(nLerpTime, fix16_from_int(17));
+    nLastLerpTime = rotatespritesmoothratio;
+    nLastLerpDelta = (nLerpTime+nLastLerpDelta)&65535;
+
+    const char nWeaponCur = ClipRange(gWeaponRadialMenuChoice, kWeaponNone, kWeaponBeast);
+    const int nPingPong = Sin((nLastLerpDelta>>5)&2047)>>20;
 
     if (gRadialMenuDimBackground)
         viewDimScreen();
@@ -1844,8 +1852,13 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         nX += weaponRadialInfo[i].nX;
         nY += weaponRadialInfo[i].nY;
         if (i == nWeaponCur) // drop shadow
+        {
             DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX+1, (200>>1)+nY+1, 127, nPal, nFlags|RS_TRANS_MASK, nScale, bMirror);
-        DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale+(i == nWeaponCur ? nPingPong+0x1800 : 0), bMirror);
+            nOldValScale[i] = interpolate(nOldValScale[i], nPingPong+0x1800, ClipHigh(nLerpTime<<4, fix16_one));
+        }
+        else
+            nOldValScale[i] = interpolate(nOldValScale[i], 0, ClipHigh(nLerpTime<<5, fix16_one));
+        DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale+nOldValScale[i], bMirror);
         int nAmmo = pPlayer->ammoCount[i-1];
         if (i == kWeaponPitchfork)
             continue;
