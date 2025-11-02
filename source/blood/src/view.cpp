@@ -1831,7 +1831,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
             continue;
         const int nWheelSlot = weaponRadialInfo[i].nSlot;
         const int nTile = weaponRadialInfo[i].nTile;
-        const int nShade = i == nWeaponCur ? ClipLow(-8-(nPingPong>>5), -128) : 28;
+        const int nShade = i == nWeaponCur ? ClipLow(-8-(nPingPong>>5), -128) : 14;
         int nPal = i == nWeaponCur ? 0 : 5;
         const int nFlags = i == nWeaponCur ? RS_AUTO : RS_AUTO|RS_TRANS_MASK;
         const int nScale = (int)weaponRadialInfo[i].nScale+(i == nWeaponCur ? nPingPong+0x1800 : 0);
