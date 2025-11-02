@@ -1832,7 +1832,7 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
         DrawStatMaskedSprite(624, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, gRadialMenuDimHud ? -64 : 0, 9, gRadialMenuDimHud ? RS_AUTO : RS_AUTO|RS_TRANS_MASK, fix16_from_float(71.f / 64.f * 0.25f));
     }
     if (gRadialMenuDimHud)
-        DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
+        DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 24, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
     for (int i = kWeaponPitchfork; i <= kWeaponRemoteTNT; i++)
     {
         if (!WeaponIsEquipable(pPlayer, i))
@@ -1873,9 +1873,8 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
             nAmmo /= 10;
         nX = (gRadialMenuPosition+nX+(nX>>4))<<16;
         nY = ((200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4))<<16;
-        if (i == nWeaponCur) // drop shadow
-            DrawStatNumber("%3d", nAmmo, 2230, nX+fix16_from_float(0.8f), nY+fix16_from_float(0.8f), 127, nPal, RS_TRANS_MASK, fix16_from_float(0.8f), 1);
-        DrawStatNumber("%3d", nAmmo, 2230, nX, nY, i == nWeaponCur ? -128 : 32, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f), 1);
+        DrawStatNumber("%3d", nAmmo, 2230, nX+fix16_from_float(0.8f), nY+fix16_from_float(0.8f), 127, nPal, RS_TRANS_MASK, fix16_from_float(0.8f), 1);
+        DrawStatNumber("%3d", nAmmo, 2230, nX, nY, i == nWeaponCur ? -128 : 24, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f), 1);
     }
 }
 
