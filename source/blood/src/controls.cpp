@@ -991,7 +991,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         }
         else // player not moving stick above threshold or pressing next/previous weapon buttons - don't update selection
             break;
-        nOldMouseX = nOldMouseY = 0; // picked a slot, reset mouse state
+        nOldMouseX = ClipRange(nOldMouseX, -gRadialMenuThreshold*2, gRadialMenuThreshold*2); // picked a slot, clamp mouse state
+        nOldMouseY = ClipRange(nOldMouseY, -gRadialMenuThreshold*2, gRadialMenuThreshold*2);
         break;
     }
     case 2:
