@@ -1153,8 +1153,8 @@ CGameMenuItemSliderFloat itemOptionsControlMouseYSensitivity("VERT SENS:", 3, 66
 CGameMenuItemTitle itemOptionsControlRadialTitle("RADIAL SETUP", 1, 160, 20, 2038);
 CGameMenuItemZCycle itemOptionsControlRadialToggle("USAGE BEHAVIOR:", 1, 18, 37, 280, 0, SetRadialMenuToggle, zRadialMenuToggle, ARRAY_SIZE(zRadialMenuToggle), 0);
 CGameMenuItemSlider itemOptionsControlRadialPosition("POSITION:", 1, 18, 53, 280, &gRadialMenuPosition, 0, 320, 16, SetRadialMenuPosition, -1, -1, kMenuSliderPercent);
-CGameMenuItemZBool itemOptionsControlRadialDimBackground("FADE BACKGROUND:", 1, 18, 69, 280, 0, SetRadialMenuDimBackground, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlRadialDimHUD("FADE MENU:", 1, 18, 85, 280, 0, SetRadialMenuDimHUD, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlRadialDimBackground("DIM BACKGROUND:", 1, 18, 69, 280, 0, SetRadialMenuDimBackground, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlRadialDimHUD("TRANSPARENT RADIAL:", 1, 18, 85, 280, 0, SetRadialMenuDimHUD, NULL, NULL);
 CGameMenuItemZBool itemOptionsControlRadialSlowDown("MENU SLOW DOWN:", 1, 18, 101, 280, 0, SetRadialMenuSlowDown, NULL, NULL);
 CGameMenuItemSlider itemOptionsControlRadialThreshold("THRESHOLD:", 1, 18, 117, 280, &gRadialMenuThreshold, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
 CGameMenuItemZCycle itemOptionsControlRadialYaw("X AXIS:", 1, 18, 133, 280, 0, SetRadialMenuYaw, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
