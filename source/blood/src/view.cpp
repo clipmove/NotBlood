@@ -1834,7 +1834,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         const int nShade = i == nWeaponCur ? ClipLow(-8-(nPingPong>>5), -128) : 14;
         int nPal = i == nWeaponCur ? 0 : 5;
         const int nFlags = i == nWeaponCur ? RS_AUTO : RS_AUTO|RS_TRANS_MASK;
-        const int nScale = (int)weaponRadialInfo[i].nScale+(i == nWeaponCur ? nPingPong+0x1800 : 0);
+        const int nScale = (int)weaponRadialInfo[i].nScale;
         const char bMirror = weaponRadialInfo[i].bMirror;
 
         int nX = (int)nWeaponRadialPos[nWheelSlot][0];
@@ -1843,7 +1843,9 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
             nY -= 5;
         nX += weaponRadialInfo[i].nX;
         nY += weaponRadialInfo[i].nY;
-        DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale, bMirror);
+        if (i == nWeaponCur) // drop shadow
+            DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX+1, (200>>1)+nY+1, 127, nPal, nFlags|RS_TRANS_MASK, nScale, bMirror);
+        DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale+(i == nWeaponCur ? nPingPong+0x1800 : 0), bMirror);
         int nAmmo = pPlayer->ammoCount[i-1];
         if (i == kWeaponPitchfork)
             continue;
@@ -1858,7 +1860,8 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
             nAmmo /= 10;
         nX = (gRadialMenuPosition+nX+(nX>>4))<<16;
         nY = ((200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4))<<16;
-        DrawStatNumber("%3d", nAmmo, 2230, nX+fix16_from_float(0.8f), nY+fix16_from_float(0.8f), 127, nPal, 0, fix16_from_float(0.8f), 1); // shadow
+        if (i == nWeaponCur) // drop shadow
+            DrawStatNumber("%3d", nAmmo, 2230, nX+fix16_from_float(0.8f), nY+fix16_from_float(0.8f), 127, nPal, RS_TRANS_MASK, fix16_from_float(0.8f), 1);
         DrawStatNumber("%3d", nAmmo, 2230, nX, nY, i == nWeaponCur ? -128 : 32, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f), 1);
     }
 }
