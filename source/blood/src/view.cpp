@@ -1831,7 +1831,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         const int nWheelSlot = weaponRadialInfo[i].nSlot;
         const int nTile = weaponRadialInfo[i].nTile;
         const int nShade = i == nWeaponCur ? ClipLow(-8-(nPingPong>>5), -128) : 28;
-        const int nPal = i == nWeaponCur ? 0 : 5;
+        int nPal = i == nWeaponCur ? 0 : 5;
         const int nFlags = i == nWeaponCur ? RS_AUTO : RS_AUTO|RS_TRANS_MASK;
         const int nScale = (int)weaponRadialInfo[i].nScale+(i == nWeaponCur ? nPingPong+0x1800 : 0);
         const char bMirror = weaponRadialInfo[i].bMirror;
@@ -1843,6 +1843,19 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         nX += weaponRadialInfo[i].nX;
         nY += weaponRadialInfo[i].nY;
         DrawStatMaskedSprite(nTile, gRadialMenuPosition+nX, (200>>1)+nY, nShade, nPal, nFlags, nScale, bMirror);
+        int nAmmo = pPlayer->ammoCount[i-1];
+        if (i == kWeaponPitchfork)
+            continue;
+        const int nMaxAmmo = gAmmoInfo[i-1].max;
+        if (nAmmo >= nMaxAmmo>>1) // above half ammo
+            nPal = 10; // 10: blue
+        else if (nAmmo >= (nMaxAmmo>>2)-(nMaxAmmo>>3)) // above eighth ammo
+            nPal = 8; // 8: gold
+        else // low ammo
+            nPal = 7; // 7: red
+        if (i == kWeaponSprayCan)
+            nAmmo /= 10;
+        DrawStatNumber("%3d", nAmmo, 2230, gRadialMenuPosition+(nX+(nX>>4)), (200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4), i == nWeaponCur ? -128 : 32, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f));
     }
 }
 
