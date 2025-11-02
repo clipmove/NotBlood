@@ -1192,11 +1192,12 @@ void DrawStatMaskedSprite(int nTile, int x, int y, int nShade, int nPalette, uns
     rotatesprite(x<<16, y<<16, nScale, ang, nTile, nShade, nPalette, nStat | 10, 0, 0, xdim-1, ydim-1);
 }
 
-void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, int nShade, int nPalette, unsigned int nStat, int nScale)
+void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, int nShade, int nPalette, unsigned int nStat, int nScale, char bQ16)
 {
     char tempbuf[80];
     int width = tilesiz[nTile].x+1;
-    x <<= 16;
+    if (!bQ16)
+        x <<= 16;
     sprintf(tempbuf, pFormat, nNumber);
     const size_t nLength = strlen(tempbuf);
     for (size_t i = 0; i < nLength; i++, x += width*nScale)
@@ -1204,6 +1205,7 @@ void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, i
         int numTile, numScale, numY;
         if (tempbuf[i] == ' ')
             continue;
+        numY = !bQ16 ? y<<16 : y;
         if (tempbuf[i] == '-')
         {
             switch (nTile)
@@ -1232,13 +1234,12 @@ void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, i
                 continue;
             }
             numScale = nScale/3;
-            numY = (y<<16) + (1<<15); // offset to center of number row
+            numY += (1>>15); // offset to center of number row
         }
         else // regular number
         {
             numTile = nTile+tempbuf[i]-'0';
             numScale = nScale;
-            numY = y<<16;
         }
         rotatesprite(x, numY, numScale, 0, numTile, nShade, nPalette, nStat | 10, 0, 0, xdim-1, ydim-1);
     }
@@ -1820,7 +1821,7 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
         const int nSlot = weaponRadialInfo[nWeaponCur].nSlot;
         const int nX = (int)nWeaponRadialReticlePos[nSlot][0];
         const int nY = (int)nWeaponRadialReticlePos[nSlot][1];
-        DrawStatMaskedSprite(624, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, gRadialMenuDimHud ? -128 : 0, 9, gRadialMenuDimHud ? RS_AUTO : RS_AUTO|RS_TRANS_MASK, fix16_from_float(71.f / 64.f * 0.25f));
+        DrawStatMaskedSprite(624, gRadialMenuPosition+nX, (200>>1)-(200>>5)+nY, gRadialMenuDimHud ? -64 : 0, 9, gRadialMenuDimHud ? RS_AUTO : RS_AUTO|RS_TRANS_MASK, fix16_from_float(71.f / 64.f * 0.25f));
     }
     if (gRadialMenuDimHud)
         DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 16, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
@@ -1855,7 +1856,10 @@ void viewDrawWeaponRadialMenu(PLAYER* pPlayer, XSPRITE* pXSprite, const int nPal
             nPal = 7; // 7: red
         if (i == kWeaponSprayCan)
             nAmmo /= 10;
-        DrawStatNumber("%3d", nAmmo, 2230, gRadialMenuPosition+(nX+(nX>>4)), (200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4), i == nWeaponCur ? -128 : 32, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f));
+        nX = (gRadialMenuPosition+nX+(nX>>4))<<16;
+        nY = ((200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4))<<16;
+        DrawStatNumber("%3d", nAmmo, 2230, nX+fix16_from_float(0.8f), nY+fix16_from_float(0.8f), 127, nPal, 0, fix16_from_float(0.8f), 1); // shadow
+        DrawStatNumber("%3d", nAmmo, 2230, nX, nY, i == nWeaponCur ? -128 : 32, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f), 1);
     }
 }
 
