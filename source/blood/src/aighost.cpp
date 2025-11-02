@@ -80,6 +80,26 @@ AISTATE ghostDodgeDown = { kAiStateMove, 0, -1, 120, NULL, MoveDodgeDown, NULL, 
 AISTATE ghostDodgeDownRight = { kAiStateMove, 0, -1, 90, NULL, MoveDodgeDown, NULL, &ghostChase };
 AISTATE ghostDodgeDownLeft = { kAiStateMove, 0, -1, 90, NULL, MoveDodgeDown, NULL, &ghostChase };
 
+inline void SlashSeqCallbackFixed(spritetype *pSprite, XSPRITE *pXSprite, spritetype *pTarget)
+{
+    int tx = pXSprite->targetX-pSprite->x;
+    int ty = pXSprite->targetY-pSprite->y;
+    int nAngle = getangle(tx, ty);
+    int dx = Cos(nAngle)>>16;
+    int dy = Sin(nAngle)>>16;
+    int dz = pTarget->z-pSprite->z;
+    const int bakVecDist = gVectorData[kVectorGhost].maxDist;
+    gVectorData[kVectorGhost].maxDist += gVectorData[kVectorGhost].maxDist>>2; // increase slash distance by 25%
+    actFireVector(pSprite, 0, 0, dx, dy, dz, kVectorGhost);
+    int r1 = Random(50);
+    int r2 = Random(50);
+    actFireVector(pSprite, 0, 0, dx+r2, dy-r1, dz, kVectorGhost);
+    r1 = Random(50);
+    r2 = Random(50);
+    actFireVector(pSprite, 0, 0, dx-r2, dy+r1, dz, kVectorGhost);
+    gVectorData[kVectorGhost].maxDist = bakVecDist;
+}
+
 static void SlashSeqCallback(int, int nXSprite)
 {
     XSPRITE *pXSprite = &xsprite[nXSprite];
@@ -88,6 +108,8 @@ static void SlashSeqCallback(int, int nXSprite)
     spritetype *pTarget = &sprite[pXSprite->target];
     DUDEINFO *pDudeInfo = getDudeInfo(pSprite->type);
     DUDEINFO *pDudeInfoT = getDudeInfo(pTarget->type);
+    if (EnemiesNotBlood() && !VanillaMode()) // use fixed calculation and increase vector distance
+        return SlashSeqCallbackFixed(pSprite, pXSprite, pTarget);
     int height = (pSprite->yrepeat*pDudeInfo->eyeHeight)<<2;
     int height2 = (pTarget->yrepeat*pDudeInfoT->eyeHeight)<<2;
     int dz = height-height2;
@@ -159,7 +181,11 @@ static void BlastSeqCallback(int, int nXSprite)
         int top, bottom;
         GetSpriteExtents(pSprite2, &top, &bottom);
         if (tz-tsr > bottom || tz+tsr < top)
+        {
+            if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for missile projectile
+                aim.dz = divscale10(pSprite2->z-pSprite->z, ClipHigh(nDist, 0x1800));
             continue;
+        }
         int dx = (tx-x2)>>4;
         int dy = (ty-y2)>>4;
         int dz = (tz-z2)>>8;
@@ -345,6 +371,24 @@ static void MoveDodgeDown(spritetype *pSprite, XSPRITE *pXSprite)
     zvel[nSprite] = 0x44444;
 }
 
+inline int thinkChaseGetTargetHeight(spritetype *pSprite, DUDEINFO *pDudeInfo, spritetype *pTarget)
+{
+    if (VanillaMode() || !EnemiesNotBlood())
+        return 0;
+    DUDEINFO *pDudeInfoT = getDudeInfo(pTarget->type);
+    int height = (pSprite->yrepeat*pDudeInfo->eyeHeight)<<2;
+    int height2 = (pTarget->yrepeat*pDudeInfoT->eyeHeight)<<2;
+    return height-height2;
+}
+
+inline void thinkAirBreaks(int nSprite)
+{
+    if (VanillaMode() || !EnemiesNotBlood() || !spriRangeIsFine(nSprite))
+        return;
+    xvel[nSprite] >>= 1;
+    yvel[nSprite] >>= 1;
+}
+
 static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
 {
     if (pXSprite->target == -1)
@@ -396,7 +440,8 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                 switch (pSprite->type) {
                 case kDudePhantasm:
                     if (nDist < 0x2000 && nDist > 0x1000 && klabs(nDeltaAngle) < 85) {
-                        int hit = HitScan(pSprite, pSprite->z, dx, dy, 0, CLIPMASK1, 0);
+                        int dz = thinkChaseGetTargetHeight(pSprite, pDudeInfo, pTarget);
+                        int hit = HitScan(pSprite, pSprite->z, dx, dy, dz, CLIPMASK1, 0);
                         switch (hit)
                         {
                         case -1:
@@ -416,20 +461,24 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                     }
                     else if (nDist < 0x400 && klabs(nDeltaAngle) < 85)
                     {
-                        int hit = HitScan(pSprite, pSprite->z, dx, dy, 0, CLIPMASK1, 0);
+                        int dz = thinkChaseGetTargetHeight(pSprite, pDudeInfo, pTarget);
+                        int hit = HitScan(pSprite, pSprite->z, dx, dy, dz, CLIPMASK1, 0);
                         switch (hit)
                         {
                         case -1:
+                            thinkAirBreaks(pSprite->index);
                             aiNewState(pSprite, pXSprite, &ghostSlash);
                             break;
                         case 0:
                         case 4:
                             break;
                         case 3:
+                            thinkAirBreaks(pSprite->index);
                             if (pSprite->type != sprite[gHitInfo.hitsprite].type && sprite[gHitInfo.hitsprite].type != kDudePhantasm)
                                 aiNewState(pSprite, pXSprite, &ghostSlash);
                             break;
                         default:
+                            thinkAirBreaks(pSprite->index);
                             aiNewState(pSprite, pXSprite, &ghostSlash);
                             break;
                         }
