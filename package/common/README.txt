@@ -5,12 +5,12 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * Switch to last active weapon if TNT/spray can is active when entering water
 * Basic room over room support for positional audio
 * Autosaving support for collecting keys and start of level
-* BloodGDX style difficulty options for singleplayer
+* BloodGDX style difficulty options for single-player
 * Set item box selection to activated item
 * Ability to record DOS compatible demos
 * Drag and drop folder mod support
 * Customizable palette adjustment
-* New singleplayer cheats
+* New single-player cheats
 * Weapon selection bar
 * Mirror mode
 * Auto crouch
@@ -32,7 +32,7 @@ NotBlood is a fork of NBlood with gameplay options, optional mutators and multip
 * NotBlood balance mod for weapons (see below for details)
 * Randomize mode for enemies and pickups (multiplayer supported)
 * Quad damage replacement for guns akimbo powerup
-* Respawning enemies option for singleplayer
+* Respawning enemies option for single-player
 * Bullet projectiles for hitscan enemies
 * Fixed bullet casings clipping into walls
 * Lower gravity of bullet casings and gibs underwater
@@ -106,11 +106,11 @@ If you have the GOG version of the game, do the following:
    - Cheogh blasting/attacking can now hit prone players
    - Phantoms blasting/attacking can now hit prone players
    - Fix Beast state when leaving water sector
+   - Disable autoaim for idly stone gargoyles
    - Restore unused fall animations for cultists
    - Shotgun/tommy gun cultists spawn spent shells (disabled in modern maps)
    - Beast stomp attack will not deal damage if target is not standing on floor
    - Restore stone breaking sequence for stone gargoyle enemy types
-   - Disable autoaim for idly stone gargoyles
 * Random cultist TNT
    - This will make cultists use a variety of random thrown sprites such as:
    - Napalm balls, proxy bundles, armed spray cans or pod projectiles
