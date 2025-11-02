@@ -1165,7 +1165,12 @@ void RecoilDude(spritetype *pSprite, XSPRITE *pXSprite)
             if (pDudeExtra->teslaHit && pXSprite->data3 > pDudeInfo->startHealth/3)
                 aiNewState(pSprite, pXSprite, &zombieATeslaRecoil);
             else if (pXSprite->data3 > pDudeInfo->startHealth/3)
-                aiNewState(pSprite, pXSprite, &zombieARecoil2);
+            {
+                if (!VanillaMode() && EnemiesNotBlood() && (gGameOptions.nGameType == kGameTypeSinglePlayer) && (gGameOptions.bQuadDamagePowerup) && powerupCheck(gMe, kPwUpTwoGuns)) // don't let zombies get knocked down while quad damage is active
+                    aiNewState(pSprite, pXSprite, &zombieARecoil);
+                else
+                    aiNewState(pSprite, pXSprite, &zombieARecoil2);
+            }
             else
                 aiNewState(pSprite, pXSprite, &zombieARecoil);
             break;
