@@ -1694,6 +1694,14 @@ void aiInitSprite(spritetype *pSprite)
     case kDudeZombieAxeLaying:
         pSprite->flags = 7;
         break;
+    case kDudeGargoyleStatueFlesh:
+    case kDudeGargoyleStatueStone:
+        if (EnemiesNotBlood() && !VanillaMode())
+        {
+            pSprite->flags = 7; // disable autoaim
+            break;
+        }
+        fallthrough__;
     #ifdef NOONE_EXTENSIONS
     case kDudeModernCustom: // flags alredy set
     case kDudePodMother: // FakeDude type
