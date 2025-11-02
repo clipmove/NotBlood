@@ -103,7 +103,7 @@ If you have the GOG version of the game, do the following:
    - Fix bloated butchers cleavers hitting prone players
    - Turn enemy around if stuck running into a corner for a few seconds
    - Limit impulse damage when shooting enemies downward at point-blank
-   - Cheogh blasting/attacking can now hit prone players (only for well done and above difficulties)
+   - Cheogh blasting/attacking can now hit prone players
    - Fix Beast state when leaving water sector
    - Restore unused fall animations for cultists
    - Shotgun/tommy gun cultists spawn spent shells (disabled in modern maps)
