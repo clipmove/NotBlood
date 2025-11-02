@@ -516,7 +516,7 @@ void CONFIG_SetDefaults(void)
     gRadialMenuToggle = 0;
     gRadialMenuPosition = 240;
     gRadialMenuDimBackground = 1;
-    gRadialMenuDimHud = 1;
+    gRadialMenuDimHud = 0;
     gRadialMenuThreshold = 128;
     gRadialMenuSlowDown = 1;
     gRadialMenuYaw = 4;
