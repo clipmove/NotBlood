@@ -127,13 +127,13 @@ static void SlashFSeqCallback(int, int nXSprite)
     spritetype *pTarget = &sprite[pXSprite->target];
     DUDEINFO *pDudeInfo = getDudeInfo(pSprite->type);
     DUDEINFO *pDudeInfoT = getDudeInfo(pTarget->type);
+    if (EnemiesNotBlood() && !VanillaMode()) // use fixed calculation and increase vector distance
+        return SlashFSeqCallbackFixed(pSprite, pXSprite, pTarget);
     int height = (pSprite->yrepeat*pDudeInfo->eyeHeight)<<2;
     int height2 = (pTarget->yrepeat*pDudeInfoT->eyeHeight)<<2;
     int dz = height-height2;
     int dx = Cos(pSprite->ang)>>16;
     int dy = Sin(pSprite->ang)>>16;
-    if ((gGameOptions.nDifficulty >= 2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation and increase vector distance
-        return SlashFSeqCallbackFixed(pSprite, pXSprite, pTarget);
     actFireVector(pSprite, 0, 0, dx, dy, dz, kVectorGargSlash);
     int r1 = Random(50);
     int r2 = Random(50);
@@ -200,7 +200,7 @@ static void BlastSSeqCallback(int, int nXSprite)
         GetSpriteExtents(pSprite2, &top, &bottom);
         if (tz-tsr > bottom || tz+tsr < top)
         {
-            if ((gGameOptions.nDifficulty >= 2) && IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for missile projectile
+            if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for missile projectile
                 aim.dz = divscale10(pSprite2->z-pSprite->z, ClipHigh(nDist, 0x1800));
             continue;
         }
@@ -403,7 +403,7 @@ static void MoveDodgeDown(spritetype *pSprite, XSPRITE *pXSprite)
 
 inline int thinkChaseGetTargetHeight(spritetype *pSprite, DUDEINFO *pDudeInfo, spritetype *pTarget)
 {
-    if ((gGameOptions.nDifficulty < 2) || VanillaMode() || !EnemiesNotBlood())
+    if (VanillaMode() || !EnemiesNotBlood())
         return 0;
     DUDEINFO *pDudeInfoT = getDudeInfo(pTarget->type);
     int height = (pSprite->yrepeat*pDudeInfo->eyeHeight)<<2;
