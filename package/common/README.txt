@@ -108,6 +108,7 @@ If you have the GOG version of the game, do the following:
    - Restore unused fall animations for cultists
    - Shotgun/tommy gun cultists spawn spent shells (disabled in modern maps)
    - Beast stomp attack will not deal damage if target is not standing on floor
+   - Restore stone breaking sequence for stone gargoyle enemy types
 * Random cultist TNT
    - This will make cultists use a variety of random thrown sprites such as:
    - Napalm balls, proxy bundles, armed spray cans or pod projectiles

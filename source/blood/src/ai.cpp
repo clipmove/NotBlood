@@ -677,8 +677,8 @@ void aiActivateDude(spritetype *pSprite, XSPRITE *pXSprite)
             if (Chance(0x4000)) aiPlay3DSound(pSprite, 1401, AI_SFX_PRIORITY_1, -1);
             else aiPlay3DSound(pSprite, 1400, AI_SFX_PRIORITY_1, -1);
             
-            if (pSprite->type == kDudeGargoyleStatueFlesh) aiNewState(pSprite, pXSprite, &gargoyleFMorph);
-            else aiNewState(pSprite, pXSprite, &gargoyleSMorph);
+            if (pSprite->type == kDudeGargoyleStatueFlesh) aiNewState(pSprite, pXSprite, EnemiesNotBlood() && !VanillaMode()? &statueFBreakSEQ : &gargoyleFMorph); // use stone break animation
+            else aiNewState(pSprite, pXSprite, EnemiesNotBlood() && !VanillaMode() ? &statueSBreakSEQ : &gargoyleSMorph);
         }
         #else
         if (Chance(0x4000)) aiPlay3DSound(pSprite, 1401, AI_SFX_PRIORITY_1, -1);
