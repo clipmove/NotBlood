@@ -1,45 +1,6 @@
 ### NotBlood
 NotBlood is a fork of NBlood with gameplay options, optional mutators and multiplayer features, while retaining NBlood mod support
 
-### Features
-* Switch to last active weapon if TNT/spray can is active when entering water
-* Basic room over room support for positional audio
-* Autosaving support for collecting keys and start of level
-* BloodGDX style difficulty options for single-player
-* Set item box selection to activated item
-* Ability to record DOS compatible demos
-* Drag and drop folder mod support
-* Customizable palette adjustment
-* New single-player cheats
-* Weapon selection bar
-* Mirror mode
-* Auto crouch
-
-### Multiplayer Features
-* Cloak powerup hides player weapon icon
-* Improved spawning randomization logic
-* Colored player names for messages
-* Adjustable spawn weapon option
-* Adjustable spawn protection
-* UT99 style multi kill alerts
-
-### Mutators (Optional)
-* Difficulty based invulnerability timer for player damage
-* Raymarching collision testing for player projectiles
-* Fix blood/bullet casings not being dragged with sectors
-* Fixed missiles colliding with water sector edges
-* Smaller hitboxes for player projectiles
-* NotBlood balance mod for weapons (see below for details)
-* Randomize mode for enemies and pickups (multiplayer supported)
-* Quad damage replacement for guns akimbo powerup
-* Respawning enemies option for single-player
-* Bullet projectiles for hitscan enemies
-* Fixed bullet casings clipping into walls
-* Lower gravity of bullet casings and gibs underwater
-* Allow particle sprites to traverse through room over room sectors
-* Increased blood splatter duration and improved floor collision accuracy
-* Make blood splatter/flare gun glow effect slope on sloped surfaces
-
 ### Installing
 1. Extract NotBlood to a new directory
 2. Copy the following files from Blood (v1.21) to NotBlood folder:
