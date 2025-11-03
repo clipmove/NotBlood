@@ -29,9 +29,8 @@ jobs:
       run: |
         cd ./upload
         ls -R -l
-        chmod +x ./notblood-macos/notblood.app/Contents/MacOS
-        tar -cvf notblood-macos.tar ./notblood-macos --remove-files
-        mv notblood-macos.tar ./notblood-macos
+        chmod +x ./notblood-macos/notblood.app/Contents/MacOS/notblood
+        ls -R -l
         for i in */; do cp *.pk3 "${i%/}"; cp *.txt "${i%/}"; mkdir -p "${i%/}"/autoload; mv "${i%/}"/addons.txt "${i%/}"/autoload; done
         for i in */; do cd "${i%/}"; zip -9 -r "../${i%/}.zip" ./; cd ..; done
     - name: Publish artifacts to release
