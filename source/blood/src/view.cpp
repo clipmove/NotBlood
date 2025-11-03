@@ -1192,12 +1192,20 @@ void DrawStatMaskedSprite(int nTile, int x, int y, int nShade, int nPalette, uns
     rotatesprite(x<<16, y<<16, nScale, ang, nTile, nShade, nPalette, nStat | 10, 0, 0, xdim-1, ydim-1);
 }
 
-void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, int nShade, int nPalette, unsigned int nStat, int nScale, char bQ16)
+void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, int nShade, int nPalette, unsigned int nStat, int nScale, char bShadow)
 {
+    if (bShadow == 1) // do shadow first
+        DrawStatNumber(pFormat, nNumber, nTile, x, y, nShade, nPalette, nStat, nScale, 2);
     char tempbuf[80];
     int width = tilesiz[nTile].x+1;
-    if (!bQ16)
-        x <<= 16;
+    x <<= 16;
+    y <<= 16;
+    if (bShadow == 2) // offset for shadow based on scale of number
+    {
+        x += nScale;
+        y += nScale;
+        nShade = 127;
+    }
     sprintf(tempbuf, pFormat, nNumber);
     const size_t nLength = strlen(tempbuf);
     for (size_t i = 0; i < nLength; i++, x += width*nScale)
@@ -1205,7 +1213,7 @@ void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, i
         int numTile, numScale, numY;
         if (tempbuf[i] == ' ')
             continue;
-        numY = !bQ16 ? y<<16 : y;
+        numY = y;
         if (tempbuf[i] == '-')
         {
             switch (nTile)
@@ -1871,9 +1879,8 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
             nPal = 7; // 7: red
         if (i == kWeaponSprayCan)
             nAmmo /= 10;
-        nX = (gRadialMenuPosition+nX+(nX>>4))<<16;
-        nY = ((200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4))<<16;
-        DrawStatNumber("%3d", nAmmo, 2230, nX+fix16_from_float(0.8f), nY+fix16_from_float(0.8f), 127, nPal, RS_TRANS_MASK, fix16_from_float(0.8f), 1);
+        nX = gRadialMenuPosition+nX+(nX>>4);
+        nY = (200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4);
         DrawStatNumber("%3d", nAmmo, 2230, nX, nY, i == nWeaponCur ? -128 : 24, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f), 1);
     }
 }
