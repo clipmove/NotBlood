@@ -182,7 +182,7 @@ static void BlastSeqCallback(int, int nXSprite)
         GetSpriteExtents(pSprite2, &top, &bottom);
         if (tz-tsr > bottom || tz+tsr < top)
         {
-            if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for missile projectile
+            if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for ghost projectile
                 aim.dz = divscale10(pSprite2->z-pSprite->z, ClipHigh(nDist, 0x1800));
             continue;
         }
@@ -203,7 +203,7 @@ static void BlastSeqCallback(int, int nXSprite)
                     aim.dx = Cos(nAngle)>>16;
                     aim.dy = Sin(nAngle)>>16;
                     aim.dz = divscale10(tz, nDist);
-                    if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for missile projectile
+                    if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for ghost projectile
                         continue;
                     if (tz > -0x333)
                         aim.dz = divscale10(tz, nDist);
@@ -468,7 +468,8 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                         switch (hit)
                         {
                         case -1:
-                            thinkAirBrakes(pSprite->index);
+                            if (IsPlayerSprite(pTarget) && (gPlayer[pTarget->type-kDudePlayer1].posture == 2)) // if crouching, hit the brakes
+                                thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &ghostSlash);
                             break;
                         case 0:
@@ -477,12 +478,14 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                         case 3:
                             if (pSprite->type != sprite[gHitInfo.hitsprite].type && sprite[gHitInfo.hitsprite].type != kDudePhantasm)
                             {
-                                thinkAirBrakes(pSprite->index);
+                                if (IsPlayerSprite(pTarget) && (gPlayer[pTarget->type-kDudePlayer1].posture == 2)) // if crouching, hit the brakes
+                                    thinkAirBrakes(pSprite->index);
                                 aiNewState(pSprite, pXSprite, &ghostSlash);
                             }
                             break;
                         default:
-                            thinkAirBrakes(pSprite->index);
+                            if (IsPlayerSprite(pTarget) && (gPlayer[pTarget->type-kDudePlayer1].posture == 2)) // if crouching, hit the brakes
+                                thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &ghostSlash);
                             break;
                         }
