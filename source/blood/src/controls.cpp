@@ -908,7 +908,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     case 1:
     {
         char bAbort = 0;
-        if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2 || gInput.buttonFlags.jump || gInput.keyFlags.lastWeapon || gInput.keyFlags.action || gInput.keyFlags.useItem) // these button instantly picks currently selected weapon and close menu
+        if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2 || gInput.keyFlags.lastWeapon || gInput.keyFlags.action || gInput.keyFlags.useItem) // these button instantly picks currently selected weapon and close menu
             bAbort = 1;
         else if (gRadialMenuToggle && !bButton && (gWeaponRadialMenuState == 4)) // wait until button is released before checking to close radial menu for toggle mode
             gWeaponRadialMenuState = 5;
