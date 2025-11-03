@@ -36,6 +36,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "levels.h"
 #include "map2d.h"
 #include "messages.h"
+#include "sound.h"
 #include "trig.h"
 #include "view.h"
 #include "weapon.h"
@@ -740,6 +741,9 @@ int gWeaponRadialMenuChoice = -1;
 
 void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
 {
+    const char *sSfxSound = "runeuse";
+    const int nSfxVol = 42;
+    const int nSfxFreq = 14600;
     const char kWeaponSelectTable[12] = // angle to weapon slot
     {
         kWeaponSprayCan,
@@ -904,7 +908,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     case 1:
     {
         char bAbort = 0;
-        if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2 || gInput.keyFlags.lastWeapon || gInput.keyFlags.action || gInput.keyFlags.useItem) // these button instantly picks currently selected weapon and close menu
+        if (gInput.buttonFlags.shoot || gInput.buttonFlags.shoot2 || gInput.buttonFlags.jump || gInput.keyFlags.lastWeapon || gInput.keyFlags.action || gInput.keyFlags.useItem) // these button instantly picks currently selected weapon and close menu
             bAbort = 1;
         else if (gRadialMenuToggle && !bButton && (gWeaponRadialMenuState == 4)) // wait until button is released before checking to close radial menu for toggle mode
             gWeaponRadialMenuState = 5;
@@ -945,7 +949,11 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                 }
             }
             if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice)) // if we have a new slot selected, check if it is valid and we have the weapon
+            {
                 gWeaponRadialMenuChoice = nNewChoice;
+                if (gRadialMenuSfx)
+                    sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
+            }
         }
         else if ((klabs(nX) >= gRadialMenuThreshold) || (klabs(nY) >= gRadialMenuThreshold)) // above threshold, read from stick
         {
@@ -968,6 +976,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             if ((nNewWeapon != gWeaponRadialMenuChoice) && WeaponIsEquipable(gMe, nNewWeapon)) // if we have a new slot selected, check if it is valid and we have the weapon
             {
                 gWeaponRadialMenuChoice = nNewWeapon;
+                if (gRadialMenuSfx)
+                    sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
             }
             else if (nNewWeapon != gWeaponRadialMenuChoice) // new slot is unselectable, check neighbor slots
             {
@@ -983,9 +993,17 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                 if (bCanPickNext != bCanPickPrev) // if ONLY ONE of our neighbor slots are valid, snap to adjacent slice
                 {
                     if (bCanPickNext)
+                    {
+                        if (gRadialMenuSfx && (gWeaponRadialMenuChoice != nChoiceNext))
+                            sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
                         gWeaponRadialMenuChoice = nChoiceNext;
+                    }
                     else if (bCanPickPrev)
+                    {
+                        if (gRadialMenuSfx && (gWeaponRadialMenuChoice != nChoicePrev))
+                            sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
                         gWeaponRadialMenuChoice = nChoicePrev;
+                    }
                 }
             }
         }
