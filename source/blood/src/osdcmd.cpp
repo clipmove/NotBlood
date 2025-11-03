@@ -1260,6 +1260,7 @@ int32_t registerosdcommands(void)
         { "in_radialmenuyawinvert", "enable/disable invert radial menu yaw input", (void*)&gRadialMenuYawInvert, CVAR_BOOL, 0, 1 },
         { "in_radialmenupitch", "sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)", (void*)&gRadialMenuPitch, CVAR_INT, 0, 5 },
         { "in_radialmenupitchinvert", "enable/disable invert radial menu pitch input", (void*)&gRadialMenuPitchInvert, CVAR_BOOL, 0, 1 },
+        { "in_radialmenuclick", "enable/disable radial menu sound effect click", (void*)&gRadialMenuSfx, CVAR_BOOL, 0, 1 },
         { "in_targetaimassist", "enable/disable slowing camera movement when aiming towards a target (joystick only)", (void *)&gTargetAimAssist, CVAR_BOOL, 0, 1 },
         { "in_turnaccelmode", "set keyboard turning acceleration mode (0: off, 1: only when running, 2: always on)", (void *)&gTurnAcceleration, CVAR_INT, 0, 2 },
         { "in_turnspeed", "keyboard turning speed", (void *)&gTurnSpeed, CVAR_INT, 64, 124 },
