@@ -116,7 +116,8 @@ inline void SlashFSeqCallbackFixed(spritetype *pSprite, XSPRITE *pXSprite, sprit
     r1 = Random(50);
     r2 = Random(50);
     actFireVector(pSprite, 0, 0, dx-r2, dy+r1, dz, kVectorGargSlash);
-    gVectorData[kVectorGargSlash].maxDist = bakVecDist;
+    if (pSprite->type == kDudeGargoyleStone)
+        gVectorData[kVectorGargSlash].maxDist = bakVecDist;
 }
 
 static void SlashFSeqCallback(int, int nXSprite)
@@ -221,6 +222,8 @@ static void BlastSSeqCallback(int, int nXSprite)
                     aim.dx = Cos(nAngle)>>16;
                     aim.dy = Sin(nAngle)>>16;
                     aim.dz = divscale10(tz, nDist);
+                    if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for missile projectile
+                        continue;
                     if (tz > -0x333)
                         aim.dz = divscale10(tz, nDist);
                     else if (tz < -0x333 && tz > -0xb33)
@@ -411,6 +414,14 @@ inline int thinkChaseGetTargetHeight(spritetype *pSprite, DUDEINFO *pDudeInfo, s
     return height-height2;
 }
 
+inline void thinkAirBrakes(int nSprite)
+{
+    if (VanillaMode() || !EnemiesNotBlood() || !spriRangeIsFine(nSprite))
+        return;
+    xvel[nSprite] = -(xvel[nSprite]>>2);
+    yvel[nSprite] = -(yvel[nSprite]>>2);
+}
+
 static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
 {
     if (pXSprite->target == -1)
@@ -495,6 +506,7 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                         {
                         case -1:
                             sfxPlay3DSound(pSprite, 1406, 0, 0);
+                            thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &gargoyleFSlash);
                             break;
                         case 0:
@@ -504,11 +516,13 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                             if (pSprite->type != sprite[gHitInfo.hitsprite].type && sprite[gHitInfo.hitsprite].type != kDudeGargoyleStone)
                             {
                                 sfxPlay3DSound(pSprite, 1406, 0, 0);
+                                thinkAirBrakes(pSprite->index);
                                 aiNewState(pSprite, pXSprite, &gargoyleFSlash);
                             }
                             break;
                         default:
                             sfxPlay3DSound(pSprite, 1406, 0, 0);
+                            thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &gargoyleFSlash);
                             break;
                         }
@@ -555,6 +569,7 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                         switch (hit)
                         {
                         case -1:
+                            thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &gargoyleFSlash);
                             break;
                         case 0:
@@ -562,9 +577,13 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                             break;
                         case 3:
                             if (pSprite->type != sprite[gHitInfo.hitsprite].type && sprite[gHitInfo.hitsprite].type != kDudeGargoyleFlesh)
+                            {
+                                thinkAirBrakes(pSprite->index);
                                 aiNewState(pSprite, pXSprite, &gargoyleFSlash);
+                            }
                             break;
                         default:
+                            thinkAirBrakes(pSprite->index);
                             aiNewState(pSprite, pXSprite, &gargoyleFSlash);
                             break;
                         }
