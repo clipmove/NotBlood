@@ -203,6 +203,8 @@ static void BlastSeqCallback(int, int nXSprite)
                     aim.dx = Cos(nAngle)>>16;
                     aim.dy = Sin(nAngle)>>16;
                     aim.dz = divscale10(tz, nDist);
+                    if (IsDudeSprite(pSprite2) && EnemiesNotBlood() && !VanillaMode()) // use fixed calculation for missile projectile
+                        continue;
                     if (tz > -0x333)
                         aim.dz = divscale10(tz, nDist);
                     else if (tz < -0x333 && tz > -0xb33)
@@ -385,8 +387,8 @@ inline void thinkAirBrakes(int nSprite)
 {
     if (VanillaMode() || !EnemiesNotBlood() || !spriRangeIsFine(nSprite))
         return;
-    xvel[nSprite] -= (xvel[nSprite]>>1)+(xvel[nSprite]>>2);
-    yvel[nSprite] -= (yvel[nSprite]>>1)+(yvel[nSprite]>>2);
+    xvel[nSprite] = -(xvel[nSprite]>>1);
+    yvel[nSprite] = -(yvel[nSprite]>>1);
 }
 
 static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
