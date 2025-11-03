@@ -281,6 +281,8 @@ void sndStartSample(const char *pzSound, int nVolume, int nChannel, int nRate)
         pChannel = FindChannel();
     else
         pChannel = &Channel[nChannel];
+    if (!pChannel)
+        return;
     if (pChannel->hVoice > 0)
         sndKillSound(pChannel);
     pChannel->at5 = gSoundRes.Lookup(pzSound, "RAW");
