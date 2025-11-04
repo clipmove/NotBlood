@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #define kMaxClients 256
 #define kMaxSequences 1024
+#define kSurfSoundBase  800
 
 static ACTIVE activeList[kMaxSequences];
 static int activeCount = 0;
@@ -96,68 +97,85 @@ void UpdateSprite(int nXSprite, SEQFRAME *pFrame)
     dassert(nSprite >= 0 && nSprite < kMaxSprites);
     spritetype *pSprite = &sprite[nSprite];
     dassert(pSprite->extra == nXSprite);
-    if (pSprite->flags & 2)
+    
+    int nScale = xsprite[nXSprite].scale; // SEQ size scaling
+
+    if (pSprite->flags & kPhysGravity)
     {
         if (tilesiz[pSprite->picnum].y != tilesiz[seqGetTile(pFrame)].y || picanm[pSprite->picnum].yofs != picanm[seqGetTile(pFrame)].yofs
             || (pFrame->yrepeat && pFrame->yrepeat != pSprite->yrepeat))
-            pSprite->flags |= 4;
+            pSprite->flags |= kPhysFalling;
     }
+
     pSprite->picnum = seqGetTile(pFrame);
+
     if (pFrame->pal)
-        pSprite->pal = pFrame->pal;
+        pSprite->pal = seqGetPal(pFrame);
+
     pSprite->shade = pFrame->shade;
-    
-    int scale = xsprite[nXSprite].scale; // SEQ size scaling
-    if (pFrame->xrepeat) {
-        if (scale) pSprite->xrepeat = ClipRange(mulscale8(pFrame->xrepeat, scale), 0, 255);
+
+    if (pFrame->xrepeat)
+    {
+        if (nScale) pSprite->xrepeat = ClipRange(mulscale8(pFrame->xrepeat, nScale), 0, 255);
         else pSprite->xrepeat = pFrame->xrepeat;
     }
 
-    if (pFrame->yrepeat) {
-        if (scale) pSprite->yrepeat = ClipRange(mulscale8(pFrame->yrepeat, scale), 0, 255);
+    if (pFrame->yrepeat)
+    {
+        if (nScale) pSprite->yrepeat = ClipRange(mulscale8(pFrame->yrepeat, nScale), 0, 255);
         else pSprite->yrepeat = pFrame->yrepeat;
     }
 
     if (pFrame->transparent)
-        pSprite->cstat |= 2;
+        pSprite->cstat |= CSTAT_SPRITE_TRANSLUCENT;
     else
-        pSprite->cstat &= ~2;
+        pSprite->cstat &= ~CSTAT_SPRITE_TRANSLUCENT;
+
     if (pFrame->transparent2)
-        pSprite->cstat |= 512;
+        pSprite->cstat |= CSTAT_SPRITE_TRANSLUCENT_INVERT;
     else
-        pSprite->cstat &= ~512;
+        pSprite->cstat &= ~CSTAT_SPRITE_TRANSLUCENT_INVERT;
+
     if (pFrame->blockable)
-        pSprite->cstat |= 1;
+        pSprite->cstat |= CSTAT_SPRITE_BLOCK;
     else
-        pSprite->cstat &= ~1;
+        pSprite->cstat &= ~CSTAT_SPRITE_BLOCK;
+
     if (pFrame->hittable)
-        pSprite->cstat |= 256;
+        pSprite->cstat |= CSTAT_SPRITE_BLOCK_HITSCAN;
     else
-        pSprite->cstat &= ~256;
+        pSprite->cstat &= ~CSTAT_SPRITE_BLOCK_HITSCAN;
+
     if (pFrame->invisible)
-        pSprite->cstat |= 32768;
+        pSprite->cstat |= CSTAT_SPRITE_INVISIBLE;
     else
-        pSprite->cstat &= (unsigned short)~32768;
-    if (pFrame->at6_0)
-        pSprite->cstat |= 4096;
+        pSprite->cstat &= (unsigned short)~CSTAT_SPRITE_INVISIBLE;
+
+    if (pFrame->pushable)
+        pSprite->cstat |= CSTAT_SPRITE_RESERVED3;
     else
-        pSprite->cstat &= ~4096;
-    if (pFrame->at5_6)
-        pSprite->flags |= 256;
+        pSprite->cstat &= ~CSTAT_SPRITE_RESERVED3;
+
+    if (pFrame->smoke)
+        pSprite->flags |= kHitagSmoke;
     else
-        pSprite->flags &= ~256;
-    if (pFrame->at5_7)
-        pSprite->flags |= 8;
+        pSprite->flags &= ~kHitagSmoke;
+
+    if (pFrame->autoaim)
+        pSprite->flags |= kHitagAutoAim;
     else
-        pSprite->flags &= ~8;
-    if (pFrame->at6_3)
-        pSprite->flags |= 1024;
+        pSprite->flags &= ~kHitagAutoAim;
+
+    if (pFrame->xflip)
+        pSprite->flags |= kHitagFlipX;
     else
-        pSprite->flags &= ~1024;
-    if (pFrame->at6_4)
-        pSprite->flags |= 2048;
+        pSprite->flags &= ~kHitagFlipX;
+
+    if (pFrame->yflip)
+        pSprite->flags |= kHitagFlipY;
     else
-        pSprite->flags &= ~2048;
+        pSprite->flags &= ~kHitagFlipY;
+
 }
 
 void UpdateWall(int nXWall, SEQFRAME *pFrame)
@@ -167,25 +185,31 @@ void UpdateWall(int nXWall, SEQFRAME *pFrame)
     dassert(nWall >= 0 && nWall < kMaxWalls);
     walltype *pWall = &wall[nWall];
     dassert(pWall->extra == nXWall);
+
     pWall->picnum = seqGetTile(pFrame);
+
     if (pFrame->pal)
-        pWall->pal = pFrame->pal;
+        pWall->pal = seqGetPal(pFrame);
+
     if (pFrame->transparent)
-        pWall->cstat |= 128;
+        pWall->cstat |= CSTAT_WALL_TRANSLUCENT;
     else
-        pWall->cstat &= ~128;
+        pWall->cstat &= ~CSTAT_WALL_TRANSLUCENT;
+
     if (pFrame->transparent2)
-        pWall->cstat |= 512;
+        pWall->cstat |= CSTAT_WALL_TRANS_FLIP;
     else
-        pWall->cstat &= ~512;
+        pWall->cstat &= ~CSTAT_WALL_TRANS_FLIP;
+
     if (pFrame->blockable)
-        pWall->cstat |= 1;
+        pWall->cstat |= CSTAT_WALL_BLOCK;
     else
-        pWall->cstat &= ~1;
+        pWall->cstat &= ~CSTAT_WALL_BLOCK;
+
     if (pFrame->hittable)
-        pWall->cstat |= 64;
+        pWall->cstat |= CSTAT_WALL_BLOCK_HITSCAN;
     else
-        pWall->cstat &= ~64;
+        pWall->cstat &= ~CSTAT_WALL_BLOCK_HITSCAN;
 }
 
 void UpdateMasked(int nXWall, SEQFRAME *pFrame)
@@ -197,48 +221,54 @@ void UpdateMasked(int nXWall, SEQFRAME *pFrame)
     dassert(pWall->extra == nXWall);
     dassert(pWall->nextwall >= 0);
     walltype *pWallNext = &wall[pWall->nextwall];
+
     pWall->overpicnum = pWallNext->overpicnum = seqGetTile(pFrame);
+
     if (pFrame->pal)
-        pWall->pal = pWallNext->pal = pFrame->pal;
+        pWall->pal = pWallNext->pal = seqGetPal(pFrame);
+
     if (pFrame->transparent)
     {
-        pWall->cstat |= 128;
-        pWallNext->cstat |= 128;
+        pWall->cstat |= CSTAT_WALL_TRANSLUCENT;
+        pWallNext->cstat |= CSTAT_WALL_TRANSLUCENT;
     }
     else
     {
-        pWall->cstat &= ~128;
-        pWallNext->cstat &= ~128;
+        pWall->cstat &= ~CSTAT_WALL_TRANSLUCENT;
+        pWallNext->cstat &= ~CSTAT_WALL_TRANSLUCENT;
     }
+
     if (pFrame->transparent2)
     {
-        pWall->cstat |= 512;
-        pWallNext->cstat |= 512;
+        pWall->cstat |= CSTAT_WALL_TRANS_FLIP;
+        pWallNext->cstat |= CSTAT_WALL_TRANS_FLIP;
     }
     else
     {
-        pWall->cstat &= ~512;
-        pWallNext->cstat &= ~512;
+        pWall->cstat &= ~CSTAT_WALL_TRANS_FLIP;
+        pWallNext->cstat &= ~CSTAT_WALL_TRANS_FLIP;
     }
+
     if (pFrame->blockable)
     {
-        pWall->cstat |= 1;
-        pWallNext->cstat |= 1;
+        pWall->cstat |= CSTAT_WALL_BLOCK;
+        pWallNext->cstat |= CSTAT_WALL_BLOCK;
     }
     else
     {
-        pWall->cstat &= ~1;
-        pWallNext->cstat &= ~1;
+        pWall->cstat &= ~CSTAT_WALL_BLOCK;
+        pWallNext->cstat &= ~CSTAT_WALL_BLOCK;
     }
+
     if (pFrame->hittable)
     {
-        pWall->cstat |= 64;
-        pWallNext->cstat |= 64;
+        pWall->cstat |= CSTAT_WALL_BLOCK_HITSCAN;
+        pWallNext->cstat |= CSTAT_WALL_BLOCK_HITSCAN;
     }
     else
     {
-        pWall->cstat &= ~64;
-        pWallNext->cstat &= ~64;
+        pWall->cstat &= ~CSTAT_WALL_BLOCK_HITSCAN;
+        pWallNext->cstat &= ~CSTAT_WALL_BLOCK_HITSCAN;
     }
 }
 
@@ -249,10 +279,13 @@ void UpdateFloor(int nXSector, SEQFRAME *pFrame)
     dassert(nSector >= 0 && nSector < kMaxSectors);
     sectortype *pSector = &sector[nSector];
     dassert(pSector->extra == nXSector);
+
     pSector->floorpicnum = seqGetTile(pFrame);
+
     pSector->floorshade = pFrame->shade;
+
     if (pFrame->pal)
-        pSector->floorpal = pFrame->pal;
+        pSector->floorpal = seqGetPal(pFrame);
 }
 
 void UpdateCeiling(int nXSector, SEQFRAME *pFrame)
@@ -262,76 +295,75 @@ void UpdateCeiling(int nXSector, SEQFRAME *pFrame)
     dassert(nSector >= 0 && nSector < kMaxSectors);
     sectortype *pSector = &sector[nSector];
     dassert(pSector->extra == nXSector);
+
     pSector->ceilingpicnum = seqGetTile(pFrame);
+
     pSector->ceilingshade = pFrame->shade;
+
     if (pFrame->pal)
-        pSector->ceilingpal = pFrame->pal;
+        pSector->ceilingpal = seqGetPal(pFrame);
 }
 
 void SEQINST::Update(ACTIVE *pActive)
 {
     dassert(frameIndex < pSequence->nFrames);
+    SEQFRAME* pFrame = &pSequence->frames[frameIndex];
+    
     switch (pActive->type)
     {
     case 0:
-        UpdateWall(pActive->xindex, &pSequence->frames[frameIndex]);
+        UpdateWall(pActive->xindex, pFrame);
         break;
     case 1:
-        UpdateCeiling(pActive->xindex , &pSequence->frames[frameIndex]);
+        UpdateCeiling(pActive->xindex , pFrame);
         break;
     case 2:
-        UpdateFloor(pActive->xindex, &pSequence->frames[frameIndex]);
+        UpdateFloor(pActive->xindex, pFrame);
         break;
     case 3: 
     {
-        UpdateSprite(pActive->xindex, &pSequence->frames[frameIndex]);
-        if (pSequence->frames[frameIndex].at6_1) {
-            
-            int sound = pSequence->nSoundID;
-            
-            // by NoOne: add random sound range feature
-            if (!VanillaMode() && pSequence->frames[frameIndex].soundRange > 0)
-                sound += Random(((pSequence->frames[frameIndex].soundRange == 1) ? 2 : pSequence->frames[frameIndex].soundRange));
-            
-            sfxPlay3DSound(&sprite[xsprite[pActive->xindex].reference], sound, -1, 0);
-        }
+        UpdateSprite(pActive->xindex, pFrame);
+        spritetype* pSpr = &sprite[xsprite[pActive->xindex].reference];
+        int nSnd, nSurf;
 
-        // by NoOne: add surfaceSound trigger feature
-        spritetype* pSprite = &sprite[xsprite[pActive->xindex].reference];
-        if (!VanillaMode() && pSequence->frames[frameIndex].surfaceSound && zvel[pSprite->index] == 0 && xvel[pSprite->index] != 0) {
+#ifdef NOONE_EXTENSIONS
+        if (pFrame->playSound)
+        {
+            nSnd = pSequence->nSoundID;
             
-            if (gUpperLink[pSprite->sectnum] >= 0) break; // don't play surface sound for stacked sectors
-            int surf = tileGetSurfType(pSprite->sectnum, 0x4000); if (!surf) break;
-            static int surfSfxMove[15][4] = {
-                /* {snd1, snd2, gameVolume, myVolume} */
-                {800,801,80,25},
-                {802,803,80,25},
-                {804,805,80,25},
-                {806,807,80,25},
-                {808,809,80,25},
-                {810,811,80,25},
-                {812,813,80,25},
-                {814,815,80,25},
-                {816,817,80,25},
-                {818,819,80,25},
-                {820,821,80,25},
-                {822,823,80,25},
-                {824,825,80,25},
-                {826,827,80,25},
-                {828,829,80,25},
-            };
-
-            int sndId = surfSfxMove[surf][Random(2)];
-            DICTNODE * hRes = gSoundRes.Lookup(sndId, "SFX"); SFX * pEffect = (SFX*)gSoundRes.Load(hRes);
-            sfxPlay3DSoundCP(pSprite, sndId, -1, 0, 0, (surfSfxMove[surf][2] != pEffect->relVol) ? pEffect->relVol : surfSfxMove[surf][3]);
+            // add random sound range feature
+            if (!VanillaMode() && pFrame->soundRange > 0)
+                nSnd += Random((pFrame->soundRange == 1) ? 2 : pFrame->soundRange);
+            
+            sfxPlay3DSound(pSpr, nSnd, -1, 0);
         }
+        
+        // add surfaceSound trigger feature
+        if (!VanillaMode() && pFrame->surfaceSound && zvel[pSpr->index] == 0 && approxDist(xvel[pSpr->index], yvel[pSpr->index]))
+        {
+            if (pSpr->sectnum >= 0 && gUpperLink[pSpr->sectnum] < 0 && (nSurf = tileGetSurfType(pSpr->sectnum, 0x4000)) > 0)
+            {
+                DICTNODE* hRes;
+                
+                nSnd = kSurfSoundBase + ((nSurf << 1) + Random(2));
+                if ((hRes = gSoundRes.Lookup(nSnd, "SFX")) != NULL)
+                {
+                    SFX* pSFX = (SFX*)gSoundRes.Load(hRes);
+                    sfxPlay3DSoundCP(pSpr, nSnd, -1, 0, 0, (pSFX->relVol != 80) ? pSFX->relVol : 25);
+                }
+            }
+        }
+#else
+        if (pFrame->playSound)
+            sfxPlay3DSound(pSpr, pSequence->nSoundID, -1, 0);
+#endif
         break;
     }
     case 4:
-        UpdateMasked(pActive->xindex, &pSequence->frames[frameIndex]);
+        UpdateMasked(pActive->xindex, pFrame);
         break;
     }
-    if (pSequence->frames[frameIndex].at5_5 && nCallbackID != -1)
+    if (pFrame->trigger && nCallbackID != -1)
         clientCallback[nCallbackID](pActive->type, pActive->xindex);
 }
 
@@ -399,7 +431,7 @@ void seqSpawn(int nSeq, int nType, int nXIndex, int nCallbackID)
     if ((pSeq->version & 0xff) == 0x00)
     {
         for (int i = 0; i < pSeq->nFrames; i++)
-            pSeq->frames[i].tile2 = 0;
+            pSeq->frames[i].tile2 = 0, pSeq->frames[i].pal2 = 0;
     }
     pInst->isPlaying = 1;
     pInst->hSeq = hSeq;
