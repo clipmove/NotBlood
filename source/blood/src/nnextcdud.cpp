@@ -4483,7 +4483,7 @@ void CUSTOMDUDEV2_SETUP::SetupWeapons(void)
                         {
                             Seq* pSeq = helperSeqLock(pState->seqId);
                             if (pSeq)
-                                pSeq->frames[pSeq->nFrames - 1].at5_5 = 1;
+                                pSeq->frames[pSeq->nFrames - 1].trigger = 1;
                         }
 
                         pState++;
@@ -5524,7 +5524,7 @@ void CUSTOMDUDEV1_SETUP::WeaponMeleeSet(CUSTOMDUDE_WEAPON* pWeapon)
         {
             Seq* pSeq = helperSeqLock(pState->seqId);
             if (pSeq)
-                pSeq->frames[pSeq->nFrames - 1].at5_5 = 1;
+                pSeq->frames[pSeq->nFrames - 1].trigger = 1;
         }
 
         pState++;
@@ -5860,7 +5860,7 @@ static char helperSeqTriggerExists(int nSeq)
         i = pSeq->nFrames;
         while (--i >= 0)
         {
-            if (pSeq->frames[i].at5_5)
+            if (pSeq->frames[i].trigger)
                 return true;
         }
     }

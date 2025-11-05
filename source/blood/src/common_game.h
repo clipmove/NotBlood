@@ -538,6 +538,8 @@ kAiStatePatrolMax,
 #define kHitagRespawn 0x0010
 #define kHitagFree 0x0020
 #define kHitagSmoke 0x0100
+#define kHitagFlipX 0x0400
+#define kHitagFlipY 0x0800
 
 // sprite physics attributes
 #define kPhysMove 0x0001 // affected by movement physics
