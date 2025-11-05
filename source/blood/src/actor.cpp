@@ -2750,7 +2750,7 @@ void actRadiusDamage(int nSprite, int x, int y, int z, int nSector, int nDist, i
     int nOwner = actSpriteIdToOwnerId(nSprite);
     gAffectedSectors[0] = 0;
     gAffectedXWalls[0] = 0;
-    const bool bAccurateCheck = (nOwner >= 0) && !VanillaMode() && IsDudeSprite(&sprite[nOwner]); // use new sector checking logic
+    const bool bAccurateCheck = (!VanillaMode() && spriRangeIsFine(nOwner) && IsDudeSprite(&sprite[nOwner])); // use new sector checking logic
     GetClosestSpriteSectors(nSector, x, y, nDist, gAffectedSectors, sectmap, gAffectedXWalls, bAccurateCheck);
     nDist <<= 4;
     if (flags & 2)

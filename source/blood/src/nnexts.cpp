@@ -8285,7 +8285,7 @@ bool isMovableSector(sectortype* pSect)
 
 char spriteIsUnderwater(spritetype* pSprite, char oldWay)
 {
-    return ((sector[pSprite->sectnum].extra >= 0 && xsector[sector[pSprite->sectnum].extra].Underwater)
+    return ((pSprite->sectnum >= 0 && (sector[pSprite->sectnum].extra >= 0 && xsector[sector[pSprite->sectnum].extra].Underwater))
         || (oldWay && (xsprite[pSprite->extra].medium == kMediumWater || xsprite[pSprite->extra].medium == kMediumGoo)));
 }
 
