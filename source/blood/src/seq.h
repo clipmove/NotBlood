@@ -24,27 +24,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "resource.h"
 
 struct SEQFRAME {
-    unsigned int tile : 12;
-    unsigned int transparent  : 1; // transparent
-    unsigned int transparent2 : 1; // transparent
-    unsigned int blockable : 1; // blockable
-    unsigned int hittable : 1; // hittable
-    unsigned int xrepeat : 8; // xrepeat
-    unsigned int yrepeat : 8; // yrepeat
-    signed int shade : 8; // shade
-    unsigned int pal : 5; // palette
-    unsigned int at5_5 : 1; //
-    unsigned int at5_6 : 1; //
-    unsigned int at5_7 : 1; //
-    unsigned int at6_0 : 1; //
-    unsigned int at6_1 : 1; //
-    unsigned int invisible : 1; // invisible
-    unsigned int at6_3 : 1; //
-    unsigned int at6_4 : 1; //
-    unsigned int tile2 : 4;
-    unsigned soundRange : 4; // (by NoOne) random sound range relative to global SEQ sound
-    unsigned surfaceSound : 1; // (by NoOne) trigger surface sound when moving / touching
-    unsigned reserved : 2;
+    unsigned int tile           : 12;
+    unsigned int transparent    : 1; // mostly translucent
+    unsigned int transparent2   : 1; // less translucent
+    unsigned int blockable      : 1; // blocking
+    unsigned int hittable       : 1; // hitscan sensitive
+    unsigned int xrepeat        : 8; //
+    unsigned int yrepeat        : 8; //
+    signed   int shade          : 8; //
+    unsigned int pal            : 5; //
+    unsigned int trigger        : 1; // callback trigger
+    unsigned int smoke          : 1; // smoke view sprite
+    unsigned int autoaim        : 1; // weapon auto-aim sensitive
+    unsigned int pushable       : 1; // can be pushed down via action key
+    unsigned int playSound      : 1; // play global sound + random(soundRange)
+    unsigned int invisible      : 1; //
+    unsigned int xflip          : 1; // 
+    unsigned int yflip          : 1; //
+    unsigned int tile2          : 4; // extends max tile number to 32767
+#ifdef NOONE_EXTENSIONS
+    unsigned int soundRange     : 4; // random sound range relative to global SEQ sound
+    unsigned int surfaceSound   : 1; // trigger surface sound when moving / touching
+    unsigned int pal2           : 2; // extends max palookup number to 128
+#else
+    unsigned int reserved       : 7;
+#endif
 };
 
 struct Seq {
@@ -80,6 +84,11 @@ struct SEQINST
 inline int seqGetTile(SEQFRAME* pFrame)
 {
     return pFrame->tile+(pFrame->tile2<<12);
+}
+
+inline int seqGetPal(SEQFRAME* pFrame)
+{
+    return pFrame->pal+(pFrame->pal2<<5);
 }
 
 int seqRegisterClient(void(*pClient)(int, int));
