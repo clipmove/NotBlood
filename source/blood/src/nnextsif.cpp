@@ -1002,13 +1002,14 @@ static char sprCmpHealth(void)
 {
     int t = 0;
     if (IsDudeSprite(pSpr))
-        t = (pXSpr->sysData2 > 0) ? ClipRange(pXSpr->sysData2 << 4, 1, 65535) : getDudeInfo(pSpr->type)->startHealth << 4;
+        t = (pXSpr->sysData2 > 0) ? ClipHigh(pXSpr->sysData2 << 4, 65535) : getDudeInfo(pSpr->type)->startHealth << 4;
     else if (pSpr->type == kThingBloodChunks)
         return Cmp(0);
     else if (IsThingSprite(pSpr))
         t = thingInfo[pSpr->type - kThingBase].startHealth << 4;
 
-    return Cmp((kPercFull * pXSpr->health) / ClipLow(t, 1));
+    t = (kPercFull * pXSpr->health) / ClipLow(t, 1);
+    return Cmp((!t && pXSpr->health) ? 1 : t);
 }
 /**---------------------------------------------------------------------------**/
 static char sprChkTouchCeil(void)
@@ -2323,8 +2324,23 @@ void conditionsBubble(XSPRITE* pXStart, void(*pActionFunc)(XSPRITE*, int), int n
         for (j = headspritestat[kStatModernCondition]; j >= 0; j = nextspritestat[j])
         {
             XSPRITE* pXSprite2 = &xsprite[sprite[j].extra];
-            if (pXSprite2->rxID == pXStart->rxID && pXSprite2->txID != pXStart->txID)
-                break; // fork found
+            if (pXSprite2->rxID == pXStart->rxID && pXSprite2 != pXStart)
+            {
+                if (pActionFunc == conditionsSetIsTriggered)
+                {
+                    if (pXSprite2->triggerOnce && ((nValue != 0 && !pXSprite2->isTriggered) || (nValue == 0 && pXSprite2->isTriggered)))
+                        break; // fork found
+                }
+                else if (pActionFunc == conditionsSetIsLocked)
+                {
+                    if ((nValue != 0 && !pXSprite2->locked) || (nValue == 0 && pXSprite2->locked))
+                        break; // fork found
+                }
+                else
+                {
+                    break; // fork found
+                }
+            }
         }
 
         if (j < 0)
