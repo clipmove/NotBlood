@@ -4003,9 +4003,31 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                         pNTSprite->y += mulscale30(Sin((gCameraAng + kAng90) & kAngMask), 96);
                         pNTSprite->z -= 12<<8; // offset up
                     }
+                } else if ((gGameOptions.nGameType == kGameTypeTeams) && (gGameOptions.uNetGameFlags&kNetGameFlagHideWeaponsTeams)) {
+                    if (pPlayer->pXSprite->health > 0) {
+                        auto pNSprite = viewInsertTSprite(pTSprite->sectnum, 32767, pTSprite);
+                        if (pNSprite)
+                        {
+                            pNSprite->x = pTSprite->x;
+                            pNSprite->y = pTSprite->y;
+                            pNSprite->z = pTSprite->z-(32<<8);
+                            if (pPlayer->posture == kPostureCrouch) // if player is crouching
+                                pNSprite->z += pPlayer->pPosture[pPlayer->lifeMode][pPlayer->posture].zOffset<<5;
+                            pNSprite->z -= 5<<8; // offset up
+                            pNSprite->picnum = 2275; // skull
+                            pNSprite->shade = pTSprite->shade;
+                            pNSprite->xrepeat = 36;
+                            pNSprite->yrepeat = 36;
+                            pNSprite->ang = (gCameraAng + kAng90) & kAngMask; // always face viewer
+                            const int nPal = powerupCheck(pPlayer, kPwUpDoppleganger) ? playerColorPalSprite(gView->teamId) : playerColorPalSprite(pPlayer->teamId);
+                            pNSprite->pal = nPal;
+                            if (pPlayer == gView && gViewPos == VIEWPOS_1)
+                                pNSprite->cstat |= CSTAT_SPRITE_TRANSLUCENT;
+                        }
+                    }
                 } else if (gShowWeapon && (gGameOptions.nGameType != kGameTypeSinglePlayer) && gView && ((pPlayer == gView && gViewPos == VIEWPOS_1) || !(gGameOptions.uNetGameFlags&kNetGameFlagHideWeaponsAlways))) {
                     const char bDrawDudeWeap = !(powerupCheck(pPlayer, kPwUpShadowCloak) && (gGameOptions.uNetGameFlags&kNetGameFlagHideWeaponsCloak)) || bIsTeammateOrDoppleganger || (pPlayer == gView && gViewPos == VIEWPOS_1); // don't draw enemy weapon if they are cloaked
-                    if (!VanillaMode() ? bDrawDudeWeap : (pPlayer != gView))
+                    if ((!VanillaMode() && bDrawDudeWeap) || (VanillaMode() && (pPlayer != gView)))
                         viewAddEffect(nTSprite, kViewEffectShowWeapon);
                 }
 

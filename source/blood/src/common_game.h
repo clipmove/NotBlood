@@ -146,6 +146,7 @@ kNetGameFlagSkillIssue          =  1 << 2,
 kNetGameFlagNoTeamColors        =  1 << 3,
 kNetGameFlagHideWeaponsCloak    =  1 << 4,
 kNetGameFlagHideWeaponsAlways   =  1 << 5,
+kNetGameFlagHideWeaponsTeams    = kNetGameFlagHideWeaponsCloak|kNetGameFlagHideWeaponsAlways, // replace show weapon icon with teams skull icon
 
 kNetGameFlagScoresLimitBase     =  6, // this bit range stores our limit value (0-255)
 kNetGameFlagScoresLimitMask     =  1 << 6|1 << 7|1 << 8|1 << 9|1 << 10|1 << 11|1 << 12|1 << 13,

@@ -224,6 +224,14 @@ const char *zShowWeapon[] =
     "ALWAYS HIDE"
 };
 
+const char *zShowWeaponTeams[] =
+{
+    "ALWAYS SHOW",
+    "HIDE WHEN CLOAKED",
+    "SHOW TEAMS",
+    "ALWAYS HIDE"
+};
+
 const char *zSpawnWeaponStrings[] =
 {
     "Pitchfork",
@@ -533,6 +541,7 @@ CGameMenuItemZBool itemNetGameBoolAutoTeams("AUTO TEAMS:", 3, 66, 113, 180, true
 CGameMenuItemZBool itemNetGameBoolTeamFlags("TEAM FLAGS:", 3, 66, 121, 180, true, 0, NULL, NULL);
 CGameMenuItemZCycle itemNetGameCycleSpawnLocation("SPAWN AREA:", 3, 66, 129, 180, 0, 0, zRespawnStrings, ARRAY_SSIZE(zRespawnStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverride("ENEMY WEAPONS:", 3, 66, 137, 180, 0, 0, zShowWeapon, ARRAY_SSIZE(zShowWeapon), 0);
+CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverrideTeams("ENEMY WEAPONS:", 3, 66, 137, 180, 0, 0, zShowWeaponTeams, ARRAY_SSIZE(zShowWeaponTeams), 0);
 CGameMenuItemZCycle itemNetGameCycleSpawnProtection("SPAWN PROTECTION:", 3, 66, 145, 180, 0, 0, zSpawnProtectStrings, ARRAY_SSIZE(zSpawnProtectStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleSpawnWeapon("SPAWN WITH WEAPON:", 3, 66, 153, 180, 0, SetNetGameMode, zSpawnWeaponStrings, ARRAY_SSIZE(zSpawnWeaponStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleMirrorModeOverride("MIRROR MODE:", 3, 66, 161, 180, 0, NULL, pzMirrorModeStrings, ARRAY_SSIZE(pzMirrorModeStrings), 0);
@@ -1533,6 +1542,7 @@ void SetupNetStartMenu(void)
     menuNetworkGameMode.Add(&itemNetGameBoolTeamFlags, false);
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnLocation, false);
     menuNetworkGameMode.Add(&itemNetGameCycleShowWeaponsOverride, false);
+    menuNetworkGameMode.Add(&itemNetGameCycleShowWeaponsOverrideTeams, false);
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnProtection, false);
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnWeapon, false);
     menuNetworkGameMode.Add(&itemNetGameCycleMirrorModeOverride, false);
@@ -1556,6 +1566,8 @@ void SetupNetStartMenu(void)
     itemNetGameCycleSpawnLocation.tooltip_pzTextUpper = "Set spawn location behavior";
     itemNetGameCycleShowWeaponsOverride.tooltip_pzTextUpper = "Set global setting for show weapons option";
     itemNetGameCycleShowWeaponsOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
+    itemNetGameCycleShowWeaponsOverrideTeams.tooltip_pzTextUpper = "Set global setting for show weapons option";
+    itemNetGameCycleShowWeaponsOverrideTeams.tooltip_pzTextLower = "(This is applied to all players in round)";
     itemNetGameCycleMirrorModeOverride.tooltip_pzTextUpper = "Set global setting for mirror mode";
     itemNetGameCycleMirrorModeOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
 
@@ -1638,6 +1650,7 @@ void SetupNetStartMenu(void)
         itemNetGameBoolTeamFlags.at20 = 0;
     itemNetGameCycleSpawnLocation.SetTextIndex(gMultiSpawnLocation != -1 ? gMultiSpawnLocation : 1);
     itemNetGameCycleShowWeaponsOverride.SetTextIndex(1);
+    itemNetGameCycleShowWeaponsOverrideTeams.SetTextIndex(1);
     itemNetGameCycleSpawnProtection.SetTextIndex(gMultiSpawnProtection != -1 ? gMultiSpawnProtection : 1);
     SetNetGameMode(&itemNetGameMode); // hide friendly fire/keys menu items depending on game mode
 
@@ -3558,26 +3571,31 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
 
     if (pItem == &itemNetGameMode)
     {
+        const int nGameType = pItem->m_nFocus+1;
         itemNetStart1.m_pzText2 = zNetGameTypes[pItem->m_nFocus];
-        itemNetGameBoolExit.bEnable = ((itemNetGameMode.m_nFocus+1) != kGameTypeCoop);
+        itemNetGameBoolExit.bEnable = nGameType != kGameTypeCoop;
         itemNetGameBoolExit.bNoDraw = !itemNetGameBoolExit.bEnable;
-        itemNetGameBoolPlayerColors.bEnable = (pItem->m_nFocus+1) != kGameTypeTeams;
+        itemNetGameBoolPlayerColors.bEnable = nGameType != kGameTypeTeams;
         itemNetGameBoolPlayerColors.bNoDraw = !itemNetGameBoolPlayerColors.bEnable;
-        itemNetGameBoolFriendlyFire.bEnable = (pItem->m_nFocus+1) != kGameTypeBloodBath;
+        itemNetGameBoolFriendlyFire.bEnable = nGameType != kGameTypeBloodBath;
         itemNetGameBoolFriendlyFire.bNoDraw = !itemNetGameBoolFriendlyFire.bEnable;
-        itemNetGameCycleKey.bEnable = (pItem->m_nFocus+1) == kGameTypeCoop;
+        itemNetGameCycleKey.bEnable = nGameType == kGameTypeCoop;
         itemNetGameCycleKey.bNoDraw = !itemNetGameCycleKey.bEnable;
-        itemNetGameCycleItemWeapon.bEnable = (pItem->m_nFocus+1) == kGameTypeCoop;
+        itemNetGameCycleItemWeapon.bEnable = nGameType == kGameTypeCoop;
         itemNetGameCycleItemWeapon.bNoDraw = !itemNetGameCycleItemWeapon.bEnable;
-        itemNetGameBoolAutoTeams.bEnable = (pItem->m_nFocus+1) == kGameTypeTeams;
+        itemNetGameBoolAutoTeams.bEnable = nGameType == kGameTypeTeams;
         itemNetGameBoolAutoTeams.bNoDraw = !itemNetGameBoolAutoTeams.bEnable;
-        itemNetGameBoolTeamColors.bEnable = (pItem->m_nFocus+1) == kGameTypeTeams;
+        itemNetGameBoolTeamColors.bEnable = nGameType == kGameTypeTeams;
         itemNetGameBoolTeamColors.bNoDraw = !itemNetGameBoolTeamColors.bEnable;
-        itemNetGameBoolTeamFlags.bEnable = (pItem->m_nFocus+1) == kGameTypeTeams;
+        itemNetGameBoolTeamFlags.bEnable = nGameType == kGameTypeTeams;
         itemNetGameBoolTeamFlags.bNoDraw = !itemNetGameBoolTeamFlags.bEnable;
-        itemNetGameCycleSpawnLocation.bEnable = (pItem->m_nFocus+1) != kGameTypeCoop;
+        itemNetGameCycleShowWeaponsOverride.bEnable = nGameType != kGameTypeTeams;
+        itemNetGameCycleShowWeaponsOverride.bNoDraw = !itemNetGameCycleShowWeaponsOverride.bEnable;
+        itemNetGameCycleShowWeaponsOverrideTeams.bEnable = nGameType == kGameTypeTeams;
+        itemNetGameCycleShowWeaponsOverrideTeams.bNoDraw = !itemNetGameCycleShowWeaponsOverrideTeams.bEnable;
+        itemNetGameCycleSpawnLocation.bEnable = nGameType != kGameTypeCoop;
         itemNetGameCycleSpawnLocation.bNoDraw = !itemNetGameCycleSpawnLocation.bEnable;
-        itemNetStartBoolSpectatorMode.bEnable = (pItem->m_nFocus+1) != kGameTypeCoop;
+        itemNetStartBoolSpectatorMode.bEnable = nGameType != kGameTypeCoop;
         itemNetStartBoolSpectatorMode.bNoDraw = !itemNetStartBoolSpectatorMode.bEnable;
         return;
     }
@@ -4490,8 +4508,22 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamFlags;
     if (itemNetGameCycleSpawnLocation.m_nFocus > 0)
         gPacketStartGame.uNetGameFlags |= itemNetGameCycleSpawnLocation.m_nFocus == 1 ? kNetGameFlagSpawnSmart : kNetGameFlagSpawnDist;
-    if (itemNetGameCycleShowWeaponsOverride.m_nFocus > 0)
-        gPacketStartGame.uNetGameFlags |= itemNetGameCycleShowWeaponsOverride.m_nFocus == 1 ? kNetGameFlagHideWeaponsCloak : kNetGameFlagHideWeaponsAlways;
+    if (gPacketStartGame.gameType == kGameTypeTeams)
+    {
+        if (itemNetGameCycleShowWeaponsOverrideTeams.m_nFocus == 1)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsCloak;
+        else if (itemNetGameCycleShowWeaponsOverrideTeams.m_nFocus == 2)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsAlways;
+        else if (itemNetGameCycleShowWeaponsOverrideTeams.m_nFocus == 3)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsTeams;
+    }
+    else
+    {
+        if (itemNetGameCycleShowWeaponsOverride.m_nFocus == 1)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsCloak;
+        else if (itemNetGameCycleShowWeaponsOverride.m_nFocus == 2)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsAlways;
+    }
     if (itemNetGameCycleMirrorModeOverride.m_nFocus & 1)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagMirrorHoriz;
     if (itemNetGameCycleMirrorModeOverride.m_nFocus & 2)
