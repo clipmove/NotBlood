@@ -505,6 +505,7 @@ CGameMenuItemTitle itemNetStartUserMapTitle("USER MAP", 1, 160, 20, 2038);
 CGameMenuFileSelect menuMultiUserMap("", 3, 0, 0, 0, "./", "*.map", zUserMapName);
 
 void SetNetGameMode(CGameMenuItemZCycle *pItem);
+void SetNetShowWeapon(CGameMenuItemZCycle *pItem);
 void SetNetMonsterMenu(CGameMenuItemZCycle *pItem);
 
 CGameMenuItemTitle itemNetStartTitle("MULTIPLAYER", 1, 160, 20, 2038);
@@ -540,8 +541,8 @@ CGameMenuItemZBool itemNetGameBoolTeamColors("TEAM COLORS:", 3, 66, 97, 180, tru
 CGameMenuItemZBool itemNetGameBoolAutoTeams("AUTO TEAMS:", 3, 66, 113, 180, true, 0, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolTeamFlags("TEAM FLAGS:", 3, 66, 121, 180, true, 0, NULL, NULL);
 CGameMenuItemZCycle itemNetGameCycleSpawnLocation("SPAWN AREA:", 3, 66, 129, 180, 0, 0, zRespawnStrings, ARRAY_SSIZE(zRespawnStrings), 0);
-CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverride("ENEMY WEAPONS:", 3, 66, 137, 180, 0, 0, zShowWeapon, ARRAY_SSIZE(zShowWeapon), 0);
-CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverrideTeams("ENEMY WEAPONS:", 3, 66, 137, 180, 0, 0, zShowWeaponTeams, ARRAY_SSIZE(zShowWeaponTeams), 0);
+CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverride("ENEMY WEAPONS:", 3, 66, 137, 180, 0, SetNetShowWeapon, zShowWeapon, ARRAY_SSIZE(zShowWeapon), 0);
+CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverrideTeams("ENEMY WEAPONS:", 3, 66, 137, 180, 0, SetNetShowWeapon, zShowWeaponTeams, ARRAY_SSIZE(zShowWeaponTeams), 0);
 CGameMenuItemZCycle itemNetGameCycleSpawnProtection("SPAWN PROTECTION:", 3, 66, 145, 180, 0, 0, zSpawnProtectStrings, ARRAY_SSIZE(zSpawnProtectStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleSpawnWeapon("SPAWN WITH WEAPON:", 3, 66, 153, 180, 0, SetNetGameMode, zSpawnWeaponStrings, ARRAY_SSIZE(zSpawnWeaponStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleMirrorModeOverride("MIRROR MODE:", 3, 66, 161, 180, 0, NULL, pzMirrorModeStrings, ARRAY_SSIZE(pzMirrorModeStrings), 0);
@@ -3604,6 +3605,14 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameCycleSpawnWeapon.m_nFocus = 0;
     else if ((pItem == &itemNetGameCycleSpawnWeapon) && (pItem->m_nFocus > 0)) // if adjusted spawn with weapon, turn off keep weapon/item settings as it will overwrite any weapon picked up after spawning
         itemNetGameCycleItemWeapon.m_nFocus = 0;
+}
+
+void SetNetShowWeapon(CGameMenuItemZCycle *pItem)
+{
+    if (pItem != &itemNetGameCycleShowWeaponsOverride)
+        itemNetGameCycleShowWeaponsOverride.SetTextIndex(ClipHigh(pItem->m_nFocus, ARRAY_SIZE(zShowWeapon)-1));
+    if (pItem != &itemNetGameCycleShowWeaponsOverrideTeams)
+        itemNetGameCycleShowWeaponsOverrideTeams.SetTextIndex(ClipHigh(pItem->m_nFocus, ARRAY_SIZE(zShowWeaponTeams)-1));
 }
 
 void SetNetMonsterMenu(CGameMenuItemZCycle *pItem)
