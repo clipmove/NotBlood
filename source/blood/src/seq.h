@@ -88,7 +88,11 @@ inline int seqGetTile(SEQFRAME* pFrame)
 
 inline int seqGetPal(SEQFRAME* pFrame)
 {
+#ifdef NOONE_EXTENSIONS
     return pFrame->pal+(pFrame->pal2<<5);
+#else
+    return pFrame->pal;
+#endif
 }
 
 int seqRegisterClient(void(*pClient)(int, int));
