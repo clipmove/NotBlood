@@ -433,7 +433,12 @@ void seqSpawn(int nSeq, int nType, int nXIndex, int nCallbackID)
     if ((pSeq->version & 0xff) == 0x00)
     {
         for (int i = 0; i < pSeq->nFrames; i++)
-            pSeq->frames[i].tile2 = 0, pSeq->frames[i].pal2 = 0;
+        {
+            pSeq->frames[i].tile2 = 0;
+#ifdef NOONE_EXTENSIONS
+            pSeq->frames[i].pal2 = 0;
+#endif
+        }
     }
     pInst->isPlaying = 1;
     pInst->hSeq = hSeq;
