@@ -811,18 +811,6 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         if (MIRRORMODE & 1) // mirror mode (horiz), invert controls
             nX = -nX;
         break;
-    case 4: // mouse x
-        nOldMouseY += pInput->mousey;
-        nX = nOldMouseY>>2;
-        if (MIRRORMODE & 2) // mirror mode (vert), invert y axis
-            nX = -nX;
-        break;
-    case 5: // mouse y
-        nOldMouseX += pInput->mousex;
-        nX = nOldMouseX>>2;
-        if (MIRRORMODE & 1) // mirror mode (horiz), invert controls
-            nX = -nX;
-        break;
     default:
         nX = 0;
         break;
@@ -847,26 +835,32 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         if (MIRRORMODE & 1) // mirror mode (horiz), invert controls
             nY = -nY;
         break;
-    case 4: // mouse x
-        nOldMouseY += pInput->mousey;
-        nY = nOldMouseY>>2;
-        if (MIRRORMODE & 2) // mirror mode (vert), invert y axis
-            nY = -nY;
-        break;
-    case 5: // mouse y
-        nOldMouseX += pInput->mousex;
-        nY = nOldMouseX>>2;
-        if (MIRRORMODE & 1) // mirror mode (horiz), invert controls
-            nY = -nY;
-        break;
     default:
         nY = 0;
         break;
     }
-    if (gRadialMenuYawInvert)
-        nX = -nX;
-    if (gRadialMenuPitchInvert)
-        nY = -nY;
+
+    int nThreshold;
+    if (!nX && !nY) // no input, defaul to mouse input
+    {
+        nOldMouseY += pInput->mousey;
+        nX = nOldMouseY>>2;
+        if (MIRRORMODE & 2) // mirror mode (vert), invert y axis
+            nX = -nX;
+        nOldMouseX += pInput->mousex;
+        nY = nOldMouseX>>2;
+        if (MIRRORMODE & 1) // mirror mode (horiz), invert controls
+            nY = -nY;
+        nThreshold = gRadialMenuMouseThreshold;
+    }
+    else
+    {
+        if (gRadialMenuYawInvert)
+            nX = -nX;
+        if (gRadialMenuPitchInvert)
+            nY = -nY;
+        nThreshold = gRadialMenuThreshold;
+    }
 
     char bButton = BUTTON(gamefunc_Radial_Weapon_Menu);
     if (!bButton && (gRadialMenuToggle == 2) && (gWeaponRadialMenuState < 1))
@@ -955,7 +949,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                     sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
             }
         }
-        else if ((klabs(nX) >= gRadialMenuThreshold) || (klabs(nY) >= gRadialMenuThreshold)) // above threshold, read from stick
+        else if ((klabs(nX) >= nThreshold) || (klabs(nY) >= nThreshold)) // above threshold, read from stick
         {
             nNewChoice = getangle(nX, nY) * (12*5) / kAngMask;
             const int nChoiceRounded = nNewChoice%5;
@@ -1009,8 +1003,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         }
         else // player not moving stick above threshold or pressing next/previous weapon buttons - don't update selection
             break;
-        nOldMouseX = ClipRange(nOldMouseX, -gRadialMenuThreshold*2, gRadialMenuThreshold*2); // picked a slot, clamp mouse state
-        nOldMouseY = ClipRange(nOldMouseY, -gRadialMenuThreshold*2, gRadialMenuThreshold*2);
+        nOldMouseX = ClipRange(nOldMouseX, -nThreshold*2, nThreshold*2); // picked a slot, clamp mouse state
+        nOldMouseY = ClipRange(nOldMouseY, -nThreshold*2, nThreshold*2);
         break;
     }
     case 2:
