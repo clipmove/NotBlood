@@ -79,6 +79,7 @@ int32_t gTurnSpeed;
 int32_t gTurnAcceleration;
 int32_t gCenterViewOnDrop;
 int32_t gTargetAimAssist;
+int32_t gRadialMenuMouseThreshold;
 int32_t gRadialMenuThreshold;
 int32_t gRadialMenuToggle;
 int32_t gRadialMenuPosition;
@@ -518,6 +519,7 @@ void CONFIG_SetDefaults(void)
     gRadialMenuPosition = 240;
     gRadialMenuDimBackground = 1;
     gRadialMenuDimHud = 1;
+    gRadialMenuMouseThreshold = 128;
     gRadialMenuThreshold = 128;
     gRadialMenuSlowDown = 1;
     gRadialMenuYaw = 4;
