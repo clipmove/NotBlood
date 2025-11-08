@@ -256,8 +256,10 @@ If you have the GOG version of the game, do the following:
    - Toggles crouch button (0:hold, 1:toggle)
 * in_radialmenuslowdown
    - Enable/disable the radial menu slow down behavior
+* in_radialmenumousethreshold
+   - Sets the radial menu mouse threshold (0-2048)
 * in_radialmenuthreshold
-   - Sets the radial menu pitch threshold (0-1024)
+   - Sets the radial menu threshold (0-1024)
 * in_radialmenutoggle
    - Sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon)
 * in_radialmenuposition
@@ -267,11 +269,11 @@ If you have the GOG version of the game, do the following:
 * in_radialmenudimhud
    - Enable/disable radial menu dimming hud
 * in_radialmenuyaw
-   - Sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)
+   - Sets the radial menu yaw input (0: strafe, 1: move, 2: turn, 3: look)
 * in_radialmenuyawinvert
    - Enable/disable invert radial menu yaw input
 * in_radialmenupitch
-   - Sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look, 4: mouse x, 5: mouse y)
+   - Sets the radial menu pitch input (0: strafe, 1: move, 2: turn, 3: look)
 * in_radialmenupitchinvert
    - Enable/disable invert radial menu pitch input
 * in_radialmenuclick
