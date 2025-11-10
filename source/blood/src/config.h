@@ -144,6 +144,7 @@ extern int32_t gHudRatio;
 extern int32_t gHudBgNewBorder;
 extern int32_t gHudBgScale;
 extern int32_t gHudBgVanilla;
+extern int32_t gHudCompetitiveMode;
 extern int32_t gPowerupDuration;
 extern int32_t gPowerupStyle;
 extern int32_t gPowerupTicks;
