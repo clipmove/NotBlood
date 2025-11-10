@@ -164,6 +164,7 @@ int32_t gHudRatio;
 int32_t gHudBgNewBorder;
 int32_t gHudBgScale;
 int32_t gHudBgVanilla;
+int32_t gHudCompetitiveMode;
 int32_t gPowerupDuration;
 int32_t gPowerupStyle;
 int32_t gPowerupTicks;
@@ -459,6 +460,7 @@ void CONFIG_SetDefaults(void)
     gHudBgNewBorder = 1;
     gHudBgScale = 1;
     gHudBgVanilla = 0;
+    gHudCompetitiveMode = 0;
     gPowerupDuration = 4;
     gPowerupStyle = 1;
     gPowerupTicks = 100;

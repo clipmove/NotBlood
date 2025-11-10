@@ -1201,6 +1201,7 @@ int32_t registerosdcommands(void)
         { "hud_bgnewborder", "enable/disable new hud bottom border background image (only for r_size 5)", (void *)&gHudBgNewBorder, CVAR_BOOL, 0, 1 },
         { "hud_bgscale", "enable/disable hud background image scaling for resolution", (void *)&gHudBgScale, CVAR_BOOL, 0, 1 },
         { "hud_bgvanilla", "enable/disable hud vanilla background image override (0: default, 1: use new tile, 2: use original tile)", (void *)&gHudBgVanilla, CVAR_INT, 0, 2 },
+        { "hud_competitivemode", "enable/disable large hud frame for view size 4", (void*)&gHudCompetitiveMode, CVAR_BOOL, 0, 1 },
 //        { "hud_bgstretch", "enable/disable background image stretching in wide resolutions", (void *)&ud.bgstretch, CVAR_BOOL, 0, 1 },
         { "hud_messages", "enable/disable showing messages", (void *)&gMessageState, CVAR_BOOL, 0, 1 },
 //        { "hud_messagetime", "length of time to display multiplayer chat messages", (void *)&ud.msgdisptime, CVAR_INT, 0, 3600 },

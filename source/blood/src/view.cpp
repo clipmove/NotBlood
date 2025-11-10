@@ -2470,7 +2470,8 @@ void UpdateStatusBar(ClockTicks arg)
     else if (gViewSize > 3)
     {
         viewDrawPack(pPlayer, 160, 200-tilesiz[2200].y);
-        DrawStatMaskedSprite(2200, 160, 172, 16, nPalette);
+        if (!gHudCompetitiveMode || (gViewSize != 4))
+            DrawStatMaskedSprite(2200, 160, 172, 16, nPalette);
         DrawPackItemInStatusBar(pPlayer, 265, 186, 260, 172);
         if (pXSprite->health >= (gHealthBlink && !VanillaMode() ? 16<<4 : 16) || ((int)totalclock&16) || pXSprite->health == 0)
         {
@@ -2546,8 +2547,11 @@ void UpdateStatusBar(ClockTicks arg)
             else
                 DrawStatSprite(nTile, x, y, 40, 5);
         }
-        DrawStatMaskedSprite(2202, 118, 185, pPlayer->isRunning ? 16 : 40);
-        DrawStatMaskedSprite(2202, 201, 185, pPlayer->isRunning ? 16 : 40);
+        if (!gHudCompetitiveMode || (gViewSize != 4))
+        {
+            DrawStatMaskedSprite(2202, 118, 185, pPlayer->isRunning ? 16 : 40);
+            DrawStatMaskedSprite(2202, 201, 185, pPlayer->isRunning ? 16 : 40);
+        }
         if (pPlayer->throwPower && pXSprite->health > 0)
         {
             TileHGauge(2260, 124, 175, pPlayer->throwPower, 65536);
@@ -5203,7 +5207,7 @@ RORHACK:
                 if (pXSector->color)
                     nPalette = pSector->floorpal;
             }
-            if (gViewSize == 4) // with this view size, move up so it matches the same position as full hud
+            if (gViewSize == 4 && !gHudCompetitiveMode) // with this view size, move up so it matches the same position as full hud
                 cY -= fix16_from_float(25.f/2.f);
             
             #ifdef NOONE_EXTENSIONS
