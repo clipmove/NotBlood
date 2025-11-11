@@ -1619,8 +1619,10 @@ void SetupNetStartMenu(void)
     itemNetMutatorWeaponsVer.tooltip_pzTextUpper = "Check readme.txt for full";
     itemNetMutatorWeaponsVer.tooltip_pzTextLower = "list of weapon changes";
     itemNetMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector logic";
-    itemNetMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to";
-    itemNetMutatorHitscanProjectiles.tooltip_pzTextLower = "spawn bullet projectiles";
+    itemNetMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
+#ifdef NOONE_EXTENSIONS
+    itemNetMutatorHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
+#endif
     itemNetMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
     itemNetMutatorRandomizerMode.tooltip_pzTextUpper = "Set the randomizer's mode";
     itemNetMutatorRandomizerSeed.tooltip_pzTextUpper = "Set the randomizer's seed";
@@ -1897,8 +1899,10 @@ void SetupOptionsMenu(void)
     itemMutatorWeaponsVer.tooltip_pzTextLower = "list of weapon changes";
     itemMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector handling";
     itemMutatorSectorBehavior.tooltip_pzTextLower = "for hitscans (e.g: firing above water)";
-    itemMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to";
-    itemMutatorHitscanProjectiles.tooltip_pzTextLower = "spawn bullet projectiles";
+    itemMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
+#ifdef NOONE_EXTENSIONS
+    itemMutatorHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
+#endif
     itemMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
     itemMutatorRandomizerMode.tooltip_pzTextUpper = "Set the randomizer's mode";
     itemMutatorRandomizerSeed.tooltip_pzTextUpper = "Set the randomizer's seed";
