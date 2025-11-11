@@ -312,7 +312,8 @@ static void AL_SetVoiceTimbre(int const voice)
     AL_SendOutput(port, OPL3_KSL_LEVEL + off, timbre->Level[0]);
     slot = slotVoice[voc][1];
 
-    AL_SendOutput(port, OPL3_FEEDBACK_CONNECTION + voc, (timbre->Feedback & OPL3_FEEDBACK_MASK) | OPL3_STEREO_BITS);
+    AL_SendOutput(port, OPL3_FEEDBACK_CONNECTION + voc,
+        (timbre->Feedback & (OPL3_FEEDBACK_MASK | OPL3_CONNECTION_BIT)) | OPL3_STEREO_BITS);
 
     off = offsetSlot[slot];
 

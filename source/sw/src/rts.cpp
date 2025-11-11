@@ -90,7 +90,7 @@ int32_t RTS_AddFile(char *filename)
     startlump = numlumps;
 
     // WAD file
-//   printf("    Adding %s.\n",filename);
+//   LOG_F(INFO, "    Adding %s.",filename);
     kread(handle, &header, sizeof(header));
     if (strncmp(header.identification,"IWAD",4))
     {

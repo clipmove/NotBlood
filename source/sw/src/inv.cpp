@@ -942,15 +942,17 @@ void InventoryBarUpdatePosition(PLAYERp pp)
     pp->InventorySelectionBox->x = x - 5;
     pp->InventorySelectionBox->y = y - 5;
 
+    // Explanation of pointer check: If inventory bar is shown just
+    // before player kill, pointer may be nullified via KillAllPanelInv.
     for (id = InventoryData; id->Name; id++, inv++)
-    {
-        x = InventoryBarXpos[gs.BorderNum] + (inv * INVENTORY_ICON_WIDTH);
-        y = InventoryBarYpos[gs.BorderNum];
+        if (pp->InventorySprite[inv])
+        {
+            x = InventoryBarXpos[gs.BorderNum] + (inv * INVENTORY_ICON_WIDTH);
+            y = InventoryBarYpos[gs.BorderNum];
 
-        pp->InventorySprite[inv]->x = x;
-        pp->InventorySprite[inv]->y = y;
-    }
-
+            pp->InventorySprite[inv]->x = x;
+            pp->InventorySprite[inv]->y = y;
+        }
 }
 
 void InventoryUse(PLAYERp pp)
@@ -1008,6 +1010,11 @@ PlayerUpdateInventory(PLAYERp pp, short InventoryNum)
         for (id = InventoryData; id->Name; id++, inv++)
         {
             psp = pp->InventorySprite[inv];
+            // Added pointer check: If inventory bar is shown just before
+            // player kill, pointer may be nullified via KillAllPanelInv.
+            if (!psp)
+                continue;
+
             if (!pp->InventoryAmount[inv])
             {
                 //SET(psp->flags, PANF_TRANSLUCENT);

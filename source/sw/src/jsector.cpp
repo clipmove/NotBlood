@@ -798,11 +798,8 @@ JS_DrawMirrors(PLAYERp pp, int tx, int ty, int tz, fix16_t tpq16ang, fix16_t tpq
                     else
                     {
                         if (mirror[cnt].campic == -1)
-                        {
-                            TerminateGame();
-                            LOG_F(ERROR, "Missing campic for mirror %d (Map Coordinates: x = %d, y = %d)", cnt, midx, midy);
-                            exit(0);
-                        }
+                            TerminateWithMsg(0,
+                              "Missing campic for mirror %d (Map Coordinates: x = %d, y = %d)", cnt, midx, midy);
 
                         // BOOL2 = Oscilate camera
                         if (TEST_BOOL2(sp))
@@ -1224,24 +1221,32 @@ JS_UnInitLockouts(void)
 void
 JS_PlockError(short wall_num, short t)
 {
-    TerminateGame();
-    printf("ERROR: JS_InitLockouts(), out of range tile number\n");
     switch (t)
     {
     case 1:
-        printf("wall %d, x %d, y %d, pic %d\n", wall_num, TrackerCast(wall[wall_num].x), TrackerCast(wall[wall_num].y), TrackerCast(wall[wall_num].picnum));
+        TerminateWithMsg(0,
+               "ERROR: JS_InitLockouts(), out of range tile number\n"
+               "wall %d, x %d, y %d, pic %d", wall_num, TrackerCast(wall[wall_num].x), TrackerCast(wall[wall_num].y), TrackerCast(wall[wall_num].picnum));
         break;
     case 2:
-        printf("wall %d, x %d, y %d, OVERpic %d\n", wall_num, TrackerCast(wall[wall_num].x), TrackerCast(wall[wall_num].y), TrackerCast(wall[wall_num].overpicnum));
+        TerminateWithMsg(0,
+               "ERROR: JS_InitLockouts(), out of range tile number\n"
+               "wall %d, x %d, y %d, OVERpic %d", wall_num, TrackerCast(wall[wall_num].x), TrackerCast(wall[wall_num].y), TrackerCast(wall[wall_num].overpicnum));
         break;
     case 3:
-        printf("sector %d, ceiling %d\n", wall_num, TrackerCast(sector[wall_num].ceilingpicnum));
+        TerminateWithMsg(0,
+               "ERROR: JS_InitLockouts(), out of range tile number\n"
+               "sector %d, ceiling %d", wall_num, TrackerCast(sector[wall_num].ceilingpicnum));
         break;
     case 4:
-        printf("sector %d, floor %d\n", wall_num, TrackerCast(sector[wall_num].floorpicnum));
+        TerminateWithMsg(0,
+               "ERROR: JS_InitLockouts(), out of range tile number\n"
+               "sector %d, floor %d", wall_num, TrackerCast(sector[wall_num].floorpicnum));
         break;
     }
-    exit(0);
+    TerminateWithMsg(0,
+               "ERROR: JS_InitLockouts(), out of range tile number\n"
+               "Unrecognizable error!");
 }
 
 void

@@ -30,7 +30,7 @@ Prepared for public release: 03/28/2005 - Charlie Wiederhold, 3D Realms
 #include "game.h"
 #include "warp.h"
 
-void _ErrMsg(const char *strFile, unsigned uLine, const char *format, ...);
+//void _ErrMsg(const char *strFile, unsigned uLine, const char *format, ...);
 void FAF_DrawRooms(int posx, int posy, int posz, fix16_t q16ang, fix16_t q16horiz, short cursectnum);
 
 ////////////////////////////////////////////////////////////////////

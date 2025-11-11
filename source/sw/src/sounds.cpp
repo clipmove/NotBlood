@@ -266,8 +266,8 @@ void CheckSndData(char *file, int line)
 
         if (memcmp(globsndata[i], globvpdata[i], glength[i]) != 0)
         {
-            printf("%s %d\n",file,line);
-            printf("CheckSndData: Data is not the same! num = %d",i);
+            LOG_F(ERROR, "%s %d",file,line);
+            LOG_F(ERROR, "CheckSndData: Data is not the same! num = %d",i);
             exit(0);
         }
     }
@@ -723,11 +723,7 @@ int _PlayerSound(const char *file, int line, int num, int *x, int *y, int *z, Vo
         return 0;
 
     if (pp < Player || pp >= Player + MAX_SW_PLAYERS)
-    {
-        TerminateGame();
-        printf("Player Sound invalid player: file %s, line %d\n",file,line);
-        exit(0);
-    }
+        TerminateWithMsg(0, "Player Sound invalid player: file %s, line %d", file, line);
 
     PRODUCTION_ASSERT(pp >= Player && pp < Player+MAX_SW_PLAYERS);
     PRODUCTION_ASSERT(num >= 0 && num < DIGI_MAX);
@@ -737,11 +733,7 @@ int _PlayerSound(const char *file, int line, int num, int *x, int *y, int *z, Vo
     // If this is a player voice and he's already yacking, forget it.
     vp = &voc[num];
     if (vp == NULL)
-    {
-        TerminateGame();
-        printf("vp == NULL in PlayerSound, num = %d\n",num);
-        exit(0);
-    }
+        TerminateWithMsg(0, "vp == NULL in PlayerSound, num = %d", num);
 
     // Not a player voice, bail.
     if (vp->priority != PRI_PLAYERVOICE && vp->priority != PRI_PLAYERDEATH)
@@ -779,9 +771,7 @@ void LockSound(int num)
         if (vp->lock >= CACHE_LOCK_MAX || vp->lock == 0)
         {
             DumpSounds();
-            TerminateGame();
-            printf("lock > MAX, num = %d",num);
-            exit(0);
+            TerminateWithMsg(0, "lock > MAX, num = %d", num);
         }
         //ASSERT(vp->lock < CACHE_LOCK_MAX);
         //ASSERT(vp->lock != 0);
@@ -1157,11 +1147,7 @@ int
 ReadSound(int handle, VOC_INFOp vp, int length)
 {
     if (kread(handle, vp->data, length) != length)
-    {
-        TerminateGame();
-        printf("Error reading file '%s'.\n", vp->name);
-        exit(0);
-    }
+        TerminateWithMsg(0, "Error reading file '%s'.", vp->name);
 
     vp->datalen = length;
 
@@ -1577,7 +1563,7 @@ Delete3DSounds(void)
             //if(vp->num > DIGI_FIRSTPLAYERVOICE && vp->num < DIGI_LASTPLAYERVOICE)
             if (!vp->vp)
             {
-                printf("Delete3DSounds(): NULL vp->vp\n");
+                LOG_F(ERROR, "Delete3DSounds(): NULL vp->vp");
             }
             else    // JBF: added null check
             if (vp->vp->priority == PRI_PLAYERVOICE || vp->vp->priority == PRI_PLAYERDEATH)
@@ -1971,10 +1957,9 @@ DoUpdateSounds3D(void)
             {
                 int enumber;
                 enumber = p->num;
-                TerminateGame();
-                printf("Owner == -1 on looping sound with follow flag set!\n");
-                printf("p->num = %d\n",enumber);
-                exit(0);
+                TerminateWithMsg(0,
+                  "Owner == -1 on looping sound with follow flag set!\n"
+                  "p->num = %d", enumber);
             }
 
             Use_SoundSpriteNum = TRUE;
@@ -1996,10 +1981,9 @@ DoUpdateSounds3D(void)
             {
                 int enumber;
                 enumber = p->num;
-                TerminateGame();
-                printf("Owner == -1 on looping sound, no follow flag.\n");
-                printf("p->num = %d\n",enumber);
-                exit(0);
+                TerminateWithMsg(0,
+                  "Owner == -1 on looping sound, no follow flag.\n"
+                  "p->num = %d", enumber);
             }
 
             Use_SoundSpriteNum = TRUE;

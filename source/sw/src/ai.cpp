@@ -63,7 +63,7 @@ void DebugMoveHit(short /*SpriteNum*/)
 
 #if 0
     if (u->ret == -1)
-        printf("Hit a ledge\n");
+        VLOG_F(LOG_DEBUG, "Hit a ledge");
     else
 #endif
     switch (TEST(u->ret, HIT_MASK))
@@ -1810,7 +1810,7 @@ FindNewAngle(short SpriteNum, signed char dir, int DistToMove)
         }
         break;
     default:
-        printf("FindNewAngle called with dir=%d!\n",dir);
+        LOG_F(ERROR, "FindNewAngle called with dir=%d!", dir);
         return 0;
     }
 

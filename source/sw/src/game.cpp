@@ -387,37 +387,6 @@ int krand1(void)
 
 #endif
 
-/*
-void HeapCheck(char *file, int line)
-{
-    switch( _heapchk() )
-        {
-        case _HEAPOK:
-            //printf( "OK - heap is good\n" );
-            break;
-        case _HEAPEMPTY:
-            //printf( "OK - heap is empty\n" );
-            break;
-        case _HEAPBADBEGIN:
-            sprintf(ds, "ERROR - heap is damaged: %s, %d", file, line);
-            MONO_PRINT(ds);
-            DebugWriteString(ds);
-            setvmode(0x3);
-            printf( "%s\n", ds);
-            exit(0);
-            break;
-        case _HEAPBADNODE:
-            sprintf(ds, "ERROR - bad node in heap: %s, %d", file, line);
-            MONO_PRINT(ds);
-            DebugWriteString(ds);
-            setvmode(0x3);
-            printf( "%s\n", ds);
-            exit(0);
-            break;
-        }
-}
-    */
-
 #if DEBUG
 SWBOOL
 ValidPtr(void *ptr)
@@ -431,7 +400,7 @@ ValidPtr(void *ptr)
 
     if (mhp->size == 0 || mhp->checksum == 0)
     {
-        printf("ValidPtr(): Size or Checksum == 0!\n");
+        LOG_F(ERROR, "ValidPtr(): Size or Checksum == 0!");
         return FALSE;
     }
 
@@ -440,7 +409,7 @@ ValidPtr(void *ptr)
     if (mhp->checksum == check[0] + check[1] + check[2] + check[3])
         return TRUE;
 
-    printf("ValidPtr(): Checksum bad!\n");
+    LOG_F(ERROR, "ValidPtr(): Checksum bad!");
     return FALSE;
 }
 
@@ -473,11 +442,7 @@ AllocMem(int size)
 
     // Used for debugging, we can remove this at ship time
     if (bp == NULL)
-    {
-        TerminateGame();
-        printf("Memory could NOT be allocated in AllocMem: size = %d\n",size);
-        exit(0);
-    }
+        TerminateWithMsg(0, "Memory could NOT be allocated in AllocMem: size = %d", size);
 
     ASSERT(bp != NULL);
 
@@ -545,11 +510,7 @@ CallocMem(int size, int num)
 
     // Used for debugging, we can remove this at ship time
     if (bp == NULL)
-    {
-        TerminateGame();
-        printf("Memory could NOT be allocated in CallocMem: size = %d, num = %d\n",size,num);
-        exit(0);
-    }
+        TerminateWithMsg(0, "Memory could NOT be allocated in CallocMem: size = %d, num = %d", size, num);
 
     ASSERT(bp != NULL);
 
@@ -691,15 +652,8 @@ LoadLevel(const char *filename)
 {
     int16_t ang;
     if (engineLoadBoard(filename, SW_SHAREWARE ? 1 : 0, &Player[0].pos, &ang, &Player[0].cursectnum) == -1)
-    {
-        TerminateGame();
-#if 1 /* defined RENDERTYPEWIN */
-        wm_msgbox(apptitle, "Level not found: %s", filename);
-#else
-        printf("Level Not Found: %s\n", filename);
-#endif
-        exit(0);
-    }
+        TerminateWithMsg(0, "Level not found: %s", filename);
+
     Player[0].q16ang = fix16_from_int(ang);
 }
 
@@ -707,15 +661,7 @@ void
 LoadImages(const char *filename)
 {
     if (artLoadFiles(filename, 32*1048576) == -1)
-    {
-        TerminateGame();
-#if 1 /* defined RENDERTYPEWIN */
-        wm_msgbox(apptitle, "Art not found. Please check your GRP file.");
-#else
-        printf("Art not found. Please check your GRP file.\n");
-#endif
-        exit(-1);
-    }
+        TerminateWithSimpleMsg(-1, "Art not found. Please check your GRP file.");
 }
 
 void LoadDemoRun(void)
@@ -808,14 +754,8 @@ void MultiSharewareCheck(void)
     if (!SW_SHAREWARE) return;
     if (numplayers > 4)
     {
-#if 1 /* defined RENDERTYPEWIN */
         wm_msgbox(apptitle,"To play a Network game with more than 4 players you must purchase "
                   "the full version.  Read the Ordering Info screens for details.");
-#else
-        printf(
-            "\n\nTo play a Network game with more than 4 players you must purchase the\n"
-            "full version.  Read the Ordering Info screens for details.\n\n");
-#endif
         uninitmultiplayers();
         //uninitkeys();
         KB_Shutdown();
@@ -829,11 +769,6 @@ void MultiSharewareCheck(void)
     }
 }
 
-
-// Some mem crap for Jim
-// I reserve 1 meg of heap space for our use out side the cache
-int TotalMemory = 0;
-int ActualHeap = 0;
 
 void InitAutoNet(void)
 {
@@ -980,37 +915,7 @@ InitGame(int32_t argc, char const * const * argv)
     }
 
     LoadDemoRun();
-    // Save off total heap for later calculations
-    //TotalMemory = Z_AvailHeap();
-    //DSPRINTF(ds,"Available Heap before LoadImages =  %d", TotalMemory);
-    //MONO_PRINT(ds);
-    // Reserve 1.5 megs for normal program use
-    // Generally, SW is consuming about a total of 11 megs including
-    // all the cached in graphics, etc. per level, so even on a 16 meg
-    // system, reserving 1.5 megs is fine.
-    // Note that on a 16 meg machine, Ken was leaving us about
-    // 24k for use outside the cache!  This was causing out of mem problems
-    // when songs, etc., greater than the remaining heap were being loaded.
-    // Even if you pre-cache songs, etc. to help, reserving some heap is
-    // a very smart idea since the game uses malloc throughout execution.
-    //ReserveMem = AllocMem(1L<<20);
-    //if(ReserveMem == 0) MONO_PRINT("Could not allocate 1.5 meg reserve!");
-
-    // LoadImages will now proceed to steal all the remaining heap space
-    //_outtext("\n\n\n\n\n\n\n\n");
-    //LOG_F(INFO, "Loading sound and graphics...");
-    //AnimateCacheCursor();
     LoadImages("tiles%03i.art");
-
-    // Now free it up for later use
-    /*
-    if(ReserveMem)
-        {
-        // Recalc TotalMemory for later reference
-        ActualHeap = Z_AvailHeap() + 1536000L;
-        FreeMem(ReserveMem);
-        }
-    */
 
     Connect();
     SortBreakInfo();
@@ -1556,8 +1461,6 @@ TerminateLevel(void)
     int i, nexti, stat, pnum, ndx;
     SECT_USERp *sectu;
 
-//HEAP_CHECK();
-
     DemoTerm();
 
     // Free any track points
@@ -1651,8 +1554,6 @@ TerminateLevel(void)
     }
 
     JS_UnInitLockouts();
-
-//HEAP_CHECK();
 }
 
 void
@@ -2898,18 +2799,12 @@ Control(int32_t argc, char const * const * argv)
 void
 _Assert(const char *expr, const char *strFile, unsigned uLine)
 {
-    LOG_F(ERROR, "Assertion failed: %s %s, line %u", expr, strFile, uLine);
     debug_break();
-
-    TerminateGame();
-
-#if 1 /* defined RENDERTYPEWIN */
-    wm_msgbox(apptitle, "%s", ds);
-#endif
-    exit(0);
+    TerminateWithMsg(0, "Assertion failed: %s %s, line %u", expr, strFile, uLine);
 }
 
 
+#if 0
 void
 _ErrMsg(const char *strFile, unsigned uLine, const char *format, ...)
 {
@@ -2919,7 +2814,6 @@ _ErrMsg(const char *strFile, unsigned uLine, const char *format, ...)
     //MONO_PRINT(ds);
     TerminateGame();
 
-#if 1 /* defined RENDERTYPEWIN */
     {
         char msg[256], *p;
         Bsnprintf(msg, sizeof(msg), "Error: %s, line %u\n", strFile, uLine);
@@ -2929,16 +2823,10 @@ _ErrMsg(const char *strFile, unsigned uLine, const char *format, ...)
         va_end(arglist);
         wm_msgbox(apptitle, "%s", msg);
     }
-#else
-    printf("Error: %s, line %u\n", strFile, uLine);
-
-    va_start(arglist, format);
-    vprintf(format, arglist);
-    va_end(arglist);
-#endif
 
     exit(0);
 }
+#endif
 
 void
 dsprintf(char *str, char *format, ...)
@@ -3325,7 +3213,6 @@ int DetectShareware(void)
 void CommandLineHelp(char const * const * /*argv*/)
 {
     int i;
-#if 1 /* defined RENDERTYPEWIN */
     char *str;
     int strl;
 
@@ -3352,21 +3239,6 @@ void CommandLineHelp(char const * const * /*argv*/)
         wm_msgbox("Shadow Warrior Help", "%s", str);
         Xfree(str);
     }
-#else
-    if (SW_SHAREWARE)
-        printf("Usage: %s [options]\n", argv[0]);
-    else
-        printf("Usage: %s [options] [map]\n", argv[0]);
-    printf("options:  ('/' may be used instead of '-', <> text is optional)\n\n");
-
-    for (i = 0; i < (int)SIZ(cli_arg); i++)
-    {
-        if (cli_arg[i].arg_fmt && (!SW_SHAREWARE || (!cli_arg[i].notshareware && SW_SHAREWARE)))
-        {
-            printf(" %-20s   %-30s\n",cli_arg[i].arg_fmt, cli_arg[i].arg_descr);
-        }
-    }
-#endif
 }
 
 int32_t app_main(int32_t argc, char const * const * argv)
@@ -3665,7 +3537,6 @@ int32_t app_main(int32_t argc, char const * const * argv)
 #if DEBUG
         else if (Bstrncasecmp(arg, "debug",5) == 0)
         {
-#if 1 /* defined RENDERTYPEWIN */
             char *str;
             int strl;
 
@@ -3690,17 +3561,6 @@ int32_t app_main(int32_t argc, char const * const * argv)
                 wm_msgbox("Shadow Warrior Debug Help",str);
                 Xfree(str);
             }
-#else
-            printf("Usage: %s [options]\n", argv[0]);
-            printf("options:  ('/' may be used instead of '-', <> text is optional)\n\n");
-            for (i = 0; i < (int)SIZ(cli_dbg_arg); i++)
-            {
-                if (cli_dbg_arg[i].arg_fmt)
-                {
-                    printf(" %-20s   %-30s\n",cli_dbg_arg[i].arg_fmt, cli_dbg_arg[i].arg_descr);
-                }
-            }
-#endif
             swexit(0);
         }
 #endif
@@ -3786,7 +3646,7 @@ int32_t app_main(int32_t argc, char const * const * argv)
             if (strlen(argv[cnt]) > 5)
                 {
                 FakeMultiNumPlayers = atoi(&argv[cnt][5]);
-                printf("Adding %d BOT(s) to the game!\n",FakeMultiNumPlayers);
+                LOG_F(INFO, "Adding %d BOT(s) to the game!", FakeMultiNumPlayers);
                 gNet.MultiGameType = MULTI_GAME_AI_BOTS;
                 BotMode = TRUE;
                 }
@@ -4166,7 +4026,7 @@ SinglePlayInput(PLAYERp pp)
             memcpy(pp->temp_pal, palette_data, sizeof(palette_data));
             DoPlayerDivePalette(tp);
             DoPlayerNightVisionPalette(tp);
-//          printf("SingPlayInput set_pal: tp->PlayerSprite = %d\n",tp->PlayerSprite);
+//          VLOG_F(LOG_INPUT, "SingPlayInput set_pal: tp->PlayerSprite = %d", tp->PlayerSprite);
         }
     }
 
@@ -4252,7 +4112,7 @@ SinglePlayInput(PLAYERp pp)
         // Now check for item or pain palette stuff
         // This sets the palette to whatever it is of the player you
         // just chose to view the game through.
-//      printf("SingPlayInput ALT+1-9 set_pal: pp->PlayerSprite = %d\n",pp->PlayerSprite);
+//      VLOG_F(LOG_INPUT, "SingPlayInput ALT+1-9 set_pal: pp->PlayerSprite = %d", pp->PlayerSprite);
         COVERsetbrightness(gs.Brightness,(char *)palette_data); // JBF: figure out what's going on here
 
         DoPlayerNightVisionPalette(pp);

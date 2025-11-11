@@ -2864,11 +2864,9 @@ SpriteSetup(void)
                     TRAVERSE_SPRITE_STAT(headspritestat[STAT_FAF], i, nexti)
                     {
                         if (sprite[i].hitag == sp->hitag && sprite[i].lotag == sp->lotag)
-                        {
-                            TerminateGame();
-                            printf("Two VIEW_THRU_ tags with same match found on level\n1: x %d, y %d \n2: x %d, y %d", TrackerCast(sp->x), TrackerCast(sp->y), TrackerCast(sprite[i].x), TrackerCast(sprite[i].y));
-                            exit(0);
-                        }
+                            TerminateWithMsg(0,
+                              "Two VIEW_THRU_ tags with same match found on level\n1: x %d, y %d \n2: x %d, y %d",
+                              TrackerCast(sp->x), TrackerCast(sp->y), TrackerCast(sprite[i].x), TrackerCast(sprite[i].y));
                     }
                     change_sprite_stat(SpriteNum, STAT_FAF);
                     break;
@@ -4925,13 +4923,11 @@ ActorDrop(short SpriteNum, int x, int y, int z, short new_sector, short min_heig
 
 #if 0
     if (florhit < 0 || ceilhit < 0)
-    {
-        TerminateGame();
-        printf("ERROR: FAFgetzrange() returned -1 for floor or ceiling check.\n");
-        printf("Most likely a sprite has been placed too close to a white wall.\n");
-        printf("spnum %d, sect %d, x %d, y %d, z %d, florhit %d, pic %d\n", SpriteNum, sp->sectnum, sp->x, sp->y, z - DIV2(SPRITEp_SIZE_Z(sp)), florhit, sp->picnum);
-        exit(0);
-    }
+        TerminateWithMsg(0,
+          "ERROR: FAFgetzrange() returned -1 for floor or ceiling check.\n"
+          "Most likely a sprite has been placed too close to a white wall.\n"
+          "spnum %d, sect %d, x %d, y %d, z %d, florhit %d, pic %d",
+          SpriteNum, sp->sectnum, sp->x, sp->y, z - DIV2(SPRITEp_SIZE_Z(sp)), florhit, sp->picnum);
 #else
     if (florhit < 0 || ceilhit < 0)
     {
@@ -5075,7 +5071,7 @@ move_actor(short SpriteNum, int xchange, int ychange, int zchange)
 
         if (ActorDrop(SpriteNum, sp->x, sp->y, sp->z, sp->sectnum, u->lo_step))
         {
-            //printf("cancel move 2\n", sp->z, u->loz);
+            //VLOG_F(LOG_DEBUG, "cancel move 2", sp->z, u->loz);
             // cancel move
             sp->x = x;
             sp->y = y;

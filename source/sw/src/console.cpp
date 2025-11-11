@@ -76,7 +76,6 @@ void CON_ModTranslucent(void);
 void CON_GetHelp(void);
 void CON_Sound(void);
 void CON_Reverb(void);
-void CON_Heap(void);
 void CON_Cache(void);
 void CON_SoundTest(void);
 void CON_SpriteInfo(void);
@@ -89,8 +88,6 @@ void CON_DamageData(void);
 void CON_WinPachinko(void);
 void CON_Tweak(void);
 void CON_Bunny(void);
-void CON_CheckHeap(void);
-void CON_DumpHeap(void);
 void CON_ShowMirror(void);
 void CON_MultiNameChange(void);
 void CON_DumpSoundList(void);
@@ -124,7 +121,6 @@ CON_COMMAND pre_commands[] =
     {"george",      CheatInput},
     {"blackburn",   CheatInput},
     {"reverb",      CON_Reverb},
-    {"mem",         CON_Heap},
     {"cache",       CON_Cache},
     {"xrepeat",     CON_ModXrepeat},
     {"yrepeat",     CON_ModYrepeat},
@@ -135,8 +131,6 @@ CON_COMMAND pre_commands[] =
     {"showuser",    CON_UserDetail},
     {"damage",      CON_DamageData},
     {"tweak",       CON_Tweak},
-    {"checkheap",   CON_CheckHeap},
-    {"dumpheap",    CON_DumpHeap},
     {"showmirror",  CON_ShowMirror},
     {"clear",       CON_ClearConsole},
     {"dumpsounds",  CON_DumpSoundList},
@@ -380,14 +374,10 @@ void CON_InitConsole(void)
     for (i = &pre_commands[0]; i->command != NULL; i++)
     {
         if (!CON_AddCommand(i->command, i->function))
-        {
-            printf("CON_InitConsole: Failed to add command contained in pre_commands list.\n");
-            TerminateGame();
-            exit(0);
-        }
+            TerminateWithSimpleMsg(0, "CON_InitConsole: Failed to add command contained in pre_commands list.");
     }
 
-    //printf("CON_InitConsole: Command list initialized.\n");
+    //LOG_F(INFO, "CON_InitConsole: Command list initialized.\n");
 }
 
 //
@@ -624,44 +614,6 @@ void CON_Reverb(void)
     CON_ConMessage("Reverb is now set to %d.",op1);
     COVER_SetReverb(op1);
     pp->Reverb = op1;
-}
-
-void CON_Heap(void)
-{
-    /*
-    int totalmemory=0;
-    extern int TotalMemory, ActualHeap;
-    int i;
-    void *testheap;
-
-    totalmemory = Z_AvailHeap();
-    CON_ConMessage("Total heap at game startup = %d", TotalMemory);
-    CON_ConMessage("ActualHeap reserved for non-cache use = %d", ActualHeap);
-    CON_ConMessage("Total unallocated blocks in bytes minus reserved heap = %d", totalmemory);
-    CON_ConMessage("NOTE: Allocation exceeding ActualHeap will result in out of memory");
-    // Find remaining heap space unused
-    i = ActualHeap;
-    while(i>0)
-    {
-    testheap = AllocMem(i);
-    if(!testheap)
-        i-=1024L; // Decrease in 1k increments
-    else
-        {
-        CON_ConMessage("Heap test result (+ or - 1k):");
-        CON_ConMessage("=============================");
-        CON_ConMessage("Unallocated heap space remaining  = %d",i);
-        CON_ConMessage("Unallocated heap space used  = %d",ActualHeap - i);
-        FreeMem(testheap);
-        i=0; // Beam us out of here Scotty!
-        }
-    }
-
-    if(ActualHeap < 50000L)
-    {
-    CON_ConMessage("ALERT: Memory is critically low!");
-    }
-    */
 }
 
 int TileRangeMem(int start)
@@ -1299,70 +1251,6 @@ void CON_Bunny(void)
         PutStringInfo(pp,"Bunny rockets enabled!");
     else
         PutStringInfo(pp,"Bunny rockets disabled!");
-}
-
-void CON_CheckHeap(void)
-{
-    /*
-    switch( _heapchk() )
-    {
-    case _HEAPOK:
-      CON_ConMessage( "OK - heap is good\n" );
-      break;
-    case _HEAPEMPTY:
-      CON_ConMessage( "OK - heap is empty\n" );
-      break;
-    case _HEAPBADBEGIN:
-      CON_ConMessage( "ERROR - heap is damaged\n" );
-      break;
-    case _HEAPBADNODE:
-      CON_ConMessage( "ERROR - bad node in heap\n" );
-      break;
-    }
-    */
-    CON_ConMessage("JonoF: Not now");
-}
-
-/*
-void heap_dump( void )
-  {
-    struct _heapinfo h_info;
-    int heap_status;
-
-    h_info._pentry = NULL;
-    for(;;) {
-      heap_status = _heapwalk( &h_info );
-      if( heap_status != _HEAPOK ) break;
-      printf( "  %s block at %Fp of size %4.4X\n",
-        (h_info._useflag == _USEDENTRY ? "USED" : "FREE"),
-        h_info._pentry, h_info._size );
-
-    }
-
-    switch( heap_status ) {
-    case _HEAPEND:
-      printf( "OK - end of heap\n" );
-      break;
-    case _HEAPEMPTY:
-      printf( "OK - heap is empty\n" );
-      break;
-    case _HEAPBADBEGIN:
-      printf( "ERROR - heap is damaged\n" );
-      break;
-    case _HEAPBADPTR:
-      printf( "ERROR - bad pointer to heap\n" );
-      break;
-    case _HEAPBADNODE:
-
-      printf( "ERROR - bad node in heap\n" );
-    }
-  }
-  */
-
-void CON_DumpHeap(void)
-{
-    //heap_dump(); // Dump it.
-    CON_ConMessage("JonoF: Not now");
 }
 
 void CON_ShowMirror(void)

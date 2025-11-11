@@ -124,7 +124,6 @@ short buttonsettings[btn_max];
 #define YDIM    200
 extern SWBOOL QuitFlag;
 
-void TerminateGame(void);
 void ResetKeys(void);
 
 // GLOBALS ////////////////////////////
@@ -4087,13 +4086,8 @@ MNU_ItemPostProcess(MenuGroup *group)
 static void
 MNU_DownLevel(MenuGroup *group)
 {
-
     if (!group)
-    {
-        TerminateGame();
-        printf("MNU_DownLevel() - NULL card\n");
-        exit(0);
-    }
+        TerminateWithSimpleMsg(0, "MNU_DownLevel() - NULL card");
 
     MNU_PushGroup(group);
 

@@ -227,11 +227,7 @@ DemoReadHeader(void)
     }
 
     if (DemoFileIn == DF_ERR)
-    {
-        TerminateGame();
-        printf("File %s is not a valid demo file.",DemoFileName);
-        exit(0);
-    }
+        TerminateWithMsg(0, "File %s is not a valid demo file.", DemoFileName);
 
     DREAD(&dh, sizeof(dh), 1, DemoFileIn);
 
