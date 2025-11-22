@@ -828,18 +828,22 @@ void Resource::Read(DICTNODE *n, void *p)
                 swapFrame.yrepeat = bitReader.readUnsigned(8);
                 swapFrame.shade = bitReader.readSigned(8);
                 swapFrame.pal = bitReader.readUnsigned(5);
-                swapFrame.at5_5 = bitReader.readBit();
-                swapFrame.at5_6 = bitReader.readBit();
-                swapFrame.at5_7 = bitReader.readBit();
-                swapFrame.at6_0 = bitReader.readBit();
-                swapFrame.at6_1 = bitReader.readBit();
+                swapFrame.trigger = bitReader.readBit();
+                swapFrame.smoke = bitReader.readBit();
+                swapFrame.autoaim = bitReader.readBit();
+                swapFrame.pushable = bitReader.readBit();
+                swapFrame.playSound = bitReader.readBit();
                 swapFrame.invisible = bitReader.readBit();
-                swapFrame.at6_3 = bitReader.readBit();
-                swapFrame.at6_4 = bitReader.readBit();
+                swapFrame.xflip = bitReader.readBit();
+                swapFrame.yflip = bitReader.readBit();
                 swapFrame.tile2 = bitReader.readUnsigned(4);
+#ifdef NOONE_EXTENSIONS
                 swapFrame.soundRange = bitReader.readUnsigned(4);
                 swapFrame.surfaceSound = bitReader.readBit();
-                swapFrame.reserved = bitReader.readUnsigned(2);
+                swapFrame.pal2 = bitReader.readUnsigned(2);
+#else
+                swapFrame.reserved = bitReader.readUnsigned(7);
+#endif
                 *pFrame = swapFrame;
             }
         }
