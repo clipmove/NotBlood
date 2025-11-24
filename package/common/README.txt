@@ -107,12 +107,14 @@ If you have the GOG version of the game, do the following:
    - Makes enemies that use hitscan bullets spawn physical sprite based bullets with travel time
    - Projectile speed is adjusted if bullet is underwater (50% speed penalty)
    - This mutator does not support custom modern map enemies
-* Gore behavior
-   - Increase random chance of wall splatter
+* Gore behavior (Extended)
    - Increase lifespan duration of blood particles
+   - Disable collisions for small gibs
+* Gore behavior (Excessive)
+   - All of the above fixes and including:
+   - Increase random chance of wall splatter
    - Increase blood gib spawn rate upon explosions and hitscan
    - Make blood splatter effect be affected by explosive impulses
-   - Disable collisions for small gibs
 * Randomizer mode
    - Set the enemy/pickups randomizer mode
    - The randomizer does not support custom modern map enemies
