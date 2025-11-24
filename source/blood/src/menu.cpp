@@ -64,7 +64,7 @@ void SetEnemyRandomTNT(CGameMenuItemZBool*);
 void SetWeaponsVer(CGameMenuItemZCycle*);
 void SetSectorBehavior(CGameMenuItemZBool*);
 void SetHitscanProjectiles(CGameMenuItemZCycle*);
-void SetGoreMode(CGameMenuItemZBool*);
+void SetGoreMode(CGameMenuItemZCycle*);
 void SetRandomizerMode(CGameMenuItemZCycle*);
 void SetRandomizerSeed(CGameMenuItemZEdit *pItem, CGameMenuEvent *pEvent);
 
@@ -306,6 +306,12 @@ const char *pzHitscanProjectilesStrings[] = {
     "Slow",
     "Medium",
     "Fast",
+};
+
+const char *pzGoreStrings[] = {
+    "Original",
+    "Extended",
+    "Excessive",
 };
 
 const char *pzRandomizerModeStrings[] = {
@@ -575,7 +581,7 @@ CGameMenuItemZBool itemNetMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66
 CGameMenuItemZCycle itemNetMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 105, 180, 0, NULL, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
 CGameMenuItemZBool itemNetMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 115, 180, false, NULL, "NOTBLOOD", "ORIGINAL");
 CGameMenuItemZCycle itemNetMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 125, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
-CGameMenuItemZBool itemNetMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 135, 180, false, NULL, "EXTRABLOOD", "ORIGINAL");
+CGameMenuItemZCycle itemNetMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 135, 180, 0, NULL, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
 CGameMenuItemZCycle itemNetMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 145, 180, 0, NULL, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
 CGameMenuItemZEdit itemNetMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 155, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
 ///////////////////
@@ -730,7 +736,7 @@ CGameMenuItemZBool itemMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 9
 CGameMenuItemZCycle itemMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 105, 180, 0, SetWeaponsVer, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
 CGameMenuItemZBool itemMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 115, 180, false, SetSectorBehavior, "NOTBLOOD", "ORIGINAL");
 CGameMenuItemZCycle itemMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 125, 180, 0, SetHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
-CGameMenuItemZBool itemMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 135, 180, false, SetGoreMode, "EXTRABLOOD", "ORIGINAL");
+CGameMenuItemZCycle itemMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 135, 180, 0, SetGoreMode, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
 CGameMenuItemZCycle itemMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 145, 180, 0, SetRandomizerMode, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
 CGameMenuItemZEdit itemMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 155, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
 ///////////////////
@@ -1670,7 +1676,7 @@ void SetupNetStartMenu(void)
     itemNetMutatorWeaponsVer.m_nFocus = gWeaponsVer % ARRAY_SSIZE(pzWeaponsVersionStrings);
     itemNetMutatorSectorBehavior.at20 = !!gSectorBehavior;
     itemNetMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
-    itemNetMutatorGoreBehavior.at20 = !!gGoreBehavior;
+    itemNetMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
     itemNetMutatorRandomizerMode.m_nFocus = gRandomizerMode % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(szRandomizerSeedMenu, gzRandomizerSeed, sizeof(gPacketStartGame.szRandomizerSeed));
     ///////
@@ -1931,7 +1937,7 @@ void SetupOptionsMenu(void)
     itemMutatorWeaponsVer.m_nFocus = gWeaponsVer % ARRAY_SSIZE(pzWeaponsVersionStrings);
     itemMutatorSectorBehavior.at20 = !!gSectorBehavior;
     itemMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
-    itemMutatorGoreBehavior.at20 = !!gGoreBehavior;
+    itemMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
     itemMutatorRandomizerMode.m_nFocus = gRandomizerMode % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(szRandomizerSeedMenu, gzRandomizerSeed, sizeof(szRandomizerSeedMenu));
     ///////
@@ -2596,13 +2602,13 @@ void SetHitscanProjectiles(CGameMenuItemZCycle *pItem)
     }
 }
 
-void SetGoreMode(CGameMenuItemZBool *pItem)
+void SetGoreMode(CGameMenuItemZCycle *pItem)
 {
     if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) {
-        gGoreBehavior = pItem->at20;
-        gGameOptions.bGoreBehavior = gGoreBehavior;
+        gGoreBehavior = pItem->m_nFocus % ARRAY_SSIZE(pzGoreStrings);
+        gGameOptions.nGoreBehavior = gGoreBehavior;
     } else {
-        pItem->at20 = !!gGoreBehavior;
+        pItem->m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
     }
 }
 
@@ -4583,7 +4589,7 @@ void StartNetGame(CGameMenuItemChain *pItem)
     gPacketStartGame.nWeaponsVer = itemNetMutatorWeaponsVer.m_nFocus % ARRAY_SSIZE(pzWeaponsVersionStrings);
     gPacketStartGame.bSectorBehavior = itemNetMutatorSectorBehavior.at20;
     gPacketStartGame.nHitscanProjectiles = itemNetMutatorHitscanProjectiles.m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
-    gPacketStartGame.bGoreBehavior = itemNetMutatorGoreBehavior.at20;
+    gPacketStartGame.nGoreBehavior = itemNetMutatorGoreBehavior.m_nFocus % ARRAY_SSIZE(pzGoreStrings);
     gPacketStartGame.randomizerMode = itemNetMutatorRandomizerMode.m_nFocus % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(gPacketStartGame.szRandomizerSeed, szRandomizerSeedMenu, sizeof(gPacketStartGame.szRandomizerSeed));
     if (gPacketStartGame.szRandomizerSeed[0] == '\0') // if no seed entered, generate new one before sending packet

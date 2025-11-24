@@ -170,7 +170,7 @@ spritetype * CFX::fxSpawn(FX_ID nFx, int nSector, int x, int y, int z, unsigned 
     FXDATA *pFX = &gFXData[nFx];
 
     int kFxMax = 512;
-    if (gGameOptions.bGoreBehavior && !VanillaMode())
+    if (gGameOptions.nGoreBehavior && !VanillaMode())
     {
         kFxMax = 4096;
         if (!duration) // no override duration given, load from global fx data struct
@@ -265,7 +265,7 @@ void CFX::fxProcess(void)
         vec3_t oldPos = pSprite->xyz;
         int nGravity = pFXData->gravity;
         int nAirDrag = pFXData->airdrag;
-        if ((pSprite->type == FX_27) && !IsUnderwaterSector(nSector) && gGameOptions.bGoreBehavior && !VanillaMode())
+        if ((pSprite->type == FX_27) && !IsUnderwaterSector(nSector) && (gGameOptions.nGoreBehavior > 1) && !VanillaMode())
         {
             nGravity = 80000; // make blood heavier
             nAirDrag >>= 1; // make blood drag 
@@ -294,7 +294,7 @@ void CFX::fxProcess(void)
                 pSprite->y = oldPos.y + (yvel[nSprite]>>12);
             }
         }
-        else if ((pSprite->type == FX_27 || pSprite->type == FX_13) && gGameOptions.bGoreBehavior && !VanillaMode()) // check if new xy position is within a wall
+        else if ((pSprite->type == FX_27 || pSprite->type == FX_13) && (gGameOptions.nGoreBehavior > 1) && !VanillaMode()) // check if new xy position is within a wall
         {
             if ((xvel[nSprite] || yvel[nSprite]) && !cansee(oldPos.x, oldPos.y, oldPos.z, nSector, pSprite->x, pSprite->y, oldPos.z, nSector)) // if new position has clipped into wall, freeze xy position
             {
@@ -347,7 +347,7 @@ void CFX::fxProcess(void)
         {
             int32_t floorZ, ceilZ;
             getzsofslope(nSector, pSprite->x, pSprite->y, &ceilZ, &floorZ);
-            if (((pSprite->type == FX_27 && !(pSprite->index&7)) || (pSprite->type == FX_13 && zvel[nSprite] > -1250000)) && (ceilZ > pSprite->z) && !(sector[nSector].ceilingstat&1) && !IsUnderwaterSector(nSector) && gGameOptions.bGoreBehavior && !VanillaMode()) // make blood gibs stick to ceiling
+            if (((pSprite->type == FX_27 && !(pSprite->index&7)) || (pSprite->type == FX_13 && zvel[nSprite] > -1250000)) && (ceilZ > pSprite->z) && !(sector[nSector].ceilingstat&1) && !IsUnderwaterSector(nSector) && (gGameOptions.nGoreBehavior > 1) && !VanillaMode()) // make blood gibs stick to ceiling
             {
                 pSprite->z = ceilZ;
                 if (pSprite->type == FX_13)
@@ -393,7 +393,7 @@ void fxSpawnBlood(spritetype *pSprite, int a2)
     if (pBlood)
     {
         pBlood->ang = 1024;
-        if (IsUnderwaterSector(pSprite->sectnum) && gGameOptions.bGoreBehavior && !VanillaMode())
+        if (IsUnderwaterSector(pSprite->sectnum) && (gGameOptions.nGoreBehavior > 1) && !VanillaMode())
         {
             // make bloodspray more dense underwater
             // scale velocities (bigger nr is bigger spread)                
