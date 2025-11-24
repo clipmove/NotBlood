@@ -3455,7 +3455,7 @@ void actKillDude(int nKillerSprite, spritetype *pSprite, DAMAGE_TYPE damageType,
                 GibSprite(pSprite, (GIBTYPE)pDudeInfo->nGibType[i], NULL, NULL);
         for (int i = 0; i < 4; i++)
             fxSpawnBlood(pSprite, damage);
-        if (gGameOptions.bGoreBehavior && !VanillaMode()) // for default, spawn more blood on explosion
+        if ((gGameOptions.nGoreBehavior > 1) && !VanillaMode()) // for default, spawn more blood on explosion
         {
             switch (pSprite->type)
             {
@@ -5657,7 +5657,7 @@ static bool MoveMissileBulletVectorTest(spritetype *pSource, spritetype *pShoote
                                 FX_ID t2 = pVectorData->surfHit[nSurf].fx2;
                                 FX_ID t3 = pVectorData->surfHit[nSurf].fx3;
                                 spritetype *pFX = NULL;
-                                const char bSpawnBlood = gGameOptions.bGoreBehavior || (t3 == FX_NONE || Chance(0x4000));
+                                const char bSpawnBlood = (gGameOptions.nGoreBehavior > 1) || (t3 == FX_NONE || Chance(0x4000));
                                 if (t2 > FX_NONE && bSpawnBlood)
                                     pFX = gFX.fxSpawn(t2, nSector, x, y, z);
                                 else if(t3 > FX_NONE)
@@ -5672,7 +5672,7 @@ static bool MoveMissileBulletVectorTest(spritetype *pSource, spritetype *pShoote
                         }
                     }
                 }
-                if (gGameOptions.bGoreBehavior) // splatIncrement for default
+                if ((gGameOptions.nGoreBehavior > 1)) // splatIncrement for default
                 {
                     switch (pSprite->type)
                     {
@@ -6519,7 +6519,7 @@ void actProcessSprites(void)
             }
         }
 
-        if (gGameOptions.bGoreBehavior && !VanillaMode() && (nType == 1 || nType == 7) && (nOwner >= 0) && IsPlayerSprite(&sprite[nOwner]))
+        if ((gGameOptions.nGoreBehavior > 1) && !VanillaMode() && (nType == 1 || nType == 7) && (nOwner >= 0) && IsPlayerSprite(&sprite[nOwner]))
         {
             for (int nSprite2 = headspritestat[kStatFX]; nSprite2 >= 0; nSprite2 = nextspritestat[nSprite2])
             {
@@ -7645,7 +7645,7 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
                                 FX_ID t2 = pVectorData->surfHit[nSurf].fx2;
                                 FX_ID t3 = pVectorData->surfHit[nSurf].fx3;
                                 spritetype *pFX = NULL;
-                                const char bSpawnBlood = (gGameOptions.bGoreBehavior && !VanillaMode()) || (t3 == FX_NONE || Chance(0x4000));
+                                const char bSpawnBlood = ((gGameOptions.nGoreBehavior > 1) && !VanillaMode()) || (t3 == FX_NONE || Chance(0x4000));
                                 if (t2 > FX_NONE && bSpawnBlood)
                                     pFX = gFX.fxSpawn(t2, nSector, x, y, z);
                                 else if(t3 > FX_NONE)
@@ -7660,7 +7660,7 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
                         }
                     }
                 }
-                if (gGameOptions.bGoreBehavior && !VanillaMode()) // splatIncrement for default
+                if ((gGameOptions.nGoreBehavior > 1) && !VanillaMode()) // splatIncrement for default
                 {
                     switch (pSprite->type)
                     {
