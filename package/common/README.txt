@@ -112,6 +112,7 @@ If you have the GOG version of the game, do the following:
    - Increase lifespan duration of blood particles
    - Increase blood gib spawn rate upon explosions and hitscan
    - Make blood splatter effect be affected by explosive impulses
+   - Disable collisions for small gibs
 * Randomizer mode
    - Set the enemy/pickups randomizer mode
    - The randomizer does not support custom modern map enemies
