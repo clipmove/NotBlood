@@ -109,9 +109,8 @@ If you have the GOG version of the game, do the following:
    - This mutator does not support custom modern map enemies
 * Gore behavior (Extended)
    - Increase lifespan duration of blood particles
-   - Disable collisions for small gibs
 * Gore behavior (Excessive)
-   - All of the above fixes and including:
+   - Increase lifespan duration of blood particles
    - Increase random chance of wall splatter
    - Increase blood gib spawn rate upon explosions and hitscan
    - Make blood splatter effect be affected by explosive impulses
@@ -169,6 +168,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable view interpolation for drawn weapon (0: disable, 1: position, 2: position/qav animation)
 * cl_colormsg
    - Enable/disable colored player names in messages
+* cl_gibnoclip
+   - Enable/disable gib collision (always off in multiplayer)
 * cl_healthblink
    - Enable/disable health blinking when under 15 health points
 * cl_killmsg
