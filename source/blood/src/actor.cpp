@@ -5672,7 +5672,7 @@ static bool MoveMissileBulletVectorTest(spritetype *pSource, spritetype *pShoote
                         }
                     }
                 }
-                if ((gGameOptions.nGoreBehavior > 1)) // splatIncrement for default
+                if (gGameOptions.nGoreBehavior > 1) // splatIncrement for default
                 {
                     switch (pSprite->type)
                     {
