@@ -169,7 +169,7 @@ If you have the GOG version of the game, do the following:
 * cl_colormsg
    - Enable/disable colored player names in messages
 * cl_gibnoclip
-   - Enable/disable gib collision (always off in multiplayer)
+   - Toggles gib clipping (always on in multiplayer)
 * cl_healthblink
    - Enable/disable health blinking when under 15 health points
 * cl_killmsg

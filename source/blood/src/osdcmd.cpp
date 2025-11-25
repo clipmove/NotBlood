@@ -1174,7 +1174,7 @@ int32_t registerosdcommands(void)
 //
 //        { "cl_weaponsway", "enable/disable player weapon swaying", (void *)&ud.weaponsway, CVAR_BOOL, 0, 1 },
         { "cl_shotgunaltfirereload", "enable/disable alt fire as reload for shotgun when fired one shell (always off in multiplayer)", (void *)&gShotgunAltFireReload, CVAR_BOOL, 0, 1 },
-        { "cl_gibnoclip", "enable/disable gib collision (always off in multiplayer)", (void *)&gGibNoClip, CVAR_BOOL, 0, 1 },
+        { "cl_gibnoclip", "toggles gib clipping (always on in multiplayer)", (void *)&gGibNoClip, CVAR_BOOL, 0, 1 },
         { "cl_weaponswitch", "enable/disable auto weapon switching", (void *)&gWeaponSwitch, CVAR_INT|CVAR_MULTI, 0, 3 },
         { "cl_weaponfastswitch", "enable/disable fast weapon switching", (void *)&gWeaponFastSwitch, CVAR_BOOL|CVAR_MULTI, 0, 1 },
         { "cl_packitemswitch", "enable/disable item slot switching to activated item (always enabled in multiplayer)", (void *)&gPackSlotSwitch, CVAR_BOOL, 0, 1 },
