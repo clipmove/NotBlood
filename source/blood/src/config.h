@@ -113,6 +113,7 @@ extern int32_t gMessageCount;
 extern int32_t gMessageTime;
 extern int32_t gMessageFont;
 extern int32_t gShotgunAltFireReload;
+extern int32_t gGibNoClip;
 extern int32_t gStereo;
 extern int32_t gPlayerTeamPreference;
 extern int32_t gPlayerColorPreference;

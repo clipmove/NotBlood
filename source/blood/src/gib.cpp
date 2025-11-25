@@ -396,7 +396,7 @@ void GibThing(spritetype *pSprite, GIBTHING *pGThing, CGibPosition *pPos, CGibVe
         dassert(pGib != NULL);
         if (pGThing->at4 > -1)
             pGib->picnum = pGThing->at4;
-        if (gGameOptions.nGoreBehavior && !VanillaMode() && (pGThing->at0 == kThingBloodBits) && (tilesiz[pGib->picnum].y < 22)) // disable collisions for small blood chunks
+        if (gGibNoClip && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !VanillaMode() && (pGThing->at0 == kThingBloodBits)) // disable collisions for small blood chunks
             pGib->cstat = 384;
         if (pVel)
         {
