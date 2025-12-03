@@ -668,7 +668,7 @@ void aiActivateDude(spritetype *pSprite, XSPRITE *pXSprite)
     }
     case kDudeGargoyleStatueFlesh:
     case kDudeGargoyleStatueStone:
-        if (!VanillaMode())
+        if (!VanillaMode()) // stone activated, add to total count
             gKillMgr.AddCount(1);
         #ifdef NOONE_EXTENSIONS
         // play gargoyle statue breaking animation if data1 = 1.
