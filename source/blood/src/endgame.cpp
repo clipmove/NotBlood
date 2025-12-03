@@ -147,7 +147,7 @@ bool CKillMgr::AllowedType(spritetype *pSprite)
         return false;
     if (pSprite->statnum != kStatDude)
         return false;
-    return pSprite->type != kDudeBat && pSprite->type != kDudeRat && pSprite->type != kDudeInnocent && pSprite->type != kDudeBurningInnocent;
+    return pSprite->type != kDudeBat && pSprite->type != kDudeRat && pSprite->type != kDudeInnocent && pSprite->type != kDudeBurningInnocent && pSprite->type != kDudeGargoyleStatueFlesh && pSprite->type != kDudeGargoyleStatueStone;
 }
 
 void CKillMgr::SetCount(int nCount)
