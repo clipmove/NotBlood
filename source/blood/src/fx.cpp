@@ -446,11 +446,16 @@ void fxSpawnEjectingBrass(spritetype *pSprite, int z, int a3, int a4)
     int nSector = pSprite->sectnum;
     x += mulscale30(a3, Cos(pSprite->ang+512));
     y += mulscale30(a3, Sin(pSprite->ang+512));
-    if (gGameOptions.bSectorBehavior && !VanillaMode()) // fix weird edge case when spawning casings over ror
+    if (!VanillaMode()) // fix weird edge case when spawning casings over ror
     {
         int cX = x, cY = y, cZ = z, nSector2 = nSector;
         if (CheckLink(&cX, &cY, &cZ, &nSector2)) // if casing spawn position is overlapping into ror sector, move origin to ror sector
-            x = cX, y = cY, z = cZ, nSector = nSector2;
+        {
+            x = cX;
+            y = cY;
+            z = cZ;
+            nSector = nSector2;
+        }
     }
     spritetype *pBrass = gFX.fxSpawn((FX_ID)(FX_37+Random(3)), nSector, x, y, z);
     if (pBrass)
@@ -481,11 +486,16 @@ void fxSpawnEjectingShell(spritetype *pSprite, int z, int a3, int a4)
     int nSector = pSprite->sectnum;
     x += mulscale30(a3, Cos(pSprite->ang+512));
     y += mulscale30(a3, Sin(pSprite->ang+512));
-    if (gGameOptions.bSectorBehavior && !VanillaMode()) // fix weird edge case when spawning casings over ror
+    if (!VanillaMode()) // fix weird edge case when spawning casings over ror
     {
         int cX = x, cY = y, cZ = z, nSector2 = nSector;
         if (CheckLink(&cX, &cY, &cZ, &nSector2)) // if casing spawn position is overlapping into ror sector, move origin to ror sector
-            x = cX, y = cY, z = cZ, nSector = nSector2;
+        {
+            x = cX;
+            y = cY;
+            z = cZ;
+            nSector = nSector2;
+        }
     }
     spritetype *pShell = gFX.fxSpawn((FX_ID)(FX_40+Random(3)), nSector, x, y, z);
     if (pShell)
