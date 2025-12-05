@@ -46,6 +46,7 @@ void SaveGame(CGameMenuItemZEditBitmap *, CGameMenuEvent *);
 void SaveGameProcess(CGameMenuItemChain *);
 void ShowDifficulties();
 void SetDifficultyAndStart(CGameMenuItemChain *);
+void SetCustomDifficultyMenu(CGameMenuItemChain *);
 void SetMonsters(CGameMenuItemZCycle *);
 void SetCustomDifficultyAndStart(CGameMenuItemChain *);
 void SetFirstLaunchOptions(CGameMenuItemChain *);
@@ -412,21 +413,22 @@ CGameMenuItemChain itemDifficulty2("PINK ON THE INSIDE", 1, 0, 75, 320, 1, NULL,
 CGameMenuItemChain itemDifficulty3("LIGHTLY BROILED", 1, 0, 95, 320, 1, NULL, -1, SetDifficultyAndStart, 2);
 CGameMenuItemChain itemDifficulty4("WELL DONE", 1, 0, 115, 320, 1, NULL, -1, SetDifficultyAndStart, 3);
 CGameMenuItemChain itemDifficulty5("EXTRA CRISPY", 1, 0, 135, 320, 1, 0, -1, SetDifficultyAndStart, 4);
-CGameMenuItemChain itemDifficulty6("< CUSTOM >", 1, 0, 155, 320, 1, &menuCustomDifficulty, -1, NULL, 0, 8);
+CGameMenuItemChain itemDifficulty6("< CUSTOM >", 1, 0, 155, 320, 1, &menuCustomDifficulty, -1, SetCustomDifficultyMenu, 0, 8);
 
 CGameMenuItemTitle itemCustomDifficultyTitle("CUSTOM", 1, 160, 20, 2038);
-CGameMenuItemZCycle itemCustomDifficultyMonsterSettings("MONSTERS:", 3, 66, 40, 180, 0, SetMonsters, zMonsterStrings, ARRAY_SSIZE(zMonsterStrings), 1);
-CGameMenuItemSlider itemCustomDifficultyEnemyQuantity("ENEMIES QUANTITY:", 3, 66, 50, 180, 2, 0, 4, 1, NULL, -1, -1);
-CGameMenuItemSlider itemCustomDifficultyEnemyHealth("ENEMIES HEALTH:", 3, 66, 60, 180, 2, 0, 4, 1, NULL, -1, -1);
-CGameMenuItemSlider itemCustomDifficultyEnemyDifficulty("ENEMIES DIFFICULTY:", 3, 66, 70, 180, 2, 0, 4, 1, NULL, -1, -1);
-CGameMenuItemSlider itemCustomDifficultyPlayerDamage("PLAYER DAMAGE TAKEN:", 3, 66, 80, 180, 2, 0, 4, 1, NULL, -1, -1);
-CGameMenuItemZCycle itemCustomDifficultyEnemySpeed("ENEMIES SPEED:", 3, 66, 90, 180, 0, 0, pzEnemySpeeds, ARRAY_SSIZE(pzEnemySpeeds), 0);
-CGameMenuItemZBool itemCustomDifficultyEnemyShuffle("RANDOMIZE ENEMY POSITIONS:", 3, 66, 100, 180, false, NULL, NULL, NULL);
-CGameMenuItemZBool itemCustomDifficultyPitchfork("PITCHFORK START:", 3, 66, 110, 180, false, NULL, NULL, NULL);
-CGameMenuItemZBool itemCustomDifficultyPermaDeath("PERMANENT DEATH:", 3, 66, 120, 180, false, NULL, NULL, NULL);
-CGameMenuItemChain itemCustomDifficultyBannedMonsters("SET MONSTERS", 3, 66, 132, 180, 1, &menuBannedMonsters, -1, NULL, 0);
-CGameMenuItemChain itemCustomDifficultyBannedItems("SET ITEMS", 3, 66, 143, 180, 1, &menuBannedItems, -1, NULL, 0);
-CGameMenuItemChain itemCustomDifficultyStart("START GAME", 1, 0, 156, 320, 1, NULL, -1, SetCustomDifficultyAndStart, 0);
+CGameMenuItemSlider itemCustomDifficultyStartLevel("LEVEL:", 3, 66, 35, 180, NULL, 0, kMaxLevels-1, 1, NULL, -1, -1, kMenuSliderValue, 1);
+CGameMenuItemZCycle itemCustomDifficultyMonsterSettings("MONSTERS:", 3, 66, 45, 180, 0, SetMonsters, zMonsterStrings, ARRAY_SSIZE(zMonsterStrings), 1);
+CGameMenuItemSlider itemCustomDifficultyEnemyQuantity("ENEMIES QUANTITY:", 3, 66, 55, 180, 2, 0, 4, 1, NULL, -1, -1);
+CGameMenuItemSlider itemCustomDifficultyEnemyHealth("ENEMIES HEALTH:", 3, 66, 65, 180, 2, 0, 4, 1, NULL, -1, -1);
+CGameMenuItemSlider itemCustomDifficultyEnemyDifficulty("ENEMIES DIFFICULTY:", 3, 66, 75, 180, 2, 0, 4, 1, NULL, -1, -1);
+CGameMenuItemSlider itemCustomDifficultyPlayerDamage("PLAYER DAMAGE TAKEN:", 3, 66, 85, 180, 2, 0, 4, 1, NULL, -1, -1);
+CGameMenuItemZCycle itemCustomDifficultyEnemySpeed("ENEMIES SPEED:", 3, 66, 95, 180, 0, 0, pzEnemySpeeds, ARRAY_SSIZE(pzEnemySpeeds), 0);
+CGameMenuItemZBool itemCustomDifficultyEnemyShuffle("RANDOMIZE ENEMY POSITIONS:", 3, 66, 105, 180, false, NULL, NULL, NULL);
+CGameMenuItemZBool itemCustomDifficultyPitchfork("PITCHFORK START:", 3, 66, 115, 180, false, NULL, NULL, NULL);
+CGameMenuItemZBool itemCustomDifficultyPermaDeath("PERMANENT DEATH:", 3, 66, 125, 180, false, NULL, NULL, NULL);
+CGameMenuItemChain itemCustomDifficultyBannedMonsters("SET MONSTERS", 3, 66, 137, 180, 1, &menuBannedMonsters, -1, NULL, 0);
+CGameMenuItemChain itemCustomDifficultyBannedItems("SET ITEMS", 3, 66, 148, 180, 1, &menuBannedItems, -1, NULL, 0);
+CGameMenuItemChain itemCustomDifficultyStart("START GAME", 1, 0, 161, 320, 1, NULL, -1, SetCustomDifficultyAndStart, 0);
 
 CGameMenuItemTitle itemBannedMonstersTitle("SET MONSTERS", 1, 160, 20, 2038);
 CGameMenuItemZBool itemBannedMonstersBats("BATS:", 3, 75, 40, 161, false, NULL, "REMOVE", "KEEP");
@@ -1315,6 +1317,7 @@ void SetupDifficultyMenu(void)
     menuDifficulty.Add(&itemBloodQAV, false);
 
     menuCustomDifficulty.Add(&itemCustomDifficultyTitle, false);
+    menuCustomDifficulty.Add(&itemCustomDifficultyStartLevel, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyMonsterSettings, true);
     menuCustomDifficulty.Add(&itemCustomDifficultyEnemyQuantity, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyEnemyHealth, false);
@@ -1328,16 +1331,28 @@ void SetupDifficultyMenu(void)
     menuCustomDifficulty.Add(&itemCustomDifficultyBannedItems, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyStart, false);
     menuCustomDifficulty.Add(&itemBloodQAV, false);
-    itemCustomDifficultyEnemyQuantity.tooltip_pzTextUpper = "Set how many enemies will spawn in the level";
-    itemCustomDifficultyEnemyHealth.tooltip_pzTextUpper = "Set enemy's starting health";
-    itemCustomDifficultyEnemyDifficulty.tooltip_pzTextUpper = "Set enemy's behavior difficulty";
-    itemCustomDifficultyPlayerDamage.tooltip_pzTextUpper = "Set player's damage taken scale";
-    itemCustomDifficultyEnemySpeed.tooltip_pzTextUpper = "Set enemy's movement speed modifier";
-    itemCustomDifficultyEnemyShuffle.tooltip_pzTextUpper = "Shuffle enemy's spawn position";
-    itemCustomDifficultyPitchfork.tooltip_pzTextUpper = "Player will lose all items on new level";
-    itemCustomDifficultyPermaDeath.tooltip_pzTextUpper = "No saving, and you only live once";
-    itemCustomDifficultyBannedMonsters.tooltip_pzTextUpper = "Set which monsters to spawn";
-    itemCustomDifficultyBannedItems.tooltip_pzTextUpper = "Set which items to spawn";
+    itemCustomDifficultyStartLevel.tooltip_pzTextUpper = "";
+    itemCustomDifficultyStartLevel.tooltip_pzTextLower = "Set the starting level for this episode";
+    itemCustomDifficultyEnemyQuantity.tooltip_pzTextUpper = "";
+    itemCustomDifficultyEnemyQuantity.tooltip_pzTextLower = "Set how many enemies will spawn in the level";
+    itemCustomDifficultyEnemyHealth.tooltip_pzTextUpper = "";
+    itemCustomDifficultyEnemyHealth.tooltip_pzTextLower = "Set enemy's starting health";
+    itemCustomDifficultyEnemyDifficulty.tooltip_pzTextUpper = "";
+    itemCustomDifficultyEnemyDifficulty.tooltip_pzTextLower = "Set enemy's behavior difficulty";
+    itemCustomDifficultyPlayerDamage.tooltip_pzTextUpper = "";
+    itemCustomDifficultyPlayerDamage.tooltip_pzTextLower = "Set player's damage taken scale";
+    itemCustomDifficultyEnemySpeed.tooltip_pzTextUpper = "";
+    itemCustomDifficultyEnemySpeed.tooltip_pzTextLower = "Set enemy's movement speed modifier";
+    itemCustomDifficultyEnemyShuffle.tooltip_pzTextUpper = "";
+    itemCustomDifficultyEnemyShuffle.tooltip_pzTextLower = "Shuffle enemy's spawn position";
+    itemCustomDifficultyPitchfork.tooltip_pzTextUpper = "";
+    itemCustomDifficultyPitchfork.tooltip_pzTextLower = "Player will lose all items on new level";
+    itemCustomDifficultyPermaDeath.tooltip_pzTextUpper = "";
+    itemCustomDifficultyPermaDeath.tooltip_pzTextLower = "No saving, and you only live once";
+    itemCustomDifficultyBannedMonsters.tooltip_pzTextUpper = "";
+    itemCustomDifficultyBannedMonsters.tooltip_pzTextLower = "Set which monsters to spawn";
+    itemCustomDifficultyBannedItems.tooltip_pzTextUpper = "";
+    itemCustomDifficultyBannedItems.tooltip_pzTextLower = "Set which items to spawn";
 
     menuBannedMonsters.Add(&itemBannedMonstersTitle, false);
     menuBannedMonsters.Add(&itemBannedMonstersBats, true);
@@ -3134,6 +3149,28 @@ void SetDifficultyAndStart(CGameMenuItemChain *pItem)
     gGameMenuMgr.Deactivate();
 }
 
+void SetCustomDifficultyMenu(CGameMenuItemChain *pItem)
+{
+    itemCustomDifficultyStartLevel.nValue = 0;
+    if (Bstrlen(gGameOptions.szUserMap)) // custom map selected, disable level select cycle item
+    {
+        itemCustomDifficultyStartLevel.bEnable = 0;
+    }
+    else
+    {
+        dassert(gGameOptions.nEpisode >= 0 && gGameOptions.nEpisode < gEpisodeCount);
+        EPISODEINFO *pEpisodeInfo = &gEpisodeInfo[gGameOptions.nEpisode];
+        if (pEpisodeInfo->nLevels <= 0)
+            itemCustomDifficultyStartLevel.bEnable = 0;
+        else
+        {
+            itemCustomDifficultyStartLevel.bEnable = 1;
+            itemCustomDifficultyStartLevel.nRangeHigh = pEpisodeInfo->nLevels-1;
+        }
+    }
+    itemCustomDifficultyStartLevel.bNoDraw = !itemCustomDifficultyStartLevel.bEnable;
+}
+
 void SetCustomDifficultyAndStart(CGameMenuItemChain *pItem)
 {
     UNREFERENCED_PARAMETER(pItem);
@@ -3172,6 +3209,8 @@ void SetCustomDifficultyAndStart(CGameMenuItemChain *pItem)
         StartLevel(&gGameOptions);
         viewResizeView(gViewSize);
     }
+    else if (itemCustomDifficultyStartLevel.nValue > 0)
+        gGameOptions.nLevel = itemCustomDifficultyStartLevel.nValue;
     gGameMenuMgr.Deactivate();
 }
 
