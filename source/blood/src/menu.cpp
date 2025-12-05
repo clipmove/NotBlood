@@ -1903,8 +1903,7 @@ void SetupOptionsMenu(void)
     itemMutatorBoolEnemyRandomTNT.tooltip_pzTextLower = "throwing random projectiles";
     itemMutatorWeaponsVer.tooltip_pzTextUpper = "Check readme.txt for full";
     itemMutatorWeaponsVer.tooltip_pzTextLower = "list of weapon changes";
-    itemMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector handling";
-    itemMutatorSectorBehavior.tooltip_pzTextLower = "for hitscans (e.g: firing above water)";
+    itemMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector logic";
     itemMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
 #ifdef NOONE_EXTENSIONS
     itemMutatorHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
