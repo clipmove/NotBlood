@@ -536,7 +536,7 @@ CGameMenuItemTitle itemNetGameTitle("GAME SETTINGS", 1, 160, 20, 2038);
 CGameMenuItemZCycle itemNetGameMode("GAME:", 3, 66, 35, 180, 0, SetNetGameMode, zNetGameTypes, ARRAY_SSIZE(zNetGameTypes), 0);
 CGameMenuItemSlider itemNetGameSliderScoreLimit("SCORE LIMIT:", 3, 66, 44, 180, 0, 0, 255, 1, NULL, -1, -1, kMenuSliderValue);
 CGameMenuItemSlider itemNetGameSliderLivesLimit("LIVES:", 3, 66, 44, 180, 0, 0, 255, 1, NULL, -1, -1, kMenuSliderValue);
-CGameMenuItemSlider itemNetGameSliderTimeLimit("TIME LIMIR:", 3, 66, 54, 180, 0, 0, 60, 1, NULL, -1, -1, kMenuSliderValue);
+CGameMenuItemSlider itemNetGameSliderTimeLimit("TIME LIMIT:", 3, 66, 54, 180, 0, 0, 60, 1, NULL, -1, -1, kMenuSliderValue);
 CGameMenuItemZBool itemNetGameBoolExit("LEVEL EXIT:", 3, 66, 65, 180, true, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolTeleFrag("TELEFRAGS:", 3, 66, 73, 180, true, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolSkillOverride("PLAYER HANDICAP:", 3, 66, 81, 180, true, NULL, "ALLOWED", "OFF");
