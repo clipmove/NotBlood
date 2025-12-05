@@ -525,17 +525,18 @@ CGameMenuItemZCycle itemNetStart6("WEAPONS:", 3, 66, 85, 180, 0, 0, zWeaponStrin
 CGameMenuItemZCycle itemNetStart7("ITEMS:", 3, 66, 95, 180, 0, 0, zItemStrings, 3, 0);
 CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, false, NULL, NULL, NULL);
-CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 125, 180, false, 0, NULL, NULL);
-CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 134, 320, 1, &menuBannedItems, -1, NULL, 0);
-CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 147, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
-CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 160, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
+CGameMenuItemZBool itemNetStartBoolReviveMode("REVIVE MODE:", 3, 66, 125, 180, true, 0, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 135, 180, false, 0, NULL, NULL);
+CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 143, 320, 1, &menuBannedItems, -1, NULL, 0);
+CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 153, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
+CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 163, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
 CGameMenuItemChain itemNetStart11("START GAME", 1, 0, 175, 320, 1, 0, -1, StartNetGame, 0);
 
 CGameMenuItemTitle itemNetGameTitle("GAME SETTINGS", 1, 160, 20, 2038);
 CGameMenuItemZCycle itemNetGameMode("GAME:", 3, 66, 35, 180, 0, SetNetGameMode, zNetGameTypes, ARRAY_SSIZE(zNetGameTypes), 0);
-CGameMenuItemSlider itemNetGameSliderScoreLimit("SCORES:", 3, 66, 44, 180, 0, 0, 255, 1, NULL, -1, -1, kMenuSliderValue);
+CGameMenuItemSlider itemNetGameSliderScoreLimit("SCORE LIMIT:", 3, 66, 44, 180, 0, 0, 255, 1, NULL, -1, -1, kMenuSliderValue);
 CGameMenuItemSlider itemNetGameSliderLivesLimit("LIVES:", 3, 66, 44, 180, 0, 0, 255, 1, NULL, -1, -1, kMenuSliderValue);
-CGameMenuItemSlider itemNetGameSliderTimeLimit("TIME:", 3, 66, 54, 180, 0, 0, 60, 1, NULL, -1, -1, kMenuSliderValue);
+CGameMenuItemSlider itemNetGameSliderTimeLimit("TIME LIMIR:", 3, 66, 54, 180, 0, 0, 60, 1, NULL, -1, -1, kMenuSliderValue);
 CGameMenuItemZBool itemNetGameBoolExit("LEVEL EXIT:", 3, 66, 65, 180, true, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolTeleFrag("TELEFRAGS:", 3, 66, 73, 180, true, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolSkillOverride("PLAYER HANDICAP:", 3, 66, 81, 180, true, NULL, "ALLOWED", "OFF");
@@ -1523,6 +1524,7 @@ void SetupNetStartMenu(void)
     menuNetStart.Add(&itemNetStart7, false);
     menuNetStart.Add(&itemNetStartBoolChaseView, false);
     menuNetStart.Add(&itemNetStartBoolHolstering, false);
+    menuNetStart.Add(&itemNetStartBoolReviveMode, false);
     menuNetStart.Add(&itemNetStartBoolSpectatorMode, false);
     menuNetStart.Add(&itemNetStart8, false);
     menuNetStart.Add(&itemNetStart9, false);
@@ -1645,6 +1647,8 @@ void SetupNetStartMenu(void)
         itemNetStartBoolChaseView.at20 = 1;
     if (gMultiHolstering)
         itemNetStartBoolHolstering.at20 = 1;
+    if (gMultiRevive > -1)
+        itemNetStartBoolReviveMode.at20 = !!gMultiRevive;
     if (gMultiSpectating)
         itemNetStartBoolSpectatorMode.at20 = 1;
 
@@ -3575,6 +3579,7 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameSliderScoreLimit.bNoDraw = !itemNetGameSliderScoreLimit.bEnable;
         itemNetGameSliderLivesLimit.bEnable = 1;
         itemNetGameSliderLivesLimit.bNoDraw = !itemNetGameSliderLivesLimit.bEnable;
+        itemNetStartBoolReviveMode.at20 = 0;
     }
     else // hide co-op game length settings
     {
@@ -3584,6 +3589,7 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameSliderScoreLimit.bNoDraw = !itemNetGameSliderScoreLimit.bEnable;
         itemNetGameSliderLivesLimit.bEnable = 0;
         itemNetGameSliderLivesLimit.bNoDraw = !itemNetGameSliderLivesLimit.bEnable;
+        itemNetStartBoolReviveMode.at20 = 1;
     }
 
     if (pItem == &itemNetGameMode)
@@ -4557,6 +4563,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoChaseView;
     if (!itemNetStartBoolHolstering.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoHolstering;
+    if (itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType == kGameTypeCoop || !itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType != kGameTypeCoop)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagReviveToggle;
     if (itemNetStartBoolSpectatorMode.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
     gPacketStartGame.episodeId = itemNetStart2.m_nFocus;

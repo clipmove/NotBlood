@@ -3050,7 +3050,7 @@ int playerDamageSprite(int nSource, PLAYER *pPlayer, DAMAGE_TYPE nDamageType, in
             nDeathSeqID = 1;
             break;
         default:
-            if (nHealth < -20 && gGameOptions.nGameType >= kGameTypeBloodBath && Chance(0x4000))
+            if (nHealth < -20 && ((gGameOptions.nGameType >= kGameTypeBloodBath && !(gGameOptions.uNetGameFlags&kNetGameFlagReviveToggle)) || (gGameOptions.nGameType == kGameTypeCoop && (gGameOptions.uNetGameFlags&kNetGameFlagReviveToggle))) && Chance(0x4000))
             {
                 DAMAGEINFO *pDamageInfo = &damageInfo[nDamageType];
                 sfxPlay3DSound(pSprite, pDamageInfo->at10[0], 0, 2);
