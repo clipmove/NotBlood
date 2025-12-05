@@ -416,7 +416,7 @@ CGameMenuItemChain itemDifficulty5("EXTRA CRISPY", 1, 0, 135, 320, 1, 0, -1, Set
 CGameMenuItemChain itemDifficulty6("< CUSTOM >", 1, 0, 155, 320, 1, &menuCustomDifficulty, -1, SetCustomDifficultyMenu, 0, 8);
 
 CGameMenuItemTitle itemCustomDifficultyTitle("CUSTOM", 1, 160, 20, 2038);
-CGameMenuItemSlider itemCustomDifficultyStartLevel("LEVEL:", 3, 66, 35, 180, NULL, 0, kMaxLevels-1, 1, NULL, -1, -1, kMenuSliderValue, 1);
+CGameMenuItemSlider itemCustomDifficultyStartLevel("LEVEL:", 3, 66, 35, 180, 0, 0, kMaxLevels-1, 1, NULL, -1, -1, kMenuSliderValue, 1);
 CGameMenuItemZCycle itemCustomDifficultyMonsterSettings("MONSTERS:", 3, 66, 45, 180, 0, SetMonsters, zMonsterStrings, ARRAY_SSIZE(zMonsterStrings), 1);
 CGameMenuItemSlider itemCustomDifficultyEnemyQuantity("ENEMIES QUANTITY:", 3, 66, 55, 180, 2, 0, 4, 1, NULL, -1, -1);
 CGameMenuItemSlider itemCustomDifficultyEnemyHealth("ENEMIES HEALTH:", 3, 66, 65, 180, 2, 0, 4, 1, NULL, -1, -1);
@@ -3151,6 +3151,7 @@ void SetDifficultyAndStart(CGameMenuItemChain *pItem)
 
 void SetCustomDifficultyMenu(CGameMenuItemChain *pItem)
 {
+    UNREFERENCED_PARAMETER(pItem);
     itemCustomDifficultyStartLevel.nValue = 0;
     if (Bstrlen(gGameOptions.szUserMap)) // custom map selected, disable level select cycle item
     {
@@ -4602,7 +4603,7 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoChaseView;
     if (!itemNetStartBoolHolstering.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoHolstering;
-    if (itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType == kGameTypeCoop || !itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType != kGameTypeCoop)
+    if ((itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType == kGameTypeCoop) || (!itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType != kGameTypeCoop))
         gPacketStartGame.uNetGameFlags |= kNetGameFlagReviveToggle;
     if (itemNetStartBoolSpectatorMode.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
