@@ -154,6 +154,7 @@ void viewDrawWinner(const char *pString = NULL, int nPal = 0);
 void UpdateStatusBar(ClockTicks arg);
 void viewInit(void);
 void viewUpdateHudRatio(void);
+void viewUpdateSkyRatio(void);
 void viewResizeView(int size);
 void UpdateFrame(void);
 void viewDimScreen(void);
