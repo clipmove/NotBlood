@@ -3337,6 +3337,7 @@ void SetDetail(CGameMenuItemSlider *pItem)
 void SetFOV(CGameMenuItemSlider *pItem)
 {
     gFov = pItem->nValue;
+    viewUpdateSkyRatio();
 }
 
 void SetupVideoModeMenu(CGameMenuItemChain *pItem)
