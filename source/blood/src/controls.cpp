@@ -637,8 +637,9 @@ void ctrlGetInput(void)
 
     if (CONTROL_JoystickEnabled) // controller input
     {
-        input.strafe -= int(scaleAdjustmentToInterval(info.dx)/2.f);
-        input.forward -= int(scaleAdjustmentToInterval(info.dz)/2.f);
+        constexpr float analogExtent  = 32767.f; // KEEPINSYNC sdlayer.cpp
+        input.strafe = fix16_ssub(input.strafe, fix16_from_float(scaleAdjustmentToInterval(info.dx / analogExtent)));
+        input.forward = fix16_ssub(input.forward, fix16_from_float(scaleAdjustmentToInterval(info.dz / analogExtent)));
         if (!run) // when autorun is off/run is not held, reduce overall speed for controller
         {
             input.strafe = clamp(input.strafe, -256, 256);
@@ -647,11 +648,11 @@ void ctrlGetInput(void)
         if (info.mousey == 0)
         {
             if (gMouseAim)
-                input.q16mlook = fix16_sadd(input.q16mlook, fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(gMouseAimingFlipped ? info.dpitch : -info.dpitch)/16.f), F16(128)));
+                input.q16mlook = fix16_sadd(input.q16mlook, fix16_from_float(scaleAdjustmentToInterval((gMouseAimingFlipped ? info.dpitch : -info.dpitch) * 64.0 / analogExtent)));
             else
-                input.forward -= int(scaleAdjustmentToInterval(info.dpitch)/2.f);
+                input.forward -= lrint(scaleAdjustmentToInterval(info.dyaw / analogExtent));
         }
-        fix16_t q16turn = fix16_sdiv(fix16_from_float(scaleAdjustmentToInterval(info.dyaw)/16.f), F16(32));
+        input.q16turn = fix16_sadd(input.q16turn, fix16_from_float(scaleAdjustmentToInterval(info.dyaw * 64.0 / analogExtent)));
         if (gTargetAimAssist && !info.mousex && !info.mousey && gMe && gMe->pSprite)
         {
             static int nLastLevelTick = 0;
@@ -663,9 +664,8 @@ void ctrlGetInput(void)
                 nLastLevelTick = gLevelTime;
             }
             if (bLookingAtTarget)
-                q16turn >>= 1;
+                input.q16turn >>= 1;
         }
-        input.q16turn = fix16_sadd(input.q16turn, q16turn);
         if (gCenterViewOnDrop == 2)
         {
             gInput.keyFlags.lookCenter = 1;
