@@ -1518,6 +1518,7 @@ void SetupFirstLaunchMenu(void)
     itemFirstLaunchVanilla.tooltip_pzTextUpper = "Set options to match v1.21 DOS Blood and use vanilla mode";
     itemFirstLaunchNBlood.tooltip_pzTextUpper = "Set options to match NBlood";
     itemFirstLaunchNotBlood.tooltip_pzTextUpper = "Keep default NotBlood options";
+    itemFirstLaunchNotBlood.tooltip_pzTextLower = "(pick this one if you're unsure)";
 }
 
 void SetupNetStartMenu(void)
