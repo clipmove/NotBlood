@@ -107,9 +107,10 @@ jobs:
           - name: GCC
             pkg: libsdl2-dev
             zipname: gcc
+            opt: HAVE_FLAC=0
           - name: Clang
             pkg: libsdl2-dev clang
-            opt: CLANG=1
+            opt: CLANG=1 HAVE_FLAC=0
             zipname: clang
     name: Linux ${{matrix.name}}
     runs-on: ubuntu-latest
