@@ -421,7 +421,7 @@ CGameMenuItemZCycle itemCustomDifficultyMonsterSettings("MONSTERS:", 3, 66, 45, 
 CGameMenuItemSlider itemCustomDifficultyEnemyQuantity("ENEMIES QUANTITY:", 3, 66, 55, 180, 2, 0, 4, 1, NULL, -1, -1);
 CGameMenuItemSlider itemCustomDifficultyEnemyHealth("ENEMIES HEALTH:", 3, 66, 65, 180, 2, 0, 4, 1, NULL, -1, -1);
 CGameMenuItemSlider itemCustomDifficultyEnemyDifficulty("ENEMIES DIFFICULTY:", 3, 66, 75, 180, 2, 0, 4, 1, NULL, -1, -1);
-CGameMenuItemSlider itemCustomDifficultyPlayerDamage("PLAYER DAMAGE TAKEN:", 3, 66, 85, 180, 2, 0, 4, 1, NULL, -1, -1);
+CGameMenuItemSlider itemCustomDifficultyPlayerDamage("PLAYER DAMAGE SCALE:", 3, 66, 85, 180, 2, 0, 4, 1, NULL, -1, -1);
 CGameMenuItemZCycle itemCustomDifficultyEnemySpeed("ENEMIES SPEED:", 3, 66, 95, 180, 0, 0, pzEnemySpeeds, ARRAY_SSIZE(pzEnemySpeeds), 0);
 CGameMenuItemZBool itemCustomDifficultyEnemyShuffle("RANDOMIZE ENEMY POSITIONS:", 3, 66, 105, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemCustomDifficultyPitchfork("PITCHFORK START:", 3, 66, 115, 180, false, NULL, NULL, NULL);
