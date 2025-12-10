@@ -527,7 +527,7 @@ CGameMenuItemZCycle itemNetStart6("WEAPONS:", 3, 66, 85, 180, 0, 0, zWeaponStrin
 CGameMenuItemZCycle itemNetStart7("ITEMS:", 3, 66, 95, 180, 0, 0, zItemStrings, 3, 0);
 CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, false, NULL, NULL, NULL);
-CGameMenuItemZBool itemNetStartBoolReviveMode("REVIVE MODE:", 3, 66, 125, 180, true, 0, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolSecondWind("SECOND WIND:", 3, 66, 125, 180, true, 0, NULL, NULL);
 CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 135, 180, false, 0, NULL, NULL);
 CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 143, 320, 1, &menuBannedItems, -1, NULL, 0);
 CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 153, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
@@ -1540,7 +1540,7 @@ void SetupNetStartMenu(void)
     menuNetStart.Add(&itemNetStart7, false);
     menuNetStart.Add(&itemNetStartBoolChaseView, false);
     menuNetStart.Add(&itemNetStartBoolHolstering, false);
-    menuNetStart.Add(&itemNetStartBoolReviveMode, false);
+    menuNetStart.Add(&itemNetStartBoolSecondWind, false);
     menuNetStart.Add(&itemNetStartBoolSpectatorMode, false);
     menuNetStart.Add(&itemNetStart8, false);
     menuNetStart.Add(&itemNetStart9, false);
@@ -1663,8 +1663,8 @@ void SetupNetStartMenu(void)
         itemNetStartBoolChaseView.at20 = 1;
     if (gMultiHolstering)
         itemNetStartBoolHolstering.at20 = 1;
-    if (gMultiRevive > -1)
-        itemNetStartBoolReviveMode.at20 = !!gMultiRevive;
+    if (gMultiSecondWind > -1)
+        itemNetStartBoolSecondWind.at20 = !!gMultiSecondWind;
     if (gMultiSpectating)
         itemNetStartBoolSpectatorMode.at20 = 1;
 
@@ -3621,7 +3621,7 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameSliderScoreLimit.bNoDraw = !itemNetGameSliderScoreLimit.bEnable;
         itemNetGameSliderLivesLimit.bEnable = 1;
         itemNetGameSliderLivesLimit.bNoDraw = !itemNetGameSliderLivesLimit.bEnable;
-        itemNetStartBoolReviveMode.at20 = 0;
+        itemNetStartBoolSecondWind.at20 = 0;
     }
     else // hide co-op game length settings
     {
@@ -3631,7 +3631,7 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameSliderScoreLimit.bNoDraw = !itemNetGameSliderScoreLimit.bEnable;
         itemNetGameSliderLivesLimit.bEnable = 0;
         itemNetGameSliderLivesLimit.bNoDraw = !itemNetGameSliderLivesLimit.bEnable;
-        itemNetStartBoolReviveMode.at20 = 1;
+        itemNetStartBoolSecondWind.at20 = 1;
     }
 
     if (pItem == &itemNetGameMode)
@@ -4605,8 +4605,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoChaseView;
     if (!itemNetStartBoolHolstering.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoHolstering;
-    if ((itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType == kGameTypeCoop) || (!itemNetStartBoolReviveMode.at20 && gPacketStartGame.gameType != kGameTypeCoop))
-        gPacketStartGame.uNetGameFlags |= kNetGameFlagReviveToggle;
+    if ((itemNetStartBoolSecondWind.at20 && gPacketStartGame.gameType == kGameTypeCoop) || (!itemNetStartBoolSecondWind.at20 && gPacketStartGame.gameType != kGameTypeCoop))
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagSecondWindToggle;
     if (itemNetStartBoolSpectatorMode.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
     gPacketStartGame.episodeId = itemNetStart2.m_nFocus;
