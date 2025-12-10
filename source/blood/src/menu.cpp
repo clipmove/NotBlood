@@ -1593,6 +1593,7 @@ void SetupNetStartMenu(void)
     itemNetGameCycleShowWeaponsOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
     itemNetGameCycleShowWeaponsOverrideTeams.tooltip_pzTextUpper = "Set global setting for show weapons option";
     itemNetGameCycleShowWeaponsOverrideTeams.tooltip_pzTextLower = "(This is applied to all players in round)";
+    itemNetGameCycleSpawnProtection.tooltip_pzTextUpper = "Give players invulnerability on spawn";
     itemNetGameCycleMirrorModeOverride.tooltip_pzTextUpper = "Set global setting for mirror mode";
     itemNetGameCycleMirrorModeOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
 
@@ -1680,7 +1681,7 @@ void SetupNetStartMenu(void)
     itemNetGameCycleSpawnLocation.SetTextIndex(gMultiSpawnLocation != -1 ? gMultiSpawnLocation : 1);
     itemNetGameCycleShowWeaponsOverride.SetTextIndex(1);
     itemNetGameCycleShowWeaponsOverrideTeams.SetTextIndex(1);
-    itemNetGameCycleSpawnProtection.SetTextIndex(gMultiSpawnProtection != -1 ? gMultiSpawnProtection : 1);
+    itemNetGameCycleSpawnProtection.SetTextIndex(gMultiSpawnProtection != -1 ? gMultiSpawnProtection : 0);
     SetNetGameMode(&itemNetGameMode); // hide friendly fire/keys menu items depending on game mode
 
     itemNetMonsterSettings.SetTextIndex(gMultiMonsters != -1 ? gMultiMonsters : 0);
