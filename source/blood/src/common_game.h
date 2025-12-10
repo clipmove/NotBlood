@@ -164,7 +164,7 @@ kNetGameFlagSpectatingAllow     =  1 << 26,
 kNetGameFlagNoChaseView         =  1 << 27, // client sided limit that can be easily bypass by a compile smh
 kNetGameFlagNoHolstering        =  1 << 28,
 kNetGameFlagVanillaColors       =  1 << 29,
-kNetGameFlagReviveToggle        =  1 << 30,
+kNetGameFlagSecondWindToggle    =  1 << 30,
 
 };
 

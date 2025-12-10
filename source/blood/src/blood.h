@@ -95,7 +95,7 @@ extern int gMultiWeapons;
 extern int gMultiItems;
 extern int gMultiSpawnLocation;
 extern int gMultiSpawnProtection;
-extern int gMultiRevive;
+extern int gMultiSecondWind;
 extern bool gMultiChaseView;
 extern bool gMultiHolstering;
 extern bool gMultiSpectating;

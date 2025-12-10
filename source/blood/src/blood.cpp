@@ -153,7 +153,7 @@ int gMultiWeapons = -1;
 int gMultiItems = -1;
 int gMultiSpawnLocation = -1;
 int gMultiSpawnProtection = -1;
-int gMultiRevive = -1;
+int gMultiSecondWind = -1;
 bool gMultiChaseView = false;
 bool gMultiHolstering = false;
 bool gMultiSpectating = false;
@@ -1459,7 +1459,7 @@ SWITCH switches[] = {
     { "mp_items", 54, 1 },
     { "mp_spawn", 55, 1 },
     { "mp_protect", 56, 1 },
-    { "mp_revive", 57, 1 },
+    { "mp_secwind", 57, 1 },
     { "mp_chaseview", 58, 0 },
     { "mp_holstering", 59, 0 },
     { "mp_spectating", 60, 0 },
@@ -1522,7 +1522,7 @@ void PrintHelp(void)
         "-mp_items [0-2]\tSet item settings for multiplayer (0: don't respawn, 1: respawn, 2: respawn with markers)\n"
         "-mp_spawn [0-2]\tSet the spawn location logic for multiplayer (0: random, 1: smart random, 2: distance)\n"
         "-mp_protect [0-3]\tSet the spawn protect length for multiplayer\n"
-        "-mp_revive [0-1]\tSet revive mode for multiplayer\n"
+        "-mp_secwind [0-1]\tSet second wind logic for multiplayer\n"
         "-mp_chaseview\tEnable chase view mode for multiplayer\n"
         "-mp_holstering\tEnable holstering for multiplayer\n"
         "-mp_spectating\tEnable spectating for multiplayer\n"
@@ -1872,10 +1872,10 @@ void ParseOptions(void)
                 ThrowError("Missing argument");
             gMultiSpawnProtection = ClipRange(atoi(OptArgv[0]), 0, 3);
             break;
-        case 57: // mp_revive
+        case 57: // mp_secwind
             if (OptArgc < 1)
                 ThrowError("Missing argument");
-            gMultiRevive = ClipRange(atoi(OptArgv[0]), 0, 1);
+            gMultiSecondWind = ClipRange(atoi(OptArgv[0]), 0, 1);
             break;
         case 58: // mp_chaseview
             gMultiChaseView = true;
