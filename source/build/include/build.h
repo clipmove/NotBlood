@@ -99,7 +99,7 @@ enum rendmode_t {
 #define MAXPLAYERS 16
 // Maximum number of component tiles in a multi-psky:
 #define MAXPSKYTILES 16
-#define MAXSPRITESONSCREEN 4096
+#define MAXSPRITESONSCREEN (4096<<1)
 #define MAXUNIQHUDID 256 //Extra slots so HUD models can store animation state without messing game sprites
 
 #define TSPR_TEMP 99
