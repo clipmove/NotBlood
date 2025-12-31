@@ -170,7 +170,7 @@ jobs:
         brew install sdl2 flac make
         brew unlink lz4
     - name: build
-      run: gmake -j2 blood tools
+      run: gmake -j2 blood tools NETCODE=0
     - name: 'prepare files for upload'
       run: |
         mkdir -p ./upload
