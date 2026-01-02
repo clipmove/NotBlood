@@ -699,6 +699,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->nEnemyBehavior = gEnemyBehavior;
         pOpt->bEnemyRandomTNT = gEnemyRandomTNT;
         pOpt->nWeaponsVer = gWeaponsVer;
+        pOpt->nAmmoScale = gAmmoScale;
         pOpt->bSectorBehavior = gSectorBehavior;
         pOpt->nHitscanProjectiles = gHitscanProjectiles;
         pOpt->nGoreBehavior = gGoreBehavior;
@@ -746,6 +747,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->nEnemyBehavior = gPacketStartGame.nEnemyBehavior;
         pOpt->bEnemyRandomTNT = gPacketStartGame.bEnemyRandomTNT;
         pOpt->nWeaponsVer = gPacketStartGame.nWeaponsVer;
+        pOpt->nAmmoScale = gPacketStartGame.nAmmoScale;
         pOpt->bSectorBehavior = gPacketStartGame.bSectorBehavior;
         pOpt->nHitscanProjectiles = gPacketStartGame.nHitscanProjectiles;
         pOpt->nGoreBehavior = gPacketStartGame.nGoreBehavior;

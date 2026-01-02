@@ -177,6 +177,7 @@ extern int gNapalmFalloff;
 extern int gEnemyBehavior;
 extern int gEnemyRandomTNT;
 extern int gWeaponsVer;
+extern int gAmmoScale;
 extern int gSectorBehavior;
 extern int gHitscanProjectiles;
 extern int gGoreBehavior;

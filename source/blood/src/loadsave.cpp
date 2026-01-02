@@ -280,6 +280,7 @@ void LoadSave::LoadGame(char *pzFile)
         gGameOptions.nEnemyBehavior = gEnemyBehavior;
         gGameOptions.bEnemyRandomTNT = gEnemyRandomTNT;
         gGameOptions.nWeaponsVer = gWeaponsVer;
+        gGameOptions.nAmmoScale = gAmmoScale;
         gGameOptions.bSectorBehavior = gSectorBehavior;
         gGameOptions.nHitscanProjectiles = gHitscanProjectiles;
         gGameOptions.nGoreBehavior = gGoreBehavior;
