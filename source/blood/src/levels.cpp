@@ -74,7 +74,8 @@ GAMEOPTIONS gSingleGameOptions = {
     0,     // bool bNapalmFalloff;
     0,     // int nEnemyBehavior;
     0,     // bool bEnemyRandomTNT;
-    1,     // int nWeaponsVer;
+    0,     // short nWeaponsVer;
+    0,     // short nAmmoScale;
     0,     // bool bSectorBehavior;
     0,     // char nHitscanProjectiles;
     0,     // char nGoreBehavior;

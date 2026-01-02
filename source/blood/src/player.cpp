@@ -1694,6 +1694,7 @@ char PickupItem(PLAYER *pPlayer, spritetype *pItem) {
 char PickupAmmo(PLAYER* pPlayer, spritetype* pAmmo) {
     AMMOITEMDATA* pAmmoItemData = &gAmmoItemData[pAmmo->type - kItemAmmoBase];
     int nAmmoType = pAmmoItemData->type;
+    const int nAmmoOld = pPlayer->ammoCount[nAmmoType];
 
     if (pPlayer->ammoCount[nAmmoType] >= gAmmoInfo[nAmmoType].max) return 0;
     #ifdef NOONE_EXTENSIONS
@@ -1705,6 +1706,28 @@ char PickupAmmo(PLAYER* pPlayer, spritetype* pAmmo) {
 
     if (pAmmoItemData->weaponType)  pPlayer->hasWeapon[pAmmoItemData->weaponType] = 1;
     sfxPlay3DSound(pPlayer->pSprite, 782, -1, 0);
+    if (gGameOptions.nAmmoScale && !VanillaMode())
+    {
+        const int nAmmoDiff = pPlayer->ammoCount[nAmmoType] - nAmmoOld;
+        switch (gGameOptions.nAmmoScale)
+        {
+        case 1: // 1.25x
+            pPlayer->ammoCount[nAmmoType] = ClipLow(pPlayer->ammoCount[nAmmoType] + ((nAmmoDiff>>1)>>1), 0);
+            break;
+        case 2: // 1.5x
+            pPlayer->ammoCount[nAmmoType] = ClipHigh(pPlayer->ammoCount[nAmmoType] + (nAmmoDiff>>1), gAmmoInfo[nAmmoType].max);
+            break;
+        case 3: // 0.25x
+            pPlayer->ammoCount[nAmmoType] = ClipLow(pPlayer->ammoCount[nAmmoType] - ((nAmmoDiff>>1)+(nAmmoDiff>>2)), 0);
+            break;
+        case 4: // 0.5x
+            pPlayer->ammoCount[nAmmoType] = ClipLow(pPlayer->ammoCount[nAmmoType] - (nAmmoDiff>>1), 0);
+            break;
+        case 5: // 0.75x
+            pPlayer->ammoCount[nAmmoType] = ClipLow(pPlayer->ammoCount[nAmmoType] - ((nAmmoDiff>>1)>>1), 0);
+            break;
+        }
+    }
     return 1;
 }
 
