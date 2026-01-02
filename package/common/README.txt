@@ -89,6 +89,8 @@ If you have the GOG version of the game, do the following:
    - Allows tesla projectiles to be reflected back with reflective shots powerup
    - While quad damage is active, the pitchfork's alt fire max charge will fire a missile
    - Voodoo doll alt fire attacks all targets visible on screen (like V1.X behavior) and consumes all ammo (only in single-player)
+* Ammo Pickup Scale
+   - Scales the amount given for ammo pickups
 * Sector behavior
    - Prevent missiles from colliding with water surface sectors
    - Fix water/blood droplets transitioning through underwater (e.g: the cave secret in CP01.MAP)

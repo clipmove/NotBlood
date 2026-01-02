@@ -196,6 +196,7 @@ int gNapalmFalloff;
 int gEnemyBehavior;
 int gEnemyRandomTNT;
 int gWeaponsVer;
+int gAmmoScale;
 int gSectorBehavior;
 int gHitscanProjectiles;
 int gGoreBehavior;
@@ -596,6 +597,7 @@ void CONFIG_SetDefaults(void)
     gEnemyBehavior = 1;
     gEnemyRandomTNT = 0;
     gWeaponsVer = 0;
+    gAmmoScale = 0;
     gSectorBehavior = 0;
     gHitscanProjectiles = 0;
     gGoreBehavior = 0;
@@ -935,6 +937,7 @@ int CONFIG_ReadSetup(void)
     SCRIPT_GetNumber(scripthandle, "Game Options", "EnemyBehavior", &gEnemyBehavior);
     SCRIPT_GetNumber(scripthandle, "Game Options", "EnemyRandomTNT", &gEnemyRandomTNT);
     SCRIPT_GetNumber(scripthandle, "Game Options", "WeaponsVer", &gWeaponsVer);
+    SCRIPT_GetNumber(scripthandle, "Game Options", "AmmoScale", &gAmmoScale);
     SCRIPT_GetNumber(scripthandle, "Game Options", "SectorBehavior", &gSectorBehavior);
     SCRIPT_GetNumber(scripthandle, "Game Options", "HitscanProjectiles", &gHitscanProjectiles);
     SCRIPT_GetNumber(scripthandle, "Game Options", "GoreBehavior", &gGoreBehavior);
@@ -1242,6 +1245,7 @@ void CONFIG_WriteSetup(uint32_t flags)
     SCRIPT_PutNumber(scripthandle, "Game Options", "EnemyBehavior", gEnemyBehavior, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "EnemyRandomTNT", gEnemyRandomTNT, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "WeaponsVer", gWeaponsVer, FALSE, FALSE);
+    SCRIPT_PutNumber(scripthandle, "Game Options", "AmmoScale", gAmmoScale, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "SectorBehavior", gSectorBehavior, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "HitscanProjectiles", gHitscanProjectiles, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "GoreBehavior", gGoreBehavior, FALSE, FALSE);
