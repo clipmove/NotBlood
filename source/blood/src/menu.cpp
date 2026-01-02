@@ -307,6 +307,7 @@ const char *pzAmmoScaleStrings[] = {
     "Original",
     "125%",
     "150%",
+    "25%",
     "50%",
     "75%",
 };
