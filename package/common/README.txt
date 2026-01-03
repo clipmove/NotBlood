@@ -285,7 +285,7 @@ If you have the GOG version of the game, do the following:
 * in_radialmenupitchinvert
    - Enable/disable invert radial menu pitch input
 * in_radialmenuclick
-   - Enable/disable radial menu sound effect click
+   - Set radial menu sound effect click (0-3)
 * in_targetaimassist
    - Enable/disable slowing camera movement when aiming towards a target (joystick only)
 * notarget
