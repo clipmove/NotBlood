@@ -741,9 +741,10 @@ int gWeaponRadialMenuChoice = -1;
 
 void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
 {
-    const char *sSfxSound = "runeuse";
-    const int nSfxVol = 42;
-    const int nSfxFreq = 14600;
+    const char *sSfxSound[3] = {"runeuse", "footstn1", "footstn2"};
+    const int nSfxVol[3] = {42, 44, 64};
+    const int nSfxFreq[3] = {14600, 11025, 11025};
+    const int nSfxChoice = (gRadialMenuSfx&3)-1;
     const char kWeaponSelectTable[12] = // angle to weapon slot
     {
         kWeaponSprayCan,
@@ -945,8 +946,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             if ((gWeaponRadialMenuChoice != nNewChoice) && WeaponIsEquipable(gMe, nNewChoice)) // if we have a new slot selected, check if it is valid and we have the weapon
             {
                 gWeaponRadialMenuChoice = nNewChoice;
-                if (gRadialMenuSfx)
-                    sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
+                if (nSfxChoice >= 0)
+                    sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
             }
         }
         else if ((klabs(nX) >= nThreshold) || (klabs(nY) >= nThreshold)) // above threshold, read from stick
@@ -970,8 +971,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             if ((nNewWeapon != gWeaponRadialMenuChoice) && WeaponIsEquipable(gMe, nNewWeapon)) // if we have a new slot selected, check if it is valid and we have the weapon
             {
                 gWeaponRadialMenuChoice = nNewWeapon;
-                if (gRadialMenuSfx)
-                    sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
+                if (nSfxChoice >= 0)
+                    sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
             }
             else if (nNewWeapon != gWeaponRadialMenuChoice) // new slot is unselectable, check neighbor slots
             {
@@ -988,14 +989,14 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                 {
                     if (bCanPickNext)
                     {
-                        if (gRadialMenuSfx && (gWeaponRadialMenuChoice != nChoiceNext))
-                            sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
+                        if ((nSfxChoice >= 0) && (gWeaponRadialMenuChoice != nChoiceNext))
+                            sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
                         gWeaponRadialMenuChoice = nChoiceNext;
                     }
                     else if (bCanPickPrev)
                     {
-                        if (gRadialMenuSfx && (gWeaponRadialMenuChoice != nChoicePrev))
-                            sndStartSample(sSfxSound, nSfxVol, -1, nSfxFreq);
+                        if ((nSfxChoice >= 0) && (gWeaponRadialMenuChoice != nChoicePrev))
+                            sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
                         gWeaponRadialMenuChoice = nChoicePrev;
                     }
                 }
