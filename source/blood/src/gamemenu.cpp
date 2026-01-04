@@ -2009,6 +2009,17 @@ void CGameMenuItemZEditBitmap::Draw(void)
     {
         shade = 32-((int)totalclock&63);
         char buffer[48];
+        struct Bstat st;
+        char sSaveName[32];
+        if (at28 < kLoadSaveSlotAutosave)
+            sprintf(sSaveName, "game00%02d.sav", at28&15);
+        else
+            sprintf(sSaveName, "gameautosave%01d.sav", (kLoadSaveSlotAutosave-at28)&1);
+        if (Bstat(sSaveName, &st) == 0)
+        {
+            sprintf(buffer, "%s", ctime(&st.st_mtime));
+            gMenuTextMgr.DrawText(buffer, m_nFont, 20, 43, 32, 0, true);
+        }
         if ((restoreGameDifficulty[at28] >= 0) && (restoreGameDifficulty[at28] <= 4))
             snprintf(buffer, sizeof(buffer), "DIFFICULTY: %s", zDiffStrings[restoreGameDifficulty[at28]]);
         else if (restoreGameDifficulty[at28] == 5)
