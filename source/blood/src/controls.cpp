@@ -747,8 +747,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     const int nSfxChoice = (gRadialMenuSfx&3)-1;
     const char kWeaponSelectTable[12] = // angle to weapon slot
     {
-        kWeaponSprayCan,
         kWeaponTNT,
+        kWeaponSprayCan,
         kWeaponShotgun,
         kWeaponTommy,
         kWeaponFlare,
@@ -767,8 +767,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         2,
         3,
         9,
-        1,
         0,
+        1,
         8,
         6,
         7,
