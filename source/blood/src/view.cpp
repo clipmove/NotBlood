@@ -1766,8 +1766,8 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
         { 559, 3,  0,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 3: shotgun
         { 558, 2,  0, -2, 0, -fix16_from_float(0.1f)+fix16_from_float(0.45f),  }, // 4: tommy gun
         { 526, 8,  0, -1, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 5: napalm launcher
-        { 589, 4, -1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.6875f),}, // 6: dynamite
-        { 618, 5,  0,  5, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 7: spray can
+        { 589, 5, -1,  4, 0, -fix16_from_float(0.1f)+fix16_from_float(0.6875f),}, // 6: dynamite
+        { 618, 4,  0,  5, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 7: spray can
         { 539, 9,  0, -6, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 8: tesla gun
         { 800, 11, 2,  0, 0, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 9: life leech
         { 525, 10, 2, -7, 1, -fix16_from_float(0.1f)+fix16_from_float(0.5f),   }, // 10: voodoo doll
