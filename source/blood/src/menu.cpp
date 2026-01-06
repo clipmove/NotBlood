@@ -1910,6 +1910,7 @@ void SetupOptionsMenu(void)
     itemOptionsGameLockSaving.bDisableForNet = 1;
     itemOptionsGameBoolVanillaMode.bDisableForNet = 1;
     itemOptionsGameSliderAutoAimRange.tooltip_pzTextUpper = "Set autoaim angle modifier";
+    itemOptionsGameSliderAutoAimRange.tooltip_pzTextLower = "(single-player only)";
     itemOptionsGameWeaponFastSwitch.tooltip_pzTextUpper = "Allow weapon switching while";
     itemOptionsGameWeaponFastSwitch.tooltip_pzTextLower = "weapon is being lowered/raised";
     itemOptionsGameAutosaveMode.tooltip_pzTextUpper = "Set when autosave will trigger";
