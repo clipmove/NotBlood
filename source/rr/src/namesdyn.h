@@ -1606,7 +1606,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define RRTILE2455__STATICRR -2455
 #define RRTILE2460__STATICRR -2460
 #define RRTILE2465__STATICRR -2465
-#define RRTILE2560__STATICRR -2560
 #define RRTILE2562__STATICRR -2562
 #define RRTILE2564__STATICRR -2564
 #define RRTILE2573__STATICRR -2573
@@ -3066,7 +3065,6 @@ extern int32_t RRTILE2451;
 extern int32_t RRTILE2455;
 extern int32_t RRTILE2460;
 extern int32_t RRTILE2465;
-extern int32_t RRTILE2560;
 extern int32_t RRTILE2562;
 extern int32_t RRTILE2564;
 extern int32_t RRTILE2573;

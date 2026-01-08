@@ -369,7 +369,6 @@ void G_OffBoat(DukePlayer_t *pPlayer)
         pPlayer->vel.y = 0;
         pPlayer->vel.x -= sintable[(fix16_to_int(pPlayer->q16ang)+512)&2047]<<7;
         pPlayer->vel.y -= sintable[fix16_to_int(pPlayer->q16ang)&2047]<<7;
-        pPlayer->moto_underwater = 0;
         j = A_Spawn(pPlayer->i, EMPTYBOAT);
         sprite[j].ang = fix16_to_int(pPlayer->q16ang);
         sprite[j].xvel += sintable[(fix16_to_int(pPlayer->q16ang)+512)&2047]<<7;
@@ -1974,7 +1973,7 @@ default_case:
             pSprite->xrepeat = 0;
             pSprite->yrepeat = 0;
             G_SetFog(2);
-            g_fogType = 1;
+            g_fogType = 2;
             break;
         case RRTILE6144__STATICRR:
             if (!RRRA) goto default_case;
@@ -4734,7 +4733,7 @@ rr_badguy:
             pSprite->yrepeat = 18;
             pSprite->clipdist = mulscale7(pSprite->xrepeat, tilesiz[pSprite->picnum].x);
             pSprite->owner = 100;
-            pSprite->cstat = 257;
+            pSprite->cstat |= 257;
             pSprite->lotag = 1;
             changespritestat(newSprite, 1);
             break;
@@ -4750,7 +4749,7 @@ rr_badguy:
             pSprite->yrepeat = 32;
             pSprite->clipdist = mulscale7(pSprite->xrepeat, tilesiz[pSprite->picnum].x);
             pSprite->owner = 20;
-            pSprite->cstat = 257;
+            pSprite->cstat |= 257;
             pSprite->lotag = 1;
             changespritestat(newSprite, 1);
             break;
@@ -5974,7 +5973,7 @@ skip:
                     )
                 {
                     if (DEER && klabs(sector[sect].ceilingheinum - sector[sect].floorheinum) > 576) continue;
-                    if (RRRA && sector[sect].lotag == 160) continue;
+                    if (RRRA && (sector[sect].lotag & 0xff) == 160) continue;
                     int const shadowZ = (DEER || (sector[sect].lotag & 0xff) > 2 || pSprite->statnum == STAT_PROJECTILE ||
                                    pSprite->statnum == STAT_MISC || pSprite->picnum == DRONE || (!RR && pSprite->picnum == COMMANDER))
                                   ? sector[sect].floorz

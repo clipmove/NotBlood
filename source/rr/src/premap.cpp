@@ -1028,6 +1028,7 @@ void P_ResetStatus(int playerNum)
                 pPlayer->on_motorcycle = 0;
                 pPlayer->gotweapon &= ~(1 << MOTORCYCLE_WEAPON);
                 pPlayer->curr_weapon = SLINGBLADE_WEAPON;
+                P_CheckWeapon(pPlayer);
             }
             pPlayer->lotag800kill = 0;
             pPlayer->moto_do_bump = 0;
@@ -1047,6 +1048,7 @@ void P_ResetStatus(int playerNum)
                 pPlayer->on_boat = 0;
                 pPlayer->gotweapon &= ~(1 << BOAT_WEAPON);
                 pPlayer->curr_weapon = SLINGBLADE_WEAPON;
+                P_CheckWeapon(pPlayer);
             }
             pPlayer->not_on_water = 0;
             pPlayer->sea_sick = 0;

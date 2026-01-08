@@ -3224,7 +3224,7 @@ static void Menu_PreDraw(MenuID_t cm, MenuEntry_t *entry, const vec2_t origin)
                                                                    "BURTON GILLIAM\n\n"
                                                                    "DAISY MAE\n"
                                                                    "TARA CHARENDOFF\n\n"
-                                                                   "BUBBA, BILLY RAY, SKINNY OL' COOT,\n"
+                                                                   "BUBBA, BILLY RAY JETER, SKINNY OL' COOT,\n"
                                                                    "FRANK THE BIKER, THE TURD MINION\n"
                                                                    "& ALL OTHER VARIOUS RAMBLINGS...\n"
                                                                    "DREW MARKHAM");
@@ -3250,7 +3250,7 @@ static void Menu_PreDraw(MenuID_t cm, MenuEntry_t *entry, const vec2_t origin)
                     mgametextcenter(origin.x, origin.y + (60<<16), "MUSIC\n\n"
                                                                    "DISGRACELAND\n"
                                                                    "TINY D & THE SOFA KINGS\n\n"
-                                                                   "BANJO AND GUITAR PICKIN\n"
+                                                                   "BANJO AND GUITAR PICKIN'\n"
                                                                    "JOHN SCHLOCKER\n"
                                                                    "HOWARD YEARWOOD");
                     break;

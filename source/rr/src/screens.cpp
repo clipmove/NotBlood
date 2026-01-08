@@ -2311,7 +2311,12 @@ static void G_DisplayMPResultsScreen(void)
     int32_t i, y, t = 0;
 
     rotatesprite_fs(160<<16, 100<<16, 65536L, 0, MENUSCREEN, 16, 0, 2+8+64+BGSTRETCH);
-    rotatesprite_fs(160<<16, 34<<16, RR ? 23592L : 65536L, 0, INGAMEDUKETHREEDEE, 0, 0, 10);
+    if (RRRA)
+        rotatesprite_fs(160<<16, 57<<16, 23592L, 0, THREEDEE, 0, 0, 10);
+    else if (RR)
+        rotatesprite_fs(160<<16, 24<<16, 23592L, 0, INGAMEDUKETHREEDEE, 0, 0, 10);
+    else
+        rotatesprite_fs(160<<16, 34<<16, 65536L, 0, INGAMEDUKETHREEDEE, 0, 0, 10);
     if (!RR && PLUTOPAK)   // JBF 20030804
         rotatesprite_fs((260)<<16, 36<<16, 65536L, 0, PLUTOPAKSPRITE+2, 0, 0, 2+8);
     gametext_center(58+(RR ? 0 : 2), "Multiplayer Totals");
@@ -3177,7 +3182,7 @@ void G_BonusScreenRRRA(int32_t bonusonly)
                     }
                 }
 
-                if (totalclock >= 1000000000 && totalclock < 1000000320)
+                if (totalclock >= 1000000000 && totalclock < 1000000730)
                 {
                     switch (((int32_t) totalclock>>4)%15)
                     {
@@ -3416,7 +3421,7 @@ void G_BonusScreenRRRA(int32_t bonusonly)
                 P_SetGamePalette(g_player[myconnectindex].ps, BASEPAL, 8+2+1);
                 Net_GetPackets();
                 break;
-            case 1:
+            default:
                 rotatesprite(0,0,65536,0,RRTILE8677+1,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
                 videoNextPage();
                 G_FadePalette(0, 0, 0, 0);

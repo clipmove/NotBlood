@@ -1736,7 +1736,7 @@ default_case:
             if (nSwitchPicnum >= MULTISWITCH && nSwitchPicnum <= MULTISWITCH + 3)
                 lotag += nSwitchPicnum - MULTISWITCH;
 
-            if (RRRA && nSwitchPicnum >= MULTISWITCH2 && nSwitchPicnum <= MULTISWITCH2 + 3)
+            else if (RRRA && nSwitchPicnum >= MULTISWITCH2 && nSwitchPicnum <= MULTISWITCH2 + 3)
                 lotag += nSwitchPicnum - MULTISWITCH2;
 
             for (bssize_t SPRITES_OF(STAT_EFFECTOR, spriteNum))
@@ -2601,7 +2601,7 @@ void A_DamageObject(int spriteNum, int const dmgSrc)
         PN(spriteNum) = RRTILE5086;
         A_PlaySound(GLASS_HEAVYBREAK, spriteNum);
         break;
-    case TECHLIGHTBUST2__STATICRR:
+    case TECHLIGHT4__STATICRR:
         if (!RRRA) goto default_case;
         PN(spriteNum) = TECHLIGHTBUST4;
         A_PlaySound(GLASS_HEAVYBREAK, spriteNum);
@@ -2807,7 +2807,7 @@ void A_DamageObject(int spriteNum, int const dmgSrc)
     case RRTILE8475__STATICRR:
         if (!RRRA) goto default_case;
         PN(spriteNum) = RRTILE5075;
-        A_PlaySound(GLASS_HEAVYBREAK, spriteNum);
+        A_PlaySound(472, spriteNum);
         break;
     case RRTILE8498__STATICRR:
         if (!RRRA) goto default_case;
@@ -4975,7 +4975,7 @@ void P_CheckSectors(int playerNum)
                             A_PlaySound(29, pPlayer->i);
                         else if (snd == 3)
                             A_PlaySound(257, pPlayer->i);
-                        else if (snd == 4)
+                        else
                             A_PlaySound(258, pPlayer->i);
                     }
                     return;
@@ -5113,7 +5113,7 @@ void P_CheckSectors(int playerNum)
                         soundPlayed = 1;
                     }
                     else if (S_CheckSoundPlaying(nearSprite, 445) == 0 && S_CheckSoundPlaying(nearSprite, 446) == 0
-                        && S_CheckSoundPlaying(nearSprite, 447) == 0 && soundPlayed == 0)
+                        && S_CheckSoundPlaying(nearSprite, 447) == 0 && soundPlayed)
                     {
                         if ((krand2()%2) == 1)
                             A_PlaySound(446, nearSprite);

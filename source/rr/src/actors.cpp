@@ -6853,7 +6853,7 @@ jib_code:
                 }
                 else
                 {
-                    if (RRRA || (pSprite->picnum == RRTILE2465 || pSprite->picnum == RRTILE2560))
+                    if (RRRA || (pSprite->picnum == RRTILE2465 || pSprite->picnum == RRTILE2460))
                         DELETE_SPRITE_AND_CONTINUE(spriteNum);
                     if (pData[2] == 0)
                     {
