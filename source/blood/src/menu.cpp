@@ -1197,11 +1197,12 @@ CGameMenuItemZBool itemOptionsControlRadialDimHUD("TRANSPARENT RADIAL:", 3, 66, 
 CGameMenuItemZBool itemOptionsControlRadialSlowDown("MENU SLOW DOWN:", 3, 66, 85, 180, 0, SetRadialMenuSlowDown, NULL, NULL);
 CGameMenuItemZCycle itemOptionsControlRadialSound("SOUND CLICK:", 3, 66, 95, 180, 0, SetRadialMenuSound, pzSoundClickStrings, ARRAY_SIZE(pzSoundClickStrings), 0);
 CGameMenuItemSlider itemOptionsControlRadialMouseThreshold("MOUSE THRESHOLD:", 3, 66, 105, 180, &gRadialMenuMouseThreshold, 0, 2048, 128, SetRadialMenuMouseThreshold, -1, -1, kMenuSliderPercent);
-CGameMenuItemSlider itemOptionsControlRadialThreshold("JOY THRESHOLD:", 3, 66, 115, 180, &gRadialMenuThreshold, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
-CGameMenuItemZCycle itemOptionsControlRadialYaw("JOY X AXIS:", 3, 66, 125, 180, 0, SetRadialMenuYaw, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
-CGameMenuItemZBool itemOptionsControlRadialYawInvert("JOY X INVERT:", 3, 66, 135, 180, 0, SetRadialMenuPitchInvert, NULL, NULL);
-CGameMenuItemZCycle itemOptionsControlRadialPitch("JOY Y AXIS:", 3, 66, 145, 180, 0, SetRadialMenuPitch, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
-CGameMenuItemZBool itemOptionsControlRadialPitchInvert("JOY Y INVERT:", 3, 66, 155, 180, 0, SetRadialMenuYawInvert, NULL, NULL);
+CGameMenuItemSlider itemOptionsControlRadialThresholdX("JOY X THRESHOLD:", 3, 66, 115, 180, &gRadialMenuThresholdX, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
+CGameMenuItemSlider itemOptionsControlRadialThresholdY("JOY Y THRESHOLD:", 3, 66, 125, 180, &gRadialMenuThresholdY, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
+CGameMenuItemZCycle itemOptionsControlRadialYaw("JOY X AXIS:", 3, 66, 135, 180, 0, SetRadialMenuYaw, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlRadialYawInvert("JOY X INVERT:", 3, 66, 145, 180, 0, SetRadialMenuPitchInvert, NULL, NULL);
+CGameMenuItemZCycle itemOptionsControlRadialPitch("JOY Y AXIS:", 3, 66, 155, 180, 0, SetRadialMenuPitch, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlRadialPitchInvert("JOY Y INVERT:", 3, 66, 165, 180, 0, SetRadialMenuYawInvert, NULL, NULL);
 
 void SetupNetworkMenu(void);
 void SetupNetworkHostMenu(CGameMenuItemChain *pItem);
@@ -2288,7 +2289,8 @@ void SetupControlsMenu(void)
     menuOptionsControlRadial.Add(&itemOptionsControlRadialSlowDown, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialSound, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialMouseThreshold, false);
-    menuOptionsControlRadial.Add(&itemOptionsControlRadialThreshold, false);
+    menuOptionsControlRadial.Add(&itemOptionsControlRadialThresholdX, false);
+    menuOptionsControlRadial.Add(&itemOptionsControlRadialThresholdY, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialYaw, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialYawInvert, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialPitch, false);
@@ -2302,7 +2304,8 @@ void SetupControlsMenu(void)
     itemOptionsControlRadialSlowDown.at20 = gRadialMenuSlowDown;
     itemOptionsControlRadialSound.m_nFocus = gRadialMenuSfx % ARRAY_SSIZE(pzSoundClickStrings);
     itemOptionsControlRadialMouseThreshold.nValue = gRadialMenuMouseThreshold;
-    itemOptionsControlRadialThreshold.nValue = gRadialMenuThreshold;
+    itemOptionsControlRadialThresholdX.nValue = gRadialMenuThresholdX;
+    itemOptionsControlRadialThresholdY.nValue = gRadialMenuThresholdY;
     itemOptionsControlRadialYaw.m_nFocus = gRadialMenuYaw % ARRAY_SSIZE(zRadialMenuAxes);
     itemOptionsControlRadialYawInvert.at20 = gRadialMenuYawInvert;
     itemOptionsControlRadialPitch.m_nFocus = gRadialMenuPitch % ARRAY_SSIZE(zRadialMenuAxes);
@@ -2850,7 +2853,9 @@ void SetRadialMenuMouseThreshold(CGameMenuItemSlider *pItem)
 
 void SetRadialMenuThreshold(CGameMenuItemSlider *pItem)
 {
-    gRadialMenuThreshold = pItem->nValue;
+    UNREFERENCED_PARAMETER(pItem);
+    gRadialMenuThresholdX = itemOptionsControlRadialThresholdX.nValue;
+    gRadialMenuThresholdY = itemOptionsControlRadialThresholdY.nValue;
 }
 
 void SetRadialMenuYaw(CGameMenuItemZCycle *pItem)
