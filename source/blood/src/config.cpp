@@ -532,9 +532,9 @@ void CONFIG_SetDefaults(void)
     gRadialMenuThresholdX = 384;
     gRadialMenuThresholdY = 256;
     gRadialMenuSlowDown = 1;
-    gRadialMenuYaw = 1;
+    gRadialMenuYaw = 0;
     gRadialMenuYawInvert = 0;
-    gRadialMenuPitch = 0;
+    gRadialMenuPitch = 1;
     gRadialMenuPitchInvert = 0;
     gRadialMenuSfx = 1;
     gCrouchToggle = 0;
