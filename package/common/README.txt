@@ -266,8 +266,10 @@ If you have the GOG version of the game, do the following:
    - Enable/disable the radial menu slow down behavior
 * in_radialmenumousethreshold
    - Sets the radial menu mouse threshold (0-2048)
-* in_radialmenuthreshold
-   - Sets the radial menu threshold (0-1024)
+* in_radialmenuthresholdx
+   - Sets the radial menu x threshold (0-1024)
+* in_radialmenuthresholdy
+   - Sets the radial menu y threshold (0-1024)
 * in_radialmenutoggle
    - Sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon)
 * in_radialmenuposition

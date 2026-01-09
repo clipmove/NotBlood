@@ -841,7 +841,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         break;
     }
 
-    int nThreshold;
+    int nThresholdX, nThresholdY;
     if (!nX && !nY) // no input, defaul to mouse input
     {
         nOldMouseY += pInput->mousey;
@@ -852,7 +852,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         nY = nOldMouseX>>2;
         if (MIRRORMODE & 1) // mirror mode (horiz), invert controls
             nY = -nY;
-        nThreshold = gRadialMenuMouseThreshold;
+        nThresholdX = nThresholdY = gRadialMenuMouseThreshold;
     }
     else
     {
@@ -860,7 +860,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             nX = -nX;
         if (gRadialMenuPitchInvert)
             nY = -nY;
-        nThreshold = gRadialMenuThreshold;
+        nThresholdX = gRadialMenuThresholdX;
+        nThresholdY = gRadialMenuThresholdY;
     }
 
     char bButton = BUTTON(gamefunc_Radial_Weapon_Menu);
@@ -950,7 +951,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                     sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
             }
         }
-        else if ((klabs(nX) >= nThreshold) || (klabs(nY) >= nThreshold)) // above threshold, read from stick
+        else if ((klabs(nX) >= nThresholdX) || (klabs(nY) >= nThresholdY)) // above threshold, read from stick
         {
             nNewChoice = getangle(nX, nY) * (12*5) / kAngMask;
             const int nChoiceRounded = nNewChoice%5;
@@ -1004,8 +1005,8 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         }
         else // player not moving stick above threshold or pressing next/previous weapon buttons - don't update selection
             break;
-        nOldMouseX = ClipRange(nOldMouseX, -nThreshold*2, nThreshold*2); // picked a slot, clamp mouse state
-        nOldMouseY = ClipRange(nOldMouseY, -nThreshold*2, nThreshold*2);
+        nOldMouseX = ClipRange(nOldMouseX, -nThresholdX*2, nThresholdX*2); // picked a slot, clamp mouse state
+        nOldMouseY = ClipRange(nOldMouseY, -nThresholdY*2, nThresholdY*2);
         break;
     }
     case 2:
