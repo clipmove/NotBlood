@@ -182,6 +182,7 @@ extern int gAmmoScale;
 extern int gSectorBehavior;
 extern int gHitscanProjectiles;
 extern int gGoreBehavior;
+extern int gPlayerModSpeed;
 extern int gRandomizerMode;
 extern int gRandomizerScaleMode;
 extern char gzRandomizerSeed[9];

@@ -76,7 +76,8 @@ struct GAMEOPTIONS {
     int nRandomizerCheat;
     int nEnemyQuantity;
     int nEnemyHealth;
-    int nEnemySpeed;
+    short nEnemySpeed;
+    short nPlayerSpeed;
     bool bEnemyShuffle;
     bool bPitchforkOnly;
     bool bPermaDeath;

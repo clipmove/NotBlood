@@ -116,6 +116,8 @@ If you have the GOG version of the game, do the following:
    - Increase random chance of wall splatter
    - Increase blood gib spawn rate upon explosions and hitscan
    - Make blood splatter effect be affected by explosive impulses
+* Player Speed
+   - Adjusts the player speed in 25% increments
 * Randomizer mode
    - Set the enemy/pickups randomizer mode
    - The randomizer does not support custom modern map enemies
