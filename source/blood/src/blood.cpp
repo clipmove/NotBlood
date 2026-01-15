@@ -703,6 +703,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->bSectorBehavior = gSectorBehavior;
         pOpt->nHitscanProjectiles = gHitscanProjectiles;
         pOpt->nGoreBehavior = gGoreBehavior;
+        pOpt->nPlayerSpeed = gPlayerModSpeed;
         pOpt->nRandomizerMode = gRandomizerMode;
         Bstrncpyz(pOpt->szRandomizerSeed, gzRandomizerSeed, sizeof(pOpt->szRandomizerSeed));
         pOpt->nRandomizerCheat = -1;
@@ -751,6 +752,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->bSectorBehavior = gPacketStartGame.bSectorBehavior;
         pOpt->nHitscanProjectiles = gPacketStartGame.nHitscanProjectiles;
         pOpt->nGoreBehavior = gPacketStartGame.nGoreBehavior;
+        pOpt->nPlayerSpeed = gPacketStartGame.nPlayerSpeed;
         pOpt->nRandomizerMode = gPacketStartGame.randomizerMode;
         Bstrncpyz(pOpt->szRandomizerSeed, gPacketStartGame.szRandomizerSeed, sizeof(pOpt->szRandomizerSeed));
         pOpt->nRandomizerCheat = -1;

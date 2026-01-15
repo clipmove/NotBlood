@@ -4729,6 +4729,11 @@ void MoveDude(spritetype *pSprite)
             vx = mulscale16(vx, (fix16_from_int(gGameOptions.nEnemySpeed)>>1) + fix16_from_int(1));
             vy = mulscale16(vy, (fix16_from_int(gGameOptions.nEnemySpeed)>>1) + fix16_from_int(1));
         }
+        else if (pPlayer && gGameOptions.nPlayerSpeed)
+        {
+            vx = mulscale16(vx, (fix16_from_int(gGameOptions.nPlayerSpeed)>>2) + fix16_from_int(1));
+            vy = mulscale16(vy, (fix16_from_int(gGameOptions.nPlayerSpeed)>>2) + fix16_from_int(1));
+        }
         vx >>= 12;
         vy >>= 12;
         if (pPlayer && gSonicMode && !VanillaMode()) // if sonic mode cheat is active

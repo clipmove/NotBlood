@@ -67,6 +67,7 @@ void SetAmmoScale(CGameMenuItemZCycle*);
 void SetSectorBehavior(CGameMenuItemZBool*);
 void SetHitscanProjectiles(CGameMenuItemZCycle*);
 void SetGoreMode(CGameMenuItemZCycle*);
+void SetPlayerSpeed(CGameMenuItemZCycle*);
 void SetRandomizerMode(CGameMenuItemZCycle*);
 void SetRandomizerSeed(CGameMenuItemZEdit *pItem, CGameMenuEvent *pEvent);
 
@@ -340,6 +341,14 @@ const char *pzEnemySpeeds[] = {
     "3.0x",
 };
 
+const char *pzPlayerSpeeds[] = {
+    "Default",
+    "1.25x",
+    "1.50x",
+    "1.75x",
+    "2.00x",
+};
+
 char zUserMapName[BMAX_PATH] = "";
 const char *zEpisodeNames[6];
 const char *zLevelNames[6][kMaxLevels];
@@ -585,19 +594,20 @@ CGameMenuItemZBool itemNetMonsterMotherSpiderHealth("MOTHER SPIDER HEALTH:", 3, 
 CGameMenuItemZBool itemNetMonsterTchernobogHealth("TCHERNOBOG HEALTH:", 3, 75, 178, 161, false, NULL, "FULL", "DEFAULT");
 
 ///////////////
-CGameMenuItemZBool itemNetMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X DAMAGE:", 3, 66, 40, 180, false, NULL, NULL, NULL);
-CGameMenuItemZCycle itemNetMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 50, 180, 0, NULL, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
-CGameMenuItemZCycle itemNetMutatorProjectileBehavior("PROJECTILES BEHAVIOR:", 3, 66, 60, 180, 0, NULL, pzProjectileBehaviorStrings, ARRAY_SSIZE(pzProjectileBehaviorStrings), 0);
-CGameMenuItemZBool itemNetMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 70, 180, false, NULL, NULL, NULL);
-CGameMenuItemZCycle itemNetMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 80, 180, false, NULL, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
-CGameMenuItemZBool itemNetMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 90, 180, false, NULL, NULL, NULL);
-CGameMenuItemZCycle itemNetMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 100, 180, 0, NULL, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
-CGameMenuItemZCycle itemNetMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 110, 180, 0, NULL, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
-CGameMenuItemZBool itemNetMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 120, 180, false, NULL, "NOTBLOOD", "ORIGINAL");
-CGameMenuItemZCycle itemNetMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 130, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
-CGameMenuItemZCycle itemNetMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 140, 180, 0, NULL, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
-CGameMenuItemZCycle itemNetMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 150, 180, 0, NULL, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
-CGameMenuItemZEdit itemNetMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 160, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
+CGameMenuItemZBool itemNetMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X DAMAGE:", 3, 66, 32, 180, false, NULL, NULL, NULL);
+CGameMenuItemZCycle itemNetMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 42, 180, 0, NULL, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
+CGameMenuItemZCycle itemNetMutatorProjectileBehavior("PROJECTILES BEHAVIOR:", 3, 66, 52, 180, 0, NULL, pzProjectileBehaviorStrings, ARRAY_SSIZE(pzProjectileBehaviorStrings), 0);
+CGameMenuItemZBool itemNetMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 62, 180, false, NULL, NULL, NULL);
+CGameMenuItemZCycle itemNetMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 72, 180, false, NULL, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
+CGameMenuItemZBool itemNetMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 82, 180, false, NULL, NULL, NULL);
+CGameMenuItemZCycle itemNetMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 92, 180, 0, NULL, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
+CGameMenuItemZCycle itemNetMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 102, 180, 0, NULL, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
+CGameMenuItemZBool itemNetMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 180, false, NULL, "NOTBLOOD", "ORIGINAL");
+CGameMenuItemZCycle itemNetMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
+CGameMenuItemZCycle itemNetMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 132, 180, 0, NULL, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
+CGameMenuItemZCycle itemNetMutatorPlayerSpeed("PLAYER SPEED:", 3, 66, 142, 180, 0, NULL, pzPlayerSpeeds, ARRAY_SSIZE(pzPlayerSpeeds), 0);
+CGameMenuItemZCycle itemNetMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 152, 180, 0, NULL, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
+CGameMenuItemZEdit itemNetMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 162, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
 ///////////////////
 
 CGameMenuItemText itemLoadingText("LOADING...", 1, 160, 100, 1);
@@ -741,19 +751,20 @@ void SetVanillaMode(CGameMenuItemZCycle *pItem);
 
 ///////////////
 CGameMenuItemTitle itemGameMutatorsTitle("MUTATORS", 1, 160, 20, 2038);
-CGameMenuItemZBool itemMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X DAMAGE:", 3, 66, 40, 180, false, SetQuadDamagePowerup, NULL, NULL);
-CGameMenuItemZCycle itemMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 50, 180, 0, SetDamageInvul, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
-CGameMenuItemZCycle itemMutatorProjectileBehavior("PROJECTILES BEHAVIOR:", 3, 66, 60, 180, 0, SetProjectileBehavior, pzProjectileBehaviorStrings, ARRAY_SSIZE(pzProjectileBehaviorStrings), 0);
-CGameMenuItemZBool itemMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 70, 180, false, SetNapalmFalloff, NULL, NULL);
-CGameMenuItemZCycle itemMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 80, 180, 0, SetEnemyBehavior, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
-CGameMenuItemZBool itemMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 90, 180, false, SetEnemyRandomTNT, NULL, NULL);
-CGameMenuItemZCycle itemMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 100, 180, 0, SetWeaponsVer, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
-CGameMenuItemZCycle itemMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 110, 180, 0, SetAmmoScale, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
-CGameMenuItemZBool itemMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 120, 180, false, SetSectorBehavior, "NOTBLOOD", "ORIGINAL");
-CGameMenuItemZCycle itemMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 130, 180, 0, SetHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
-CGameMenuItemZCycle itemMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 140, 180, 0, SetGoreMode, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
-CGameMenuItemZCycle itemMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 150, 180, 0, SetRandomizerMode, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
-CGameMenuItemZEdit itemMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 160, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
+CGameMenuItemZBool itemMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X DAMAGE:", 3, 66, 32, 180, false, SetQuadDamagePowerup, NULL, NULL);
+CGameMenuItemZCycle itemMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 42, 180, 0, SetDamageInvul, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
+CGameMenuItemZCycle itemMutatorProjectileBehavior("PROJECTILES BEHAVIOR:", 3, 66, 52, 180, 0, SetProjectileBehavior, pzProjectileBehaviorStrings, ARRAY_SSIZE(pzProjectileBehaviorStrings), 0);
+CGameMenuItemZBool itemMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 62, 180, false, SetNapalmFalloff, NULL, NULL);
+CGameMenuItemZCycle itemMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 72, 180, 0, SetEnemyBehavior, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
+CGameMenuItemZBool itemMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 82, 180, false, SetEnemyRandomTNT, NULL, NULL);
+CGameMenuItemZCycle itemMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 92, 180, 0, SetWeaponsVer, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
+CGameMenuItemZCycle itemMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 102, 180, 0, SetAmmoScale, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
+CGameMenuItemZBool itemMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 180, false, SetSectorBehavior, "NOTBLOOD", "ORIGINAL");
+CGameMenuItemZCycle itemMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, SetHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
+CGameMenuItemZCycle itemMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 132, 180, 0, SetGoreMode, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
+CGameMenuItemZCycle itemMutatorPlayerSpeed("PLAYER SPEED:", 3, 66, 142, 180, 0, SetPlayerSpeed, pzPlayerSpeeds, ARRAY_SSIZE(pzPlayerSpeeds), 0);
+CGameMenuItemZCycle itemMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 152, 180, 0, SetRandomizerMode, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
+CGameMenuItemZEdit itemMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 162, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
 ///////////////////
 
 CGameMenuItemTitle itemOptionsGameTitle("GAME SETUP", 1, 160, 20, 2038);
@@ -1649,6 +1660,7 @@ void SetupNetStartMenu(void)
     menuNetworkGameMutators.Add(&itemNetMutatorSectorBehavior, false);
     menuNetworkGameMutators.Add(&itemNetMutatorHitscanProjectiles, false);
     menuNetworkGameMutators.Add(&itemNetMutatorGoreBehavior, false);
+    menuNetworkGameMutators.Add(&itemNetMutatorPlayerSpeed, false);
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerMode, false);
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerSeed, false);
     menuNetworkGameMutators.Add(&itemBloodQAV, false);
@@ -1672,6 +1684,7 @@ void SetupNetStartMenu(void)
     itemNetMutatorHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
 #endif
     itemNetMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
+    itemNetMutatorPlayerSpeed.tooltip_pzTextUpper = "Adjusts the player speed";
     itemNetMutatorRandomizerMode.tooltip_pzTextUpper = "Set the randomizer's mode";
     itemNetMutatorRandomizerSeed.tooltip_pzTextUpper = "Set the randomizer's seed";
     itemNetMutatorRandomizerSeed.tooltip_pzTextLower = "No seed = always use a random seed";
@@ -1722,6 +1735,7 @@ void SetupNetStartMenu(void)
     itemNetMutatorSectorBehavior.at20 = !!gSectorBehavior;
     itemNetMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     itemNetMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
+    itemNetMutatorPlayerSpeed.m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
     itemNetMutatorRandomizerMode.m_nFocus = gRandomizerMode % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(szRandomizerSeedMenu, gzRandomizerSeed, sizeof(gPacketStartGame.szRandomizerSeed));
     ///////
@@ -1933,6 +1947,7 @@ void SetupOptionsMenu(void)
     menuOptionsGameMutators.Add(&itemMutatorSectorBehavior, false);
     menuOptionsGameMutators.Add(&itemMutatorHitscanProjectiles, false);
     menuOptionsGameMutators.Add(&itemMutatorGoreBehavior, false);
+    menuOptionsGameMutators.Add(&itemMutatorPlayerSpeed, false);
     menuOptionsGameMutators.Add(&itemMutatorRandomizerMode, false);
     menuOptionsGameMutators.Add(&itemMutatorRandomizerSeed, false);
     menuOptionsGameMutators.Add(&itemBloodQAV, false);
@@ -1957,6 +1972,7 @@ void SetupOptionsMenu(void)
     itemMutatorHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
 #endif
     itemMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
+    itemMutatorPlayerSpeed.tooltip_pzTextUpper = "Adjusts the player speed";
     itemMutatorRandomizerMode.tooltip_pzTextUpper = "Set the randomizer's mode";
     itemMutatorRandomizerSeed.tooltip_pzTextUpper = "Set the randomizer's seed";
     itemMutatorRandomizerSeed.tooltip_pzTextLower = "No seed = always use a random seed";
@@ -1986,6 +2002,7 @@ void SetupOptionsMenu(void)
     itemMutatorSectorBehavior.at20 = !!gSectorBehavior;
     itemMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     itemMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
+    itemMutatorPlayerSpeed.m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
     itemMutatorRandomizerMode.m_nFocus = gRandomizerMode % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(szRandomizerSeedMenu, gzRandomizerSeed, sizeof(szRandomizerSeedMenu));
     ///////
@@ -2669,6 +2686,16 @@ void SetGoreMode(CGameMenuItemZCycle *pItem)
         gGameOptions.nGoreBehavior = gGoreBehavior;
     } else {
         pItem->m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
+    }
+}
+
+void SetPlayerSpeed(CGameMenuItemZCycle *pItem)
+{
+    if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) {
+        gPlayerModSpeed = pItem->m_nFocus % ARRAY_SSIZE(pzPlayerSpeeds);
+        gGameOptions.nPlayerSpeed = gPlayerModSpeed;
+    } else {
+        pItem->m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
     }
 }
 
@@ -4683,6 +4710,7 @@ void StartNetGame(CGameMenuItemChain *pItem)
     gPacketStartGame.bSectorBehavior = itemNetMutatorSectorBehavior.at20;
     gPacketStartGame.nHitscanProjectiles = itemNetMutatorHitscanProjectiles.m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     gPacketStartGame.nGoreBehavior = itemNetMutatorGoreBehavior.m_nFocus % ARRAY_SSIZE(pzGoreStrings);
+    gPacketStartGame.nPlayerSpeed = itemNetMutatorPlayerSpeed.m_nFocus % ARRAY_SSIZE(pzPlayerSpeeds);
     gPacketStartGame.randomizerMode = itemNetMutatorRandomizerMode.m_nFocus % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(gPacketStartGame.szRandomizerSeed, szRandomizerSeedMenu, sizeof(gPacketStartGame.szRandomizerSeed));
     if (gPacketStartGame.szRandomizerSeed[0] == '\0') // if no seed entered, generate new one before sending packet
