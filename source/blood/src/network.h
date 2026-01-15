@@ -91,6 +91,7 @@ struct PKT_STARTGAME {
     bool bSectorBehavior;
     int nHitscanProjectiles;
     char nGoreBehavior;
+    char nPlayerSpeed;
     bool bFriendlyFire;
     bool bAutoTeams;
     char nSpawnProtection;

@@ -664,10 +664,24 @@ void fakeMoveDude(spritetype *pSprite)
     dassert(nSector >= 0 && nSector < kMaxSectors);
     if (predict.at5c || predict.at60)
     {
+        int vx = predict.at5c;
+        int vy = predict.at60;
+        if (gGameOptions.nEnemySpeed && !pPlayer) // if enemy speed modifier is enabled
+        {
+            vx = mulscale16(vx, (fix16_from_int(gGameOptions.nEnemySpeed)>>1) + fix16_from_int(1));
+            vy = mulscale16(vy, (fix16_from_int(gGameOptions.nEnemySpeed)>>1) + fix16_from_int(1));
+        }
+        else if (pPlayer && gGameOptions.nPlayerSpeed)
+        {
+            vx = mulscale16(vx, (fix16_from_int(gGameOptions.nPlayerSpeed)>>2) + fix16_from_int(1));
+            vy = mulscale16(vy, (fix16_from_int(gGameOptions.nPlayerSpeed)>>2) + fix16_from_int(1));
+        }
+        vx >>= 12;
+        vy >>= 12;
         if (pPlayer && gNoClip)
         {
-            predict.at50 += predict.at5c>>12;
-            predict.at54 += predict.at60>>12;
+            predict.at50 += vx;
+            predict.at54 += vy;
             if (!FindSector(predict.at50, predict.at54, &nSector))
                 nSector = predict.at68;
         }
@@ -675,7 +689,7 @@ void fakeMoveDude(spritetype *pSprite)
         {
             short bakCstat = pSprite->cstat;
             pSprite->cstat &= ~257;
-            predict.at75.hit = ClipMove(&predict.at50, &predict.at54, &predict.at58, &nSector, predict.at5c >> 12, predict.at60 >> 12, wd, tz, bz, CLIPMASK0);
+            predict.at75.hit = ClipMove(&predict.at50, &predict.at54, &predict.at58, &nSector, vx, vy, wd, tz, bz, CLIPMASK0);
             if (nSector == -1)
                 nSector = predict.at68;
                     
