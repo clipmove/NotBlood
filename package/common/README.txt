@@ -166,6 +166,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable multiplayer chat message beep
 * cl_dim
    - Enable/disable dimming background when menu is active
+* cl_ghostshutup
+   - Enable/disable reducing the screaming of ghost enemies
 * cl_interpolatemethod
    - Set view interpolation method (0: original [integer], 1: notblood [floating-point])"
 * cl_interpolateweapon

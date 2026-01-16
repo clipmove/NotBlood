@@ -89,6 +89,7 @@ extern int32_t gCalebTalk;
 extern int32_t gTeamsScoreStyle;
 extern int32_t gChatSnd;
 extern int32_t gColorMsg;
+extern int32_t gGhostScream;
 extern int32_t gHealthBlink;
 extern int32_t gKillObituary;
 extern int32_t gKillMsg;

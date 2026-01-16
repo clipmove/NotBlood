@@ -4729,7 +4729,7 @@ void MoveDude(spritetype *pSprite)
             vx = mulscale16(vx, (fix16_from_int(gGameOptions.nEnemySpeed)>>1) + fix16_from_int(1));
             vy = mulscale16(vy, (fix16_from_int(gGameOptions.nEnemySpeed)>>1) + fix16_from_int(1));
         }
-        else if (pPlayer && gGameOptions.nPlayerSpeed)
+        else if (pPlayer && gGameOptions.nPlayerSpeed && !VanillaMode())
         {
             vx = mulscale16(vx, (fix16_from_int(gGameOptions.nPlayerSpeed)>>2) + fix16_from_int(1));
             vy = mulscale16(vy, (fix16_from_int(gGameOptions.nPlayerSpeed)>>2) + fix16_from_int(1));
