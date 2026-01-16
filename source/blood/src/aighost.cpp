@@ -492,11 +492,15 @@ static void thinkChase(spritetype *pSprite, XSPRITE *pXSprite)
                     }
                     else if ((height2-height > 0x2000 || floorZ-bottom > 0x2000) && nDist < 0x1400 && nDist > 0x800)
                     {
-                        aiPlay3DSound(pSprite, 1600, AI_SFX_PRIORITY_1, -1);
+                        if (!gGhostScream || !QRandom2(2))
+                            aiPlay3DSound(pSprite, 1600, AI_SFX_PRIORITY_1, -1);
                         aiNewState(pSprite, pXSprite, &ghostSwoop);
                     }
                     else if ((height2-height < 0x2000 || floorZ-bottom < 0x2000) && klabs(nDeltaAngle) < 85)
-                        aiPlay3DSound(pSprite, 1600, AI_SFX_PRIORITY_1, -1);
+                    {
+                        if (!gGhostScream || !QRandom2(2))
+                            aiPlay3DSound(pSprite, 1600, AI_SFX_PRIORITY_1, -1);
+                    }
                     break;
                 }
             }

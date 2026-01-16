@@ -110,6 +110,7 @@ int32_t gCalebTalk;
 int32_t gTeamsScoreStyle;
 int32_t gChatSnd;
 int32_t gColorMsg;
+int32_t gGhostScream;
 int32_t gHealthBlink;
 int32_t gKillObituary;
 int32_t gKillMsg;
@@ -543,6 +544,7 @@ void CONFIG_SetDefaults(void)
     gTeamsScoreStyle = 1;
     gChatSnd = 1;
     gColorMsg = 1;
+    gGhostScream = 0;
     gHealthBlink = 1;
     gKillObituary = 1;
     gKillMsg = 1;
