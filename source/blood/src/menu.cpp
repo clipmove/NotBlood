@@ -2139,7 +2139,7 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewBoolPowerupStyle.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolPowerupStyle.tooltip_pzTextLower = "Set the display style for power-ups";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextUpper = "";
-    itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextLower = "Set the display style for power-ups";
+    itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextLower = "Set the display style for secrets";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextLower = "Reduce the speed of flickering sectors (e.g: E1M4)";
 
