@@ -2328,7 +2328,7 @@ void viewDrawSecret(void)
     }
     if (klabs((int)gFrameClock - nLastTick) < (kTicRate<<1))
     {
-        viewDrawText(0, "You've found a secret!", 160, 200-137, -128, 8, 1, 1, 0, 0);
+        viewDrawText(0, "You've found a secret!", 160, 50, -128, 2, 1, 1, 0, 0);
         return;
     }
     gSecretStyle = 2;
