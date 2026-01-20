@@ -230,6 +230,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable hud vanilla background image override (0: default, 1: use new tile, 2: use original tile)
 * hud_competitivemode
    - Enable/disable large hud frame for view size 4
+* hud_secretstyle
+   - Set secrets message style (0: original, 1: notblood, 2: gzdoom)
 * hud_stats
    - Set aspect ratio screen position for hud (0: native, 1: 4:3, 2: 16:10, 3: 16:9, 3: 21:9)
 * hud_statsautomaponly

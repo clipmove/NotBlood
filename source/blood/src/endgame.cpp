@@ -258,12 +258,17 @@ void CSecretMgr::Found(int nType)
     } else nSuperSecretsFound++;
 
     if (gGameOptions.nGameType == kGameTypeSinglePlayer) {
+        if (!VanillaMode() && (gSecretStyle >= 2)) {
+            if (gSecretStyle == 2)
+                gSecretStyle = 3;
+            return;
+        }
         switch (Random(2)) {
             case 0:
-                viewSetMessage("A secret is revealed.", VanillaMode() ? 0 : 8, MESSAGE_PRIORITY_SECRET); // 8: gold
+                viewSetMessage("A secret is revealed.", VanillaMode() || !gSecretStyle ? 0 : 8, MESSAGE_PRIORITY_SECRET); // 8: gold
                 break;
             case 1:
-                viewSetMessage("You found a secret.", VanillaMode() ? 0 : 8, MESSAGE_PRIORITY_SECRET); // 8: gold
+                viewSetMessage("You found a secret.", VanillaMode() || !gSecretStyle ? 0 : 8, MESSAGE_PRIORITY_SECRET); // 8: gold
                 break;
         }
     }
