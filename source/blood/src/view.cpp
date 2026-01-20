@@ -2316,6 +2316,25 @@ void viewDrawWinner(const char *pString, int nPal)
     return;
 }
 
+void viewDrawSecret(void)
+{
+    static int nLastTick = 0;
+    if (gGameOptions.nGameType != kGameTypeSinglePlayer || gSecretStyle < 3)
+        return;
+    if (gSecretStyle == 3)
+    {
+        nLastTick = (int)gFrameClock;
+        gSecretStyle = 4;
+    }
+    if (klabs((int)gFrameClock - nLastTick) < (kTicRate<<1))
+    {
+        viewDrawText(0, "You've found a secret!", 160, 200-137, -128, 8, 1, 1, 0, 0);
+        return;
+    }
+    gSecretStyle = 2;
+    return;
+}
+
 void UpdateStatusBar(ClockTicks arg)
 {
     PLAYER *pPlayer = gView;
@@ -2584,7 +2603,11 @@ void UpdateStatusBar(ClockTicks arg)
     if (gWeaponRadialMenuState > 0) // draw weapon radial menu over hud
         viewDrawWeaponRadialMenu(pPlayer, pXSprite, nPalette);
 
-    if (gGameOptions.nGameType == kGameTypeSinglePlayer) return;
+    if (gGameOptions.nGameType == kGameTypeSinglePlayer)
+    {
+        viewDrawSecret();
+        return;
+    }
 
     if (gGameOptions.nGameType >= kGameTypeBloodBath)
     {

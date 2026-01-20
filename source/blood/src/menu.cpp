@@ -734,6 +734,12 @@ const char *pzWeaponInterpolateStrings[] = {
     "ALL ANIMATION"
 };
 
+const char *pzSecretStyleStrings[] = {
+    "ORIGINAL",
+    "NOTBLOOD",
+    "GZDOOM"
+};
+
 void SetAutoAim(CGameMenuItemZCycle *pItem);
 void SetAutoAimRange(CGameMenuItemSlider *pItem);
 void SetAutoRun(CGameMenuItemZBool *pItem);
@@ -741,6 +747,7 @@ void SetLevelStats(CGameMenuItemZCycle *pItem);
 void SetLevelStatsOnAutomap(CGameMenuItemZBool *pItem);
 void SetPowerupDuration(CGameMenuItemZCycle *pItem);
 void SetPowerupStyle(CGameMenuItemZBool *pItem);
+void SetSecretStyle(CGameMenuItemZCycle *pItem);
 void SetShowMapTitle(CGameMenuItemZBool *pItem);
 void SetWeaponSwitch(CGameMenuItemZCycle *pItem);
 void SetWeaponFastSwitch(CGameMenuItemZBool *pItem);
@@ -878,17 +885,18 @@ CGameMenuItemSliderFloat itemOptionsDisplayColorVisibility("VISIBILITY:", 3, 66,
 CGameMenuItemChain itemOptionsDisplayColorReset("RESET TO DEFAULTS", 3, 66, 150, 180, 0, NULL, 0, ResetVideoColor, 0);
 
 CGameMenuItemTitle itemOptionsDisplayViewTitle("VIEW SETUP", 1, 160, 20, 2038);
-CGameMenuItemSlider itemOptionsDisplayViewHudSize("HUD SIZE:", 3, 66, 50, 180, &gViewSize, 0, 9, 1, SetHudSize, -1, -1, kMenuSliderValue);
-CGameMenuItemZCycle itemOptionsDisplayViewHudRatio("HUD ALIGNMENT:", 3, 66, 60, 180, 0, SetHudRatio, pzHudRatioStrings, ARRAY_SSIZE(pzHudRatioStrings), 0);
-CGameMenuItemZBool itemOptionsDisplayViewBoolCenterHoriz("CENTER HORIZON LINE:", 3, 66, 70, 180, gCenterHoriz, SetCenterHoriz, NULL, NULL);
-CGameMenuItemZBool itemOptionsDisplayViewBoolSlopeTilting("SLOPE TILTING:", 3, 66, 80, 180, gSlopeTilting, SetSlopeTilting, NULL, NULL);
-CGameMenuItemZBool itemOptionsDisplayViewBoolViewBobbing("VIEW BOBBING:", 3, 66, 90, 180, gViewVBobbing, SetViewBobbing, NULL, NULL);
-CGameMenuItemZBool itemOptionsDisplayViewBoolViewSwaying("VIEW SWAYING:", 3, 66, 100, 180, gViewHBobbing, SetViewSwaying, NULL, NULL);
-CGameMenuItemZCycle itemOptionsDisplayViewWeaponSwaying("WEAPON SWAYING:", 3, 66, 110, 180, 0, SetWeaponSwaying, pzWeaponHBobbingStrings, ARRAY_SSIZE(pzWeaponHBobbingStrings), 0);
-CGameMenuItemZCycle itemOptionsDisplayViewWeaponInterpolation("WEAPON SMOOTHING:", 3, 66, 120, 180, 0, SetWeaponInterpolate, pzWeaponInterpolateStrings, ARRAY_SSIZE(pzWeaponInterpolateStrings), 0);
-CGameMenuItemZBool itemOptionsDisplayViewBoolInterpolation("VIEW INTERPOLATE:", 3, 66, 130, 180, gViewInterpolateMethod, SetViewInterpolate, "MODERN", "ORIGINAL");
-CGameMenuItemZBool itemOptionsDisplayViewBoolLevelCompleteTime("LEVEL TIME AT INTERMISSION:", 3, 66, 140, 180, gShowCompleteTime, SetLevelCompleteTime, "SHOW", "HIDE");
-CGameMenuItemZBool itemOptionsDisplayViewBoolPowerupStyle("POWERUP STYLE:", 3, 66, 150, 180, gPowerupStyle, SetPowerupStyle, "NOTBLOOD", "NBLOOD");
+CGameMenuItemSlider itemOptionsDisplayViewHudSize("HUD SIZE:", 3, 66, 40, 180, &gViewSize, 0, 9, 1, SetHudSize, -1, -1, kMenuSliderValue);
+CGameMenuItemZCycle itemOptionsDisplayViewHudRatio("HUD ALIGNMENT:", 3, 66, 50, 180, 0, SetHudRatio, pzHudRatioStrings, ARRAY_SSIZE(pzHudRatioStrings), 0);
+CGameMenuItemZBool itemOptionsDisplayViewBoolCenterHoriz("CENTER HORIZON LINE:", 3, 66, 60, 180, gCenterHoriz, SetCenterHoriz, NULL, NULL);
+CGameMenuItemZBool itemOptionsDisplayViewBoolSlopeTilting("SLOPE TILTING:", 3, 66, 70, 180, gSlopeTilting, SetSlopeTilting, NULL, NULL);
+CGameMenuItemZBool itemOptionsDisplayViewBoolViewBobbing("VIEW BOBBING:", 3, 66, 80, 180, gViewVBobbing, SetViewBobbing, NULL, NULL);
+CGameMenuItemZBool itemOptionsDisplayViewBoolViewSwaying("VIEW SWAYING:", 3, 66, 90, 180, gViewHBobbing, SetViewSwaying, NULL, NULL);
+CGameMenuItemZCycle itemOptionsDisplayViewWeaponSwaying("WEAPON SWAYING:", 3, 66, 100, 180, 0, SetWeaponSwaying, pzWeaponHBobbingStrings, ARRAY_SSIZE(pzWeaponHBobbingStrings), 0);
+CGameMenuItemZCycle itemOptionsDisplayViewWeaponInterpolation("WEAPON SMOOTHING:", 3, 66, 110, 180, 0, SetWeaponInterpolate, pzWeaponInterpolateStrings, ARRAY_SSIZE(pzWeaponInterpolateStrings), 0);
+CGameMenuItemZBool itemOptionsDisplayViewBoolInterpolation("VIEW INTERPOLATE:", 3, 66, 120, 180, gViewInterpolateMethod, SetViewInterpolate, "MODERN", "ORIGINAL");
+CGameMenuItemZBool itemOptionsDisplayViewBoolLevelCompleteTime("LEVEL TIME AT INTERMISSION:", 3, 66, 130, 180, gShowCompleteTime, SetLevelCompleteTime, "SHOW", "HIDE");
+CGameMenuItemZBool itemOptionsDisplayViewBoolPowerupStyle("POWERUP STYLE:", 3, 66, 140, 180, gPowerupStyle, SetPowerupStyle, "NOTBLOOD", "NBLOOD");
+CGameMenuItemZCycle itemOptionsDisplayViewSecretMessageStyle("SECRET MESSAGE STYLE:", 3, 66, 150, 180, 0, SetSecretStyle, pzSecretStyleStrings, ARRAY_SSIZE(pzSecretStyleStrings), 0);
 CGameMenuItemZCycle itemOptionsDisplayViewMirrorMode("MIRROR MODE:", 3, 66, 160, 180, 0, SetMirrorMode, pzMirrorModeStrings, ARRAY_SSIZE(pzMirrorModeStrings), 0);
 CGameMenuItemZBool itemOptionsDisplayViewBoolSlowRoomFlicker("SLOW FLICKERING LIGHTS:", 3, 66, 170, 180, gSlowRoomFlicker, SetSlowRoomFlicker, NULL, NULL);
 
@@ -2115,6 +2123,7 @@ void SetupOptionsMenu(void)
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolInterpolation, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolLevelCompleteTime, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolPowerupStyle, false);
+    menuOptionsDisplayView.Add(&itemOptionsDisplayViewSecretMessageStyle, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewMirrorMode, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolSlowRoomFlicker, false);
     menuOptionsDisplayView.Add(&itemBloodQAV, false);
@@ -2129,6 +2138,8 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewBoolInterpolation.tooltip_pzTextLower = "Set interpolation method (original/integer or modern/float)";
     itemOptionsDisplayViewBoolPowerupStyle.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolPowerupStyle.tooltip_pzTextLower = "Set the display style for power-ups";
+    itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextUpper = "";
+    itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextLower = "Set the display style for power-ups";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextLower = "Reduce the speed of flickering sectors (e.g: E1M4)";
 
@@ -2142,6 +2153,7 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewBoolInterpolation.at20 = gViewInterpolateMethod;
     itemOptionsDisplayViewBoolLevelCompleteTime.at20 = gShowCompleteTime;
     itemOptionsDisplayViewBoolPowerupStyle.at20 = gPowerupStyle;
+    itemOptionsDisplayViewSecretMessageStyle.m_nFocus = gSecretStyle % ARRAY_SSIZE(pzSecretStyleStrings);
     itemOptionsDisplayViewMirrorMode.m_nFocus = r_mirrormode % ARRAY_SSIZE(pzMirrorModeStrings);
     itemOptionsDisplayViewBoolSlowRoomFlicker.at20 = gSlowRoomFlicker;
 
@@ -2968,6 +2980,11 @@ void SetPowerupStyle(CGameMenuItemZBool* pItem)
     gPowerupStyle = pItem->at20;
 }
 
+void SetSecretStyle(CGameMenuItemZCycle *pItem)
+{
+    gSecretStyle = pItem->m_nFocus % ARRAY_SSIZE(pzSecretStyleStrings);
+}
+
 void SetShowMapTitle(CGameMenuItemZBool* pItem)
 {
     gShowMapTitle = pItem->at20;
@@ -3033,6 +3050,7 @@ void SetGameVanillaMode(char nState)
     itemOptionsGameWeaponFastSwitch.bEnable = !gVanilla;
     itemOptionsGameBoolVanillaMode.m_nFocus = gVanilla % ARRAY_SSIZE(pzVanillaModeStrings);
     itemOptionsDisplayViewBoolInterpolation.bEnable = !gVanilla;
+    itemOptionsDisplayViewSecretMessageStyle.bEnable = !gVanilla;
     itemOptionsDisplayWeaponSelect.bEnable = !gVanilla;
     itemOptionsChainMutators.bEnable = !gVanilla;
     VanillaModeUpdate();
@@ -3307,6 +3325,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         gRestoreLastSave = 0;
         gPowerupDuration = 0;
         gPowerupStyle = 0;
+        gSecretStyle = 0;
         gShowCompleteTime = 0;
         gHudRatio = 1;
         gViewSize = 5;
@@ -3325,6 +3344,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         gAutosave = 0;
         gRestoreLastSave = 0;
         gPowerupStyle = 0;
+        gSecretStyle = 0;
         gShowCompleteTime = 0;
         gHudRatio = 0;
         gViewSize = 2;
@@ -3340,6 +3360,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
     itemOptionsGameRestoreLastSave.at20 = gRestoreLastSave;
     itemOptionsDisplayPowerupDuration.m_nFocus = gPowerupDuration;
     itemOptionsDisplayViewBoolPowerupStyle.at20 = gPowerupStyle;
+    itemOptionsDisplayViewSecretMessageStyle.m_nFocus = gSecretStyle;
     itemOptionsDisplayViewBoolLevelCompleteTime.at20 = gShowCompleteTime;
     itemOptionsDisplayViewHudRatio.m_nFocus = gHudRatio;
     itemOptionsDisplayViewHudSize.nValue = gViewSize;
