@@ -259,8 +259,10 @@ void CSecretMgr::Found(int nType)
 
     if (gGameOptions.nGameType == kGameTypeSinglePlayer) {
         if (!VanillaMode() && (gSecretStyle >= 2)) {
-            if (gSecretStyle == 2)
+            if (gSecretStyle == 2) {
+                sndStartSample("NOTBLOOD4", 92, -1, 11025);
                 gSecretStyle = 3;
+            }
             return;
         }
         switch (Random(2)) {
