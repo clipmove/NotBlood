@@ -136,6 +136,7 @@ int32_t gMessageState;
 int32_t gMessageCount;
 int32_t gMessageTime;
 int32_t gMessageFont;
+int32_t gSecretStyle;
 int32_t gShotgunAltFireReload;
 int32_t gGibNoClip;
 int32_t gStereo;
@@ -573,6 +574,7 @@ void CONFIG_SetDefaults(void)
     gMessageCount = 4;
     gMessageTime = 5;
     gMessageFont = 0;
+    gSecretStyle = 1;
     gShotgunAltFireReload = 0;
     gGibNoClip = 0;
     gStereo = 1;
