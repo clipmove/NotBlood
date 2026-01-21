@@ -895,6 +895,8 @@ static int osdcmd_say_team(osdcmdptr_t parm)
     const int nSecond = gLevelTime > 0 ? gLevelTime / kTicsPerSec : 0;
     if (!gGameStarted)
         OSD_Printf("say_team: game not started.\n");
+    else if (gGameOptions.nGameType != kGameTypeTeams)
+        OSD_Printf("say_team: team game not active.\n");
     else if (parm->parms[0][0] == '\0')
         return OSDCMD_SHOWHELP;
     else if (gLastSayTick == nSecond)
