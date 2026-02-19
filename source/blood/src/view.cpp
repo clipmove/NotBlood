@@ -1473,7 +1473,7 @@ void viewBurnTime(int gScale)
     }
 }
 
-#define kPowerUps 13
+#define kPowerUps 14
 
 const struct POWERUPDISPLAY {
     int nTile;
@@ -1496,6 +1496,7 @@ const struct POWERUPDISPLAY {
     {gPowerUpInfo[kPwUpShrinkShroom].picnum, fix16_from_float(0.4f), 4}, // shrink shroom
 
     {gPowerUpInfo[kPwUpDivingSuit].picnum, fix16_from_float(0.3f), 9}, // diving suit supply
+    {1131, fix16_from_float(0.32f), -1}, // underwater air supply
 };
 
 void viewDrawPowerUps(PLAYER* pPlayer)
@@ -1522,6 +1523,7 @@ void viewDrawPowerUps(PLAYER* pPlayer)
     nPowerActive[11] = pPlayer->pwUpTime[kPwUpShrinkShroom]; // shrink shroom
 
     nPowerActive[12] = pPlayer->isUnderwater && packItemActive(pPlayer, kPackDivingSuit) ? pPlayer->pwUpTime[kPwUpDivingSuit] : 0; // diving suit supply
+    nPowerActive[13] = pPlayer->isUnderwater && !packItemActive(pPlayer, kPackDivingSuit) ? ClipLow(pPlayer->underwaterTime, 1) : 0; // underwater air supply
 
     int nSortPower[kPowerUps+1];
     unsigned char nSortIndex[kPowerUps+1];
