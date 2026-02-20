@@ -240,6 +240,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable level statistics display (0: off, 1: on [default], 2: on [4:3], 3: on [16:10], 4: on [16:9], 5: on [21:9])
 * hud_powerupduration
    - Enable/disable displaying the remaining time for power-ups (0: off, 1: on [default], 2: on [4:3], 3: on [16:10], 4: on [16:9], 5: on [21:9])
+* hud_powerupdurationshowoxygen
+   - Enable/disable oxygen supply as a power-up
 * hud_powerupdurationstyle
    - Set the display style for the remaining time for power-ups (0: nblood, 1: notblood)
 * hud_powerupdurationticks

@@ -170,6 +170,7 @@ int32_t gHudBgScale;
 int32_t gHudBgVanilla;
 int32_t gHudCompetitiveMode;
 int32_t gPowerupDuration;
+int32_t gPowerupShowOxygenSupply;
 int32_t gPowerupStyle;
 int32_t gPowerupTicks;
 int32_t gShowCompleteTime;
@@ -472,6 +473,7 @@ void CONFIG_SetDefaults(void)
     gHudBgVanilla = 0;
     gHudCompetitiveMode = 0;
     gPowerupDuration = 4;
+    gPowerupShowOxygenSupply = 1;
     gPowerupStyle = 1;
     gPowerupTicks = 100;
     gShowCompleteTime = 1;
