@@ -55,7 +55,7 @@ extern char strRestoreGameStrings[][16];
 extern int restoreGameDifficulty[];
 extern const char *zDiffStrings[];
 extern char zUserMapName[BMAX_PATH];
-extern char zNetAddressBuffer[16];
+extern char zNetAddressBuffer[48];
 extern char zNetPortBuffer[6];
 void drawLoadingScreen(int nTile);
 void SetupMenus(void);

@@ -1229,7 +1229,7 @@ void SetupNetworkJoinMenu(CGameMenuItemChain *pItem);
 void NetworkHostGame(CGameMenuItemChain *pItem);
 void NetworkJoinGame(CGameMenuItemChain *pItem);
 
-char zNetAddressBuffer[16] = "localhost";
+char zNetAddressBuffer[48] = "localhost";
 char zNetPortBuffer[6] = "23513";
 
 CGameMenuItemTitle itemNetworkTitle("MULTIPLAYER", 1, 160, 20, 2038);
@@ -1243,7 +1243,7 @@ CGameMenuItemZEdit itemNetworkHostPort("NETWORK PORT:", 3, 66, 80, 180, zNetPort
 CGameMenuItemChain itemNetworkHostHost("HOST A GAME", 3, 66, 100, 180, 1, NULL, -1, NetworkHostGame, 0);
 
 CGameMenuItemTitle itemNetworkJoinTitle("JOIN A GAME", 1, 160, 20, 2038);
-CGameMenuItemZEdit itemNetworkJoinAddress("NETWORK ADDRESS:", 3, 66, 70, 180, zNetAddressBuffer, 16, 0, NULL, 0);
+CGameMenuItemZEdit itemNetworkJoinAddress("NETWORK ADDRESS:", 3, 66, 70, 180, zNetAddressBuffer, 48, 0, NULL, 0);
 CGameMenuItemZEdit itemNetworkJoinPort("NETWORK PORT:", 3, 66, 80, 180, zNetPortBuffer, 6, 0, NULL, 0);
 CGameMenuItemChain itemNetworkJoinJoin("JOIN A GAME", 3, 66, 100, 180, 1, NULL, -1, NetworkJoinGame, 0);
 

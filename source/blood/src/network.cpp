@@ -73,7 +73,7 @@ bool gNetNotifyProfileUpdate = false; // inform the user that their gProfile set
 bool gNetNotifySpectating = false; // inform every player that we're spectating
 
 NETWORKMODE gNetMode = NETWORK_NONE;
-char gNetAddress[32];
+char gNetAddress[48];
 // PORT-TODO: Use different port?
 int gNetPort = kNetDefaultPort;
 int gNetPortLocal = -1;
