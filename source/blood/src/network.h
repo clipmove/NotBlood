@@ -68,7 +68,7 @@ extern bool ready2send;
 extern bool gNetNotifyProfileUpdate;
 extern bool gNetNotifySpectating;
 extern NETWORKMODE gNetMode;
-extern char gNetAddress[32];
+extern char gNetAddress[48];
 extern int gNetPort;
 extern int gNetPortLocal;
 
