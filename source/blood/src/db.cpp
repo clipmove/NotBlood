@@ -868,6 +868,8 @@ int dbLoadMap(const char *pPath, int *pX, int *pY, int *pZ, short *pAngle, short
         }
         #endif
 
+    } else if ((header.version & 0xff00) == 0x600) {
+        // no-op
     } else {
         LOG_F(ERROR, "Map file is wrong version");
         gSysRes.Unlock(pNode);
