@@ -1940,7 +1940,7 @@ void SetupOptionsMenu(void)
     itemOptionsGameLockSaving.tooltip_pzTextUpper = "Disable manual saving/save scumming";
     itemOptionsGameRestoreLastSave.tooltip_pzTextUpper = "Prompt to restore last save game on death";
     itemOptionsGameBoolVanillaMode.tooltip_pzTextUpper = "Disable all non-vanilla features/mutators";
-    itemOptionsGameBoolVanillaMode.tooltip_pzTextLower = "(v1.21 DOS compatibility mode)";
+    itemOptionsGameBoolVanillaMode.tooltip_pzTextLower = "and restores bugs (v1.21 DOS compatibility mode)";
 
     //////////////////////
     menuOptionsGameMutators.Add(&itemGameMutatorsTitle, false);
