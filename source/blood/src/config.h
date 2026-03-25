@@ -151,6 +151,7 @@ extern int32_t gHudBgVanilla;
 extern int32_t gHudCompetitiveMode;
 extern int32_t gPowerupDuration;
 extern int32_t gPowerupShowOxygenSupply;
+extern int32_t gPowerupShowDivingSuit;
 extern int32_t gPowerupStyle;
 extern int32_t gPowerupTicks;
 extern int32_t gShowCompleteTime;
