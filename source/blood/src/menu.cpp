@@ -2175,13 +2175,13 @@ void SetupOptionsMenu(void)
 
     itemOptionsDisplayPowerupDuration.at20 = !!gPowerupDuration;
     itemOptionsDisplayPowerupPosition.m_nFocus = (gPowerupDuration-1) % ARRAY_SSIZE(pzHudRatioStrings);
-    itemOptionsDisplayPowerupPosition.bEnable = gPowerupDuration;
+    itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolPowerupStyle.at20 = gPowerupStyle;
-    itemOptionsDisplayBoolPowerupStyle.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolShowOxygen.at20 = gPowerupShowOxygenSupply;
-    itemOptionsDisplayBoolShowOxygen.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowOxygen.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolShowDivingSuit.at20 = gPowerupShowDivingSuit;
-    itemOptionsDisplayBoolShowDivingSuit.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowDivingSuit.bEnable = !!gPowerupDuration;
 
 #ifdef USE_OPENGL
     menuOptionsDisplayPolymost.Add(&itemOptionsDisplayPolymostTitle, false);
@@ -2998,10 +2998,10 @@ void SetLevelStatsOnAutomap(CGameMenuItemZBool *pItem)
 void SetPowerupDuration(CGameMenuItemZBool *pItem)
 {
     gPowerupDuration = pItem->at20;
-    itemOptionsDisplayPowerupPosition.bEnable = gPowerupDuration;
-    itemOptionsDisplayBoolPowerupStyle.bEnable = gPowerupDuration;
-    itemOptionsDisplayBoolShowOxygen.bEnable = gPowerupDuration;
-    itemOptionsDisplayBoolShowDivingSuit.bEnable = gPowerupDuration;
+    itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
+    itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
+    itemOptionsDisplayBoolShowOxygen.bEnable = !!gPowerupDuration;
+    itemOptionsDisplayBoolShowDivingSuit.bEnable = !!gPowerupDuration;
     viewResizeView(gViewSize);
 }
 
@@ -3398,12 +3398,12 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
     itemOptionsGameRestoreLastSave.at20 = gRestoreLastSave;
     itemOptionsDisplayPowerupDuration.at20 = gPowerupDuration;
     itemOptionsDisplayBoolPowerupStyle.at20 = gPowerupStyle;
-    itemOptionsDisplayBoolPowerupStyle.bEnable = gPowerupDuration;
-    itemOptionsDisplayPowerupPosition.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
+    itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolShowOxygen.at20 = gPowerupShowOxygenSupply;
-    itemOptionsDisplayBoolShowOxygen.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowOxygen.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolShowDivingSuit.at20 = gPowerupShowDivingSuit;
-    itemOptionsDisplayBoolShowDivingSuit.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowDivingSuit.bEnable = !!gPowerupDuration;
     itemOptionsDisplayViewSecretMessageStyle.m_nFocus = gSecretStyle;
     itemOptionsDisplayViewBoolLevelCompleteTime.at20 = gShowCompleteTime;
     itemOptionsDisplayViewHudRatio.m_nFocus = gHudRatio;
