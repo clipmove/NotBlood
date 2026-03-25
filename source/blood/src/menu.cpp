@@ -120,6 +120,8 @@ void SetWeaponSelectMode(CGameMenuItemZCycle *);
 void SetDetail(CGameMenuItemSlider *);
 void SetVoxels(CGameMenuItemZBool *);
 void SetFOV(CGameMenuItemSlider *);
+void SetOxygenSupply(CGameMenuItemZBool*);
+void SetDivingSuit(CGameMenuItemZBool*);
 void UpdateVideoModeMenuFrameLimit(CGameMenuItemZCycle *pItem);
 void UpdateVideoColorMenu(CGameMenuItemSliderFloat *);
 void UpdateVideoPaletteCycleMenu(CGameMenuItemZCycle *);
@@ -648,6 +650,7 @@ CGameMenu menuOptionsDisplay;
 CGameMenu menuOptionsDisplayView;
 CGameMenu menuOptionsDisplayColor;
 CGameMenu menuOptionsDisplayMode;
+CGameMenu menuOptionsDisplayPowerup;
 #ifdef USE_OPENGL
 CGameMenu menuOptionsDisplayPolymost;
 #endif
@@ -745,7 +748,8 @@ void SetAutoAimRange(CGameMenuItemSlider *pItem);
 void SetAutoRun(CGameMenuItemZBool *pItem);
 void SetLevelStats(CGameMenuItemZCycle *pItem);
 void SetLevelStatsOnAutomap(CGameMenuItemZBool *pItem);
-void SetPowerupDuration(CGameMenuItemZCycle *pItem);
+void SetPowerupDuration(CGameMenuItemZBool *pItem);
+void SetPowerupPosition(CGameMenuItemZCycle *pItem);
 void SetPowerupStyle(CGameMenuItemZBool *pItem);
 void SetSecretStyle(CGameMenuItemZCycle *pItem);
 void SetShowMapTitle(CGameMenuItemZBool *pItem);
@@ -794,12 +798,19 @@ CGameMenuItemZBool itemOptionsDisplayBoolVoxels("VOXELS:", 3, 66, 90, 180, 0, Se
 CGameMenuItemZCycle itemOptionsDisplayCrosshair("CROSSHAIR:", 3, 66, 100, 180, 0, SetCrosshair, pzCrosshairStrings, ARRAY_SSIZE(pzCrosshairStrings), 0);
 CGameMenuItemZCycle itemOptionsDisplayLevelStats("LEVEL STATS:", 3, 66, 110, 180, 0, SetLevelStats, pzStatsPowerupRatioStrings, ARRAY_SSIZE(pzStatsPowerupRatioStrings), 0);
 CGameMenuItemZBool itemOptionsDisplayLevelStatsOnAutomap("LEVEL STATS ON AUTOMAP ONLY:", 3, 66, 120, 180, gLevelStatsOnlyOnMap, SetLevelStatsOnAutomap, NULL, NULL);
-CGameMenuItemZCycle itemOptionsDisplayPowerupDuration("POWERUP DURATION:", 3, 66, 130, 180, 0, SetPowerupDuration, pzStatsPowerupRatioStrings, ARRAY_SSIZE(pzStatsPowerupRatioStrings), 0);
+CGameMenuItemChain itemOptionsDisplayPowerup("SETUP POWERUP DISPLAY", 3, 66, 130, 180, 0, &menuOptionsDisplayPowerup, -1, SetupVideoModeMenu, 0);
 CGameMenuItemZBool itemOptionsDisplayBoolShowMapTitle("MAP TITLE:", 3, 66, 140, 180, gShowMapTitle, SetShowMapTitle, NULL, NULL);
 CGameMenuItemZBool itemOptionsDisplayBoolMessages("MESSAGES:", 3, 66, 150, 180, gMessageState, SetMessages, NULL, NULL);
 CGameMenuItemZBool itemOptionsDisplayBoolWidescreen("WIDESCREEN:", 3, 66, 160, 180, r_usenewaspect, SetWidescreen, NULL, NULL);
 CGameMenuItemZCycle itemOptionsDisplayWeaponSelect("SHOW WEAPON SELECT:", 3, 66, 170, 180, 0, SetWeaponSelectMode, pzWeaponSelectStrings, ARRAY_SSIZE(pzWeaponSelectStrings), 0);
 CGameMenuItemSlider itemOptionsDisplayFOV("FOV:", 3, 66, 180, 180, &gFov, 75, 140, 1, SetFOV, -1, -1, kMenuSliderValue);
+
+CGameMenuItemTitle itemOptionsPowerupTitle("POWERUP DISPLAY", 1, 160, 20, 2038);
+CGameMenuItemZBool itemOptionsDisplayPowerupDuration("SHOW POWERUP DURATION:", 1, 18, 50, 280, 0, SetPowerupDuration, NULL, NULL);
+CGameMenuItemZCycle itemOptionsDisplayPowerupPosition("POWERUP POSITION:", 1, 18, 70, 280, 0, SetPowerupPosition, pzHudRatioStrings, ARRAY_SSIZE(pzHudRatioStrings), 0);
+CGameMenuItemZBool itemOptionsDisplayBoolPowerupStyle("POWERUP STYLE:", 1, 18, 90, 280, gPowerupStyle, SetPowerupStyle, "NOTBLOOD", "NBLOOD");
+CGameMenuItemZBool itemOptionsDisplayBoolShowOxygen("SHOW OXYGEN REMAINING:", 1, 18, 110, 280, gPowerupShowOxygenSupply, SetOxygenSupply, NULL, NULL);
+CGameMenuItemZBool itemOptionsDisplayBoolShowDivingSuit("SHOW DIVE SUIT USAGE:", 1, 18, 130, 280, gPowerupShowDivingSuit, SetDivingSuit, NULL, NULL);
 
 const char *pzRendererStrings[] = {
     "CLASSIC",
@@ -895,10 +906,9 @@ CGameMenuItemZCycle itemOptionsDisplayViewWeaponSwaying("WEAPON SWAYING:", 3, 66
 CGameMenuItemZCycle itemOptionsDisplayViewWeaponInterpolation("WEAPON SMOOTHING:", 3, 66, 110, 180, 0, SetWeaponInterpolate, pzWeaponInterpolateStrings, ARRAY_SSIZE(pzWeaponInterpolateStrings), 0);
 CGameMenuItemZBool itemOptionsDisplayViewBoolInterpolation("VIEW INTERPOLATE:", 3, 66, 120, 180, gViewInterpolateMethod, SetViewInterpolate, "MODERN", "ORIGINAL");
 CGameMenuItemZBool itemOptionsDisplayViewBoolLevelCompleteTime("LEVEL TIME AT INTERMISSION:", 3, 66, 130, 180, gShowCompleteTime, SetLevelCompleteTime, "SHOW", "HIDE");
-CGameMenuItemZBool itemOptionsDisplayViewBoolPowerupStyle("POWERUP STYLE:", 3, 66, 140, 180, gPowerupStyle, SetPowerupStyle, "NOTBLOOD", "NBLOOD");
-CGameMenuItemZCycle itemOptionsDisplayViewSecretMessageStyle("SECRET MESSAGE STYLE:", 3, 66, 150, 180, 0, SetSecretStyle, pzSecretStyleStrings, ARRAY_SSIZE(pzSecretStyleStrings), 0);
-CGameMenuItemZCycle itemOptionsDisplayViewMirrorMode("MIRROR MODE:", 3, 66, 160, 180, 0, SetMirrorMode, pzMirrorModeStrings, ARRAY_SSIZE(pzMirrorModeStrings), 0);
-CGameMenuItemZBool itemOptionsDisplayViewBoolSlowRoomFlicker("SLOW FLICKERING LIGHTS:", 3, 66, 170, 180, gSlowRoomFlicker, SetSlowRoomFlicker, NULL, NULL);
+CGameMenuItemZCycle itemOptionsDisplayViewSecretMessageStyle("SECRET MESSAGE STYLE:", 3, 66, 140, 180, 0, SetSecretStyle, pzSecretStyleStrings, ARRAY_SSIZE(pzSecretStyleStrings), 0);
+CGameMenuItemZCycle itemOptionsDisplayViewMirrorMode("MIRROR MODE:", 3, 66, 150, 180, 0, SetMirrorMode, pzMirrorModeStrings, ARRAY_SSIZE(pzMirrorModeStrings), 0);
+CGameMenuItemZBool itemOptionsDisplayViewBoolSlowRoomFlicker("SLOW FLICKERING LIGHTS:", 3, 66, 160, 180, gSlowRoomFlicker, SetSlowRoomFlicker, NULL, NULL);
 
 #ifdef USE_OPENGL
 const char *pzTextureModeStrings[] = {
@@ -2024,7 +2034,7 @@ void SetupOptionsMenu(void)
     menuOptionsDisplay.Add(&itemOptionsDisplayCrosshair, false);
     menuOptionsDisplay.Add(&itemOptionsDisplayLevelStats, false);
     menuOptionsDisplay.Add(&itemOptionsDisplayLevelStatsOnAutomap, false);
-    menuOptionsDisplay.Add(&itemOptionsDisplayPowerupDuration, false);
+    menuOptionsDisplay.Add(&itemOptionsDisplayPowerup, false);
     menuOptionsDisplay.Add(&itemOptionsDisplayBoolShowMapTitle, false);
     menuOptionsDisplay.Add(&itemOptionsDisplayBoolMessages, false);
     menuOptionsDisplay.Add(&itemOptionsDisplayBoolWidescreen, false);
@@ -2036,7 +2046,6 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayLevelStats.m_nFocus = gLevelStats % ARRAY_SSIZE(pzStatsPowerupRatioStrings);
     itemOptionsDisplayLevelStatsOnAutomap.at20 = gLevelStatsOnlyOnMap;
     itemOptionsDisplayLevelStatsOnAutomap.bEnable = !!gLevelStats;
-    itemOptionsDisplayPowerupDuration.m_nFocus = gPowerupDuration % ARRAY_SSIZE(pzStatsPowerupRatioStrings);
     itemOptionsDisplayBoolShowMapTitle.at20 = gShowMapTitle;
     itemOptionsDisplayBoolMessages.at20 = gMessageState;
     itemOptionsDisplayBoolWidescreen.at20 = r_usenewaspect;
@@ -2122,7 +2131,6 @@ void SetupOptionsMenu(void)
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewWeaponInterpolation, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolInterpolation, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolLevelCompleteTime, false);
-    menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolPowerupStyle, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewSecretMessageStyle, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewMirrorMode, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolSlowRoomFlicker, false);
@@ -2136,8 +2144,6 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewWeaponSwaying.tooltip_pzTextLower = "Set weapon sway (v1.0x alters tommy cultist behavior)";
     itemOptionsDisplayViewBoolInterpolation.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolInterpolation.tooltip_pzTextLower = "Set interpolation method (original/integer or modern/float)";
-    itemOptionsDisplayViewBoolPowerupStyle.tooltip_pzTextUpper = "";
-    itemOptionsDisplayViewBoolPowerupStyle.tooltip_pzTextLower = "Set the display style for power-ups";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextLower = "Set the display style for secrets";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextUpper = "";
@@ -2152,10 +2158,30 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewWeaponInterpolation.m_nFocus = gWeaponInterpolate % ARRAY_SSIZE(pzWeaponInterpolateStrings);
     itemOptionsDisplayViewBoolInterpolation.at20 = gViewInterpolateMethod;
     itemOptionsDisplayViewBoolLevelCompleteTime.at20 = gShowCompleteTime;
-    itemOptionsDisplayViewBoolPowerupStyle.at20 = gPowerupStyle;
     itemOptionsDisplayViewSecretMessageStyle.m_nFocus = gSecretStyle % ARRAY_SSIZE(pzSecretStyleStrings);
     itemOptionsDisplayViewMirrorMode.m_nFocus = r_mirrormode % ARRAY_SSIZE(pzMirrorModeStrings);
     itemOptionsDisplayViewBoolSlowRoomFlicker.at20 = gSlowRoomFlicker;
+
+    menuOptionsDisplayPowerup.Add(&itemOptionsPowerupTitle, false);
+    menuOptionsDisplayPowerup.Add(&itemOptionsDisplayPowerupDuration, true);
+    menuOptionsDisplayPowerup.Add(&itemOptionsDisplayPowerupPosition, false);
+    menuOptionsDisplayPowerup.Add(&itemOptionsDisplayBoolPowerupStyle, false);
+    menuOptionsDisplayPowerup.Add(&itemOptionsDisplayBoolShowOxygen, false);
+    menuOptionsDisplayPowerup.Add(&itemOptionsDisplayBoolShowDivingSuit, false);
+    menuOptionsDisplayPowerup.Add(&itemBloodQAV, false);
+    itemOptionsDisplayBoolPowerupStyle.tooltip_pzTextUpper = "Set the display style for power-ups";
+    itemOptionsDisplayBoolShowOxygen.tooltip_pzTextUpper = "Show oxygen supply while underwater";
+    itemOptionsDisplayBoolShowDivingSuit.tooltip_pzTextUpper = "Show diving suit usage while underwater";
+
+    itemOptionsDisplayPowerupDuration.at20 = !!gPowerupDuration;
+    itemOptionsDisplayPowerupPosition.m_nFocus = (gPowerupDuration-1) % ARRAY_SSIZE(pzHudRatioStrings);
+    itemOptionsDisplayPowerupPosition.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolPowerupStyle.at20 = gPowerupStyle;
+    itemOptionsDisplayBoolPowerupStyle.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowOxygen.at20 = gPowerupShowOxygenSupply;
+    itemOptionsDisplayBoolShowOxygen.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowDivingSuit.at20 = gPowerupShowDivingSuit;
+    itemOptionsDisplayBoolShowDivingSuit.bEnable = gPowerupDuration;
 
 #ifdef USE_OPENGL
     menuOptionsDisplayPolymost.Add(&itemOptionsDisplayPolymostTitle, false);
@@ -2969,9 +2995,19 @@ void SetLevelStatsOnAutomap(CGameMenuItemZBool *pItem)
     gLevelStatsOnlyOnMap = pItem->at20;
 }
 
-void SetPowerupDuration(CGameMenuItemZCycle* pItem)
+void SetPowerupDuration(CGameMenuItemZBool *pItem)
 {
-    gPowerupDuration = pItem->m_nFocus % ARRAY_SSIZE(pzStatsPowerupRatioStrings);
+    gPowerupDuration = pItem->at20;
+    itemOptionsDisplayPowerupPosition.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolPowerupStyle.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowOxygen.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowDivingSuit.bEnable = gPowerupDuration;
+    viewResizeView(gViewSize);
+}
+
+void SetPowerupPosition(CGameMenuItemZCycle *pItem)
+{
+    gPowerupDuration = (pItem->m_nFocus % ARRAY_SSIZE(pzHudRatioStrings))+1;
     viewResizeView(gViewSize);
 }
 
@@ -3325,6 +3361,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         gRestoreLastSave = 0;
         gPowerupDuration = 0;
         gPowerupStyle = 0;
+        gPowerupShowOxygenSupply = gPowerupShowDivingSuit = 0;
         gSecretStyle = 0;
         gShowCompleteTime = 0;
         gHudRatio = 1;
@@ -3344,6 +3381,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         gAutosave = 0;
         gRestoreLastSave = 0;
         gPowerupStyle = 0;
+        gPowerupShowOxygenSupply = gPowerupShowDivingSuit = 0;
         gSecretStyle = 0;
         gShowCompleteTime = 0;
         gHudRatio = 0;
@@ -3358,8 +3396,14 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
     itemOptionsGameWeaponSwitch.m_nFocus = gWeaponSwitch;
     itemOptionsGameAutosaveMode.m_nFocus = gAutosave;
     itemOptionsGameRestoreLastSave.at20 = gRestoreLastSave;
-    itemOptionsDisplayPowerupDuration.m_nFocus = gPowerupDuration;
-    itemOptionsDisplayViewBoolPowerupStyle.at20 = gPowerupStyle;
+    itemOptionsDisplayPowerupDuration.at20 = gPowerupDuration;
+    itemOptionsDisplayBoolPowerupStyle.at20 = gPowerupStyle;
+    itemOptionsDisplayBoolPowerupStyle.bEnable = gPowerupDuration;
+    itemOptionsDisplayPowerupPosition.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowOxygen.at20 = gPowerupShowOxygenSupply;
+    itemOptionsDisplayBoolShowOxygen.bEnable = gPowerupDuration;
+    itemOptionsDisplayBoolShowDivingSuit.at20 = gPowerupShowDivingSuit;
+    itemOptionsDisplayBoolShowDivingSuit.bEnable = gPowerupDuration;
     itemOptionsDisplayViewSecretMessageStyle.m_nFocus = gSecretStyle;
     itemOptionsDisplayViewBoolLevelCompleteTime.at20 = gShowCompleteTime;
     itemOptionsDisplayViewHudRatio.m_nFocus = gHudRatio;
@@ -3430,6 +3474,16 @@ void SetFOV(CGameMenuItemSlider *pItem)
 {
     gFov = pItem->nValue;
     viewUpdateSkyRatio();
+}
+
+void SetOxygenSupply(CGameMenuItemZBool *pItem)
+{
+    gPowerupShowOxygenSupply = pItem->at20;
+}
+
+void SetDivingSuit(CGameMenuItemZBool *pItem)
+{
+    gPowerupShowDivingSuit = pItem->at20;
 }
 
 void SetupVideoModeMenu(CGameMenuItemChain *pItem)
