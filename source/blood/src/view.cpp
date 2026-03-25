@@ -1522,7 +1522,7 @@ void viewDrawPowerUps(PLAYER* pPlayer)
     nPowerActive[10] = pPlayer->pwUpTime[kPwUpGrowShroom]; // grow shroom
     nPowerActive[11] = pPlayer->pwUpTime[kPwUpShrinkShroom]; // shrink shroom
 
-    nPowerActive[12] = pPlayer->isUnderwater && packItemActive(pPlayer, kPackDivingSuit) ? pPlayer->pwUpTime[kPwUpDivingSuit] : 0; // diving suit supply
+    nPowerActive[12] = !gPowerupShowDivingSuit ? 0 : pPlayer->isUnderwater && packItemActive(pPlayer, kPackDivingSuit) ? pPlayer->pwUpTime[kPwUpDivingSuit] : 0; // diving suit supply
     nPowerActive[13] = !gPowerupShowOxygenSupply ? 0 : pPlayer->isUnderwater && !packItemActive(pPlayer, kPackDivingSuit) ? ClipLow(pPlayer->underwaterTime, 1) : 0; // underwater air supply
 
     int nSortPower[kPowerUps+1];
