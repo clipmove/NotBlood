@@ -2174,7 +2174,7 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayBoolShowDivingSuit.tooltip_pzTextUpper = "Show diving suit usage while underwater";
 
     itemOptionsDisplayPowerupDuration.at20 = !!gPowerupDuration;
-    itemOptionsDisplayPowerupPosition.m_nFocus = (gPowerupDuration-1) % ARRAY_SSIZE(pzHudRatioStrings);
+    itemOptionsDisplayPowerupPosition.m_nFocus = gPowerupDuration ? (gPowerupDuration-1) % ARRAY_SSIZE(pzHudRatioStrings) : 0;
     itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolPowerupStyle.at20 = gPowerupStyle;
     itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
@@ -2998,6 +2998,8 @@ void SetLevelStatsOnAutomap(CGameMenuItemZBool *pItem)
 void SetPowerupDuration(CGameMenuItemZBool *pItem)
 {
     gPowerupDuration = pItem->at20;
+    if (gPowerupDuration)
+        gPowerupDuration = (itemOptionsDisplayPowerupPosition.m_nFocus % ARRAY_SSIZE(pzHudRatioStrings))+1;
     itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolShowOxygen.bEnable = !!gPowerupDuration;
