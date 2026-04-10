@@ -508,6 +508,8 @@ kAiStatePatrolMax,
 #define kPhysGravity 0x0002 // affected by gravity
 #define kPhysFalling 0x0004 // currently in z-motion
 
+#define kHitagNoModel 0x8000 // shows no voxel nor model
+
 // sector cstat
 #define kSecCParallax 0x01
 #define kSecCSloped 0x02

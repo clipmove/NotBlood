@@ -2475,6 +2475,19 @@ void actInit(bool bSaveLoad) {
         gUserItemsInitialized = 1;
     }
 
+    if (!bSaveLoad)
+    {
+        int i, s;
+        i = numsectors;
+        while (--i >= 0)
+        {
+            for (s = headspritesect[i]; s >= 0; s = nextspritesect[s])
+            {
+                if (sprite[s].flags & kHitagNoModel)
+                    spriteext[s].flags |= SPREXT_NOTMD;
+            }
+        }
+    }
     #endif
     
     for (int nSprite = headspritestat[kStatItem]; nSprite >= 0; nSprite = nextspritestat[nSprite]) {
