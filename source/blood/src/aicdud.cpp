@@ -436,16 +436,16 @@ static int weaponShotSummon(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D
     XSPRITE *pXShot, *pXSpr = pDude->pXSpr;
 
     int x = pSpr->x+dx, y = pSpr->y+dy, z = pSpr->z+dz, a = 0;
-    
+    int nRadius = (pWeap->data2 & 0x01) ? 0 : 32;
     int nDude = pWeap->id;
     if (pWeap->type == kCdudeWeaponSummonCdude)
         nDude = kDudeModernCustom;
 
-    nnExtOffsetPos(pOffs->x, ClipLow(pOffs->y, 800), pOffs->z, pSpr->ang, &x, &y, &z);
+    nnExtOffsetPos(pOffs->x, (pSpr->clipdist<<3) + pOffs->y, pOffs->z, pSpr->ang, &x, &y, &z);
 
     while (a < kAng180)
     {
-        if (!posObstructed(x, y, z, 32))
+        if (!posObstructed(x, y, z, nRadius))
         {
             if ((pShot = nnExtSpawnDude(pSpr, nDude, x, y, z)) != NULL)
             {
@@ -479,7 +479,10 @@ static int weaponShotSummon(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pWeap, POINT3D
                 aiActivateDude(pShot, pXShot);
 
                 pDude->slaves.list->Add(pShot->index);
-                gKillMgr.AddCount(pShot);
+                
+                if ((pWeap->data2 & 0x02) == 0)
+                    gKillMgr.AddCount(pShot);
+
                 return pShot->index;
             }
         }
@@ -2008,6 +2011,9 @@ static char posObstructed(int x, int y, int z, int nRadius)
     while (--i >= 0 && !inside(x, y, i));
     if (i < 0)
         return true;
+
+    if (nRadius == 0)
+        return false;
 
     for (i = 0; i < kMaxSprites; i++)
     {
