@@ -68,6 +68,7 @@ void _consoleSysMsg(const char* pMessage, ...);
 
 #define dassert(x) if (!(x)) __dassert(#x,__FILE__,__LINE__)
 
+#define LENGTH(x)           (sizeof(x) / sizeof(x[0]))
 
 #define kMaxSectors MAXSECTORS
 #define kMaxWalls MAXWALLS
