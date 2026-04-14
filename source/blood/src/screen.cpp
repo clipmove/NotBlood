@@ -100,7 +100,7 @@ RGB curDAC[256];
 RGB baseDAC[256];
 static RGB fromDAC[256];
 static RGB toRGB;
-static RGB *palTable[5];
+static RGB *palTable[kMaxPalettes];
 static int curPalette;
 static int curGamma;
 int gGammaLevels;
@@ -212,14 +212,32 @@ void scrLoadPalette(void)
     paletteInitClosestColorGrid();
     paletteloaded = 0;
     LOG_F(INFO, "Loading palettes");
-    for (int i = 0; i < 5; i++)
+    int i;
+    int nPal;
+    
+    DICTNODE* pPal;
+    for (i = 0; i < kMaxPalettes; i++)
     {
-        DICTNODE *pPal = gSysRes.Lookup(PAL[i].name, "PAL");
-        if (!pPal)
-            ThrowError("%s.PAL not found (RFF files may be wrong version)", PAL[i].name);
-        palTable[PAL[i].id] = (RGB*)gSysRes.Lock(pPal);
-        paletteSetColorTable(PAL[i].id, (uint8_t*)palTable[PAL[i].id]);
+        nPal = i;
+        if ((pPal = gSysRes.Lookup(i, "PAL")) == NULL)
+        {
+            if (i < LENGTH(PAL))
+            {
+                // some blood versions have palettes added without ID
+                if ((pPal = gSysRes.Lookup(PAL[i].name, "PAL")) == NULL)
+                    ThrowError("%s.PAL not found (RFF files may be wrong version)", PAL[i].name);
+                
+                nPal = PAL[i].id;
+            }
+
+            if (i == 0)
+                ThrowError("Palette ID #%d not found!", i);
+        }
+        
+        palTable[nPal] = (pPal) ? (RGB*)gSysRes.Lock(pPal) : palTable[0];
+        paletteSetColorTable(nPal, (uint8_t*)palTable[nPal]);
     }
+
     memcpy(palette, palTable[0], sizeof(palette));
     numshades = 64;
     paletteloaded |= PALETTE_MAIN;
@@ -243,7 +261,7 @@ void scrLoadPalette(void)
     paletteInitClosestColorMap((uint8_t*)palTable[0]);
     palettePostLoadTables();
     // Make color index 255 of palette black.
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < kMaxPalettes; i++)
     {
         if (basepaltable[i] != NULL)
             Bmemset(&basepaltable[i][255 * 3], 0, 3);
