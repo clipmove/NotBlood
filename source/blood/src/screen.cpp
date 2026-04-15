@@ -593,14 +593,14 @@ void scrCustomizePalette(int replacePal, char bUseCIEDE2000, char bGrayscale, ch
 
     for (int i = 0; i < kMaxPalettes; i++)
     {
-        if (!basepaltable[PAL[i].id]) // not initialized, should never happen
+        if (!basepaltable[i]) // not initialized, should never happen
             continue;
         if (!bHasBakPalTable)
-            memcpy(bakPalTable[PAL[i].id], palTable[PAL[i].id], sizeof(bakPalTable[0])); // create backup
+            memcpy(bakPalTable[i], palTable[i], sizeof(bakPalTable[0])); // create backup
         else
-            memcpy(palTable[PAL[i].id], bakPalTable[PAL[i].id], sizeof(bakPalTable[0])); // restore from backup
-        scrTweakPalette((uint8_t *)palTable[PAL[i].id], replacePal, bUseCIEDE2000, bGrayscale, bInvertPal, sizeof(bakPalTable[0]));
-        paletteSetColorTable(PAL[i].id, (uint8_t *)palTable[PAL[i].id]);
+            memcpy(palTable[i], bakPalTable[i], sizeof(bakPalTable[0])); // restore from backup
+        scrTweakPalette((uint8_t *)palTable[i], replacePal, bUseCIEDE2000, bGrayscale, bInvertPal, sizeof(bakPalTable[0]));
+        paletteSetColorTable(i, (uint8_t *)palTable[i]);
     }
     memcpy(palette, palTable[0], sizeof(palette));
     bHasBakPalTable = 1;
