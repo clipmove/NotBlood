@@ -588,10 +588,10 @@ static void scrTweakPalette(uint8_t *curPal, int replacePal, char bUseCIEDE2000,
 
 void scrCustomizePalette(int replacePal, char bUseCIEDE2000, char bGrayscale, char bInvertPal)
 {
-    static RGB bakPalTable[5][256];
+    static RGB bakPalTable[kMaxPalettes][256];
     static char bHasBakPalTable = 0;
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < kMaxPalettes; i++)
     {
         if (!basepaltable[PAL[i].id]) // not initialized, should never happen
             continue;
@@ -606,7 +606,7 @@ void scrCustomizePalette(int replacePal, char bUseCIEDE2000, char bGrayscale, ch
     bHasBakPalTable = 1;
 
     // Make color index 255 of palette black (or closest)
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < kMaxPalettes; i++)
     {
         if (!basepaltable[i])
             continue;
