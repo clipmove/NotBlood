@@ -50,7 +50,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //#define NNEXTS_USE_RES_SYS
 
 // CONSTANTS
-#define LENGTH(x)                           (int)(sizeof(x) / sizeof(x[0]))
 #define EVTIME2TICKS(x)                     ((x * 120) / 10)
 #define DELETE_AND_NULL(x)                  delete(x), x = NULL;
 
