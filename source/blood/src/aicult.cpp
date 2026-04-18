@@ -257,6 +257,24 @@ static void ThrowSeqCallback(int, int nXSprite)
             zvel[nSprite] = -1250000;
             return;
         }
+        else if (!Random(35) && !dbIsBannedSpriteType(kDudeRat)) // throw a rat
+        {
+            spritetype *pSpawn = actSpawnDude(pSprite, kDudeRat, pSprite->clipdist<<1, 0);
+            if (pSpawn)
+            {
+                gKillMgr.AddCount(pSpawn);
+                pSpawn->ang = pSprite->ang;
+                if (xspriRangeIsFine(pSpawn->extra)) // increase rat size for funnies
+                    xsprite[pSpawn->extra].scale = 512;
+                nSprite = pSprite->index;
+                int x = Cos(pSprite->ang)>>16;
+                int y = Sin(pSprite->ang)>>16;
+                xvel[pSpawn->index] = xvel[nSprite] + mulscale14(0x155555<<1, x);
+                yvel[pSpawn->index] = yvel[nSprite] + mulscale14(0x155555<<1, y);
+                zvel[pSpawn->index] = -1500000;
+                return;
+            }
+        }
     }
     char v4 = Chance(0x6000);
     sfxPlay3DSound(pSprite, 455, -1, 0);

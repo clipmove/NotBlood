@@ -75,7 +75,7 @@ If you have the GOG version of the game, do the following:
    - While quad damage is active, zombies will not be knocked down (single-player only)
 * Random cultist TNT
    - This will make cultists use a variety of random thrown sprites such as:
-   - Napalm balls, proxy bundles, armed spray cans or pod projectiles
+   - Napalm balls, proxy bundles, armed spray cans, pod projectiles or giant rats
 * Weapon behavior
    - Select between original weapon behavior, NBlood's V1.X behavior or NotBlood's tweaked weapon set which include:
    - Tommy gun alt fire uses autoaim
