@@ -911,11 +911,7 @@ void dbRandomizerMode(spritetype *pSprite)
         return;
     char bIsPartOfLevelScripting = 0;
     if (xspriRangeIsFine(pSprite->extra))
-    {
         bIsPartOfLevelScripting = xsprite[pSprite->extra].rxID > 0 || xsprite[pSprite->extra].txID > 0 || xsprite[pSprite->extra].command != kCmdOff;
-        if (bIsPartOfLevelScripting && IsDudeSprite(pSprite)) // this dude has a level event attached, leave them alone
-            return;
-    }
 
     if ((gGameOptions.nRandomizerMode >= 2) && (pSprite->type == kItemBeastVision)) // always replace beast vision if pickups or enemies+pickups mode
     {
@@ -1034,6 +1030,8 @@ void dbRandomizerMode(spritetype *pSprite)
 
     if (gGameOptions.nRandomizerMode & 1) // if enemies or enemies+weapons mode, randomize enemy
     {
+        if (bIsPartOfLevelScripting && IsDudeSprite(pSprite)) // this dude has a level event attached, leave them alone
+            return;
         switch (pSprite->type)
         {
         case kDudeInnocent:
@@ -1180,7 +1178,7 @@ void dbRandomizerMode(spritetype *pSprite)
     }
     if (gGameOptions.nRandomizerMode >= 2) // if pickups or enemies+pickups mode, randomize pickup
     {
-        const int nPicnumOrig = pSprite->picnum;
+        int16_t nNewType = -1, nNewPicnum = -1, nNewStatnum = -1;
         int nTopOrig, nBottomOrig;
         GetSpriteExtents(pSprite, &nTopOrig, &nBottomOrig);
 
@@ -1191,8 +1189,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemAmmoSprayCan, kItemWeaponTommygun, kItemWeaponTNT, kItemHealthLifeEssense};
             const int pickupsrngpicnum[] = {618, 558, 589, 2169};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemWeaponSawedoff:
@@ -1200,8 +1198,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemWeaponTommygun, kItemAmmoSprayCan, kItemAmmoTNTBox};
             const int pickupsrngpicnum[] = {558, 618, 809};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemWeaponTommygun:
@@ -1209,8 +1207,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemWeaponSawedoff, kItemWeaponFlarePistol, kItemAmmoTNTBox};
             const int pickupsrngpicnum[] = {559, 524, 809};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemAmmoTNTBox:
@@ -1218,8 +1216,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemAmmoSprayCan, kItemAmmoRemoteBombBundle, kItemAmmoTNTBox};
             const int pickupsrngpicnum[] = {618, 810, 809};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemWeaponTNT:
@@ -1230,8 +1228,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemAmmoSprayCan, kItemAmmoSawedoffFew, kItemAmmoTommygunFew};
             const int pickupsrngpicnum[] = {618, 619, 813};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemWeaponSprayCan:
@@ -1239,8 +1237,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemWeaponSawedoff, kItemAmmoTommygunFew};
             const int pickupsrngpicnum[] = {559, 813};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemWeaponVoodooDoll:
@@ -1249,8 +1247,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemWeaponLifeLeech, kItemWeaponNapalmLauncher, kItemWeaponSawedoff, kItemHealthLifeSeed, kItemTwoGuns, kItemReflectShots, kItemWeaponTeslaCannon};
             const int pickupsrngpicnum[] = {800, 526, 559, 2433, 829, 2428, 539};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemWeaponTeslaCannon:
@@ -1258,8 +1256,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemWeaponTommygun, kItemHealthLifeSeed, kItemShadowCloak, kItemReflectShots, kItemWeaponVoodooDoll};
             const int pickupsrngpicnum[] = {558, 2433, 896, 2428, 525};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemWeaponNapalmLauncher:
@@ -1269,8 +1267,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemTwoGuns, kItemReflectShots, kItemWeaponVoodooDoll};
             const int pickupsrngpicnum[] = {829, 2428, 525};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemHealthDoctorBag:
@@ -1278,8 +1276,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemHealthLifeEssense, kItemHealthLifeSeed, kItemAmmoSawedoffBox, kItemWeaponTeslaCannon};
             const int pickupsrngpicnum[] = {2169, 2433, 812, 539};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemAmmoFlares:
@@ -1287,8 +1285,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemAmmoSprayCan, kItemAmmoRemoteBombBundle, kItemAmmoTNTBundle, kItemAmmoSprayCan, kItemAmmoTNTBox, kItemAmmoGasolineCan};
             const int pickupsrngpicnum[] = {618, 810, 589, 618, 809, 801};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemAmmoSawedoffBox:
@@ -1296,8 +1294,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemAmmoTeslaCharge, kItemWeaponSawedoff, kItemAmmoSawedoffBox};
             const int pickupsrngpicnum[] = {548, 559, 812};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemAmmoSawedoffFew:
@@ -1305,8 +1303,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemAmmoRemoteBombBundle, kItemAmmoTeslaCharge, kItemAmmoTommygunDrum};
             const int pickupsrngpicnum[] = {810, 548, 817};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemAmmoTommygunFew:
@@ -1314,8 +1312,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemAmmoRemoteBombBundle, kItemAmmoTNTBundle, kItemAmmoSawedoffFew};
             const int pickupsrngpicnum[] = {810, 589, 619};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemArmorBasic:
@@ -1326,8 +1324,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemArmorBasic, kItemArmorBody, kItemArmorFire, kItemArmorSpirit, kItemArmorSuper, kItemHealthLifeEssense, kItemHealthLifeSeed, kItemTwoGuns, kItemReflectShots, kItemShadowCloak, kItemHealthDoctorBag};
             const int pickupsrngpicnum[] = {2628, 2586, 2578, 2602, 2594, 2169, 2433, 829, 2428, 896, 519};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kItemTwoGuns:
@@ -1336,8 +1334,8 @@ void dbRandomizerMode(spritetype *pSprite)
             const int pickupsrngtype[] = {kItemTwoGuns, kItemReflectShots};
             const int pickupsrngpicnum[] = {829, 2428};
             const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-            pSprite->type = pickupsrngtype[rng];
-            pSprite->picnum = pickupsrngpicnum[rng];
+            nNewType = pickupsrngtype[rng];
+            nNewPicnum = pickupsrngpicnum[rng];
             break;
         }
         case kThingObjectGib: // generic breakable objects
@@ -1364,9 +1362,9 @@ void dbRandomizerMode(spritetype *pSprite)
                     const int pickupsrngtype[] = {kItemAmmoSawedoffFew, kItemAmmoTommygunFew, kItemAmmoTNTBundle};
                     const int pickupsrngpicnum[] = {619, 813, 589};
                     const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-                    pSprite->type = pickupsrngtype[rng];
-                    pSprite->picnum = pickupsrngpicnum[rng];
-                    changespritestat(pSprite->index, kStatItem);
+                    nNewType = pickupsrngtype[rng];
+                    nNewPicnum = pickupsrngpicnum[rng];
+                    nNewStatnum = kStatItem;
                     break;
                 }
                 case 605: // glass bottle
@@ -1376,9 +1374,9 @@ void dbRandomizerMode(spritetype *pSprite)
                     const int pickupsrngtype[] = {kItemAmmoSawedoffFew, kItemAmmoTommygunFew, kItemAmmoTommygunDrum, kItemAmmoSawedoffBox, kItemAmmoTNTBox};
                     const int pickupsrngpicnum[] = {619, 813, 817, 812, 809};
                     const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-                    pSprite->type = pickupsrngtype[rng];
-                    pSprite->picnum = pickupsrngpicnum[rng];
-                    changespritestat(pSprite->index, kStatItem);
+                    nNewType = pickupsrngtype[rng];
+                    nNewPicnum = pickupsrngpicnum[rng];
+                    nNewStatnum = kStatItem;
                     break;
                 }
                 case 834: // montana jar
@@ -1390,9 +1388,9 @@ void dbRandomizerMode(spritetype *pSprite)
                     const int pickupsrngtype[] = {kItemHealthLifeEssense, kItemAmmoTommygunDrum, kItemAmmoSawedoffBox, kItemAmmoTNTBox};
                     const int pickupsrngpicnum[] = {2169, 817, 812, 809};
                     const int rng = dbRandomizerRNGThings(ARRAY_SSIZE(pickupsrngtype));
-                    pSprite->type = pickupsrngtype[rng];
-                    pSprite->picnum = pickupsrngpicnum[rng];
-                    changespritestat(pSprite->index, kStatItem);
+                    nNewType = pickupsrngtype[rng];
+                    nNewPicnum = pickupsrngpicnum[rng];
+                    nNewStatnum = kStatItem;
                     break;
                 }
                 case 563: // zombie barrel
@@ -1400,9 +1398,9 @@ void dbRandomizerMode(spritetype *pSprite)
                 {
                     if (dbRandomizerRNGThings(5)) // lower chance of replacing object
                         break;
-                    pSprite->type = kThingTNTBarrel; // replace with tnt barrel
-                    pSprite->picnum = 907;
-                    changespritestat(pSprite->index, kStatThing);
+                    nNewType = kThingTNTBarrel; // replace with tnt barrel
+                    nNewPicnum = 907;
+                    nNewStatnum = kStatThing;
                     break;
                 }
                 default:
@@ -1412,13 +1410,23 @@ void dbRandomizerMode(spritetype *pSprite)
         default:
             break;
         }
-
-        if (pSprite->picnum != nPicnumOrig) // if changed sprite type and picnum, readjust position
+        if (nNewType >= 0)
         {
+            if (dbIsBannedSpriteType(nNewType) && bIsPartOfLevelScripting) // if the new type is banned, and is part of the level scripting, don't change it
+                return;
+            pSprite->type = nNewType;
+        }
+        if (nNewPicnum >= 0) // if changed sprite type and picnum, readjust position
+        {
+            pSprite->picnum = nNewPicnum;
             int top, bottom;
             GetSpriteExtents(pSprite, &top, &bottom);
             if (bottom >= nBottomOrig)
                 pSprite->z -= bottom - nBottomOrig;
+        }
+        if (nNewStatnum >= 0)
+        {
+            changespritestat(pSprite->index, nNewStatnum);
         }
     }
 }
