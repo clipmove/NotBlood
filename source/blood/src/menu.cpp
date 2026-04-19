@@ -1417,8 +1417,22 @@ void SetupDifficultyMenu(void)
     menuBannedMonsters.Add(&itemBannedMonstersMotherSpiderHealth, false);
     menuBannedMonsters.Add(&itemBannedMonstersTchernobogHealth, false);
     menuBannedMonsters.Add(&itemBloodQAV, false);
-    itemBannedMonstersSpiders.tooltip_pzTextUpper = "";
-    itemBannedMonstersSpiders.tooltip_pzTextLower = "Mother spiders are not removed to avoid boss softlocks";
+    itemBannedMonstersBats.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersBats.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
+    itemBannedMonstersRats.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersRats.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
+    itemBannedMonstersFish.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersFish.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
+    itemBannedMonstersHands.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersHands.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
+    itemBannedMonstersGhosts.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersGhosts.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
+    itemBannedMonstersSpiders.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersSpiders.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
+    itemBannedMonstersTinyCaleb.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersTinyCaleb.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
+    itemBannedMonstersHellHounds.tooltip_pzTextUpper = "Enemies that are part of the level";
+    itemBannedMonstersHellHounds.tooltip_pzTextLower = " scripting (bosses, etc) will not be removed";
     itemBannedMonstersTchernobogHealth.tooltip_pzTextUpper = "";
     itemBannedMonstersTchernobogHealth.tooltip_pzTextLower = "Fix overflow health bug for Tchernobog";
 
