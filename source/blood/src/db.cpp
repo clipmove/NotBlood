@@ -1030,6 +1030,8 @@ void dbRandomizerMode(spritetype *pSprite)
 
     if (gGameOptions.nRandomizerMode & 1) // if enemies or enemies+weapons mode, randomize enemy
     {
+        int16_t nNewType = -1;
+        uint16_t nNewCstat = pSprite->cstat;
         if (bIsPartOfLevelScripting && IsDudeSprite(pSprite)) // this dude has a level event attached, leave them alone
             return;
         switch (pSprite->type)
@@ -1037,143 +1039,151 @@ void dbRandomizerMode(spritetype *pSprite)
         case kDudeInnocent:
         {
             const int enemiesrng[] = {kDudeBat, kDudeRat, kDudeZombieAxeNormal, kDudeGillBeast, kDudeHand, kDudeCultistShotgunProne};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeBat:
         {
             const int enemiesrng[] = {kDudeRat, kDudeZombieAxeLaying, kDudeHand, kDudeInnocent, kDudeCultistTNT, kDudePhantasm};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
-            pSprite->cstat &= ~CSTAT_SPRITE_YFLIP;
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewCstat &= ~CSTAT_SPRITE_YFLIP;
             break;
         }
         case kDudeRat:
         {
             const int enemiesrng[] = {kDudeBat, kDudeZombieAxeBuried, kDudeHand, kDudeTinyCaleb, kDudeSpiderBrown, kDudeSpiderRed};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeZombieAxeBuried:
         {
             const int enemiesrng[] = {kDudeSpiderRed, kDudeZombieAxeLaying, kDudeGillBeast, kDudeZombieButcher, kDudeCultistShotgun, kDudeCultistTommy, kDudeCultistTNT};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeZombieAxeLaying:
         {
             const int enemiesrng[] = {kDudeSpiderRed, kDudeZombieAxeBuried, kDudeGillBeast, kDudeZombieButcher, kDudeCultistShotgunProne, kDudeCultistTNT};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeZombieAxeNormal:
         {
             const int enemiesrng[] = {kDudeZombieAxeBuried, kDudeZombieAxeLaying, kDudeGillBeast, kDudeZombieButcher, kDudeCultistShotgun, kDudeCultistTommy, kDudeTinyCaleb, kDudeCultistTNT};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeBoneEel:
         {
             const int enemiesrng[] = {kDudeZombieAxeNormal, kDudeGillBeast, kDudeHand, kDudeCultistShotgunProne, kDudeInnocent, kDudeCultistTNT};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeGillBeast:
         {
             const int enemiesrng[] = {kDudeZombieAxeNormal, kDudeZombieAxeLaying, kDudeZombieButcher, kDudeCultistShotgun, kDudeCultistTommy, kDudeCultistTNT, kDudeGargoyleFlesh, kDudeCultistShotgunProne, kDudeCultistTesla};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeZombieButcher:
         {
             const int enemiesrng[] = {kDudeZombieAxeNormal, kDudeZombieAxeLaying, kDudeGillBeast, kDudeCultistShotgun, kDudeCultistTommy, kDudeCultistTNT, kDudeGargoyleFlesh, kDudePhantasm, kDudeCultistShotgunProne, kDudeHellHound, kDudeCultistTommyProne, kDudeCultistTesla};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeSpiderBrown:
         case kDudeSpiderRed:
         {
             const int enemiesrng[] = {kDudeHand, kDudeTinyCaleb, kDudeCultistTNT, kDudeHellHound, kDudeCultistTommyProne, kDudeCultistShotgunProne};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeSpiderBlack:
         {
             const int enemiesrng[] = {kDudeCultistTNT, kDudeGargoyleFlesh, kDudeCultistShotgunProne, kDudeHellHound, kDudeCultistTommyProne, kDudeCultistTesla, kDudeSpiderMother};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudePhantasm:
         {
             const int enemiesrng[] = {kDudeBat, kDudeHellHound, kDudeZombieButcher, kDudeCultistTNT, kDudeCultistTommyProne, kDudeGillBeast};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeHand:
         case kDudeTinyCaleb:
         {
             const int enemiesrng[] = {kDudeSpiderBrown, kDudeSpiderRed, kDudeCultistTNT, kDudePhantasm, kDudeHellHound, kDudeCultistTommyProne, kDudeCultistShotgunProne, kDudeGillBeast, kDudeZombieAxeLaying};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeTentacleGreen:
         case kDudeTentacleFire:
         {
             const int enemiesrng[] = {kDudePodFire, kDudePodGreen, kDudeCultistShotgunProne, kDudeCultistTommyProne, kDudeZombieAxeBuried};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeCultistShotgun:
         case kDudeCultistTommy:
         {
             const int enemiesrng[] = {kDudeInnocent, kDudeZombieAxeBuried, kDudeZombieAxeNormal, kDudeGillBeast, kDudeCultistTesla, kDudeCultistTNT, kDudeCultistShotgun, kDudeCultistShotgunProne, kDudeCultistTommyProne};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeCultistShotgunProne:
         case kDudeCultistTommyProne:
         {
             const int enemiesrng[] = {kDudeGillBeast, kDudeZombieAxeLaying, kDudeSpiderBlack, kDudeCultistShotgun, kDudeCultistTommy, kDudeCultistTNT, kDudeHellHound, kDudeCultistTesla};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeCultistTNT:
         {
             const int enemiesrng[] = {kDudeZombieAxeNormal, kDudeGillBeast, kDudeZombieAxeLaying, kDudeCultistTommy, kDudeCultistShotgunProne, kDudeHellHound, kDudeCultistTommyProne, kDudeCultistTesla};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeGargoyleFlesh:
         {
             const int enemiesrng[] = {kDudeBat, kDudeCultistTNT, kDudeHellHound, kDudeCultistTommyProne, kDudeCultistTesla};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeHellHound:
         {
             const int enemiesrng[] = {kDudeCultistTNT, kDudeCultistTommyProne, kDudeCultistTesla, kDudeGargoyleFlesh};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeCultistTesla:
         {
             const int enemiesrng[] = {kDudeCultistTesla, kDudeCultistTesla, kDudeCultistTesla, kDudeGargoyleStone, kDudeCerberusOneHead, kDudeCultistTommyProne, kDudeCultistTNT};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         case kDudeCerberusOneHead:
         case kDudeCerberusTwoHead:
         {
             const int enemiesrng[] = {kDudeCerberusTwoHead, kDudeGargoyleStone, kDudeTchernobog, kDudeHellHound, kDudeBeast};
-            pSprite->type = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
+            nNewType = enemiesrng[dbRandomizerRNGDudes(ARRAY_SSIZE(enemiesrng))];
             break;
         }
         default:
             break;
         }
-        if (pSprite->type == kDudeGargoyleFlesh || pSprite->type == kDudeGargoyleStone || pSprite->type == kDudeBat) // set the correct flags needed for flying enemies
-            pSprite->flags &= ~kPhysGravity;
-        else
-            pSprite->flags |= kPhysGravity;
+
+        if (nNewType >= 0)
+        {
+            if (bIsPartOfLevelScripting && dbIsBannedSpriteType(nNewType)) // if the new type is banned, and is part of the level scripting, abort
+                return;
+            pSprite->type = nNewType;
+            pSprite->cstat = nNewCstat;
+            if (pSprite->type == kDudeGargoyleFlesh || pSprite->type == kDudeGargoyleStone || pSprite->type == kDudeBat) // set the correct flags needed for flying enemies
+                pSprite->flags &= ~kPhysGravity;
+            else
+                pSprite->flags |= kPhysGravity;
+        }
         pSprite->pal = 0;
     }
     if (gGameOptions.nRandomizerMode >= 2) // if pickups or enemies+pickups mode, randomize pickup
@@ -1412,7 +1422,7 @@ void dbRandomizerMode(spritetype *pSprite)
         }
         if (nNewType >= 0)
         {
-            if (dbIsBannedSpriteType(nNewType) && bIsPartOfLevelScripting) // if the new type is banned, and is part of the level scripting, don't change it
+            if (bIsPartOfLevelScripting && dbIsBannedSpriteType(nNewType)) // if the new type is banned, and is part of the level scripting, don't change it
                 return;
             pSprite->type = nNewType;
         }
