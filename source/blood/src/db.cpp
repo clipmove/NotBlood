@@ -734,7 +734,7 @@ char dbIsBannedSpriteType(int nType)
     if (!bBanned && (nBannedType&BANNED_GHOSTS))
         bBanned = nType == kDudePhantasm;
     if (!bBanned && (nBannedType&BANNED_SPIDERS))
-        bBanned = (nType == kDudeSpiderBrown) || (nType == kDudeSpiderRed) || (nType == kDudeSpiderBlack);
+        bBanned = (nType == kDudeSpiderBrown) || (nType == kDudeSpiderRed) || (nType == kDudeSpiderBlack) || (nType == kDudeSpiderMother);
     if (!bBanned && (nBannedType&BANNED_TCALEBS))
         bBanned = nType == kDudeTinyCaleb;
     if (!bBanned && (nBannedType&BANNED_HHOUNDS))
@@ -795,8 +795,11 @@ char dbIsBannedSprite(spritetype *pSprite, XSPRITE* pXSprite)
 {
     if (gGameOptions.uSpriteBannedFlags == BANNED_NONE) // no sprites banned, return
         return 0;
+    const char bIsDude = IsDudeSprite(pSprite);
+    if (pXSprite && bIsDude && ((pXSprite->rxID > 0) || (pXSprite->txID > 0) || (pXSprite->command != kCmdOff))) // this dude has a level event attached, leave them alone
+        return 0;
     const char bRemove = dbIsBannedSpriteType(pSprite->type);
-    if (bRemove && IsDudeSprite(pSprite) && pXSprite)
+    if (bRemove && bIsDude && pXSprite)
     {
         if (pXSprite->key > 0) // drop key
             actDropObject(pSprite, kItemKeyBase + (pXSprite->key - 1));
@@ -906,6 +909,13 @@ void dbRandomizerMode(spritetype *pSprite)
         return;
     if (!spriRangeIsFine(pSprite->index))
         return;
+    char bIsPartOfLevelScripting = 0;
+    if (xspriRangeIsFine(pSprite->extra))
+    {
+        bIsPartOfLevelScripting = xsprite[pSprite->extra].rxID > 0 || xsprite[pSprite->extra].txID > 0 || xsprite[pSprite->extra].command != kCmdOff;
+        if (bIsPartOfLevelScripting && IsDudeSprite(pSprite)) // this dude has a level event attached, leave them alone
+            return;
+    }
 
     if ((gGameOptions.nRandomizerMode >= 2) && (pSprite->type == kItemBeastVision)) // always replace beast vision if pickups or enemies+pickups mode
     {
@@ -1332,6 +1342,8 @@ void dbRandomizerMode(spritetype *pSprite)
         }
         case kThingObjectGib: // generic breakable objects
         {
+            if (bIsPartOfLevelScripting) // if breakable object has level scripting attached, ignore
+                break;
             if (pSprite->statnum != kStatThing) // unexpected type, don't replace
                 break;
             if (xspriRangeIsFine(pSprite->extra))
@@ -1464,6 +1476,8 @@ inline int dbShuffleEnemyList(spritetype **pSpriteList = NULL)
     {
         const int type = sprite[i].type;
         if (!((type >= kDudeBase) && (type < kDudeVanillaMax))) // not an enemy sprite, skip
+            continue;
+        if (xspriRangeIsFine(sprite[i].extra) && ((xsprite[sprite[i].extra].rxID > 0) || (xsprite[sprite[i].extra].txID > 0) || (xsprite[sprite[i].extra].command != kCmdOff))) // this dude has a level event attached, leave them alone
             continue;
         switch (type) // filter problematic enemy types
         {
