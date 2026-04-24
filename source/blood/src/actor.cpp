@@ -2500,19 +2500,6 @@ void actInit(bool bSaveLoad) {
     }
 
     #ifdef NOONE_EXTENSIONS
-    if (!gModernMap) {
-        LOG_F(INFO, "> This map *does not* provide modern features.");
-        nnExtResetGlobals();
-    } else {
-        LOG_F(INFO, "> This map provides modern features.");
-        nnExtInitModernStuff(bSaveLoad);
-    }
-
-    if (!gUserItemsInitialized)
-    {
-        userItemsInit(1);
-        gUserItemsInitialized = 1;
-    }
 
     if (!bSaveLoad)
     {
@@ -2526,6 +2513,20 @@ void actInit(bool bSaveLoad) {
                     spriteext[s].flags |= SPREXT_NOTMD;
             }
         }
+    }
+
+    if (!gModernMap) {
+        LOG_F(INFO, "> This map *does not* provide modern features.");
+        nnExtResetGlobals();
+    } else {
+        LOG_F(INFO, "> This map provides modern features.");
+        nnExtInitModernStuff(bSaveLoad);
+    }
+
+    if (!gUserItemsInitialized)
+    {
+        userItemsInit(1);
+        gUserItemsInitialized = 1;
     }
     #endif
     
