@@ -342,6 +342,10 @@ int InsertSprite(int nSector, int nStat)
     RemoveSpriteStat(nSprite);
     spritetype *pSprite = &sprite[nSprite];
     memset(&sprite[nSprite], 0, sizeof(spritetype));
+#ifdef NOONE_EXTENSIONS
+    memset(&spriteext[nSprite], 0, sizeof(spriteext_t));
+#endif
+
     InsertSpriteStat(nSprite, nStat);
     InsertSpriteSect(nSprite, nSector);
     pSprite->cstat = 128;
