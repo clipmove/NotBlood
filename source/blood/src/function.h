@@ -35,7 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 extern "C" {
 #endif
 
-#define NUMGAMEFUNCTIONS 59
+#define NUMGAMEFUNCTIONS 60
 #define MAXGAMEFUNCLEN 32
 
 extern char gamefunctions[NUMGAMEFUNCTIONS][MAXGAMEFUNCLEN];
@@ -103,6 +103,7 @@ enum GameFunction_t
    gamefunc_Show_Console,
    gamefunc_Quick_Save,
    gamefunc_Quick_Load,
+   gamefunc_Quick_Map_Restart,
    };
 #ifdef __cplusplus
 }
