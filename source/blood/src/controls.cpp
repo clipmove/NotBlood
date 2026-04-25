@@ -576,10 +576,6 @@ void ctrlGetInput(void)
         }
         gViewLook = fix16_clamp(gViewLook+(input.q16mlook << 3), F16(downAngle), F16(upAngle));
     }
-
-    if (BUTTON(gamefunc_Quick_Map_Restart)
-        && (gGameOptions.nGameType == kGameTypeSinglePlayer || gNetPlayers < 2))
-            gInput.keyFlags.restart = 1;
 }
 
 void ctrlJoystickRumble(int nTime)
