@@ -214,7 +214,7 @@ static int osdcmd_restartmap(osdcmdptr_t UNUSED(parm))
         return OSDCMD_OK;
     }
 
-    if (!gGameStarted || gDemo.at1)
+    if (!gGameStarted || gDemo.bPlaying)
     {
         OSD_Printf("restartmap: no map to restart.\n");
         return OSDCMD_OK;
