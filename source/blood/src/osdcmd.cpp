@@ -197,6 +197,25 @@ static int osdcmd_map(osdcmdptr_t parm)
     return OSDCMD_OK;
 }
 
+static int osdcmd_restartmap(osdcmdptr_t UNUSED(parm))
+{
+    UNREFERENCED_CONST_PARAMETER(parm);
+    if (numplayers > 1)
+    {
+        OSD_Printf("restartmap: single player only.\n");
+        return OSDCMD_OK;
+    }
+
+    if (!gGameStarted || gDemo.at1)
+    {
+        OSD_Printf("restartmap: no map to restart.\n");
+        return OSDCMD_OK;
+    }
+
+    levelRestart();
+    return OSDCMD_OK;
+}
+
 static int osdcmd_demo(osdcmdptr_t parm)
 {
     if (numplayers > 1)
@@ -1110,6 +1129,7 @@ int32_t registerosdcommands(void)
 //    {
     OSD_RegisterFunction("changelevel","changelevel <volume> <level>: warps to the given level", osdcmd_changelevel);
     OSD_RegisterFunction("map","map <mapfile>: loads the given user map", osdcmd_map);
+    OSD_RegisterFunction("restartmap","restarts current map", osdcmd_restartmap);
     OSD_RegisterFunction("demo","demo <demofile or demonum>: starts the given demo", osdcmd_demo);
 //    }
 //
