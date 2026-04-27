@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <stdio.h>
 #include "build.h"
 #include "compat.h"
+#include "crc32.h"
 #include "lz4.h"
 #include "mmulti.h"
 #include "common_game.h"
@@ -356,6 +357,10 @@ void MyLoadSave::Load(void)
     Read(&version, sizeof(version));
     if (version != BYTEVERSION)
         ThrowError("Incompatible version of saved game found!");
+    uint32_t uINICRC;
+    Read(&uINICRC, sizeof(uINICRC));
+    if (uINICRC != Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0))
+        ThrowError("Not using the same INI as saved game!");
     short nSkill;
     Read(&nSkill, sizeof(nSkill));
     Read(&gGameOptions, sizeof(gGameOptions));
@@ -473,6 +478,8 @@ void MyLoadSave::Save(void)
     Write(&id, sizeof(id));
     short version = BYTEVERSION;
     Write(&version, sizeof(version));
+    uint32_t uINICRC = Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0);
+    Write(&uINICRC, sizeof(uINICRC));
     short nSkill = (short)gProfile[myconnectindex].skill;
     Write(&nSkill, sizeof(nSkill));
     for (int nSprite = 0; nSprite < kMaxSprites; nSprite++)
@@ -587,6 +594,7 @@ void LoadSavedInfo(void)
         int id = 0;
         short version = 0;
         short nSkill = 0, nSlot = 0;
+        uint32_t uINICRC = 0;
         if ((uint32_t)kread(hFile, &id, sizeof(id)) != sizeof(id))
         {
             kclose(hFile);
@@ -615,6 +623,12 @@ void LoadSavedInfo(void)
             kclose(hFile);
             continue;
         }
+        kread(hFile, &uINICRC, sizeof(uINICRC));
+        if (uINICRC != Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0))
+        {
+            kclose(hFile);
+            continue;
+        }
         kread(hFile, &nSkill, sizeof(nSkill));
         if ((uint32_t)kread(hFile, &gSaveGameOptions[nSlot], sizeof(gSaveGameOptions[0])) != sizeof(gSaveGameOptions[0]))
             ThrowError("Error reading save file.");
@@ -639,6 +653,7 @@ void LoadAutosavedInfo(void)
         int id = 0;
         short version = 0;
         short nSkill = 0, nSlot = 0;
+        uint32_t uINICRC = 0;
         if ((uint32_t)kread(hFile, &id, sizeof(id)) != sizeof(id))
         {
             kclose(hFile);
@@ -663,6 +678,12 @@ void LoadAutosavedInfo(void)
         }
         nSlot = kLoadSaveSlotAutosave + Batoi(&pIterator->name[nSlot-nNameMin]);
         if (nSlot < kLoadSaveSlotAutosave || nSlot > kLoadSaveSlotKey) // slot id too small/big, skip
+        {
+            kclose(hFile);
+            continue;
+        }
+        kread(hFile, &uINICRC, sizeof(uINICRC));
+        if (uINICRC != Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0))
         {
             kclose(hFile);
             continue;
