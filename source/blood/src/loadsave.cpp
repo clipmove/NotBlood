@@ -359,7 +359,7 @@ void MyLoadSave::Load(void)
         ThrowError("Incompatible version of saved game found!");
     uint32_t uINICRC;
     Read(&uINICRC, sizeof(uINICRC));
-    if (uINICRC != Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0))
+    if (uINICRC != Bcrc32(pINISelected->zName, (unsigned int)BMAX_PATH, 0))
         ThrowError("Not using the same INI as saved game!");
     short nSkill;
     Read(&nSkill, sizeof(nSkill));
@@ -478,7 +478,7 @@ void MyLoadSave::Save(void)
     Write(&id, sizeof(id));
     short version = BYTEVERSION;
     Write(&version, sizeof(version));
-    uint32_t uINICRC = Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0);
+    uint32_t uINICRC = Bcrc32(pINISelected->zName, (unsigned int)BMAX_PATH, 0);
     Write(&uINICRC, sizeof(uINICRC));
     short nSkill = (short)gProfile[myconnectindex].skill;
     Write(&nSkill, sizeof(nSkill));
@@ -624,7 +624,7 @@ void LoadSavedInfo(void)
             continue;
         }
         kread(hFile, &uINICRC, sizeof(uINICRC));
-        if (uINICRC != Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0))
+        if (uINICRC != Bcrc32(pINISelected->zName, (unsigned int)BMAX_PATH, 0))
         {
             kclose(hFile);
             continue;
@@ -683,7 +683,7 @@ void LoadAutosavedInfo(void)
             continue;
         }
         kread(hFile, &uINICRC, sizeof(uINICRC));
-        if (uINICRC != Bcrc32((unsigned char*)pINISelected->zName, (unsigned int)BMAX_PATH, 0))
+        if (uINICRC != Bcrc32(pINISelected->zName, (unsigned int)BMAX_PATH, 0))
         {
             kclose(hFile);
             continue;
