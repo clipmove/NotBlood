@@ -724,75 +724,95 @@ char dbIsBannedSpriteType(int nType)
     const unsigned int nBannedType = gGameOptions.uSpriteBannedFlags;
     if (nBannedType == BANNED_NONE) // no monsters banned, return
         return 0;
-    char bBanned = 0;
 
+    switch (nType)
+    {
     // monsters
-    if (!bBanned && (nBannedType&BANNED_BATS))
-        bBanned = nType == kDudeBat;
-    if (!bBanned && (nBannedType&BANNED_RATS))
-        bBanned = nType == kDudeRat;
-    if (!bBanned && (nBannedType&BANNED_FISH))
-        bBanned = (nType == kDudeGillBeast) || (nType == kDudeBoneEel);
-    if (!bBanned && (nBannedType&BANNED_HANDS))
-        bBanned = nType == kDudeHand;
-    if (!bBanned && (nBannedType&BANNED_GHOSTS))
-        bBanned = nType == kDudePhantasm;
-    if (!bBanned && (nBannedType&BANNED_SPIDERS))
-        bBanned = (nType == kDudeSpiderBrown) || (nType == kDudeSpiderRed) || (nType == kDudeSpiderBlack) || (nType == kDudeSpiderMother);
-    if (!bBanned && (nBannedType&BANNED_TCALEBS))
-        bBanned = nType == kDudeTinyCaleb;
-    if (!bBanned && (nBannedType&BANNED_HHOUNDS))
-        bBanned = nType == kDudeHellHound;
+    case kDudeBat:
+        return (nBannedType&BANNED_BATS) != 0;
+    case kDudeRat:
+        return (nBannedType&BANNED_RATS) != 0;
+    case kDudeGillBeast:
+    case kDudeBoneEel:
+        return (nBannedType&BANNED_FISH) != 0;
+    case kDudeHand:
+        return (nBannedType&BANNED_HANDS) != 0;
+    case kDudePhantasm:
+        return (nBannedType&BANNED_GHOSTS) != 0;
+    case kDudeSpiderBrown:
+    case kDudeSpiderRed:
+    case kDudeSpiderBlack:
+    case kDudeSpiderMother:
+        return (nBannedType&BANNED_SPIDERS) != 0;
+    case kDudeTinyCaleb:
+        return (nBannedType&BANNED_TCALEBS) != 0;
+    case kDudeHellHound:
+        return (nBannedType&BANNED_HHOUNDS) != 0;
 
     // weapons
-    if (!bBanned && (nBannedType&BANNED_FLARE))
-        bBanned = (nType == kItemWeaponFlarePistol) || (nType == kItemAmmoFlares);
-    if (!bBanned && (nBannedType&BANNED_SHOTGUN))
-        bBanned = (nType == kItemWeaponSawedoff) || (nType == kItemAmmoSawedoffFew) || (nType == kItemAmmoSawedoffBox);
-    if (!bBanned && (nBannedType&BANNED_TOMMYGUN))
-        bBanned = (nType == kItemWeaponTommygun) || (nType == kItemAmmoTommygunFew) || (nType == kItemAmmoTommygunDrum);
-    if (!bBanned && (nBannedType&BANNED_NAPALM))
-        bBanned = (nType == kItemWeaponNapalmLauncher) || (nType == kItemAmmoGasolineCan);
-    if (!bBanned && (nBannedType&BANNED_TNT))
-        bBanned = (nType == kItemWeaponTNT) || (nType == kItemAmmoTNTBundle) || (nType == kItemAmmoTNTBox);
-    if (!bBanned && (nBannedType&BANNED_SPRAYCAN))
-        bBanned = (nType == kItemWeaponSprayCan) || (nType == kItemAmmoSprayCan);
-    if (!bBanned && (nBannedType&BANNED_TESLA))
-        bBanned = (nType == kItemWeaponTeslaCannon) || (nType == kItemAmmoTeslaCharge);
-    if (!bBanned && (nBannedType&BANNED_LIFELEECH))
-        bBanned = (nType == kItemWeaponLifeLeech) || (nType == kItemAmmoTrappedSoul);
-    if (!bBanned && (nBannedType&BANNED_VOODOO))
-        bBanned = (nType == kItemWeaponVoodooDoll) || (nType == kItemAmmoVoodooDoll);
-    if (!bBanned && (nBannedType&BANNED_PROXY))
-        bBanned = nType == kItemAmmoProxBombBundle;
-    if (!bBanned && (nBannedType&BANNED_REMOTE))
-        bBanned = nType == kItemAmmoRemoteBombBundle;
+    case kItemWeaponFlarePistol:
+    case kItemAmmoFlares:
+        return (nBannedType&BANNED_FLARE) != 0;
+    case kItemWeaponSawedoff:
+    case kItemAmmoSawedoffFew:
+    case kItemAmmoSawedoffBox:
+        return (nBannedType&BANNED_SHOTGUN) != 0;
+    case kItemWeaponTommygun:
+    case kItemAmmoTommygunFew:
+    case kItemAmmoTommygunDrum:
+        return (nBannedType&BANNED_TOMMYGUN) != 0;
+    case kItemWeaponNapalmLauncher:
+    case kItemAmmoGasolineCan:
+        return (nBannedType&BANNED_NAPALM) != 0;
+    case kItemWeaponTNT:
+    case kItemAmmoTNTBundle:
+    case kItemAmmoTNTBox:
+        return (nBannedType&BANNED_TNT) != 0;
+    case kItemWeaponSprayCan:
+    case kItemAmmoSprayCan:
+        return (nBannedType&BANNED_SPRAYCAN) != 0;
+    case kItemWeaponTeslaCannon:
+    case kItemAmmoTeslaCharge:
+        return (nBannedType&BANNED_TESLA) != 0;
+    case kItemWeaponLifeLeech:
+    case kItemAmmoTrappedSoul:
+        return (nBannedType&BANNED_LIFELEECH) != 0;
+    case kItemWeaponVoodooDoll:
+    case kItemAmmoVoodooDoll:
+        return (nBannedType&BANNED_VOODOO) != 0;
+    case kItemAmmoProxBombBundle:
+        return (nBannedType&BANNED_PROXY) != 0;
+    case kItemAmmoRemoteBombBundle:
+        return (nBannedType&BANNED_REMOTE) != 0;
 
     // items
-    if (!bBanned && (nBannedType&BANNED_MEDKIT))
-        bBanned = nType == kItemHealthDoctorBag;
-    if (!bBanned && (nBannedType&BANNED_LIFEESSENCE)) // life essence, and other misc healing items
-        bBanned = (nType == kItemHealthMedPouch) || (nType == kItemHealthLifeEssense) || (nType == kItemHealthRedPotion);
-    if (!bBanned && (nBannedType&BANNED_LIFESEED))
-        bBanned = nType == kItemHealthLifeSeed;
-    if (!bBanned && (nBannedType&BANNED_SUPERARMOR))
-        bBanned = nType == kItemArmorSuper;
-    if (!bBanned && (nBannedType&BANNED_CRYSTALBALL))
-        bBanned = nType == kItemCrystalBall;
+    case kItemHealthDoctorBag:
+        return (nBannedType&BANNED_MEDKIT) != 0;
+    case kItemHealthMedPouch:
+    case kItemHealthLifeEssense:
+    case kItemHealthRedPotion:
+        return (nBannedType&BANNED_LIFEESSENCE) != 0; // life essence, and other misc healing items
+    case kItemHealthLifeSeed:
+        return (nBannedType&BANNED_LIFESEED) != 0;
+    case kItemArmorSuper:
+        return (nBannedType&BANNED_SUPERARMOR) != 0;
+    case kItemCrystalBall:
+        return (nBannedType&BANNED_CRYSTALBALL) != 0;
 
     // powerups
-    if (!bBanned && (nBannedType&BANNED_JUMPBOOTS))
-        bBanned = nType == kItemJumpBoots;
-    if (!bBanned && (nBannedType&BANNED_CLOAK))
-        bBanned = nType == kItemShadowCloak;
-    if (!bBanned && (nBannedType&BANNED_DEATHMASK))
-        bBanned = nType == kItemDeathMask;
-    if (!bBanned && (nBannedType&BANNED_AKIMBO))
-        bBanned = nType == kItemTwoGuns;
-    if (!bBanned && (nBannedType&BANNED_REFLECT))
-        bBanned = nType == kItemReflectShots;
+    case kItemJumpBoots:
+        return (nBannedType&BANNED_JUMPBOOTS) != 0;
+    case kItemShadowCloak:
+        return (nBannedType&BANNED_CLOAK) != 0;
+    case kItemDeathMask:
+        return (nBannedType&BANNED_DEATHMASK) != 0;
+    case kItemTwoGuns:
+        return (nBannedType&BANNED_AKIMBO) != 0;
+    case kItemReflectShots:
+        return (nBannedType&BANNED_REFLECT) != 0;
+    }
 
-    return bBanned;
+    return 0;
 }
 
 char dbIsBannedSprite(spritetype *pSprite, XSPRITE* pXSprite)
