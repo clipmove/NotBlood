@@ -1740,6 +1740,17 @@ int A_Spawn(int spriteNum, int tileNum)
     actor_t *   pActor;
     int         sectNum;
 
+    if ((unsigned)tileNum >= MAXUSERTILES)
+    {
+        // RRRA E1L7: spawn invisible sprite
+        tileNum = MAXUSERTILES-1;
+        while (tileNum > 0)
+        {
+            if (tilesiz[tileNum].x == 0 && tilesiz[tileNum].y == 0 && g_tile[tileNum].execPtr == 0)
+                break;
+            tileNum--;
+        }
+    }
 
     if (spriteNum >= 0)
     {
