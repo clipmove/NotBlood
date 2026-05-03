@@ -30,7 +30,7 @@ jobs:
             sys: mingw32
             env: i686
             pkg: nasm mingw-w64-i686-SDL
-            opt: SDLCONFIG=
+            opt: SDLCONFIG= LTO=0
             additional-cmd: cp -a ./package/updater/w32/notbloodupdate ./upload/notbloodupdate.exe
             zipname: win32
           - name: i686 GCC WinXP
@@ -38,7 +38,7 @@ jobs:
             sys: mingw32
             env: i686
             pkg: nasm sed unzip mingw-w64-i686-SDL
-            opt: SDL_TARGET=1 USE_MIMALLOC=0 USE_OPENGL=0 NETCODE=0
+            opt: SDL_TARGET=1 USE_MIMALLOC=0 USE_OPENGL=0 NETCODE=0 LTO=0
             additional-cmd: unzip "./package/xp support files.zip" -d ./upload; echo ADVAPI32.dll\0\0\0\0 with ZDVAPI32.dll\0\0\0\0; sed -i -b -e 's/\x41\x44\x56\x41\x50\x49\x33\x32\x2E\x64\x6C\x6C\x00\x00\x00\x00/\x5A\x44\x56\x41\x50\x49\x33\x32\x2E\x64\x6C\x6C\x00\x00\x00\x00/g' ./notblood.exe; echo KERNEL32.dll\0\0\0\0 with ZERNEL32.dll\0\0\0\0; sed -i -b -e 's/\x4B\x45\x52\x4E\x45\x4C\x33\x32\x2E\x64\x6C\x6C\x00\x00\x00\x00/\x5A\x45\x52\x4E\x45\x4C\x33\x32\x2E\x64\x6C\x6C\x00\x00\x00\x00/g' ./notblood.exe; echo WS2_32.dll\0\0 with ZS2_32.dll\0\0; sed -i -b -e 's/\x57\x53\x32\x5F\x33\x32\x2E\x64\x6C\x6C\x00\x00/\x5A\x53\x32\x5F\x33\x32\x2E\x64\x6C\x6C\x00\x00/g' ./notblood.exe
             zipname: winxp
     name: Windows MSYS2 ${{matrix.name}}
@@ -81,7 +81,7 @@ jobs:
           - name: i686 GCC without SDL
             sys: mingw32
             env: i686
-            opt: RENDERTYPE=WIN
+            opt: RENDERTYPE=WIN LTO=0
             pkg: nasm
     name: Windows MSYS2 ${{matrix.name}}
     runs-on: windows-latest

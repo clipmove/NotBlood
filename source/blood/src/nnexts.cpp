@@ -4560,7 +4560,8 @@ bool modernTypeOperateSprite(int nSprite, spritetype* pSprite, XSPRITE* pXSprite
             case kCmdOn:
                 evKill(nSprite, OBJ_SPRITE, causerID);
                 SetSpriteState(nSprite, pXSprite, 1, causerID);
-                if (pSprite->type == kModernSeqSpawner) seqSpawnerOffSameTx(pXSprite);
+                if (pSprite->type == kModernSeqSpawner && pXSprite->txID >= kChannelUser
+                    && (pSprite->flags & kModernTypeFlag16) == 0) seqSpawnerOffSameTx(pXSprite);
                 fallthrough__;
             case kCmdRepeat:
                 if (event.cmd == kCmdRepeat && !pXSprite->state) break;
@@ -7891,7 +7892,7 @@ void seqSpawnerOffSameTx(XSPRITE* pXSource) {
                 continue;
 
             pXSpr = (xspriRangeIsFine(pSpr->extra)) ? &xsprite[pSpr->extra] : NULL;
-            if (!pXSpr || pXSpr->reference == pXSource->reference || !pXSpr->state)
+            if (!pXSpr || pXSpr->reference == pXSource->reference || !pXSpr->state || pXSpr->txID != pXSource->txID)
                 continue;
 
             evKill(j, OBJ_SPRITE);
