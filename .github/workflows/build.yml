@@ -32,7 +32,7 @@ jobs:
             sys: mingw32
             env: i686
             make: make
-            opt: SDLCONFIG=
+            opt: SDLCONFIG= LTO=0
             pkg: nasm
             publish-as: win32
           - name: Windows MSYS2 x86_64 GCC without SDL
