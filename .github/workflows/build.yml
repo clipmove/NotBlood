@@ -97,7 +97,7 @@ jobs:
         cache: true
         install: git mingw-w64-${{matrix.env}}-toolchain make ${{matrix.pkg}}
     - name: build
-      run: make -j$(nproc) blood tools SDLCONFIG=
+      run: make -j$(nproc) blood tools ${{matrix.opt}}
 
   build-linux:
     strategy:
