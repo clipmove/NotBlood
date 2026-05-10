@@ -7907,7 +7907,8 @@ void levelEndLevelCustom(int nLevel) {
 
     gGameOptions.uGameFlags |= kGameFlagContinuing;
 
-    if (nLevel >= 16 || nLevel < 0) {
+    if (!rngok(nLevel, 0, kMaxLevels))
+    {
         gGameOptions.uGameFlags |= kGameFlagEnding;
         gGameOptions.nLevel = 0;
         return;
