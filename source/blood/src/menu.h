@@ -61,6 +61,7 @@ void drawLoadingScreen(int nTile);
 void SetupMenus(void);
 void UpdateNetworkMenus(void);
 void SetGameVanillaMode(char nState);
+unsigned int SetBannedSprites(char bSinglePlayer);
 void QuickSaveGame(void);
 void AutosaveGame(bool bLevelStartSave);
 void QuickLoadGame(void);
