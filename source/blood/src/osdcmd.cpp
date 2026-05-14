@@ -398,6 +398,22 @@ static int osdcmd_vidmode(osdcmdptr_t parm)
     return OSDCMD_OK;
 }
 
+static int osdcmd_banned_item_save(osdcmdptr_t parm)
+{
+    if (parm->numparms != 1) return OSDCMD_SHOWHELP;
+    if (!parm->parms[0] || strlen(parm->parms[0]) <= 1) return OSDCMD_SHOWHELP;
+
+    char szFilePathPreset[BMAX_PATH];
+    snprintf(szFilePathPreset, BMAX_PATH, "%s.itm", parm->parms[0]);
+    FILE *hFile = fopen(szFilePathPreset, "wb");
+    if (hFile == NULL)
+        ThrowError("File error #%d creating save file.", errno);
+    uint32_t nBannedItems = SetBannedSprites(0);
+    if (fwrite((void*)&nBannedItems, 1, sizeof(nBannedItems), hFile) != sizeof(nBannedItems))
+        ThrowError("File error #%d writing save file.", errno);
+    fclose(hFile);
+}
+
 static int osdcmd_crosshaircolor(osdcmdptr_t parm)
 {
     if (parm->numparms != 3)
@@ -1386,13 +1402,13 @@ int32_t registerosdcommands(void)
 //    {
     OSD_RegisterFunction("changelevel","changelevel <volume> <level>: warps to the given level", osdcmd_changelevel);
     OSD_RegisterFunction("map","map <mapfile>: loads the given user map", osdcmd_map);
-    OSD_RegisterFunction("restartmap","restarts current map", osdcmd_restartmap);
     OSD_RegisterFunction("demo","demo <demofile or demonum>: starts the given demo", osdcmd_demo);
 //    }
 //
 //    OSD_RegisterFunction("addpath","addpath <path>: adds path to game filesystem", osdcmd_addpath);
     OSD_RegisterFunction("bind",R"(bind <key> <string>: associates a keypress with a string of console input. Type "bind showkeys" for a list of keys and "listsymbols" for a list of valid console commands.)", osdcmd_bind);
 //    OSD_RegisterFunction("cmenu","cmenu <#>: jumps to menu", osdcmd_cmenu);
+    OSD_RegisterFunction("cl_banned_item_save", "cl_banned_item_save <preset name>: save the current banned item list as a preset file", osdcmd_banned_item_save);
     OSD_RegisterFunction("crosshaircolor","crosshaircolor: changes the crosshair color", osdcmd_crosshaircolor);
     OSD_RegisterFunction("crosshairreset", "crosshairreset: restores the original crosshair", osdcmd_resetcrosshair);
 //
