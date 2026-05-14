@@ -412,6 +412,7 @@ static int osdcmd_banned_item_save(osdcmdptr_t parm)
     if (fwrite((void*)&nBannedItems, 1, sizeof(nBannedItems), hFile) != sizeof(nBannedItems))
         ThrowError("File error #%d writing save file.", errno);
     fclose(hFile);
+    return OSDCMD_OK;
 }
 
 static int osdcmd_crosshaircolor(osdcmdptr_t parm)
