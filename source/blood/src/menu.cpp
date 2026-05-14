@@ -109,6 +109,7 @@ void ResetKeysClassic(CGameMenuItemChain *);
 void SetMessages(CGameMenuItemZBool *);
 void LoadGame(CGameMenuItemZEditBitmap *, CGameMenuEvent *);
 void SetupNetLevels(CGameMenuItemZCycle *);
+void NetLoadItemsConfig(void);
 void NetClearUserMap(CGameMenuItemZCycle *);
 void StartNetGame(CGameMenuItemChain *);
 void SetupLevelMenuItem(int);
@@ -530,6 +531,11 @@ CGameMenuItemZEditBitmap itemLoadGameAutosaveKey(NULL, 3, 20, 186, 320, strResto
 CGameMenuItemBitmapLS itemLoadGamePic(NULL, 3, 0, 0, 2518);
 
 CGameMenu menuMultiUserMaps;
+CGameMenu menuMultiUserItems;
+
+char zUserItemName[BMAX_PATH] = "";
+CGameMenuItemTitle itemNetStartUserItemTitle("ITEM CONFIG", 1, 160, 20, 2038);
+CGameMenuFileSelect menuMultiUserItem("", 3, 0, 0, 0, "./", "*.itm", zUserItemName, NetLoadItemsConfig);
 
 CGameMenuItemTitle itemNetStartUserMapTitle("USER MAP", 1, 160, 20, 2038);
 CGameMenuFileSelect menuMultiUserMap("", 3, 0, 0, 0, "./", "*.map", zUserMapName);
@@ -550,7 +556,8 @@ CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, fal
 CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemNetStartBoolSecondWind("SECOND WIND:", 3, 66, 125, 180, true, 0, NULL, NULL);
 CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 135, 180, false, 0, NULL, NULL);
-CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 143, 320, 1, &menuBannedItems, -1, NULL, 0);
+CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 143, 256, 1, &menuBannedItems, -1, NULL, 0);
+CGameMenuItemChain itemNetStart8Load("LOAD ITEMS", 3, 0, 143, 384, 1, &menuMultiUserItems, 0, NULL, 0);
 CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 153, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
 CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 163, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
 CGameMenuItemChain itemNetStart11("START GAME", 1, 0, 175, 320, 1, 0, -1, StartNetGame, 0);
@@ -1607,9 +1614,14 @@ void SetupNetStartMenu(void)
     menuNetStart.Add(&itemNetStartBoolSecondWind, false);
     menuNetStart.Add(&itemNetStartBoolSpectatorMode, false);
     menuNetStart.Add(&itemNetStart8, false);
+    menuNetStart.Add(&itemNetStart8Load, false);
     menuNetStart.Add(&itemNetStart9, false);
     menuNetStart.Add(&itemNetStart10, false);
     menuNetStart.Add(&itemNetStart11, false);
+    menuMultiUserItems.Add(&itemNetStartUserItemTitle, true);
+    menuMultiUserItems.Add(&menuMultiUserItem, true);
+    menuMultiUserItem.tooltip_pzTextUpper = "Use console cmd cl_banned_item_save <preset_name>";
+    menuMultiUserItem.tooltip_pzTextLower = "to save the currently banned items as a preset";
     menuMultiUserMaps.Add(&itemNetStartUserMapTitle, true);
     menuMultiUserMaps.Add(&menuMultiUserMap, true);
 
@@ -3124,7 +3136,7 @@ void SetVanillaMode(CGameMenuItemZCycle *pItem)
     }
 }
 
-inline unsigned int SetBannedSprites(char bSinglePlayer)
+unsigned int SetBannedSprites(char bSinglePlayer)
 {
     unsigned int uSpriteBannedFlags = BANNED_NONE;
 
@@ -4702,6 +4714,47 @@ void SetupNetLevels(CGameMenuItemZCycle *pItem)
 {
     SetupLevelMenuItem(pItem->m_nFocus);
     NetClearUserMap(pItem);
+}
+
+void NetLoadItemsConfig(void)
+{
+    int hFile = kopen4load(zUserItemName, 0);
+    if (hFile == -1)
+        return;
+    uint32_t uBannedItems = 0;
+    if ((uint32_t)kread(hFile, &uBannedItems, sizeof(uBannedItems)) != sizeof(uBannedItems))
+    {
+        kclose(hFile);
+        return;
+    }
+    kclose(hFile);
+
+    // weapons
+    itemBannedItemsFlare.at20 = !!(uBannedItems&BANNED_FLARE);
+    itemBannedItemsShotgun.at20 = !!(uBannedItems&BANNED_SHOTGUN);
+    itemBannedItemsTommyGun.at20 = !!(uBannedItems&BANNED_TOMMYGUN);
+    itemBannedItemsNapalm.at20 = !!(uBannedItems&BANNED_NAPALM);
+    itemBannedItemsTNT.at20 = !!(uBannedItems&BANNED_TNT);
+    itemBannedItemsSpray.at20 = !!(uBannedItems&BANNED_SPRAYCAN);
+    itemBannedItemsTesla.at20 = !!(uBannedItems&BANNED_TESLA);
+    itemBannedItemsLifeLeech.at20 = !!(uBannedItems&BANNED_LIFELEECH);
+    itemBannedItemsVoodoo.at20 = !!(uBannedItems&BANNED_VOODOO);
+    itemBannedItemsProxy.at20 = !!(uBannedItems&BANNED_PROXY);
+    itemBannedItemsRemote.at20 = !!(uBannedItems&BANNED_REMOTE);
+
+    // items
+    itemBannedItemsMedKit.at20 = !!(uBannedItems&BANNED_MEDKIT);
+    itemBannedItemsLifeEssence.at20 = !!(uBannedItems&BANNED_LIFEESSENCE);
+    itemBannedItemsLifeSeed.at20 = !!(uBannedItems&BANNED_LIFESEED);
+    itemBannedItemsSuperArmor.at20 = !!(uBannedItems&BANNED_SUPERARMOR);
+    itemBannedItemsCrystalBall.at20 = !!(uBannedItems&BANNED_CRYSTALBALL);
+
+    // powerups
+    itemBannedItemsJumpBoots.at20 = !!(uBannedItems&BANNED_JUMPBOOTS);
+    itemBannedItemsCloak.at20 = !!(uBannedItems&BANNED_CLOAK);
+    itemBannedItemsDeathMask.at20 = !!(uBannedItems&BANNED_DEATHMASK);
+    itemBannedItemsAkimbo.at20 = !!(uBannedItems&BANNED_AKIMBO);
+    itemBannedItemsReflect.at20 = !!(uBannedItems&BANNED_REFLECT);
 }
 
 void NetClearUserMap(CGameMenuItemZCycle *pItem)

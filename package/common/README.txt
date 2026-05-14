@@ -160,6 +160,8 @@ If you have the GOG version of the game, do the following:
    - Set auto aim range angle modifier (default: 4, single-player only)
 * cl_autodivingsuit
    - Enable/disable automatic diving suit equipping when entering water (always enabled in multiplayer)
+* cl_banned_item_save <preset name>
+   - Save the current banned item list as a preset file
 * cl_calebtalk
    - Enable/disable Caleb's dialog lines (0: on, 1: no idle, 2: no explosion/gib, 3: off)
 * cl_chatsnd
