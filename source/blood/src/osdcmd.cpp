@@ -1402,6 +1402,7 @@ int32_t registerosdcommands(void)
 //    {
     OSD_RegisterFunction("changelevel","changelevel <volume> <level>: warps to the given level", osdcmd_changelevel);
     OSD_RegisterFunction("map","map <mapfile>: loads the given user map", osdcmd_map);
+    OSD_RegisterFunction("restartmap","restarts current map", osdcmd_restartmap);
     OSD_RegisterFunction("demo","demo <demofile or demonum>: starts the given demo", osdcmd_demo);
 //    }
 //
