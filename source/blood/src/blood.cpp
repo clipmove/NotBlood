@@ -961,7 +961,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         AutosaveGame(true); // create autosave at start of the new level
 }
 
-static void DoQuickLoad(const char bIgnoreMenu = 0)
+void DoQuickLoad(const bool bIgnoreMenu)
 {
     if (!gGameMenuMgr.m_bActive || bIgnoreMenu)
     {
@@ -2401,7 +2401,7 @@ RESTART:
                 if (gGameMenuMgr.m_bActive)
                     gGameMenuMgr.Process();
                 if (bQuickLoadFromMenu)
-                    DoQuickLoad(1);
+                    DoQuickLoad(true);
                 break;
             }
             case INPUT_MODE_0:
