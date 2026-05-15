@@ -961,9 +961,9 @@ void StartLevel(GAMEOPTIONS *pOpt)
         AutosaveGame(true); // create autosave at start of the new level
 }
 
-static void DoQuickLoad(void)
+static void DoQuickLoad(const char bIgnoreMenu = 0)
 {
-    if (!gGameMenuMgr.m_bActive)
+    if (!gGameMenuMgr.m_bActive || bIgnoreMenu)
     {
         if (gQuickLoadSlot != kLoadSaveNull)
         {
@@ -2396,9 +2396,14 @@ RESTART:
             switch (gInputMode)
             {
             case INPUT_MODE_1:
+            {
+                const char bQuickLoadFromMenu = !gGameStarted && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !gGameOptions.bPermaDeath && keyGetState(sc_F9);
                 if (gGameMenuMgr.m_bActive)
                     gGameMenuMgr.Process();
+                if (bQuickLoadFromMenu)
+                    DoQuickLoad(1);
                 break;
+            }
             case INPUT_MODE_0:
                 LocalKeys();
                 break;
