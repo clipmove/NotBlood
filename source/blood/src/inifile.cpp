@@ -42,7 +42,7 @@ void strTrim(char* str, char side = 0x03)
         c = 0;
         while(str[c] && isspace(str[c])) c++;
         if (c)
-            memcpy(str, &str[c], l - c + 1), l-=c;
+            memmove(str, &str[c], l - c + 1), l-=c;
     }
 
 
@@ -133,7 +133,7 @@ void IniFile::Load(unsigned char* pRaw, int nLength, char flags)
             {
                 if (n+1 < nLength && pRaw[n+1] == '\n')
                 {
-                    memcpy(&pRaw[n], &pRaw[n+1], nLength - n);
+                    memmove(&pRaw[n], &pRaw[n+1], nLength - n);
                     nLength--;
                 }
             }
@@ -370,7 +370,7 @@ int IniFile::NodeAdd(ININODE* pNode, int nPos)
     dassert(node != NULL);
 
     if (!rngok(nPos, 0, numnodes)) nPos = numnodes;
-    else memcpy(&node[nPos+1], &node[nPos], sizeof(ININODE)*(numnodes-nPos));
+    else memmove(&node[nPos+1], &node[nPos], sizeof(ININODE)*(numnodes-nPos));
 
     memcpy(&node[nPos], pNode, sizeof(ININODE));
     numnodes++;
@@ -390,7 +390,7 @@ void IniFile::NodeRemove(int nID)
     numnodes--;
     
     if (nID < numnodes)
-        memcpy(&node[nID], &node[nID+1], sizeof(ININODE)*(numnodes-nID));
+        memmove(&node[nID], &node[nID+1], sizeof(ININODE)*(numnodes-nID));
 
     node = (ININODE*)realloc(node, sizeof(ININODE)*numnodes);
     if (numnodes > 0)
