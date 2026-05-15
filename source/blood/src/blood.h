@@ -103,6 +103,7 @@ extern bool gMultiSpectating;
 void QuitGame(void);
 void PreloadCache(void);
 void StartLevel(GAMEOPTIONS *gameOptions);
+void DoQuickLoad(const bool bIgnoreMenu = false);
 void ProcessFrame(void);
 void ScanINIFiles(void);
 bool LoadArtFile(const char *pzFile);
