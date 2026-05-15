@@ -516,8 +516,13 @@ void CDemo::ProcessKeys(void)
     switch (gInputMode)
     {
     case INPUT_MODE_1:
+    {
+        const char bQuickLoadFromMenu = (gGameOptions.nGameType == kGameTypeSinglePlayer) && !gGameOptions.bPermaDeath && keyGetState(sc_F9);
         gGameMenuMgr.Process();
+        if (bQuickLoadFromMenu)
+            DoQuickLoad(true);
         break;
+    }
     case INPUT_MODE_2:
         gPlayerMsg.ProcessKeys();
         break;
