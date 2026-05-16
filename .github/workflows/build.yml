@@ -22,7 +22,7 @@ jobs:
             ref: master
             sys: mingw64
             env: x86_64
-            opt: SDLCONFIG=
+            opt: SDLCONFIG= LTO=0
             additional-cmd: cp -a ./package/updater/w64/notbloodupdate ./upload/notbloodupdate.exe
             zipname: win64
           - name: i686 GCC
@@ -77,7 +77,7 @@ jobs:
           - name: x86_64 GCC without SDL
             sys: mingw64
             env: x86_64
-            opt: RENDERTYPE=WIN
+            opt: RENDERTYPE=WIN LTO=0
           - name: i686 GCC without SDL
             sys: mingw32
             env: i686
@@ -107,10 +107,10 @@ jobs:
           - name: GCC
             pkg: libsdl2-dev
             zipname: gcc
-            opt: HAVE_FLAC=0
+            opt: HAVE_FLAC=0 LTO=0
           - name: Clang
             pkg: libsdl2-dev clang
-            opt: CLANG=1 HAVE_FLAC=0
+            opt: CLANG=1 HAVE_FLAC=0 LTO=0
             zipname: clang
     name: Linux ${{matrix.name}}
     runs-on: ubuntu-latest
@@ -139,16 +139,16 @@ jobs:
         include:
           - name: GCC SDL 1.2
             pkg: libsdl1.2-dev
-            opt: SDL_TARGET=1
+            opt: SDL_TARGET=1 LTO=0
           - name: GCC SDL 1.2 without GL/NoOne Extensions Disabled
             pkg: libsdl1.2-dev
-            opt: SDL_TARGET=1 USE_OPENGL=0 NOONE_EXTENSIONS=0
+            opt: SDL_TARGET=1 USE_OPENGL=0 NOONE_EXTENSIONS=0 LTO=0
           - name: Clang without GL
             pkg: libsdl2-dev clang
-            opt: CLANG=1 USE_OPENGL=0
+            opt: CLANG=1 USE_OPENGL=0 LTO=0
           - name: Clang without Polymer
             pkg: libsdl2-dev clang
-            opt: CLANG=1 POLYMER=0
+            opt: CLANG=1 POLYMER=0 LTO=0
     name: Linux ${{matrix.name}}
     runs-on: ubuntu-latest
     steps:
