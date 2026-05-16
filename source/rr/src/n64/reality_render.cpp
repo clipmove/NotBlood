@@ -2429,7 +2429,7 @@ void RT_DrawWall(int wallnum)
         glVertex3f(vtx.x, vtx.y, vtx.z);
     }
     glEnd();
-    if (wall[wallnum].cstat & 2)
+    if ((wall[wallnum].cstat & 2) && (wall[wallnum].nextwall >= 0))
         RT_SetTexture(wall[wall[wallnum].nextwall].picnum);
     glBegin(GL_QUADS);
     for (int i = 0; i < rt_hasbottomwall * 4; i++)
