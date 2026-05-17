@@ -61,6 +61,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // armor items when cur slot amount <= 100 and other slots amount < 100.
 #define kFlagActionCompat       0x02
 
+// Always check amount for min and max (even with SUB and ADD)
+#define kFlagActionChkRng       0x04
+
+// Always clip to limits[0] OR limits[1] (amount[1] OR amount[2] otherwise)
+#define kFlagActionClipToLimit  0x08
+
 extern char gUserItemsInitialized;
 
 #pragma pack(push, 1)
@@ -77,7 +83,8 @@ struct ITEM
     struct ACTION
     {
         uint8_t  operation, type;
-        int32_t  amount[3];
+        int32_t  amount[3]; // cur, user min/max
+        int32_t  limits[2]; // game min/max
         uint8_t  flags;
         uint8_t  slot;
     }
