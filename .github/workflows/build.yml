@@ -24,7 +24,7 @@ jobs:
             sys: mingw64
             env: x86_64
             make: make
-            opt: SDLCONFIG=
+            opt: SDLCONFIG= LTO=0
             publish-as: win64
           - name: Windows MSYS2 i686 GCC
             os: windows-latest
