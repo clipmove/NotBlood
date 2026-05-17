@@ -2688,7 +2688,7 @@ void teslaHit(spritetype *pMissile, int a2)
     int nOwner = actSpriteOwnerToSpriteId(pMissile);
     gAffectedSectors[0] = -1;
     gAffectedXWalls[0] = -1;
-    const bool bAccurateCheck = (nOwner >= 0) && !VanillaMode() && IsDudeSprite(&sprite[nOwner]); // use new sector checking logic
+    const bool bAccurateCheck = spriRangeIsFine(nOwner) && !VanillaMode() && IsDudeSprite(&sprite[nOwner]); // use new sector checking logic
     GetClosestSpriteSectors(nSector, x, y, nDist, gAffectedSectors, sectmap, gAffectedXWalls, bAccurateCheck);
     char v4 = 1;
     int v24 = -1;
