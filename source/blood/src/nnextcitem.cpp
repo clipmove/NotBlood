@@ -211,6 +211,8 @@ enum enum_PAR_ACTION_ENTRY
     kParActionSlot,
     kParActionReq,
     kParActionCompat,
+    kParActionRanged,
+    kParActionClipAmount,
 };
 static const char* gParItemActEntry[] =
 {
@@ -220,6 +222,8 @@ static const char* gParItemActEntry[] =
     "Slot",
     "Required",
     "Compatible",
+    "CheckRange",
+    "ClipToAmount",
     NULL,
 };
 
@@ -931,20 +935,40 @@ static int helperChangeValue(int nValue, ITEM::ACTION* pAct)
     int32_t n = pAct->amount[0];
     int32_t l = pAct->amount[1];
     int32_t g = pAct->amount[2];
+    int32_t clipL, clipG;
+
+    if (pAct->flags & kFlagActionClipToLimit)
+    {
+        clipL = pAct->limits[0];
+        clipG = pAct->limits[1];
+    }
+    else
+    {
+        clipL = l;
+        clipG = g;
+    }
 
     switch (pAct->operation)
     {
         case kParItemActionSet:
             if (!irngok(nValue, l, g)) break;
-            nValue = ClipRange(n, l, g);
+            nValue = ClipRange(n, clipL, clipG);
             break;
-        case kParItemActionAdd:
-            if (nValue > g) break;
-            nValue = ClipHigh(nValue + n, g);
-            break;
-        case kParItemActionSub:
-            if (nValue < l) break;
-            nValue = ClipLow(nValue - n, l);
+        default:
+            if ((pAct->flags & kFlagActionChkRng) == 0 || rngok(nValue, l, g))
+            {
+                switch (pAct->operation)
+                {
+                    case kParItemActionAdd:
+                        if (nValue > g) break;
+                        nValue = ClipHigh(nValue + n, clipG);
+                        break;
+                    case kParItemActionSub:
+                        if (nValue < l) break;
+                        nValue = ClipLow(nValue - n, clipL);
+                        break;
+                }
+            }
             break;
     }
 
@@ -1202,23 +1226,31 @@ char CUSTOMITEM_SETUP::SetupAppearance(const char* str)
 
 char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
 {
+    int m;
+
     switch (pAct->type)
     {
         case kItemActionHealth:
-            pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
-            pAct->amount[2] = SetMaxAmount(pAct->amount[2], (extLimits) ? 999 : 200);
+            m = (extLimits) ? 999 : 200;
+            
             pAct->amount[0] <<= 4;
-            pAct->amount[1] <<= 4;
-            pAct->amount[2] <<= 4;
+            pAct->amount[1] = SetMinAmount(pAct->amount[1], 0) << 4;
+            pAct->amount[2] = SetMaxAmount(pAct->amount[2], m) << 4;
+            
+            pAct->limits[0] = 0;
+            pAct->limits[1] = m << 4;
             break;
         case kItemActionArmor:
             if (pAct->slot < LENGTH(PLAYER::armor))
             {
-                pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
-                pAct->amount[2] = SetMaxAmount(pAct->amount[2], (extLimits) ? 250 : 200);
+                m = (extLimits) ? 250 : 200;
+                
                 pAct->amount[0] <<= 4;
-                pAct->amount[1] <<= 4;
-                pAct->amount[2] <<= 4;
+                pAct->amount[1] = SetMinAmount(pAct->amount[1], 0) << 4;
+                pAct->amount[2] = SetMaxAmount(pAct->amount[2], m) << 4;
+                
+                pAct->limits[0] = 0;
+                pAct->limits[1] = m << 4;
                 break;
             }
             return 0;
@@ -1229,38 +1261,49 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
                 pAct->amount[0] = (pAct->amount[0]) ? 1 : 0;
                 pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
                 pAct->amount[2] = SetMaxAmount(pAct->amount[2], 1);
+
+                pAct->limits[0] = 0;
+                pAct->limits[1] = 1;
                 break;
             }
             return 0;
         case kItemActionWeapon:
             if (pAct->slot + 1 < LENGTH(PLAYER::hasWeapon))
             {
-                int n = gAmmoInfo[pAct->slot+1].max;
-                pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
+                m = gAmmoInfo[pAct->slot+1].max;
+                
                 if (extLimits)
                 {
-                    if (n > 999)        n = 9990;   // spray can and such
-                    else if (n > 99)    n = 999;    // normal weapons
-                    else                n = 99;     // prox / remote bombs cannot have more than 2 digits in HUD.
+                    if (m > 999)        m = 9990;   // spray can and such
+                    else if (m > 99)    m = 999;    // normal weapons
+                    else                m = 99;     // prox / remote bombs cannot have more than 2 digits in HUD.
                 }
-
-                pAct->amount[2] = SetMaxAmount(pAct->amount[2], n);
+                
+                pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
+                pAct->amount[2] = SetMaxAmount(pAct->amount[2], m);
+                
+                pAct->limits[0] = 0;
+                pAct->limits[1] = m;
                 break;
             }
             return 0;
         case kItemActionAmmo:
             if (pAct->slot < LENGTH(PLAYER::ammoCount))
             {
-                int n = gAmmoInfo[pAct->slot].max;
-                pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
+                m = gAmmoInfo[pAct->slot].max;
+                
                 if (extLimits)
                 {
-                    if (n > 999)        n = 9990;   // spray can and such
-                    else if (n > 99)    n = 999;    // normal weapons
-                    else                n = 99;     // prox / remote bombs cannot have more than 2 digits in HUD.
+                    if (m > 999)        m = 9990;   // spray can and such
+                    else if (m > 99)    m = 999;    // normal weapons
+                    else                m = 99;     // prox / remote bombs cannot have more than 2 digits in HUD.
                 }
-
-                pAct->amount[2] = SetMaxAmount(pAct->amount[2], n);
+                
+                pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
+                pAct->amount[2] = SetMaxAmount(pAct->amount[2], m);
+                
+                pAct->limits[0] = 0;
+                pAct->limits[1] = m;
                 break;
             }
             return 0;
@@ -1269,18 +1312,23 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
             {
                 if (extLimits)
                 {
-                    pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
-                    pAct->amount[2] = SetMaxAmount(pAct->amount[2], 999);
+                    m = 999;
                     pAct->amount[0] *= 100;
-                    pAct->amount[1] *= 100;
-                    pAct->amount[2] *= 100;
+                    pAct->amount[1] = SetMinAmount(pAct->amount[1], 0) * 100;
+                    pAct->amount[2] = SetMaxAmount(pAct->amount[2], m) * 100;
+
+                    pAct->limits[0] = 0;
+                    pAct->limits[1] = m * 100;
                 }
                 else
                 {
-                    pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
-                    pAct->amount[2] = gPowerUpInfo[pAct->slot].maxTime;
+                    m = gPowerUpInfo[pAct->slot].maxTime;
                     pAct->amount[0] *= 100;
-                    pAct->amount[1] *= 100;
+                    pAct->amount[1] = SetMinAmount(pAct->amount[1], 0) * 100;
+                    pAct->amount[2] = m; // already adjusted
+                    
+                    pAct->limits[0] = 0;
+                    pAct->limits[1] = m;
                 }
 
                 break;
@@ -1289,8 +1337,12 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
         case kItemActionPack:
             if (pAct->slot < LENGTH(PLAYER::packSlots))
             {
+                m = (extLimits) ? 999 : 100;
                 pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
-                pAct->amount[2] = SetMaxAmount(pAct->amount[2], (extLimits) ? 999 : 100);
+                pAct->amount[2] = SetMaxAmount(pAct->amount[2], m);
+                
+                pAct->limits[0] = 0;
+                pAct->limits[1] = m;
                 break;
             }
             return 0;
@@ -1301,11 +1353,13 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
             }
             return 0;
         case kItemActionAirTime:
-            pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
-            pAct->amount[2] = SetMaxAmount(pAct->amount[2], 999);
+            m = 999;
             pAct->amount[0] *= 100;
-            pAct->amount[1] *= 100;
-            pAct->amount[2] *= 100;
+            pAct->amount[1] = SetMinAmount(pAct->amount[1], 0) * 100;
+            pAct->amount[2] = SetMaxAmount(pAct->amount[2], m) * 100;
+            
+            pAct->limits[0] = 0;
+            pAct->limits[1] = m * 100;
             break;
         case kItemActionDmgIgnore:
             if (pAct->slot < kDamageMax)
@@ -1313,6 +1367,7 @@ char CUSTOMITEM_SETUP::SetupActionLimits(ITEM::ACTION* pAct, char extLimits)
                 // Can only iterate by 1
                 pAct->amount[0] = (pAct->amount[0]) ? 1 : 0;
                 pAct->amount[1] = SetMinAmount(pAct->amount[1], 0);
+                pAct->limits[0] = 0;
                 break;
             }
             return 0;
@@ -1355,6 +1410,8 @@ char CUSTOMITEM_SETUP::SetupAction(const char* str, int nOperator, int nAction)
     action.amount[0] = 1;
     action.amount[1] = INT32_MIN + 1;
     action.amount[2] = INT32_MAX - 1;
+    action.limits[0] = INT32_MIN + 1;
+    action.limits[1] = INT32_MAX - 1;
     action.operation = nOperator;
     action.type      = nAction;
 
@@ -1393,6 +1450,18 @@ char CUSTOMITEM_SETUP::SetupAction(const char* str, int nOperator, int nAction)
                 if ((nVal = btoi(val)) > 0)
                 {
                     action.flags |= kFlagActionCompat;
+                }
+                break;
+            case kParActionRanged:
+                if ((nVal = btoi(val)) > 0)
+                {
+                    action.flags |= kFlagActionChkRng;
+                }
+                break;
+            case kParActionClipAmount:
+                if ((nVal = btoi(val)) != 1)
+                {
+                    action.flags |= kFlagActionClipToLimit;
                 }
                 break;
         }
