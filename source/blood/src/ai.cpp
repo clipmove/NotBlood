@@ -181,6 +181,18 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
         if (sprite[nLower].type == kMarkerLowWater || sprite[nLower].type == kMarkerLowGoo)
             Depth = 1;
     }
+    char bOnFakeFloor = 0;
+    if (EnemiesNotBlood() && !VanillaMode()) // check for fake floors
+    {
+        int UNUSED(ceilZ2), UNUSED(ceilHit);
+        int floorZ2, floorHit;
+        const int bakCstat = pSprite->cstat;
+        pSprite->cstat &= ~257;
+        GetZRangeAtXYZ(x, y, z, nSector, &ceilZ2, &ceilHit, &floorZ2, &floorHit, pSprite->clipdist<<2, CLIPMASK0, PARALLAXCLIP_CEILING|PARALLAXCLIP_FLOOR);
+        pSprite->cstat = bakCstat;
+        if ((floorHit&0xc000) == 0xc000)
+            bOnFakeFloor = (floorZ2 - bottom <= 0x2000) && (sprite[floorHit&0x3fff].cstat & (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR|CSTAT_SPRITE_INVISIBLE)) == (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR);
+    }
     switch (pSprite->type) {
     case kDudeGargoyleFlesh:
     case kDudeGargoyleStone:
@@ -231,6 +243,8 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
     case kDudeInnocent:
         if (Crusher)
             return false;
+        if (bOnFakeFloor)
+            return true;
         if (Depth || Underwater)
             return false;
         if (floorZ - bottom > 0x2000)
@@ -246,6 +260,8 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
     default:
         if (Crusher)
             return false;
+        if (bOnFakeFloor)
+            return true;
         if ((nXSector < 0 || (!xsector[nXSector].Underwater && !xsector[nXSector].Depth)) && floorZ - bottom > 0x2000)
             return false;
         break;
