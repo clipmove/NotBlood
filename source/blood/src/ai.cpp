@@ -133,6 +133,18 @@ bool isImmune(spritetype* pSprite, int dmgType, int minScale) {
     return true;
 }
 
+inline bool CheckForFakeFloors(spritetype* pSprite, int x, int y, int z, int nSector, int nBottom)
+{
+    int ceilZ, ceilHit, floorZ, floorHit;
+    const int bakCstat = pSprite->cstat;
+    pSprite->cstat &= ~257;
+    GetZRangeAtXYZ(x, y, z, nSector, &ceilZ, &ceilHit, &floorZ, &floorHit, pSprite->clipdist<<2, CLIPMASK0, PARALLAXCLIP_CEILING|PARALLAXCLIP_FLOOR);
+    pSprite->cstat = bakCstat;
+    if ((floorHit&0xc000) != 0xc000)
+        return false;
+    return (floorZ - nBottom <= 0x2000) && (sprite[floorHit&0x3fff].cstat & (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR|CSTAT_SPRITE_INVISIBLE)) == (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR);
+}
+
 bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
 {
     int top, bottom;
@@ -231,10 +243,12 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
     case kDudeInnocent:
         if (Crusher)
             return false;
-        if (Depth || Underwater)
+        if (Depth || Underwater || (floorZ - bottom > 0x2000))
+        {
+            if (EnemiesNotBlood() && !VanillaMode() && CheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
+                return true;
             return false;
-        if (floorZ - bottom > 0x2000)
-            return false;
+        }
         break;
     #ifdef NOONE_EXTENSIONS
     case kDudeModernCustom:
@@ -247,7 +261,11 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
         if (Crusher)
             return false;
         if ((nXSector < 0 || (!xsector[nXSector].Underwater && !xsector[nXSector].Depth)) && floorZ - bottom > 0x2000)
+        {
+            if (EnemiesNotBlood() && !VanillaMode() && CheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
+                return true;
             return false;
+        }
         break;
     }
     return 1;
