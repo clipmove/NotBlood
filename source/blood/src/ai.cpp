@@ -184,8 +184,7 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
     char bOnFakeFloor = 0;
     if (EnemiesNotBlood() && !VanillaMode()) // check for fake floors
     {
-        int UNUSED(ceilZ2), UNUSED(ceilHit);
-        int floorZ2, floorHit;
+        int ceilZ2, ceilHit, floorZ2, floorHit;
         const int bakCstat = pSprite->cstat;
         pSprite->cstat &= ~257;
         GetZRangeAtXYZ(x, y, z, nSector, &ceilZ2, &ceilHit, &floorZ2, &floorHit, pSprite->clipdist<<2, CLIPMASK0, PARALLAXCLIP_CEILING|PARALLAXCLIP_FLOOR);
