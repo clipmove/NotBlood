@@ -133,7 +133,7 @@ bool isImmune(spritetype* pSprite, int dmgType, int minScale) {
     return true;
 }
 
-inline bool CheckForFakeFloors(spritetype* pSprite, int x, int y, int z, int nSector, int nBottom)
+inline bool aiCheckForFakeFloors(spritetype *pSprite, int x, int y, int z, int nSector, int nBottom)
 {
     int ceilZ, ceilHit, floorZ, floorHit;
     const int bakCstat = pSprite->cstat;
@@ -245,7 +245,7 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
             return false;
         if (Depth || Underwater || (floorZ - bottom > 0x2000))
         {
-            if (EnemiesNotBlood() && !VanillaMode() && CheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
+            if (EnemiesNotBlood() && !VanillaMode() && aiCheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
                 return true;
             return false;
         }
@@ -262,7 +262,7 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
             return false;
         if ((nXSector < 0 || (!xsector[nXSector].Underwater && !xsector[nXSector].Depth)) && floorZ - bottom > 0x2000)
         {
-            if (EnemiesNotBlood() && !VanillaMode() && CheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
+            if (EnemiesNotBlood() && !VanillaMode() && aiCheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
                 return true;
             return false;
         }
