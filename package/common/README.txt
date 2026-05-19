@@ -157,6 +157,8 @@ If you have the GOG version of the game, do the following:
 * SNEAKYFU - Proned shotgun/tommy gun cultists only
 
 ### New console variables for NotBlood
+* automap_peek
+   - Display the full map cheat
 * cl_autoaimrange
    - Set auto aim range angle modifier (default: 4, single-player only)
 * cl_autodivingsuit
