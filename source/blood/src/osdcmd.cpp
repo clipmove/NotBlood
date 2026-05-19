@@ -55,6 +55,31 @@ static inline int osdcmd_quit(osdcmdptr_t UNUSED(parm))
     return OSDCMD_OK;
 }
 
+static int osdcmd_automap_peek(osdcmdptr_t parm)
+{
+    if (parm->numparms > 1) return OSDCMD_SHOWHELP;
+
+    if (numplayers != 1)
+    {
+        OSD_Printf("automap_peek: single player only.\n");
+        return OSDCMD_OK;
+    }
+    if (!gGameStarted)
+    {
+        OSD_Printf("automap_peek: no map to peek.\n");
+        return OSDCMD_OK;
+    }
+    if (gDemo.bPlaying || gDemo.bRecording)
+    {
+        OSD_Printf("automap_peek: cannot peek while in demo mode.\n");
+        return OSDCMD_OK;
+    }
+
+    gFullMap = parm->numparms == 1 ? parm->parms[0][0] != '0' : !gFullMap;
+    gCheatMgr.m_bPlayerCheated = true;
+    return OSDCMD_OK;
+}
+
 static int osdcmd_changelevel(osdcmdptr_t parm)
 {
     int32_t volume,level;
@@ -1401,6 +1426,7 @@ int32_t registerosdcommands(void)
 //        OSD_RegisterFunction("changelevel","changelevel <level>: warps to the given level", osdcmd_changelevel);
 //    else
 //    {
+    OSD_RegisterFunction("automap_peek", "automap_peek <0/1>: display the full map cheat", osdcmd_automap_peek);
     OSD_RegisterFunction("changelevel","changelevel <volume> <level>: warps to the given level", osdcmd_changelevel);
     OSD_RegisterFunction("map","map <mapfile>: loads the given user map", osdcmd_map);
     OSD_RegisterFunction("restartmap","restarts current map", osdcmd_restartmap);
