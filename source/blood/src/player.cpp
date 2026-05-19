@@ -1709,23 +1709,22 @@ char PickupAmmo(PLAYER* pPlayer, spritetype* pAmmo) {
     sfxPlay3DSound(pPlayer->pSprite, 782, -1, 0);
     if (gGameOptions.nAmmoScale && !VanillaMode())
     {
-        pPlayer->ammoCount[nAmmoType] = oldAmmoCount;
         switch (gGameOptions.nAmmoScale)
         {
         case 3: // 0.25x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(pPlayer->ammoCount[nAmmoType] + (nAmmoAdded>>2), gAmmoInfo[nAmmoType].max);
+            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + (nAmmoAdded>>2), gAmmoInfo[nAmmoType].max);
             break;
         case 4: // 0.5x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(pPlayer->ammoCount[nAmmoType] + (nAmmoAdded>>1), gAmmoInfo[nAmmoType].max);
+            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + (nAmmoAdded>>1), gAmmoInfo[nAmmoType].max);
             break;
         case 5: // 0.75x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(pPlayer->ammoCount[nAmmoType] + ((nAmmoAdded>>1)+(nAmmoAdded>>2)), gAmmoInfo[nAmmoType].max);
+            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + ((nAmmoAdded>>1)+(nAmmoAdded>>2)), gAmmoInfo[nAmmoType].max);
             break;
         case 1: // 1.25x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(pPlayer->ammoCount[nAmmoType] + nAmmoAdded+(nAmmoAdded>>2), gAmmoInfo[nAmmoType].max);
+            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + nAmmoAdded+(nAmmoAdded>>2), gAmmoInfo[nAmmoType].max);
             break;
         case 2: // 1.5x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(pPlayer->ammoCount[nAmmoType] + nAmmoAdded+(nAmmoAdded>>1), gAmmoInfo[nAmmoType].max);
+            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + nAmmoAdded+(nAmmoAdded>>1), gAmmoInfo[nAmmoType].max);
             break;
         }
     }
