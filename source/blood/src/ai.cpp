@@ -142,7 +142,7 @@ inline bool aiCheckForFakeFloors(spritetype *pSprite, int x, int y, int z, int n
     pSprite->cstat = bakCstat;
     if ((floorHit&0xc000) != 0xc000)
         return false;
-    return (floorZ - nBottom <= 0x2000) && (sprite[floorHit&0x3fff].cstat & (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR|CSTAT_SPRITE_INVISIBLE)) == (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR);
+    return (floorZ - nBottom <= 0x2000) && (sprite[floorHit&0x3fff].cstat & (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR)) == (CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_ALIGNMENT_FLOOR);
 }
 
 bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
