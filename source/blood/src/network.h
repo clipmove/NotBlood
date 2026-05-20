@@ -159,6 +159,7 @@ inline void GetPacketBuffer(char *&p, void *pBuffer, int size)
 
 void netResetState(void);
 void netResetToSinglePlayer(void);
+void netBroadcastUserMapPath(const char* pzMapFilename);
 void netBroadcastMessage(int nPlayer, const char *pzMessage, const char bTeamMessage);
 void netBroadcastNotifySpectating(int nPlayer);
 void netWaitForEveryone(char a1);

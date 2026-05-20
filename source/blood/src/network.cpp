@@ -78,7 +78,7 @@ char gNetAddress[48];
 int gNetPort = kNetDefaultPort;
 int gNetPortLocal = -1;
 
-const short kNetVersion = 0x242;
+const short kNetVersion = 0x243;
 
 #ifdef NORENDER
 #ifdef _WIN32
@@ -578,23 +578,23 @@ void netGetPackets(void)
             }
             break;
         case 4:
+        {
+            if (gPlayer[nPlayer].pXSprite && (gPlayer[nPlayer].pXSprite->health == 0) && !VanillaMode()) // if player is dead, don't play taunt
+                break;
+            int nTaunt = GetPacketByte(pPacket);
+            if (gPlayer[nPlayer].pSprite && (nTaunt >= 10) && !VanillaMode()) // cultist talk
             {
-                if (gPlayer[nPlayer].pXSprite && (gPlayer[nPlayer].pXSprite->health == 0) && !VanillaMode()) // if player is dead, don't play taunt
-                    break;
-                int nTaunt = GetPacketByte(pPacket);
-                if (gPlayer[nPlayer].pSprite && (nTaunt >= 10) && !VanillaMode()) // cultist talk
-                {
-                    nTaunt = ClipRange(nTaunt-10, 0, 4);
-                    sfxPlay3DSoundCP(gPlayer[nPlayer].pSprite, 1008+nTaunt, 1, 0, 0, 128);
-                    break;
-                }
-                nTaunt = ClipRange(nTaunt, 0, 9);
-                if (gPlayer[nPlayer].pSprite && !VanillaMode())
-                    sfxPlay3DSoundCP(gPlayer[nPlayer].pSprite, 4400+nTaunt, 1, 0, 0, 128);
-                else
-                    sndStartSample(4400+nTaunt, 128, 1, 0);
+                nTaunt = ClipRange(nTaunt-10, 0, 4);
+                sfxPlay3DSoundCP(gPlayer[nPlayer].pSprite, 1008+nTaunt, 1, 0, 0, 128);
+                break;
             }
+            nTaunt = ClipRange(nTaunt, 0, 9);
+            if (gPlayer[nPlayer].pSprite && !VanillaMode())
+                sfxPlay3DSoundCP(gPlayer[nPlayer].pSprite, 4400+nTaunt, 1, 0, 0, 128);
+            else
+                sndStartSample(4400+nTaunt, 128, 1, 0);
             break;
+        }
         case 6:
             sprintf(buffer, "%s is now spectating", gProfile[nPlayer].name);
             viewSetMessage(buffer, gColorMsg && !VanillaMode() ? playerColorPalMessage(gPlayer[nPlayer].teamId) : 0);
@@ -606,6 +606,15 @@ void netGetPackets(void)
             netPlayerQuit(nPlayer);
             netWaitForEveryone(0);
             break;
+        case 248:
+        {
+            char szMapPath[BMAX_PATH];
+            memcpy(szMapPath, pPacket, sizeof(szMapPath));
+            szMapPath[BMAX_PATH-1] = '\0';
+            if (!testkopen(szMapPath, 0))
+                NetAlertMissingMap();
+            break;
+        }
         case 249:
             nPlayer = GetPacketDWord(pPacket);
             dassert(nPlayer != myconnectindex);
@@ -760,6 +769,18 @@ void netBroadcastTauntRandom(int nPlayer)
         netSendPacketAll(packet, pPacket-packet);
     }
     sndStartSample(1008+nTaunt, 2, 1, 0);
+}
+
+void netBroadcastUserMapPath(const char *pzMapFilename)
+{
+    if (numplayers > 1)
+    {
+        int nSize = strlen(pzMapFilename);
+        char *pPacket = packet;
+        PutPacketByte(pPacket, 248);
+        PutPacketBuffer(pPacket, pzMapFilename, nSize+1);
+        netSendPacketAll(packet, pPacket-packet);
+    }
 }
 
 void netBroadcastMessage(int nPlayer, const char *pzMessage, const char bTeamMessage)
