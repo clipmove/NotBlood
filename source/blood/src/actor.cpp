@@ -3587,8 +3587,12 @@ int actDamageSprite(int nSource, spritetype *pSprite, DAMAGE_TYPE damageType, in
                         }
                     }
                 }
-                if (pSourcePlayer && pSourcePlayer->pSprite != pSprite)
+                if (pSourcePlayer && (pSourcePlayer->pSprite != pSprite))
+                {
+                    if (!pSourcePlayer->damageAccumulatedTick || (damage > 25) && (damageType != kDamageBurn))
+                         pSourcePlayer->damageAccumulatedTick = kTicsPerSec;
                     pSourcePlayer->damageAccumulated += (unsigned short)damage;
+                }
             }
         }
         break;
