@@ -1708,6 +1708,7 @@ void SetupNetStartMenu(void)
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerMode, false);
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerSeed, false);
     menuNetworkGameMutators.Add(&itemBloodQAV, false);
+    menuNetworkGameMutators.OrganizeItems(true, true);
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";
     itemNetMutatorDamageInvul.tooltip_pzTextUpper = "Apply a short invulnerability state";
@@ -1995,6 +1996,7 @@ void SetupOptionsMenu(void)
     menuOptionsGameMutators.Add(&itemMutatorRandomizerMode, false);
     menuOptionsGameMutators.Add(&itemMutatorRandomizerSeed, false);
     menuOptionsGameMutators.Add(&itemBloodQAV, false);
+    menuOptionsGameMutators.OrganizeItems(true, true);
     itemOptionsChainMutators.bDisableForNet = 1;
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";

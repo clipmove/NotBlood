@@ -537,6 +537,46 @@ bool CGameMenu::MouseEvent(CGameMenuEvent &event)
     return pItemList[m_nFocus]->MouseEvent(event);
 }
 
+void CGameMenu::OrganizeItems(const bool bAddSpace, const bool bAddSpaceForTooltips)
+{
+    int nCount = 0;
+    for (int i = 0; i < m_nItems; i++) // get count
+    {
+        if (pItemList[i] == NULL)
+            continue;
+        if (pItemList[i]->bIgnoreOrganize)
+            continue;
+        nCount++;
+    }
+    if (nCount <= 0)
+        return;
+
+    if (!bAddSpace && (nCount > 1))
+        nCount--;
+    int nStart = 32;
+    int nEnd = bAddSpaceForTooltips ? 162 : 192;
+    float nStep = (float)(nEnd - nStart) / (float)nCount;
+    if (bAddSpace)
+    {
+        nStart -= int(nStep / 2.f);
+        nCount = 1;
+    }
+    else
+    {
+        nCount = 0;
+    }
+
+    for (int i = 0; i < m_nItems; i++) // shift
+    {
+        if (pItemList[i] == NULL)
+            continue;
+        if (pItemList[i]->bIgnoreOrganize)
+            continue;
+        pItemList[i]->m_nY = nStart + int(nStep * (float)nCount);
+        nCount++;
+    }
+}
+
 CGameMenuItem::CGameMenuItem()
 {
     m_pzText = NULL;
@@ -548,6 +588,7 @@ CGameMenuItem::CGameMenuItem()
     bNoDraw = 0;
     bDisableForNet = 0;
     bDisableForPermaDeath = 0;
+    bIgnoreOrganize = 0;
     tooltip_pzTextUpper = NULL;
     tooltip_pzTextLower = NULL;
     pPreDrawCallback = NULL;
@@ -621,6 +662,7 @@ CGameMenuItemText::CGameMenuItemText()
 {
     m_pzText = 0;
     bEnable = 0;
+    bIgnoreOrganize = 1;
 }
 
 CGameMenuItemText::CGameMenuItemText(const char *a1, int a2, int a3, int a4, int a5)
@@ -632,6 +674,7 @@ CGameMenuItemText::CGameMenuItemText(const char *a1, int a2, int a3, int a4, int
     m_nY = a4;
     at20 = a5;
     bEnable = 0;
+    bIgnoreOrganize = 1;
 }
 
 void CGameMenuItemText::Draw(void)
@@ -659,6 +702,7 @@ CGameMenuItemTitle::CGameMenuItemTitle()
 {
     m_pzText = 0;
     bEnable = 0;
+    bIgnoreOrganize = 1;
 }
 
 CGameMenuItemTitle::CGameMenuItemTitle(const char *a1, int a2, int a3, int a4, int a5)
@@ -670,6 +714,7 @@ CGameMenuItemTitle::CGameMenuItemTitle(const char *a1, int a2, int a3, int a4, i
     m_nY = a4;
     at20 = a5;
     bEnable = 0;
+    bIgnoreOrganize = 1;
 }
 
 void CGameMenuItemTitle::Draw(void)
@@ -2175,6 +2220,7 @@ CGameMenuItemQAV::CGameMenuItemQAV()
     at24 = NULL;
     at28 = 0;
     bEnable = 0;
+    bIgnoreOrganize = 1;
 }
 
 CGameMenuItemQAV::CGameMenuItemQAV(const char *a1, int a2, int a3, int a4, const char *a5, bool widescreen, bool clearbackground)
@@ -2186,6 +2232,7 @@ CGameMenuItemQAV::CGameMenuItemQAV(const char *a1, int a2, int a3, int a4, const
     at20 = a5;
     m_nX = a3;
     bEnable = 0;
+    bIgnoreOrganize = 1;
     bWideScreen = widescreen;
     bClearBackground = clearbackground;
 }
