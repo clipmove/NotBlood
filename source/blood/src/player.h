@@ -236,6 +236,7 @@ struct PLAYER
     int                 chokeEffect;
     int                 handTime;
     bool                hand;  // if true, there is hand start choking the player
+    unsigned short      damageAccumulated; // accumulate total damage caused to enemies per 128 ticks
     int                 pickupEffect;
     bool                flashEffect;  // if true, reduce pPlayer->visibility counter; originally 32-bit
     int                 quakeEffect;

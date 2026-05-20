@@ -143,6 +143,7 @@ extern int32_t gUpscaleFactor;
 extern int32_t gRenderScale;
 extern int32_t gLevelStats;
 extern int32_t gLevelStatsOnlyOnMap;
+extern int32_t gShowDamage;
 extern int32_t gShowSpeed;
 extern int32_t gHudRatio;
 extern int32_t gHudBgNewBorder;
