@@ -196,6 +196,7 @@ int32_t gFMPianoFix;
 //////////
 int gVanilla;
 int gQuadDamagePowerup;
+int gBeastVision;
 int gDamageInvul;
 int gProjectileBehavior;
 int gNapalmFalloff;
@@ -600,6 +601,7 @@ void CONFIG_SetDefaults(void)
 
     gVanilla = 0;
     gQuadDamagePowerup = 0;
+    gBeastVision = 0;
     gDamageInvul = 0;
     gProjectileBehavior = 0;
     gNapalmFalloff = 0;
@@ -941,6 +943,7 @@ int CONFIG_ReadSetup(void)
     SCRIPT_GetNumber(scripthandle, "Game Options", "RestoreLastSave", &gRestoreLastSave);
     SCRIPT_GetNumber(scripthandle, "Game Options", "VanillaMode", &gVanilla);
     SCRIPT_GetNumber(scripthandle, "Game Options", "QuadDamagePowerup", &gQuadDamagePowerup);
+    SCRIPT_GetNumber(scripthandle, "Game Options", "BeastVision", &gBeastVision);
     SCRIPT_GetNumber(scripthandle, "Game Options", "DamageInvul", &gDamageInvul);
     SCRIPT_GetNumber(scripthandle, "Game Options", "ProjectilesBehavior", &gProjectileBehavior);
     SCRIPT_GetNumber(scripthandle, "Game Options", "NapalmFalloff", &gNapalmFalloff);
@@ -1250,6 +1253,7 @@ void CONFIG_WriteSetup(uint32_t flags)
     SCRIPT_PutNumber(scripthandle, "Game Options", "RestoreLastSave", gRestoreLastSave, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "VanillaMode", gVanilla, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "QuadDamagePowerup", gQuadDamagePowerup, FALSE, FALSE);
+    SCRIPT_PutNumber(scripthandle, "Game Options", "BeastVision", gBeastVision, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "DamageInvul", gDamageInvul, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "ProjectilesBehavior", gProjectileBehavior, FALSE, FALSE);
     SCRIPT_PutNumber(scripthandle, "Game Options", "NapalmFalloff", gNapalmFalloff, FALSE, FALSE);

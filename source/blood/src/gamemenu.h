@@ -111,6 +111,7 @@ public:
     unsigned int bNoDraw : 1;
     unsigned int bDisableForNet : 1;
     unsigned int bDisableForPermaDeath : 1;
+    unsigned int bIgnoreOrganize : 1;
     const char* tooltip_pzTextUpper;
     const char* tooltip_pzTextLower;
     CGameMenuItem();
@@ -446,6 +447,7 @@ public:
     void FocusBottomItem(void);
     bool IsFocusItem(CGameMenuItem *pItem);
     bool MouseEvent(CGameMenuEvent &event);
+    void OrganizeItems(const bool bAddSpace, const bool bAddSpaceForTooltips);
 };
 
 class CGameMenuMgr

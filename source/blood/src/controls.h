@@ -105,6 +105,7 @@ struct GINPUT
 
 extern GINPUT gInput, gNetInput;
 extern bool bSilentAim;
+extern bool gTimeSlowed;
 extern int32_t gMouseAim; // Should be an int32 due to being passed to OSD
 
 extern fix16_t gViewLook, gViewAngle;
