@@ -57,6 +57,7 @@ void SetMonoStereo(CGameMenuItemZBool *);
 void SetCrosshair(CGameMenuItemZCycle *);
 
 void SetQuadDamagePowerup(CGameMenuItemZBool*);
+void SetBeastVisionReplacement(CGameMenuItemZCycle*);
 void SetDamageInvul(CGameMenuItemZCycle*);
 void SetProjectileBehavior(CGameMenuItemZCycle*);
 void SetNapalmFalloff(CGameMenuItemZBool*);
@@ -278,6 +279,12 @@ const char *zDiffStrings[] =
     "LIGHTLY BROILED",
     "WELL DONE",
     "EXTRA CRISPY",
+};
+
+const char *pzBeastVisionReplacementStrings[] = {
+    "DEFAULT",
+    "X-RAY",
+    "ADRENALINE",
 };
 
 const char *pzDamageInvulBehaviorStrings[] = {
@@ -604,10 +611,11 @@ CGameMenuItemZBool itemNetMonsterTchernobogHealth("TCHERNOBOG HEALTH:", 3, 75, 1
 
 ///////////////
 CGameMenuItemZBool itemNetMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X DAMAGE:", 3, 66, 32, 180, false, NULL, NULL, NULL);
+CGameMenuItemZBool itemNetMutatorBoolBeastVision("REPLACE BEAEST VISION:", 3, 66, 32, 180, false, NULL, "X-RAY", "ORIGINAL");
 CGameMenuItemZCycle itemNetMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 42, 180, 0, NULL, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
 CGameMenuItemZCycle itemNetMutatorProjectileBehavior("PROJECTILES BEHAVIOR:", 3, 66, 52, 180, 0, NULL, pzProjectileBehaviorStrings, ARRAY_SSIZE(pzProjectileBehaviorStrings), 0);
 CGameMenuItemZBool itemNetMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 62, 180, false, NULL, NULL, NULL);
-CGameMenuItemZCycle itemNetMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 72, 180, false, NULL, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
+CGameMenuItemZCycle itemNetMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 72, 180, 0, NULL, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
 CGameMenuItemZBool itemNetMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 82, 180, false, NULL, NULL, NULL);
 CGameMenuItemZCycle itemNetMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 92, 180, 0, NULL, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
 CGameMenuItemZCycle itemNetMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 102, 180, 0, NULL, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
@@ -770,6 +778,7 @@ void SetVanillaMode(CGameMenuItemZCycle *pItem);
 ///////////////
 CGameMenuItemTitle itemGameMutatorsTitle("MUTATORS", 1, 160, 20, 2038);
 CGameMenuItemZBool itemMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X DAMAGE:", 3, 66, 32, 180, false, SetQuadDamagePowerup, NULL, NULL);
+CGameMenuItemZCycle itemMutatorCycleBeastVisionReplacement("REPLACE BEAEST VISION:", 3, 66, 32, 180, 0, SetBeastVisionReplacement, pzBeastVisionReplacementStrings, ARRAY_SSIZE(pzBeastVisionReplacementStrings), 0);
 CGameMenuItemZCycle itemMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 42, 180, 0, SetDamageInvul, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
 CGameMenuItemZCycle itemMutatorProjectileBehavior("PROJECTILES BEHAVIOR:", 3, 66, 52, 180, 0, SetProjectileBehavior, pzProjectileBehaviorStrings, ARRAY_SSIZE(pzProjectileBehaviorStrings), 0);
 CGameMenuItemZBool itemMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 62, 180, false, SetNapalmFalloff, NULL, NULL);
@@ -1694,6 +1703,7 @@ void SetupNetStartMenu(void)
     //////////////////////
     menuNetworkGameMutators.Add(&itemGameMutatorsTitle, false);
     menuNetworkGameMutators.Add(&itemNetMutatorBoolQuadDamagePowerup, true);
+    menuNetworkGameMutators.Add(&itemNetMutatorBoolBeastVision, false);
     menuNetworkGameMutators.Add(&itemNetMutatorDamageInvul, false);
     menuNetworkGameMutators.Add(&itemNetMutatorProjectileBehavior, false);
     menuNetworkGameMutators.Add(&itemNetMutatorNapalmFalloff, false);
@@ -1711,6 +1721,7 @@ void SetupNetStartMenu(void)
     menuNetworkGameMutators.OrganizeItems(true, true);
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";
+    itemNetMutatorBoolBeastVision.tooltip_pzTextLower = "Replace beast vision item function";
     itemNetMutatorDamageInvul.tooltip_pzTextUpper = "Apply a short invulnerability state";
     itemNetMutatorDamageInvul.tooltip_pzTextLower = "on bullet/spirit/tesla damage";
     itemNetMutatorProjectileBehavior.tooltip_pzTextUpper = "Use smaller hitboxes and improve collision";
@@ -1770,6 +1781,7 @@ void SetupNetStartMenu(void)
 
     ///////
     itemNetMutatorBoolQuadDamagePowerup.at20 = !!gQuadDamagePowerup;
+    itemNetMutatorBoolBeastVision.at20 = !!gBeastVision;
     itemNetMutatorDamageInvul.m_nFocus = gDamageInvul % ARRAY_SSIZE(pzDamageInvulBehaviorStrings);
     itemNetMutatorProjectileBehavior.m_nFocus = gProjectileBehavior % ARRAY_SSIZE(pzProjectileBehaviorStrings);
     itemNetMutatorNapalmFalloff.at20 = !!gNapalmFalloff;
@@ -1982,6 +1994,7 @@ void SetupOptionsMenu(void)
     //////////////////////
     menuOptionsGameMutators.Add(&itemGameMutatorsTitle, false);
     menuOptionsGameMutators.Add(&itemMutatorBoolQuadDamagePowerup, true);
+    menuOptionsGameMutators.Add(&itemMutatorCycleBeastVisionReplacement, false);
     menuOptionsGameMutators.Add(&itemMutatorDamageInvul, false);
     menuOptionsGameMutators.Add(&itemMutatorProjectileBehavior, false);
     menuOptionsGameMutators.Add(&itemMutatorNapalmFalloff, false);
@@ -2000,6 +2013,7 @@ void SetupOptionsMenu(void)
     itemOptionsChainMutators.bDisableForNet = 1;
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";
+    itemMutatorCycleBeastVisionReplacement.tooltip_pzTextUpper = "Replace beast vision item function";
     itemMutatorDamageInvul.tooltip_pzTextUpper = "Apply a short invulnerability state";
     itemMutatorDamageInvul.tooltip_pzTextLower = "on bullet/spirit/tesla damage";
     itemMutatorProjectileBehavior.tooltip_pzTextUpper = "Use smaller hitboxes and improve collision";
@@ -2038,6 +2052,7 @@ void SetupOptionsMenu(void)
 
     ///////
     itemMutatorBoolQuadDamagePowerup.at20 = !!gQuadDamagePowerup;
+    itemMutatorCycleBeastVisionReplacement.m_nFocus = gBeastVision % ARRAY_SSIZE(pzBeastVisionReplacementStrings);
     itemMutatorDamageInvul.m_nFocus = gDamageInvul % ARRAY_SSIZE(pzDamageInvulBehaviorStrings);
     itemMutatorProjectileBehavior.m_nFocus = gProjectileBehavior % ARRAY_SSIZE(pzProjectileBehaviorStrings);
     itemMutatorNapalmFalloff.at20 = !!gNapalmFalloff;
@@ -2652,6 +2667,16 @@ void SetQuadDamagePowerup(CGameMenuItemZBool* pItem)
         gGameOptions.bQuadDamagePowerup = gQuadDamagePowerup;
     } else {
         pItem->at20 = gQuadDamagePowerup;
+    }
+}
+
+void SetBeastVisionReplacement(CGameMenuItemZCycle *pItem)
+{
+    if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) {
+        gBeastVision = pItem->m_nFocus % ARRAY_SSIZE(pzBeastVisionReplacementStrings);
+        gGameOptions.nBeastVision = gBeastVision;
+    } else {
+        pItem->m_nFocus = gBeastVision % ARRAY_SSIZE(pzBeastVisionReplacementStrings);
     }
 }
 
@@ -4846,6 +4871,7 @@ void StartNetGame(CGameMenuItemChain *pItem)
     ////
     SetGameVanillaMode(0); // turn off vanilla mode for multiplayer so menus don't get bugged
     gPacketStartGame.bQuadDamagePowerup = itemNetMutatorBoolQuadDamagePowerup.at20;
+    gPacketStartGame.nBeastVision = itemNetMutatorBoolBeastVision.at20;
     gPacketStartGame.nDamageInvul = itemNetMutatorDamageInvul.m_nFocus % ARRAY_SSIZE(pzDamageInvulBehaviorStrings);
     gPacketStartGame.nProjectileBehavior = itemNetMutatorProjectileBehavior.m_nFocus % ARRAY_SSIZE(pzProjectileBehaviorStrings);
     gPacketStartGame.bNapalmFalloff = itemNetMutatorNapalmFalloff.at20;

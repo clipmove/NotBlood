@@ -80,7 +80,8 @@ struct PKT_STARTGAME {
     unsigned int uNetGameFlags;
     char userMap, userMapName[BMAX_PATH];
     char monsterQuantity, monsterHealth, monsterSpeed;
-    bool bQuadDamagePowerup;
+    char bQuadDamagePowerup;
+    char nBeastVision;
     int nDamageInvul;
     int nProjectileBehavior;
     bool bNapalmFalloff;
