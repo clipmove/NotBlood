@@ -111,6 +111,7 @@ void SetMessages(CGameMenuItemZBool *);
 void LoadGame(CGameMenuItemZEditBitmap *, CGameMenuEvent *);
 void SetupNetLevels(CGameMenuItemZCycle *);
 void NetLoadItemsConfig(void);
+void NetLoadTestMap(void);
 void NetClearUserMap(CGameMenuItemZCycle *);
 void StartNetGame(CGameMenuItemChain *);
 void SetupLevelMenuItem(int);
@@ -170,6 +171,9 @@ int restoreGameDifficulty[kMaxLoadSaveSlot] =
     -1,
     -1,
 };
+
+const char *zNetStartGame = "START GAME";
+const char *zNetStartGameError = "USER MAP NOT FOUND!!";
 
 const char *zNetGameTypes[] =
 {
@@ -545,7 +549,7 @@ CGameMenuItemTitle itemNetStartUserItemTitle("ITEM CONFIG", 1, 160, 20, 2038);
 CGameMenuFileSelect menuMultiUserItem("", 3, 0, 0, 0, "./", "*.itm", zUserItemName, NetLoadItemsConfig);
 
 CGameMenuItemTitle itemNetStartUserMapTitle("USER MAP", 1, 160, 20, 2038);
-CGameMenuFileSelect menuMultiUserMap("", 3, 0, 0, 0, "./", "*.map", zUserMapName);
+CGameMenuFileSelect menuMultiUserMap("", 3, 0, 0, 0, "./", "*.map", zUserMapName, NetLoadTestMap);
 
 void SetNetGameMode(CGameMenuItemZCycle *pItem);
 void SetNetShowWeapon(CGameMenuItemZCycle *pItem);
@@ -567,7 +571,7 @@ CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 143, 256, 1, &menuBannedItem
 CGameMenuItemChain itemNetStart8Load("LOAD ITEMS", 3, 0, 143, 384, 1, &menuMultiUserItems, 0, NULL, 0);
 CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 153, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
 CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 163, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
-CGameMenuItemChain itemNetStart11("START GAME", 1, 0, 175, 320, 1, 0, -1, StartNetGame, 0);
+CGameMenuItemChain itemNetStart11(zNetStartGame, 1, 0, 175, 320, 1, 0, -1, StartNetGame, 0);
 
 CGameMenuItemTitle itemNetGameTitle("GAME SETTINGS", 1, 160, 20, 2038);
 CGameMenuItemZCycle itemNetGameMode("GAME:", 3, 66, 35, 180, 0, SetNetGameMode, zNetGameTypes, ARRAY_SSIZE(zNetGameTypes), 0);
@@ -4784,10 +4788,22 @@ void NetLoadItemsConfig(void)
     itemBannedItemsReflect.at20 = !!(uBannedItems&BANNED_REFLECT);
 }
 
+void NetLoadTestMap(void)
+{
+    netBroadcastUserMapPath(zUserMapName);
+    itemNetStart11.m_pzText = zNetStartGame;
+}
+
+void NetAlertMissingMap(void)
+{
+    itemNetStart11.m_pzText = zNetStartGameError;
+}
+
 void NetClearUserMap(CGameMenuItemZCycle *pItem)
 {
     UNREFERENCED_PARAMETER(pItem);
     memset(zUserMapName, 0, sizeof(zUserMapName));
+    itemNetStart11.m_pzText = zNetStartGame;
 }
 
 void StartNetGame(CGameMenuItemChain *pItem)
