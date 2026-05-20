@@ -693,6 +693,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
 
         ///////
         pOpt->bQuadDamagePowerup = gQuadDamagePowerup;
+        pOpt->nBeastVision = gBeastVision;
         pOpt->nDamageInvul = gDamageInvul;
         pOpt->nProjectileBehavior = gProjectileBehavior;
         pOpt->bNapalmFalloff = gNapalmFalloff;
@@ -742,6 +743,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
 
         ///////
         pOpt->bQuadDamagePowerup = gPacketStartGame.bQuadDamagePowerup;
+        pOpt->nBeastVision = gPacketStartGame.nBeastVision;
         pOpt->nDamageInvul = gPacketStartGame.nDamageInvul;
         pOpt->nProjectileBehavior = gPacketStartGame.nProjectileBehavior;
         pOpt->bNapalmFalloff = gPacketStartGame.bNapalmFalloff;

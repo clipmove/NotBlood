@@ -177,6 +177,7 @@ extern const char *gPlayerNames[];
 ///////
 extern int gVanilla;
 extern int gQuadDamagePowerup;
+extern int gBeastVision;
 extern int gDamageInvul;
 extern int gProjectileBehavior;
 extern int gNapalmFalloff;

@@ -33,6 +33,8 @@ If you have the GOG version of the game, do the following:
 ### Mutator Options
 * Replace guns akimbo with quad damage
    - Replaces the guns akimbo powerup with Quake's quad damage (lasts 22 seconds)
+* Replace beast vision
+   - Replaces the beast vision item with x-ray or adrenaline (single-player only)
 * Player damage invulnerability
    - Apply a short invulnerability state for the player for bullet hitscans/spirit/tesla damage
    - Invulnerability duration changes depending on damage taken scale/current health (lower health = longer invulnerability state)
@@ -80,7 +82,6 @@ If you have the GOG version of the game, do the following:
 * Weapon behavior
    - Select between original weapon behavior, NBlood's V1.X behavior or NotBlood's tweaked weapon set which include:
    - Tommy gun alt fire uses autoaim
-   - Make beast vision see through nearby walls
    - Adjust pitch offset for spray/missile firing
    - Adds a charge up stab for pitchfork's alt fire
    - Lifeleech steals enemy's health (like V1.X behavior)

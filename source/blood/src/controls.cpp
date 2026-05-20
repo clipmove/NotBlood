@@ -62,6 +62,7 @@ void ctrlClearAllInput(void)
 
 GINPUT gInput, gNetInput;
 bool bSilentAim = false;
+bool gTimeSlowed = false;
 
 int32_t GetTime(void)
 {
@@ -775,17 +776,16 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         11,
         10,
     };
-    static char bTimeSlowed = 0;
     static int nMenuCooldown = 0;
     static int nOldMouseX = 0, nOldMouseY = 0;
 
     if (bReset || !gMe || (gMe->pXSprite->health == 0))
     {
         gWeaponRadialMenuState = nMenuCooldown = 0;
-        if (bTimeSlowed)
+        if (gTimeSlowed)
         {
             timerInit(CLOCKTICKSPERSECOND);
-            bTimeSlowed = 0;
+            gTimeSlowed = false;
         }
         nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
         return;
@@ -885,7 +885,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         if (gRadialMenuSlowDown && (gGameOptions.nGameType == kGameTypeSinglePlayer)) // only allow slowdown during singleplayer
         {
             timerInit(CLOCKTICKSPERSECOND>>4);
-            bTimeSlowed = 1;
+            gTimeSlowed = true;
         }
         if ((gMe->input.newWeapon >= kWeaponPitchfork) && (gMe->input.newWeapon <= kWeaponRemoteTNT)) // set the reticle to the weapon being switched to
             gWeaponRadialMenuChoice = gMe->input.newWeapon;
@@ -1019,10 +1019,10 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             else
                 gInput.newWeapon = gWeaponRadialMenuChoice;
         }
-        if (bTimeSlowed)
+        if (gTimeSlowed)
         {
             timerInit(CLOCKTICKSPERSECOND);
-            bTimeSlowed = 0;
+            gTimeSlowed = false;
         }
         break;
     }

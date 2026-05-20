@@ -581,6 +581,13 @@ void powerupDeactivate(PLAYER *pPlayer, int nPowerUp)
             pPlayer->input.newWeapon = pPlayer->curWeapon;
             WeaponRaise(pPlayer);
             break;
+        case kItemBeastVision:
+            if ((gGameOptions.nBeastVision == 2) && gTimeSlowed && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !VanillaMode())
+            {
+                timerInit(CLOCKTICKSPERSECOND);
+                gTimeSlowed = false;
+            }
+            break;
     }
 }
 
@@ -604,7 +611,19 @@ void powerupProcess(PLAYER *pPlayer)
             {
                 pPlayer->pwUpTime[i] = ClipLow(pPlayer->pwUpTime[i]-kTicsPerFrame, 0);
                 if (pPlayer->pwUpTime[i])
+                {
                     pPlayer->packSlots[nPack].curAmount = (100*pPlayer->pwUpTime[i])/gPowerUpInfo[i].bonusTime;
+                    if ((nPack == kPackBeastVision) && (gGameOptions.nBeastVision == 2) && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !VanillaMode())
+                    {
+                        if (!gTimeSlowed)
+                        {
+                            timerInit(CLOCKTICKSPERSECOND>>2);
+                            gTimeSlowed = true;
+                        }
+                        pPlayer->pwUpTime[i] = ClipLow(pPlayer->pwUpTime[i]-(kTicsPerFrame<<1), 0);
+                        pPlayer->packSlots[nPack].curAmount = (100*pPlayer->pwUpTime[i])/gPowerUpInfo[i].bonusTime;
+                    }
+                }
                 else
                 {
                     powerupDeactivate(pPlayer, i);

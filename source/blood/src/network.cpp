@@ -75,7 +75,7 @@ char gNetAddress[48];
 int gNetPort = kNetDefaultPort;
 int gNetPortLocal = -1;
 
-const short kNetVersion = 0x241;
+const short kNetVersion = 0x242;
 
 PKT_STARTGAME gPacketStartGame;
 
