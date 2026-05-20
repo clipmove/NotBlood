@@ -163,6 +163,7 @@ int32_t gUpscaleFactor;
 int32_t gRenderScale;
 int32_t gLevelStats;
 int32_t gLevelStatsOnlyOnMap;
+int32_t gShowDamage;
 int32_t gShowSpeed;
 int32_t gHudRatio;
 int32_t gHudBgNewBorder;
@@ -467,6 +468,7 @@ void CONFIG_SetDefaults(void)
     //ud.idplayers              = 1;
     gLevelStats = 0;
     gLevelStatsOnlyOnMap = 0;
+    gShowDamage = 0;
     gShowSpeed = 0;
     gHudRatio = 1;
     gHudBgNewBorder = 1;

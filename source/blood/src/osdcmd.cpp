@@ -1214,6 +1214,7 @@ int32_t registerosdcommands(void)
         { "cl_randomizerscale", "enable/disable randomly scaling enemies for randomizer mode (0: disable, 1: only with seed cheats, 2: always) (always use 1 in multiplayer)", (void *)&gRandomizerScaleMode, CVAR_INT, 0, 2 },
         { "cl_slopetilting", "enable/disable slope tilting", (void *)&gSlopeTilting, CVAR_BOOL, 0, 1 },
         { "cl_slopecrosshair", "enable/disable adjusting crosshair position for slope tilting", (void *)&gSlopeReticle, CVAR_BOOL, 0, 1 },
+        { "cl_showdamage", "enable/disable showing player damage to other enemies", (void*)&gShowDamage, CVAR_BOOL, 0, 1 },
         { "cl_showplayernames", "enable/disable showing player names in multiplayer when looking at other players", (void *)&gShowPlayerNames, CVAR_BOOL, 0, 1 },
         { "cl_showspeed", "enable/disable showing player speed", (void*)&gShowSpeed, CVAR_BOOL, 0, 1 },
         { "cl_showweapon", "enable/disable show weapons (0: disable, 1: sprite, 2: voxel)", (void *)&gShowWeapon, CVAR_INT, 0, 2 },
