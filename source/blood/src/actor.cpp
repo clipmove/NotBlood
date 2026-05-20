@@ -3571,19 +3571,24 @@ int actDamageSprite(int nSource, spritetype *pSprite, DAMAGE_TYPE damageType, in
 
             }
 
-            if (gSoundDing && (pSourcePlayer == gMe) && gMe && (pSprite != gMe->pSprite) && (damage > 0) && bWasAlive) {
-                for (int i = 0; i < 4; i++) {
-                    DMGFEEDBACK *pSoundDmgSprite = &gSoundDingSprite[i];
-                    if (pSoundDmgSprite->nSprite == -1) {
-                        pSoundDmgSprite->nSprite = pSprite->index;
-                        pSoundDmgSprite->nDamage = kDamageBeforeScaling;
-                        break;
-                    }
-                    if (pSoundDmgSprite->nSprite == pSprite->index) {
-                        pSoundDmgSprite->nDamage += kDamageBeforeScaling;
-                        break;
+            if ((damage > 0) && bWasAlive) {
+                if (gSoundDing && (pSourcePlayer == gMe) && gMe && (pSprite != gMe->pSprite))
+                {
+                    for (int i = 0; i < 4; i++) {
+                        DMGFEEDBACK* pSoundDmgSprite = &gSoundDingSprite[i];
+                        if (pSoundDmgSprite->nSprite == -1) {
+                            pSoundDmgSprite->nSprite = pSprite->index;
+                            pSoundDmgSprite->nDamage = kDamageBeforeScaling;
+                            break;
+                        }
+                        if (pSoundDmgSprite->nSprite == pSprite->index) {
+                            pSoundDmgSprite->nDamage += kDamageBeforeScaling;
+                            break;
+                        }
                     }
                 }
+                if (pSourcePlayer && pSourcePlayer->pSprite != pSprite)
+                    pSourcePlayer->damageAccumulated += (unsigned short)damage;
             }
         }
         break;

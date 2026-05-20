@@ -1314,6 +1314,7 @@ void playerStart(int nPlayer, int bNewLevel)
 
     #endif
     pPlayer->hand = 0;
+    pPlayer->damageAccumulated = 0;
     pPlayer->nWaterPal = 0;
     playerResetPowerUps(pPlayer);
     const char bSpectatorPlayer = (gGameOptions.uNetGameFlags&kNetGameFlagSpectatingAllow) && !strncmp(gProfile[nPlayer].name, "spectator", MAXPLAYERNAME);
@@ -2433,6 +2434,8 @@ void playerProcess(PLAYER *pPlayer)
     }
     ProcessInput(pPlayer);
     int nSpeed = approxDist(xvel[nSprite], yvel[nSprite]);
+    if (!(gLevelTime&31))
+        pPlayer->damageAccumulated = 0;
     if (pPlayer == gMe)
         gPlayerSpeed = nSpeed;
     pPlayer->zViewVel = interpolate(pPlayer->zViewVel, zvel[nSprite], 0x7000, 1);
