@@ -737,7 +737,12 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->nSpawnProtection = gPacketStartGame.nSpawnProtection;
         pOpt->nSpawnWeapon = gPacketStartGame.nSpawnWeapon;
         if (gPacketStartGame.userMap)
-            levelAddUserMap(gNetMapOverride[0] != '\0' ? gNetMapOverride : gPacketStartGame.userMapName);
+        {
+            const char *pMapFilepath = gNetMapOverride[0] != '\0' ? gNetMapOverride : gPacketStartGame.userMapName;
+            if (check_file_exist(pMapFilepath))
+                ThrowError("Map not found: %s", pMapFilepath);
+            levelAddUserMap(pMapFilepath);
+        }
         else
             levelSetupOptions(pOpt->nEpisode, pOpt->nLevel);
 
