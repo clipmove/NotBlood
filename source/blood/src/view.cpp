@@ -1410,6 +1410,26 @@ void viewDrawStats(PLAYER *pPlayer, int x, int y)
     viewDrawText(3, buffer, x, y, 20, 0, 0, true, 256, 0, &colorStr);
 }
 
+void viewDrawDamage(PLAYER *pPlayer)
+{
+    if (!gShowDamage || !pPlayer)
+        return;
+    char buffer[128];
+
+    const int nDamage = int(pPlayer->damageAccumulated)>>4;
+    int nPal;
+    if (nDamage < 10)
+        nPal = 0;
+    else if (nDamage < 50)
+        nPal = 10; // 10: blue
+    else if (nDamage < 75)
+        nPal = 8; // 8: gold
+    else
+        nPal = 7; // 7: red
+    sprintf(buffer, "%d", nDamage);
+    viewDrawText(3, buffer, 160, 165, -128, nPal, 1, 1, 0, 0);
+}
+
 void viewDrawSpeed(void)
 {
     if (!gShowSpeed)
@@ -2406,6 +2426,7 @@ void UpdateStatusBar(ClockTicks arg)
         else
             viewDrawPack(pPlayer, 166, 200-tilesiz[2201].y/2-30);
         viewDrawStats(pPlayer, 2-xscalestats, 140);
+        viewDrawDamage(pPlayer);
         viewDrawSpeed();
         viewDrawPowerUps(pPlayer);
     }
@@ -2499,6 +2520,7 @@ void UpdateStatusBar(ClockTicks arg)
             }
         }
         viewDrawStats(pPlayer, 2-xscalestats, 140);
+        viewDrawDamage(pPlayer);
         viewDrawSpeed();
         viewDrawPowerUps(pPlayer);
     }
@@ -2595,6 +2617,7 @@ void UpdateStatusBar(ClockTicks arg)
             TileHGauge(2260, 124, 175, pPlayer->throwPower, 65536);
         }
         viewDrawStats(pPlayer, 2-xscalestats, 140-yscalestats);
+        viewDrawDamage(pPlayer);
         viewDrawSpeed();
         viewDrawPowerUps(pPlayer);
     }
