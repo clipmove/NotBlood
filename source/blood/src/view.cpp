@@ -1417,6 +1417,8 @@ void viewDrawDamage(PLAYER *pPlayer)
     char buffer[128];
 
     const int nDamage = int(pPlayer->damageAccumulated)>>4;
+    if (!nDamage)
+        return;
     int nPal;
     if (nDamage < 10)
         nPal = 0;
