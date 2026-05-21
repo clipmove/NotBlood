@@ -1429,7 +1429,7 @@ void viewDrawDamage(PLAYER *pPlayer)
     else
         nPal = 7; // 7: red
     sprintf(buffer, "%d", nDamage);
-    viewDrawText(3, buffer, 160, 165, -128, nPal, 1, 1, 0, 0);
+    viewDrawText(3, buffer, gShowDamageX, gShowDamageY, -128, nPal, 1, 1, 0, 0);
 }
 
 void viewDrawSpeed(void)
