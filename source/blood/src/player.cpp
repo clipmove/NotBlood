@@ -627,11 +627,13 @@ void powerupProcess(PLAYER *pPlayer)
                     {
                         if (!gTimeSlowed)
                         {
-                            timerInit(CLOCKTICKSPERSECOND>>2);
+                            timerInit(CLOCKTICKSPERSECOND/3);
                             gTimeSlowed = true;
                         }
                         pPlayer->pwUpTime[i] = ClipLow(pPlayer->pwUpTime[i]-(kTicsPerFrame<<1), 0);
                         pPlayer->packSlots[nPack].curAmount = (100*pPlayer->pwUpTime[i])/gPowerUpInfo[i].bonusTime;
+                        if (gInputMode != INPUT_MODE_0)
+                            powerupDeactivate(pPlayer, i);
                     }
                 }
                 else
