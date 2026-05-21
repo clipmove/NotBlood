@@ -4191,7 +4191,7 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                     viewAddEffect(nTSprite, kViewEffectShadow);
             }
             const char bArmedBomb = (pTSprite->type == kThingArmedTNTStick) || (pTSprite->type == kThingArmedTNTBundle) || (pTSprite->type == kThingArmedProxBomb) || (pTSprite->type == kThingArmedRemoteBomb);
-            if ((powerupCheck(gView, kPwUpBeastVision) > 0) && WeaponsNotBlood() && !VanillaMode() && bArmedBomb && !cansee(cX, cY, cZ, gView->pSprite->sectnum, pTSprite->x, pTSprite->y, pTSprite->z, pTSprite->sectnum)) // janky x-ray vision
+            if ((powerupCheck(gView, kPwUpBeastVision) > 0) && (gGameOptions.nBeastVision == 1) && !VanillaMode() && bArmedBomb && !cansee(cX, cY, cZ, gView->pSprite->sectnum, pTSprite->x, pTSprite->y, pTSprite->z, pTSprite->sectnum)) // janky x-ray vision
             {
                 auto pNSprite = viewInsertTSprite(gView->pSprite->sectnum, 32767, pTSprite);
                 if (!pNSprite)
