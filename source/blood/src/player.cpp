@@ -454,7 +454,8 @@ char powerupActivate(PLAYER *pPlayer, int nPowerUp)
     int nPack = powerupToPackItem(nPowerUp);
     if (nPack >= 0)
         pPlayer->packSlots[nPack].isActive = 1;
-    
+
+    char bTriggerSfx = 1;
     switch (nPowerUp + kItemBase) {
         #ifdef NOONE_EXTENSIONS
         case kItemModernMapLevel:
@@ -523,8 +524,16 @@ char powerupActivate(PLAYER *pPlayer, int nPowerUp)
             pPlayer->input.newWeapon = pPlayer->curWeapon;
             WeaponRaise(pPlayer);
             break;
+        case kItemBeastVision:
+            if ((gGameOptions.nBeastVision == 2) && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !VanillaMode())
+            {
+                sndStartSample("NOTBLOOD5", 92, -1, 22050);
+                bTriggerSfx = 0;
+            }
+            break;
     }
-    sfxPlay3DSound(pPlayer->pSprite, 776, -1, 0);
+    if (bTriggerSfx)
+        sfxPlay3DSound(pPlayer->pSprite, 776, -1, 0);
     return 1;
 }
 
@@ -586,6 +595,7 @@ void powerupDeactivate(PLAYER *pPlayer, int nPowerUp)
             {
                 timerInit(CLOCKTICKSPERSECOND);
                 gTimeSlowed = false;
+                sndStartSample("NOTBLOOD6", 128, -1, 22050);
             }
             break;
     }
