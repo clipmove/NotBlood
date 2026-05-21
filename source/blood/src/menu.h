@@ -65,5 +65,5 @@ unsigned int SetBannedSprites(char bSinglePlayer);
 void QuickSaveGame(void);
 void AutosaveGame(bool bLevelStartSave);
 void QuickLoadGame(void);
-void NetAlertMissingMap(void);
+void NetAlertMissingMap(char bError);
 void StartNetGame(CGameMenuItemChain *);

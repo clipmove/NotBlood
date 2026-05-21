@@ -4794,9 +4794,9 @@ void NetLoadTestMap(void)
     itemNetStart11.m_pzText = zNetStartGame;
 }
 
-void NetAlertMissingMap(void)
+void NetAlertMissingMap(char bError)
 {
-    itemNetStart11.m_pzText = zNetStartGameError;
+    itemNetStart11.m_pzText = bError ? zNetStartGameError : zNetStartGame;
 }
 
 void NetClearUserMap(CGameMenuItemZCycle *pItem)
