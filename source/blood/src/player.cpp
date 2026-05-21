@@ -1060,7 +1060,21 @@ static void playerResetTeamId(int nPlayer, int bNewLevel)
     if (gGameOptions.nGameType == kGameTypeTeams)
     {
         if (gGameOptions.bAutoTeams || (gProfile[nPlayer].nTeamPreference == 0)) // game is set to auto teams/player team preference is set to none
-            pPlayer->teamId = nPlayer&1;
+        {
+            int nTeamId = 0;
+            if (bNewLevel)
+            {
+                for (int p = connecthead; p >= 0; p = connectpoint2[p])
+                {
+                    if (nPlayer == p)
+                        break;
+                    nTeamId++;
+                }
+            }
+            else
+                nTeamId = nPlayer;
+            pPlayer->teamId = nTeamId&1;
+        }
         else
             pPlayer->teamId = gProfile[nPlayer].nTeamPreference-1; // set to player team preference
 

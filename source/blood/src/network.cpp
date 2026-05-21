@@ -530,8 +530,7 @@ void netGetPackets(void)
             char szMapPath[BMAX_PATH];
             memcpy(szMapPath, pPacket, sizeof(szMapPath));
             szMapPath[BMAX_PATH-1] = '\0';
-            if (!testkopen(szMapPath, 0))
-                NetAlertMissingMap();
+            NetAlertMissingMap(!testkopen(szMapPath, 0));
             break;
         }
         case 249:
