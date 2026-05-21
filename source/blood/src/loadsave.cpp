@@ -274,6 +274,11 @@ void LoadSave::LoadGame(char *pzFile)
 
     if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) // if single-player, update the game options/player profile by loading the current set settings
     {
+        if (gTimeSlowed)
+        {
+            timerInit(CLOCKTICKSPERSECOND);
+            gTimeSlowed = false;
+        }
         gGameOptions.bQuadDamagePowerup = gQuadDamagePowerup;
         gGameOptions.nBeastVision = gBeastVision;
         gGameOptions.nDamageInvul = gDamageInvul;
