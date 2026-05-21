@@ -202,6 +202,12 @@ If you have the GOG version of the game, do the following:
    - Enable/disable the menu backdrop for loading/saving game
 * cl_showdamage
    - Enable/disable showing player damage to other enemies
+* cl_showdamageticks
+   - Set player damage counter duration (0-255)
+* cl_showdamagex
+   - Set player damage counter x position (0-320)
+* cl_showdamagey
+   - Set player damage counter y position (0-200)
 * cl_showspeed
    - Enable/disable showing player speed
 * cl_slopecrosshair
