@@ -3589,7 +3589,7 @@ int actDamageSprite(int nSource, spritetype *pSprite, DAMAGE_TYPE damageType, in
                 }
                 if (pSourcePlayer && (pSourcePlayer->pSprite != pSprite))
                 {
-                    if (!pSourcePlayer->damageAccumulatedTick || (damage > 25))
+                    if (!pSourcePlayer->damageAccumulatedTick)
                          pSourcePlayer->damageAccumulatedTick = gShowDamageTicks;
                     pSourcePlayer->damageAccumulated += (unsigned short)damage;
                 }
