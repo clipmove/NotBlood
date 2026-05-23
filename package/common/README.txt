@@ -201,7 +201,7 @@ If you have the GOG version of the game, do the following:
 * cl_showloadsavebackdrop
    - Enable/disable the menu backdrop for loading/saving game
 * cl_showdamage
-   - Enable/disable showing player damage to other enemies
+   - Enable/disable showing player damage to other enemies (0: off, 1-3: on [small/medium/large])
 * cl_showdamageticks
    - Set player damage counter duration (0-255)
 * cl_showdamagex
