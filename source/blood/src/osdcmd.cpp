@@ -1214,7 +1214,7 @@ int32_t registerosdcommands(void)
         { "cl_randomizerscale", "enable/disable randomly scaling enemies for randomizer mode (0: disable, 1: only with seed cheats, 2: always) (always use 1 in multiplayer)", (void *)&gRandomizerScaleMode, CVAR_INT, 0, 2 },
         { "cl_slopetilting", "enable/disable slope tilting", (void *)&gSlopeTilting, CVAR_BOOL, 0, 1 },
         { "cl_slopecrosshair", "enable/disable adjusting crosshair position for slope tilting", (void *)&gSlopeReticle, CVAR_BOOL, 0, 1 },
-        { "cl_showdamage", "enable/disable showing player damage to other enemies", (void*)&gShowDamage, CVAR_BOOL, 0, 1 },
+        { "cl_showdamage", "enable/disable showing player damage to other enemies (0: off, 1-3: on [small/medium/large])", (void*)&gShowDamage, CVAR_INT, 0, 3 },
         { "cl_showdamageticks", "set player damage counter duration (0-255)", (void*)&gShowDamageTicks, CVAR_INT, 0, 255 },
         { "cl_showdamagex", "set player damage counter x position (0-320)", (void*)&gShowDamageX, CVAR_INT, 0, 320 },
         { "cl_showdamagey", "set player damage counter y position (0-200)", (void*)&gShowDamageY, CVAR_INT, 0, 200 },

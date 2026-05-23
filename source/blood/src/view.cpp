@@ -1419,7 +1419,7 @@ void viewDrawDamage(PLAYER *pPlayer)
     const int nDamage = int(pPlayer->damageAccumulated)>>4;
     if (!nDamage)
         return;
-    int nPal;
+    int nFont = 3, nPal;
     if (nDamage < 10)
         nPal = 0;
     else if (nDamage < 50)
@@ -1429,7 +1429,19 @@ void viewDrawDamage(PLAYER *pPlayer)
     else
         nPal = 7; // 7: red
     sprintf(buffer, "%d", nDamage);
-    viewDrawText(3, buffer, gShowDamageX, gShowDamageY, -128, nPal, 1, 1, 0, 0);
+    switch (gShowDamage)
+    {
+    case 1:
+        nFont = 3;
+        break;
+    case 2:
+        nFont = 0;
+        break;
+    case 3:
+        nFont = 1;
+        break;
+    }
+    viewDrawText(nFont, buffer, gShowDamageX, gShowDamageY, -128, nPal, 1, 1, 0, 0);
 }
 
 void viewDrawSpeed(void)
