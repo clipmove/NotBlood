@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "build.h"
 #include "mmulti.h"
 #include "common_game.h"
+#include "actor.h"
+#include "endgame.h"
 #include "levels.h"
 #include "map2d.h"
 #include "trig.h"
@@ -156,6 +158,33 @@ void DrawMap(int x, int y, int z, short a)
                 rotatesprite((xdim<<15)+(x1<<4), (ydim<<15)+(y1<<4), nScale, pa, nTile, pSprite->shade, pSprite->pal, (pSprite->cstat&2)>>1,
                     windowxy1.x, windowxy1.y, windowxy2.x, windowxy2.y);
             }
+        }
+    }
+
+    if ((gGameOptions.nGameType <= kGameTypeCoop) && gEnemiesMap)
+    {
+        for (int nSprite = headspritestat[kStatDude]; nSprite >= 0; nSprite = nextspritestat[nSprite])
+        {
+            spritetype* pSprite = &sprite[nSprite];
+
+            if ((pSprite->flags&32) || IsPlayerSprite(pSprite) || !gKillMgr.AllowedType(pSprite))
+                continue;
+            if (!sectRangeIsFine(pSprite->sectnum) || !(gFullMap || (show2dsector[pSprite->sectnum>>3]&(1<<(pSprite->sectnum&7)))))
+                continue;
+            int px = pSprite->x-x;
+            int py = pSprite->y-y;
+            int pa = (pSprite->ang-a)&kAngMask;
+            int x1 = dmulscale16(px, nCos, -py, nSin);
+            int y1 = dmulscale16(py, nCos2, px, nSin2);
+            int nTile = pSprite->picnum;
+            int ceilZ, ceilHit, floorZ, floorHit;
+            GetZRange(pSprite, &ceilZ, &ceilHit, &floorZ, &floorHit, (pSprite->clipdist<<2)+16, CLIPMASK0, PARALLAXCLIP_CEILING|PARALLAXCLIP_FLOOR);
+            int nTop, nBottom;
+            GetSpriteExtents(pSprite, &nTop, &nBottom);
+            int nScale = mulscale16((pSprite->yrepeat+((floorZ-nBottom)>>8))*z, yxaspect);
+            nScale = ClipRange(nScale, 8000, 65536<<1);
+            rotatesprite((xdim<<15)+(x1<<4), (ydim<<15)+(y1<<4), nScale, pa, nTile, pSprite->shade, pSprite->pal, (pSprite->cstat&2)>>1,
+                windowxy1.x, windowxy1.y, windowxy2.x, windowxy2.y);
         }
     }
 }

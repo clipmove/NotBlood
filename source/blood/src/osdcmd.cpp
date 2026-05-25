@@ -1172,6 +1172,7 @@ int32_t registerosdcommands(void)
     char buffer[256];
     static osdcvardata_t cvars_game[] =
     {
+        { "automap_enemies", "enable/disable enemies on automap (single-player and co-op only)", (void *)&gEnemiesMap, CVAR_BOOL, 0, 1 },
         { "crosshair", "enable/disable crosshair (0: off, 1: on, 2: on [autoaim])", (void *)&gAimReticle, CVAR_INT, 0, 2 },
         { "crosshairoffsetx", "set X axis offset for crosshair (-32 to 32)", (void *)&gAimReticleOffsetX, CVAR_INT, -32, 32 },
         { "crosshairoffsety", "set Y axis offset for crosshair (-32 to 32)", (void *)&gAimReticleOffsetY, CVAR_INT, -32, 32 },
