@@ -760,7 +760,8 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->nRandomizerCheat = -1;
         pOpt->bEnemyShuffle = false;
         pOpt->bPitchforkOnly = false;
-        pOpt->bPermaDeath = false;
+        pOpt->bPermaDeath = 0;
+        pOpt->bDamage2X = 0;
         pOpt->uSpriteBannedFlags = gPacketStartGame.uSpriteBannedFlags;
         ///////
     }

@@ -3552,6 +3552,9 @@ int actDamageSprite(int nSource, spritetype *pSprite, DAMAGE_TYPE damageType, in
             const int kDamageBeforeScaling = damage;
             const char bWasAlive = (pXSprite->health > 0);
 
+            if (gGameOptions.bDamage2X)
+                damage <<= 1;
+
             if (!nDamageFactor) return 0;
             else if (nDamageFactor != 256)
                 damage = mulscale8(damage, nDamageFactor);
