@@ -459,6 +459,7 @@ CGameMenuItemZCycle itemCustomDifficultyEnemySpeed("ENEMIES SPEED:", 3, 66, 95, 
 CGameMenuItemZBool itemCustomDifficultyEnemyShuffle("RANDOMIZE ENEMY POSITIONS:", 3, 66, 105, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemCustomDifficultyPitchfork("PITCHFORK START:", 3, 66, 115, 180, false, NULL, NULL, NULL);
 CGameMenuItemZBool itemCustomDifficultyPermaDeath("PERMANENT DEATH:", 3, 66, 125, 180, false, NULL, NULL, NULL);
+CGameMenuItemZBool itemCustomDifficultyDamage2X("ALL DAMAGE 2X:", 3, 66, 125, 180, false, NULL, NULL, NULL);
 CGameMenuItemChain itemCustomDifficultyBannedMonsters("SET MONSTERS", 3, 66, 137, 180, 1, &menuBannedMonsters, -1, NULL, 0);
 CGameMenuItemChain itemCustomDifficultyBannedItems("SET ITEMS", 3, 66, 148, 180, 1, &menuBannedItems, -1, NULL, 0);
 CGameMenuItemChain itemCustomDifficultyStart("START GAME", 1, 0, 161, 320, 1, NULL, -1, SetCustomDifficultyAndStart, 0);
@@ -1397,10 +1398,12 @@ void SetupDifficultyMenu(void)
     menuCustomDifficulty.Add(&itemCustomDifficultyEnemyShuffle, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyPitchfork, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyPermaDeath, false);
+    menuCustomDifficulty.Add(&itemCustomDifficultyDamage2X, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyBannedMonsters, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyBannedItems, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyStart, false);
     menuCustomDifficulty.Add(&itemBloodQAV, false);
+    menuCustomDifficulty.OrganizeItems(false, true);
     itemCustomDifficultyStartLevel.tooltip_pzTextUpper = "";
     itemCustomDifficultyStartLevel.tooltip_pzTextLower = "Set the starting level for this episode";
     itemCustomDifficultyEnemyQuantity.tooltip_pzTextUpper = "";
@@ -1419,6 +1422,8 @@ void SetupDifficultyMenu(void)
     itemCustomDifficultyPitchfork.tooltip_pzTextLower = "Player will lose all items on new level";
     itemCustomDifficultyPermaDeath.tooltip_pzTextUpper = "";
     itemCustomDifficultyPermaDeath.tooltip_pzTextLower = "No saving, and you only live once";
+    itemCustomDifficultyDamage2X.tooltip_pzTextUpper = "";
+    itemCustomDifficultyDamage2X.tooltip_pzTextLower = "Increase the damage of everything by 2X";
     itemCustomDifficultyBannedMonsters.tooltip_pzTextUpper = "";
     itemCustomDifficultyBannedMonsters.tooltip_pzTextLower = "Set which monsters to spawn";
     itemCustomDifficultyBannedItems.tooltip_pzTextUpper = "";
@@ -3309,7 +3314,8 @@ void SetDifficultyAndStart(CGameMenuItemChain *pItem)
     gGameOptions.nEnemySpeed = 0;
     gGameOptions.bEnemyShuffle = false;
     gGameOptions.bPitchforkOnly = false;
-    gGameOptions.bPermaDeath = false;
+    gGameOptions.bPermaDeath = 0;
+    gGameOptions.bDamage2X = 0;
     gGameOptions.uSpriteBannedFlags = BANNED_NONE;
     gGameOptions.nLevel = 0;
     if (!gVanilla) // don't reset gameflags for vanilla mode
@@ -3374,6 +3380,7 @@ void SetCustomDifficultyAndStart(CGameMenuItemChain *pItem)
     gGameOptions.bEnemyShuffle = !!itemCustomDifficultyEnemyShuffle.at20;
     gGameOptions.bPitchforkOnly = !!itemCustomDifficultyPitchfork.at20;
     gGameOptions.bPermaDeath = !!itemCustomDifficultyPermaDeath.at20;
+    gGameOptions.bDamage2X = !!itemCustomDifficultyDamage2X.at20;
     gGameOptions.uSpriteBannedFlags = SetBannedSprites(1);
     gGameOptions.nLevel = 0;
     if (!gVanilla) // don't reset gameflags for vanilla mode

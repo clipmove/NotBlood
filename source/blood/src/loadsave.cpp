@@ -728,6 +728,8 @@ bool LoadSavedInCurrentSession(int nSlot)
         return false;
     if (gSaveGameOptions[nSlot].bPermaDeath != gGameOptions.bPermaDeath)
         return false;
+    if (gSaveGameOptions[nSlot].bDamage2X != gGameOptions.bDamage2X)
+        return false;
     if (gSaveGameOptions[nSlot].uSpriteBannedFlags != gGameOptions.uSpriteBannedFlags)
         return false;
     if (gSaveGameOptions[nSlot].nRandomizerCheat != gGameOptions.nRandomizerCheat)
@@ -756,6 +758,8 @@ void LoadUpdateSaveGame(int nSlot, int nSkill)
     else if (gSaveGameOptions[nSlot].bPitchforkOnly)
         nDifficulty = 5;
     else if (gSaveGameOptions[nSlot].bPermaDeath)
+        nDifficulty = 5;
+    else if (gSaveGameOptions[nSlot].bDamage2X)
         nDifficulty = 5;
     else if (gSaveGameOptions[nSlot].uSpriteBannedFlags)
         nDifficulty = 5;

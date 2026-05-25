@@ -329,7 +329,8 @@ void LevelWarpAndRecord(int nEpisode, int nLevel)
     gGameOptions.nEnemySpeed = 0;
     gGameOptions.bEnemyShuffle = false;
     gGameOptions.bPitchforkOnly = false;
-    gGameOptions.bPermaDeath = false;
+    gGameOptions.bPermaDeath = 0;
+    gGameOptions.bDamage2X = 0;
     gGameOptions.uSpriteBannedFlags = BANNED_NONE;
     playerSetSkill(gGameOptions.nDifficulty); // set skill to same value as current difficulty
     StartLevel(&gGameOptions);
