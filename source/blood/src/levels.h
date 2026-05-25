@@ -81,7 +81,8 @@ struct GAMEOPTIONS {
     short nPlayerSpeed;
     bool bEnemyShuffle;
     bool bPitchforkOnly;
-    bool bPermaDeath;
+    char bPermaDeath : 1;
+    char bDamage2X : 1;
     bool bFriendlyFire;
     char nKeySettings;
     char bItemWeaponSettings;

@@ -89,7 +89,8 @@ GAMEOPTIONS gSingleGameOptions = {
     0,     // int nPlayerSpeed;
     0,     // bool bEnemyShuffle;
     0,     // bool bPitchforkOnly;
-    0,     // bool bPermaDeath;
+    0,     // bool bPermaDeath : 1;
+    0,     // bool bDamage2X : 1;
     0,     // bool bFriendlyFire;
     1,     // char nKeySettings;
     0,     // char bItemWeaponSettings;

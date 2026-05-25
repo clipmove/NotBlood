@@ -251,7 +251,8 @@ void ReadGameOptionsLegacy(GAMEOPTIONS &gameOptions, GAMEOPTIONSLEGACY &gameOpti
     gameOptions.nPlayerSpeed = 0;
     gameOptions.bEnemyShuffle = false;
     gameOptions.bPitchforkOnly = false;
-    gameOptions.bPermaDeath = false;
+    gameOptions.bPermaDeath = 0;
+    gameOptions.bDamage2X = 0;
     gameOptions.bFriendlyFire = true;
     gameOptions.nKeySettings = 0;
     gameOptions.bItemWeaponSettings = 0;
