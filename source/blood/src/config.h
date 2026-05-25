@@ -103,6 +103,7 @@ extern int32_t gViewVBobbing;
 extern int32_t gWeaponHBobbing;
 extern int32_t gSlowRoomFlicker;
 extern int32_t gFollowMap;
+extern int32_t gEnemiesMap;
 extern int32_t gOverlayMap;
 extern int32_t gRotateMap;
 extern int32_t gAimReticle;

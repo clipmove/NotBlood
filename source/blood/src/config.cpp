@@ -125,6 +125,7 @@ int32_t gViewVBobbing;
 int32_t gWeaponHBobbing;
 int32_t gSlowRoomFlicker;
 int32_t gFollowMap;
+int32_t gEnemiesMap;
 int32_t gOverlayMap;
 int32_t gRotateMap;
 int32_t gAimReticle;
@@ -572,6 +573,7 @@ void CONFIG_SetDefaults(void)
     gWeaponHBobbing = 1;
     gSlowRoomFlicker = 0;
     gFollowMap = 1;
+    gEnemiesMap = 0;
     gOverlayMap = 0;
     gRotateMap = 0;
     gAimReticle = 1;

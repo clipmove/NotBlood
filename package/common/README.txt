@@ -158,6 +158,8 @@ If you have the GOG version of the game, do the following:
 * SNEAKYFU - Proned shotgun/tommy gun cultists only
 
 ### New console variables for NotBlood
+* automap_enemies
+   - Enable/disable enemies on automap (single-player and co-op only)
 * automap_peek
    - Display the full map cheat
 * cl_autoaimrange
