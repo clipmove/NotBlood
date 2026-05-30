@@ -177,6 +177,8 @@ void DrawMap(int x, int y, int z, short a)
             int x1 = dmulscale16(px, nCos, -py, nSin);
             int y1 = dmulscale16(py, nCos2, px, nSin2);
             int nTile = pSprite->picnum;
+            if ((pSprite->type == kDudeZombieAxeBuried) && (pSprite->picnum == 3055)) // if buried zombies, change to more recognizable tile
+                nTile = 3054;
             int nScale = mulscale16(pSprite->yrepeat*z, yxaspect);
             nScale = ClipRange(nScale, 8000, 65536<<1);
             rotatesprite((xdim<<15)+(x1<<4), (ydim<<15)+(y1<<4), nScale, pa, nTile, pSprite->shade, pSprite->pal, (pSprite->cstat&2)>>1,
