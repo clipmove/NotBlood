@@ -634,6 +634,8 @@ void powerupProcess(PLAYER *pPlayer)
                         pPlayer->packSlots[nPack].curAmount = (100*pPlayer->pwUpTime[i])/gPowerUpInfo[i].bonusTime;
                         if (gInputMode != INPUT_MODE_0)
                             powerupDeactivate(pPlayer, i);
+                        else if (!(gLevelTime&15)) // heartbeat
+                            sndStartSample(780, 1, -1);
                     }
                 }
                 else
