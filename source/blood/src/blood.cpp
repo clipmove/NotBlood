@@ -139,6 +139,7 @@ char bDemoState = 0;
 bool gNetPortOverride = false;
 char gNetMapOverride[BMAX_PATH] = "";
 bool gNetRetry = false;
+bool gChatPipeUse = true;
 
 int gMultiModeInit = -1;
 int gMultiScoreLimit = -1;
@@ -1474,6 +1475,7 @@ SWITCH switches[] = {
     { "mp_mapclient", 62, 1 },
     { "netretry", 63, 0 },
     { "clientport", 64, 1 },
+    { "chatpipe", 65, 1 },
     { NULL, 0, 0 }
 };
 
@@ -1537,6 +1539,9 @@ void PrintHelp(void)
         "-mp_mapclient [map]\tOverride user map for multiplayer clients (e.g: filename.map)\n"
         "-netretry\t\tReattempts client connection automatically (hold down escape to end loop)\n"
         "-clientport\tSets the local port used for network binding for clients\n"
+#if defined(_WIN32) // Windows only
+        "-chatpipe [0-1]\tSet the chatpipe functionality\n"
+#endif
         ;
 #ifdef WM_MSGBOX_WINDOW
     Bsnprintf(tempbuf, sizeof(tempbuf), APPNAME " %s", s_buildRev);
@@ -1907,7 +1912,18 @@ void ParseOptions(void)
             gNetRetry = true;
             break;
         case 64: // clientport
+            if (OptArgc < 1)
+                ThrowError("Missing argument");
             gNetPortLocal = strtoul(OptArgv[0], NULL, 0);
+            break;
+        case 65: // chatpipe
+#if defined(_WIN32) // Windows only
+            if (OptArgc < 1)
+                ThrowError("Missing argument");
+            gChatPipeUse = OptArgv[0][0] == '1';
+#else
+            ThrowError("Chatpipe not supported on this platform");
+#endif
             break;
         }
     }
@@ -2029,7 +2045,8 @@ int app_main(int argc, char const * const * argv)
     if (!g_useCwd)
         G_AddSearchPaths();
 
-    ChatPipe_Create();
+    if (gChatPipeUse)
+        ChatPipe_Create();
 
     // used with binds for fast function lookup
     hash_init(&h_gamefuncs);
