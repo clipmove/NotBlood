@@ -3351,8 +3351,11 @@ void SetCustomDifficultyMenu(CGameMenuItemChain *pItem)
     {
         dassert(gGameOptions.nEpisode >= 0 && gGameOptions.nEpisode < gEpisodeCount);
         EPISODEINFO *pEpisodeInfo = &gEpisodeInfo[gGameOptions.nEpisode];
-        if (pEpisodeInfo->nLevels <= 0)
+        if (pEpisodeInfo->nLevels <= 1)
+        {
             itemCustomDifficultyStartLevel.bEnable = 0;
+            itemCustomDifficultyStartLevel.nRangeHigh = 0;
+        }
         else
         {
             itemCustomDifficultyStartLevel.bEnable = 1;
