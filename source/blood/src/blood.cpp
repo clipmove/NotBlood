@@ -1903,6 +1903,8 @@ void ParseOptions(void)
             gNetRetry = true;
             break;
         case 64: // clientport
+            if (OptArgc < 1)
+                ThrowError("Missing argument");
             gNetPortLocal = strtoul(OptArgv[0], NULL, 0);
             break;
         }
