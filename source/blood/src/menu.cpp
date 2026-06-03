@@ -3284,7 +3284,7 @@ unsigned int SetBannedSprites(char bSinglePlayer)
     return uSpriteBannedFlags;
 }
 
-short gQuickLoadSlot = kLoadSaveNull;
+short gQuickLoadSlot = kLoadSaveSlotQuick;
 
 void ShowDifficulties()
 {
