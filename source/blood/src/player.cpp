@@ -1747,21 +1747,22 @@ char PickupAmmo(PLAYER* pPlayer, spritetype* pAmmo) {
         switch (gGameOptions.nAmmoScale)
         {
         case 3: // 0.25x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + (nAmmoAdded>>2), gAmmoInfo[nAmmoType].max);
+            nAmmoAdded = ClipLow(nAmmoAdded>>2, 1);
             break;
         case 4: // 0.5x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + (nAmmoAdded>>1), gAmmoInfo[nAmmoType].max);
+            nAmmoAdded = ClipLow(nAmmoAdded>>1, 1);
             break;
         case 5: // 0.75x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + ((nAmmoAdded>>1)+(nAmmoAdded>>2)), gAmmoInfo[nAmmoType].max);
+            nAmmoAdded = ClipLow((nAmmoAdded>>1) + (nAmmoAdded>>2), 1);
             break;
         case 1: // 1.25x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + nAmmoAdded+(nAmmoAdded>>2), gAmmoInfo[nAmmoType].max);
+            nAmmoAdded += nAmmoAdded>>2;
             break;
         case 2: // 1.5x
-            pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + nAmmoAdded+(nAmmoAdded>>1), gAmmoInfo[nAmmoType].max);
+            nAmmoAdded += nAmmoAdded>>1;
             break;
         }
+        pPlayer->ammoCount[nAmmoType] = ClipHigh(oldAmmoCount + nAmmoAdded, gAmmoInfo[nAmmoType].max);
     }
     return 1;
 }
