@@ -404,7 +404,7 @@ bool CGameMenu::Event(CGameMenuEvent &event)
     {
     case kMenuEventInit:
     case kMenuEventDeInit:
-        if (at8 >= 0)
+        if ((m_nFocus < 0 || !CanSelectItem(m_nFocus)) && at8 >= 0) // check if focus was set to menu item (and is still selectable)
             m_nFocus = at8;
         InitializeItems(event);
         return false;
