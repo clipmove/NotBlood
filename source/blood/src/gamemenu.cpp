@@ -422,7 +422,7 @@ bool CGameMenu::Event(CGameMenuEvent &event)
     {
     case kMenuEventInit:
     case kMenuEventDeInit:
-        if (at8 >= 0)
+        if (m_nFocus == -1 && at8 >= 0)
             m_nFocus = at8;
         InitializeItems(event);
         return false;
