@@ -1181,6 +1181,7 @@ int32_t registerosdcommands(void)
         { "cl_autoaimrange", "set auto aim range angle modifier (default: 4, single-player only)", (void *)&gAutoAimRange, CVAR_INT, 0, 9 },
 //        { "cl_automsg", "enable/disable automatically sending messages to all players", (void *)&ud.automsg, CVAR_BOOL, 0, 1 },
         { "cl_autodivingsuit", "enable/disable automatic diving suit equipping when entering water (always enabled in multiplayer)", (void *)&gAutoDivingSuit, CVAR_BOOL, 0, 1 },
+        { "cl_automedkit", "enable/disable automatic medkit healing", (void *)&gAutoMedkit, CVAR_BOOL, 0, 1 },
         { "cl_autorun", "enable/disable autorun", (void *)&gAutoRun, CVAR_BOOL, 0, 1 },
 //
 //        { "cl_autosave", "enable/disable autosaves", (void *) &ud.autosave, CVAR_BOOL, 0, 1 },

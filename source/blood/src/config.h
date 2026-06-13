@@ -84,6 +84,7 @@ extern int32_t gRestoreLastSave;
 extern int32_t gAutosave;
 extern bool gAutosaveInCurLevel;
 extern int32_t gAutoDivingSuit;
+extern int32_t gAutoMedkit;
 extern int32_t gAutoRun;
 extern int32_t gCalebTalk;
 extern int32_t gTeamsScoreStyle;

@@ -504,7 +504,7 @@ void ctrlGetInput(void)
         gInput.useFlags.useJumpBoots = 1;
     }
 
-    if (BUTTON(gamefunc_MedKit))
+    if (BUTTON(gamefunc_MedKit) || gAutoMedkit)
     {
         CONTROL_ClearButton(gamefunc_MedKit);
         gInput.useFlags.useMedKit = 1;
