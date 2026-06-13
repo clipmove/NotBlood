@@ -166,6 +166,8 @@ If you have the GOG version of the game, do the following:
    - Set auto aim range angle modifier (default: 4, single-player only)
 * cl_autodivingsuit
    - Enable/disable automatic diving suit equipping when entering water (always enabled in multiplayer)
+* cl_automedkit
+   - Enable/disable automatic medkit healing
 * cl_banned_item_save <preset name>
    - Save the current banned item list as a preset file
 * cl_calebtalk
