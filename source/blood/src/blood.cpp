@@ -139,7 +139,7 @@ char bDemoState = 0;
 bool gNetPortOverride = false;
 char gNetMapOverride[BMAX_PATH] = "";
 bool gNetRetry = false;
-bool gChatPipeUse = true;
+bool gChatPipeUse = false;
 
 int gMultiModeInit = -1;
 int gMultiScoreLimit = -1;

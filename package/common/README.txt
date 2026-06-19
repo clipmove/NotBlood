@@ -284,6 +284,8 @@ If you have the GOG version of the game, do the following:
    - Set the display style for the teams score display (0: original, 1: nblood)
 * mus_redbookfallback
    - Enables/disables redbook audio if midi song is not specified for level (mus_redbook must already be enabled)
+* net_chatpipe
+   - Enable/disable chatpipe used for NukemNet multiplayer
 * in_centerviewondrop
    - Enable/disable recenter view when dropping down onto ground
 * in_crouchauto
