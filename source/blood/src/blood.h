@@ -80,6 +80,7 @@ extern char bVanilla;
 extern char bDemoState;
 
 extern bool gNetRetry;
+extern bool gChatPipeUse;
 
 extern int gMultiModeInit;
 extern int gMultiScoreLimit;
