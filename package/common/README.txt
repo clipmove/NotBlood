@@ -285,7 +285,7 @@ If you have the GOG version of the game, do the following:
 * mus_redbookfallback
    - Enables/disables redbook audio if midi song is not specified for level (mus_redbook must already be enabled)
 * net_chatpipe
-   - Enable/disable chatpipe used for NukemNet multiplayer
+   - Enable/disable chatpipe used for NukemNet multiplayer (requires restart)
 * in_centerviewondrop
    - Enable/disable recenter view when dropping down onto ground
 * in_crouchauto
