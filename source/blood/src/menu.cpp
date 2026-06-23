@@ -125,7 +125,6 @@ void SetVoxels(CGameMenuItemZBool *);
 void SetFOV(CGameMenuItemSlider *);
 void SetOxygenSupply(CGameMenuItemZBool*);
 void SetDivingSuit(CGameMenuItemZBool*);
-void UpdateVideoModeMenuFrameLimit(CGameMenuItemZCycle *pItem);
 void UpdateVideoColorMenu(CGameMenuItemSliderFloat *);
 void UpdateVideoPaletteCycleMenu(CGameMenuItemZCycle *);
 void UpdateVideoPaletteBoolMenu(CGameMenuItemZBool *);
@@ -861,28 +860,6 @@ const int nVSyncValues[] = {
 #endif
 };
 
-const char *pzFrameLimitStrings[] = {
-    "30 FPS",
-    "60 FPS",
-    "75 FPS",
-    "100 FPS",
-    "120 FPS",
-    "144 FPS",
-    "165 FPS",
-    "240 FPS"
-};
-
-const int nFrameLimitValues[] = {
-    30,
-    60,
-    75,
-    100,
-    120,
-    144,
-    165,
-    240
-};
-
 const char *pzInvertPaletteStrings[] = {
     "OFF",
     "ON",
@@ -900,7 +877,7 @@ CGameMenuItemChain itemOptionsDisplayModePolymost("POLYMOST SETUP", 3, 66, 80, 1
 #endif
 CGameMenuItemZBool itemOptionsDisplayModeFullscreen("FULLSCREEN:", 3, 66, 90, 180, 0, NULL, NULL, NULL);
 CGameMenuItemZCycle itemOptionsDisplayModeVSync("VSYNC:", 3, 66, 100, 180, 0, NULL, pzVSyncStrings, ARRAY_SSIZE(pzVSyncStrings), 0);
-CGameMenuItemZCycle itemOptionsDisplayModeFrameLimit("FRAMERATE LIMIT:", 3, 66, 110, 180, 0, UpdateVideoModeMenuFrameLimit, pzFrameLimitStrings, 8, 0);
+CGameMenuItemSlider itemOptionsDisplayModeFrameLimit("FRAMERATE LIMIT:", 3, 66, 110, 180, 0, 30, 500, 1, NULL, -1, -1, kMenuSliderValue);
 CGameMenuItemChain itemOptionsDisplayModeApply("APPLY CHANGES", 3, 66, 125, 180, 0, NULL, 0, SetVideoMode, 0);
 
 void PreDrawDisplayColor(CGameMenuItem *);
@@ -3496,6 +3473,8 @@ void SetVideoMode(CGameMenuItemChain *pItem)
                        (nRendererValues[itemOptionsDisplayModeRenderer.m_nFocus] == REND_CLASSIC) ? 8 : gResolution[nResolution].bppmax, 0 };
     int32_t UNUSED(nrend) = nRendererValues[itemOptionsDisplayModeRenderer.m_nFocus];
     int32_t nvsync = nVSyncValues[itemOptionsDisplayModeVSync.m_nFocus];
+    r_maxfps = itemOptionsDisplayModeFrameLimit.nValue;
+    g_frameDelay = calcFrameDelay(r_maxfps);
 
     if (videoSetGameMode(n.flags, n.xdim, n.ydim, n.bppmax, upscalefactor) < 0)
     {
@@ -3585,15 +3564,7 @@ void SetupVideoModeMenu(CGameMenuItemChain *pItem)
             break;
         }
     }
-    const int kMaxFps = r_maxfps == -1 ? round(refreshfreq) : r_maxfps;
-    for (int i = 0; i < 8; i++)
-    {
-        if (kMaxFps == nFrameLimitValues[i])
-        {
-            itemOptionsDisplayModeFrameLimit.m_nFocus = i;
-            break;
-        }
-    }
+    itemOptionsDisplayModeFrameLimit.nRangeHigh = ClipLow(round(refreshfreq), 60);
 }
 
 void PreDrawVideoModeMenu(CGameMenuItem *pItem)
@@ -3604,12 +3575,6 @@ void PreDrawVideoModeMenu(CGameMenuItem *pItem)
     else if (pItem == &itemOptionsDisplayModeRenderer)
         pItem->bEnable = gResolution[itemOptionsDisplayModeResolution.m_nFocus].bppmax > 8;
 #endif
-}
-
-void UpdateVideoModeMenuFrameLimit(CGameMenuItemZCycle *pItem)
-{
-    r_maxfps = nFrameLimitValues[pItem->m_nFocus];
-    g_frameDelay = calcFrameDelay(r_maxfps);
 }
 
 void UpdateVideoColorMenu(CGameMenuItemSliderFloat *pItem)
