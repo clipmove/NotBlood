@@ -241,14 +241,14 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
     case kDudeHellHound:
     case kDudeRat:
     case kDudeInnocent:
+        if ((floorZ - bottom > 0x2000) && EnemiesNotBlood() && !VanillaMode() && aiCheckForFakeFloors(pSprite, x, y, z, nSector, bottom)) // check for bridges
+            return true;
         if (Crusher)
             return false;
-        if (Depth || Underwater || (floorZ - bottom > 0x2000))
-        {
-            if (EnemiesNotBlood() && !VanillaMode() && aiCheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
-                return true;
+        if (Depth || Underwater)
             return false;
-        }
+        if (floorZ - bottom > 0x2000)
+            return false;
         break;
     #ifdef NOONE_EXTENSIONS
     case kDudeModernCustom:
@@ -258,14 +258,12 @@ bool CanMove(spritetype *pSprite, int a2, int nAngle, int nRange)
     case kDudePhantasm:
     case kDudeGillBeast:
     default:
+        if ((floorZ - bottom > 0x2000) && EnemiesNotBlood() && !VanillaMode() && aiCheckForFakeFloors(pSprite, x, y, z, nSector, bottom)) // check for bridges
+            return true;
         if (Crusher)
             return false;
         if ((nXSector < 0 || (!xsector[nXSector].Underwater && !xsector[nXSector].Depth)) && floorZ - bottom > 0x2000)
-        {
-            if (EnemiesNotBlood() && !VanillaMode() && aiCheckForFakeFloors(pSprite, x, y, z, nSector, bottom))
-                return true;
             return false;
-        }
         break;
     }
     return 1;
