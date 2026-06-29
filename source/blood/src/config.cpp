@@ -119,6 +119,7 @@ int32_t gMultiKill;
 int32_t gPlayerModel;
 int32_t gViewDim;
 int32_t gViewInterpolate;
+int32_t gViewInterpolateChase;
 int32_t gViewInterpolateMethod;
 int32_t gWeaponInterpolate;
 int32_t gViewHBobbing;
@@ -568,6 +569,7 @@ void CONFIG_SetDefaults(void)
     gMultiKill = 2;
     gViewDim = 1;
     gViewInterpolate = 1;
+    gViewInterpolateChase = 1;
     gViewInterpolateMethod = 0;
     gWeaponInterpolate = 2;
     gViewHBobbing = 1;

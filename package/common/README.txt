@@ -178,8 +178,10 @@ If you have the GOG version of the game, do the following:
    - Enable/disable dimming background when menu is active
 * cl_ghostshutup
    - Enable/disable reducing the screaming of ghost enemies
+* cl_interpolatechase
+   - Enable/disable view interpolation for chase view
 * cl_interpolatemethod
-   - Set view interpolation method (0: original [integer], 1: notblood [floating-point])"
+   - Set view interpolation method (0: original [integer], 1: notblood [floating-point])
 * cl_interpolateweapon
    - Enable/disable view interpolation for drawn weapon (0: disable, 1: position, 2: position/qav animation)
 * cl_colormsg
