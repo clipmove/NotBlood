@@ -1201,6 +1201,7 @@ int32_t registerosdcommands(void)
         { "cl_calebtalk", "enable/disable Caleb's dialog lines (0: on, 1: no idle, 2: no explosion/gib, 3: off)", (void *)&gCalebTalk, CVAR_INT, 0, 3 },
         { "cl_chatsnd", "enable/disable multiplayer chat message beep", (void *)&gChatSnd, CVAR_BOOL, 0, 1 },
         { "cl_interpolate", "enable/disable view interpolation", (void *)&gViewInterpolate, CVAR_BOOL, 0, 1 },
+        { "cl_interpolatechase", "enable/disable view interpolation for chase view", (void *)&gViewInterpolateChase, CVAR_BOOL, 0, 1 },
         { "cl_interpolatemethod", "set view interpolation method (0: original [integer], 1: notblood [floating-point])", (void *)&gViewInterpolateMethod, CVAR_BOOL, 0, 1 },
         { "cl_interpolateweapon", "enable/disable view interpolation for drawn weapon (0: disable, 1: position, 2: position/qav animation)", (void *)&gWeaponInterpolate, CVAR_INT, 0, 2 },
         { "cl_colormsg", "enable/disable colored player names in messages", (void *)&gColorMsg, CVAR_BOOL, 0, 1 },
