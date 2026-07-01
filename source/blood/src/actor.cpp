@@ -2992,7 +2992,7 @@ spritetype *actDropObject(spritetype *pSprite, int nType) {
     return pSprite2;
 }
 
-bool actHealDude(XSPRITE *pXDude, int a2, int a3)
+bool actHealDude(XSPRITE *pXDude, int a2, int a3, char bNoSound)
 {
     dassert(pXDude != NULL);
     a2 <<= 4;
@@ -3000,7 +3000,7 @@ bool actHealDude(XSPRITE *pXDude, int a2, int a3)
     if (pXDude->health < a3)
     {
         spritetype *pSprite = &sprite[pXDude->reference];
-        if (IsPlayerSprite(pSprite))
+        if (IsPlayerSprite(pSprite) && !bNoSound)
             sfxPlay3DSound(pSprite->x, pSprite->y, pSprite->z, 780, pSprite->sectnum);
         pXDude->health = ClipHigh(pXDude->health+a2, a3);
         return 1;
