@@ -249,7 +249,7 @@ spritetype *actDropItem(spritetype *pSprite, int nType);
 spritetype *actDropKey(spritetype *pSprite, int nType);
 spritetype *actDropFlag(spritetype *pSprite, int nType);
 spritetype *actDropObject(spritetype *pSprite, int nType);
-bool actHealDude(XSPRITE *pXDude, int a2, int a3);
+bool actHealDude(XSPRITE* pXDude, int a2, int a3, char bNoSound = 0);
 void actKillDude(int a1, spritetype *pSprite, DAMAGE_TYPE a3, int a4);
 int actDamageSprite(int nSource, spritetype *pSprite, DAMAGE_TYPE a3, int a4);
 void actHitcodeToData(int a1, HITINFO *pHitInfo, int *a3, spritetype **a4, XSPRITE **a5, int *a6, walltype **a7, XWALL **a8, int *a9, sectortype **a10, XSECTOR **a11);

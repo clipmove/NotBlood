@@ -766,7 +766,7 @@ void packUseItem(PLAYER *pPlayer, int nPack)
             if (health < 100)
             {
                 int heal = ClipHigh(100-health, pPlayer->packSlots[0].curAmount);
-                actHealDude(pXSprite, heal, 100);
+                actHealDude(pXSprite, heal, 100, gAutoMedkit);
                 pPlayer->packSlots[kPackMedKit].curAmount -= heal;
             }
             break;
