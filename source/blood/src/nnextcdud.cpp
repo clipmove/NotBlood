@@ -58,7 +58,9 @@ struct SNDCOMPAT
 struct WEAPINFO
 {
     unsigned int type               : 4;
-    const char* keyword;
+    unsigned int spawnsSprite       : 1;
+    const char* keywordA;
+    const char* keywordB;
     unsigned short range[2];
     unsigned int clipMask;
 };
@@ -68,15 +70,18 @@ static CUSTOMDUDE* gCustomDude = NULL;
 
 static CUSTOMDUDE_SOUND gSoundTemplate[] =
 {
-    { { 1003, 1004, 1003 },  0x03, true,   true,  true,  0 },  // spot
-    { { 1013, 1014, 1013 },  0x03, true,   true,  true,  0 },  // pain
-    { { 1018, 1019, 1018 },  0x03, true,   true,  true,  0 },  // death
-    { { 1031, 1032, 1031 },  0x03, true,   true,  true,  0 },  // burning state
-    { { 1018, 1019, 1018 },  0x03, true,   true,  true,  0 },  // explosive death or end of burning state
-    { { 4021, 4022, 4021 },  0x03, true,   true,  true,  0 },  // target of dude is dead
-    { { 1005, 1006, 1005 },  0x03, true,   true,  true,  0 },  // target chase
-    { { 9008, 9008, 9008 },  0x03, true,   true,  true,  0 },  // morph in another dude
-    { { 745,  745,  745 },   0x03, true,   true,  true,  0 },  // wake after sleeping
+    { { 1003, 1004, 1003 },  0x03, true,   true,  true,  0, 0 },  // spot
+    { { 1013, 1014, 1013 },  0x03, true,   true,  true,  0, 0 },  // pain
+    { { 1018, 1019, 1018 },  0x03, true,   true,  true,  0, 0 },  // death
+    { { 1031, 1032, 1031 },  0x03, true,   true,  true,  0, 0 },  // burning state
+    { { 1018, 1019, 1018 },  0x03, true,   true,  true,  0, 0 },  // explosive death or end of burning state
+    { { 4021, 4022, 4021 },  0x03, true,   true,  true,  0, 0 },  // target of dude is dead
+    { { 1005, 1006, 1005 },  0x03, true,   true,  true,  0, 0 },  // target chase
+    { { 9008, 9008, 9008 },  0x03, true,   true,  true,  0, 0 },  // morph in another dude
+    { { 745,  745,  745  },  0x03, true,   true,  true,  0, 0 },  // wake after sleeping
+    { { 728,  729,  730  },  0x03, true,   true,  true,  0, 0 },  // enterring last stand
+    { { 715,  715,  715  },  0x03, true,   true,  true,  0, 0 },  // in last stand
+    { { 3009, 3010, 3011 },  0x03, true,   true,  true,  0, 0 },  // last stand wake
 };
 
 // v1 dude animation compatibility
@@ -98,6 +103,7 @@ static SEQCOMPAT gSeqCompat[] =
     { { 1,   1,  1 },  kCdudeStateDeathBase,        },
     { { 2,   2,  2 },  kCdudeStateDeathExplode,     },
     { { 15, 15, 15 },  kCdudeStateDeathBurn,        },
+    { { 16, 16, 16 },  kCdudeStateDeathBurn,        }, // in case previous seq is not found
 };
 
 // v1 dude sound compatibility
@@ -139,6 +145,7 @@ static const char* gValTypes[kValMax] =
     "COMMON ARRAY",
     "ASSOCIATIVE ARRAY",
     "BOOLEAN",
+    "HEALTH",
     "CDUD",
     "WEAPON",
     "FX",
@@ -149,18 +156,24 @@ static const char* gValTypes[kValMax] =
     "VDUD",
     "KAMIKAZE",
     "SPECIAL",
+    "MORPH",
+    "DAMAGE",
 };
 
 static WEAPINFO gCdudeWeaponInfo[] =
 {
-    { kCdudeWeaponNone,              gValTypes[kValNone],        { 0, 0 },                                                   0 },
-    { kCdudeWeaponHitscan,           gValTypes[kValVector],      { 0, kVectorMax },                                         CLIPMASK1 },
-    { kCdudeWeaponMissile,           gValTypes[kValProjectile],  { kMissileBase, kMissileMax },                             CLIPMASK0 },
-    { kCdudeWeaponThrow,             gValTypes[kValThrow],       { kThingBase, kThingMax},                                  CLIPMASK0 },
-    { kCdudeWeaponSummon,            gValTypes[kValVdud],        { kDudeCultistTommy, kDudeVanillaMax },                    CLIPMASK0 },
-    { kCdudeWeaponSummonCdude,       gValTypes[kValCdud],        { 1, 10000 },                                              CLIPMASK0 },
-    { kCdudeWeaponKamikaze,          gValTypes[kValKamikaze],    { kTrapExploder, kTrapExploder + kExplosionMax },          0 },
-    { kCdudeWeaponSpecial,           gValTypes[kValSpecial],     { kCdudeWeaponIdSpecialBase, kCdudeWeaponIdSpecialMax },   CLIPMASK0 },
+    { kCdudeWeaponNone,              0,     gValTypes[kValNone],       NULL,                   { 0, 0 },                                                   0 },
+    { kCdudeWeaponHitscan,           0,     gValTypes[kValVector],     NULL,                   { 0, kVectorMax },                                         CLIPMASK1 },
+    { kCdudeWeaponMissile,           1,     gValTypes[kValProjectile], NULL,                   { kMissileBase, kMissileMax },                             CLIPMASK0 },
+    { kCdudeWeaponThrow,             1,     gValTypes[kValThrow],      NULL,                   { kThingBase, kThingMax},                                  CLIPMASK0 },
+    { kCdudeWeaponSummon,            1,     gValTypes[kValVdud],       NULL,                   { kDudeCultistTommy, kDudeVanillaMax },                    CLIPMASK0 },
+    { kCdudeWeaponSummonCdude,       1,     gValTypes[kValCdud],       NULL,                   { 1, 10000 },                                              CLIPMASK0 },
+    { kCdudeWeaponKamikaze,          1,     gValTypes[kValKamikaze],   NULL,                   { kTrapExploder, kTrapExploder + kExplosionMax },          0 },
+    { kCdudeWeaponSpecial,           0,     gValTypes[kValSpecial],    NULL,                   { kCdudeWeaponIdSpecialBase, kCdudeWeaponIdSpecialMax },   CLIPMASK0 },
+    { kCdudeWeaponMorph,             0,     gValTypes[kValMorph],      gValTypes[kValVdud],    { kDudeCultistTommy, kDudeVanillaMax },                    0 },
+    { kCdudeWeaponMorphCdude,        0,     gValTypes[kValMorph],      gValTypes[kValCdud],    { 1, 10000 },                                              0 },
+    { kCdudeWeaponDamage,            0,     gValTypes[kValDamage],     NULL,                   { kDmgFall, kDmgMax },                                     0 },
+    { kCdudeWeaponHealth,            0,     gValTypes[kValHealth],     NULL,                   { 0, 0 },                                                  0 },
 };
 
 /*************************************************************************************************/
@@ -176,6 +189,7 @@ static PARAM gParGroup[] =
     {kParGroupParser,               "Parser"    },              {kParGroupFlyPat,       "Flight"    },
     {kParGroupMorph,                "Morphing"  },              {kParGroupSleep,        "Sleeping"  },
     {kParGroupSlaves,               "Slaves"    },              {kParGroupRandomness,   "Randomness"},
+    {kParGroupLastStand,            "LastStand" },              {kParGroupChgTarg,      "TargetChange" },
     {kParamMax, NULL},
 };
 
@@ -207,9 +221,11 @@ static PARAM gParamAnim[] =
     {kCdudeStateDeathBase,      "DeathDefault"  },      {kCdudeStateDeathBurn,      "DeathBurning"  },
     {kCdudeStateDeathVector,    "DeathBullet"   },      {kCdudeStateDeathExplode,   "DeathExplode"  },
     {kCdudeStateDeathChoke,     "DeathChoke"    },      {kCdudeStateDeathSpirit,    "DeathSpirit"   },
-    {kCdudeStateDeathElectric,  "DeathElectric" },      {kCdudeAnimScale,           "Scale"         },
-    {kCdudeStateDeath,          "Death"         },      {kCdudeStateMove,           "Move"          },
-    {kCdudeStateAttack,         "Attack"        },
+    {kCdudeStateDeathElectric,  "DeathElectric" },      {kCdudeStateDeathLStand,    "DeathLastStand" },
+    {kCdudeAnimScale,           "Scale"         },      {kCdudeStateDeath,          "Death"         },
+    {kCdudeStateMove,           "Move"          },      {kCdudeStateAttack,         "Attack"        },
+    {kCdudeAnimLStandEnter,     "LastStandEnter" },     {kCdudeAnimLStand,          "LastStand"     },
+    {kCdudeAnimLStandExit,      "LastStandExit"  },
     {kParamMax, NULL},
 };
 
@@ -220,6 +236,9 @@ static PARAM gParamSounds[] =
     {kCdudeSndBurning,              "Burning"     },          {kCdudeSndDeathNormal,      "DeathDefault"      },
     {kCdudeSndDeathExplode,         "DeathBurning"},          {kCdudeSndTransforming,     "Morphing"          },
     {kCdudeSndWake,                 "IdleWake"    },          {kParSndMultiSrc,           "MultipleSources"   },
+    {kCdudeSndLStandEnter,          "LastStandEnter"},        {kCdudeSndLStand,           "LastStand"},
+    {kCdudeSndLStandWake,           "LastStandExit"},
+
     {kParamMax, NULL},
 };
 
@@ -237,7 +256,8 @@ static PARAM gParamWeapon[] =
     {kParWeaponStyle,               "Style"            },          {kParWeaponSlope,               "AimSlope"        },
     {kParWeaponAkimboFrame,         "AkimboAnimFrame"  },          {kParWeaponHeigh,               "Height"          },
     {kParWeaponData,                "Data"             },          {kParWeaponAttackSnd,           "AttackSound"     },
-    {kParWeaponIsDefault,           "Default"          },
+    {kParWeaponIsDefault,           "Default"          },          {kParWeaponMaxUnits,            "MaxObjects"      },
+    {kParWeaponRealCheck,           "RealTimeCheck"    },          {kParWeaponTargetBurn,          "TargetBurnTime"  },
     {kParamMax, NULL},
 };
 
@@ -263,6 +283,7 @@ static PARAM gParamAttack[] =
     {kParAttackNumShots,            "NumShots"      },
     {kParAttackInertia,             "Inertia"       },
     {kParAttackPredict,             "Prediction"    },
+    {kParAttackLocked,              "Immune"        },
     {kParamMax, NULL},
 };
 
@@ -296,12 +317,21 @@ static PARAM gParamVelocity[] =
     {kParamMax, NULL},
 };
 
+static PARAM gParamVelMod[] =
+{
+    {kCdudeVelModChase,     "Chase"  },
+    {kCdudeVelModSearch,    "Search" },
+    {kCdudeVelModBurn,      "Burn"   },
+    {kCdudeVelModFlee,      "Flee"   },
+    {kParamMax, NULL},
+};
+
 static PARAM gParamPosture[] =
 {
     {kCdudePostureL,        "Stand"  },
     {kCdudePostureC,        "Crouch" },
     {kCdudePostureW,        "Swim"   },
-    {kCdudePostureF,        "Fly"   },
+    {kCdudePostureF,        "Fly"    },
     {kParamMax, NULL},
 };
 
@@ -310,6 +340,7 @@ static PARAM gParamMedium[]
     {kParMediumAny,         "Any"   },
     {kParMediumLand,        "Land"  },
     {kParMediumWater,       "Water" },
+    {kParMediumNone,        "None"  },
     {kParamMax, NULL},
 };
 
@@ -319,7 +350,8 @@ static PARAM gParamDamage[] =
     {kDmgBullet,            "Bullet"           },              {kDmgExplode,           "Explode"          },
     {kDmgChoke,             "Choke"            },              {kDmgSpirit,            "Spirit"           },
     {kDmgElectric,          "Electric"         },              {kParDmgSource,         "IgnoreDamageFrom" },
-    {kParDmgBotTouch,       "StompDamage"      },
+    {kParDmgBotTouch,       "StompDamage"      },              {kParDmgMediumLand,     "MediumWaterDamage" },
+    {kParDmgMediumLand,     "MediumLandDamage" },
     {kParamMax, NULL},
 };
 
@@ -339,6 +371,7 @@ static PARAM gParamAppearance[] =
     {kAppearPic,            "Tile"  },                       {kAppearShade,      "Shade"    },
     {kAppearPal,            "Pal"   },                       {kAppearSize,       "Size"     },
     {kAppearOffs1,          "Offset"},                       {kAppearCstat,      "Cstat"    },
+    {kAppearEffect,         "Effect"},
     {kParamMax, NULL},
 };
 
@@ -476,11 +509,21 @@ static PARAM gParamMorphData[]
     {kParamMax, NULL},
 };
 
+static PARAM gParamMorphExtra[]
+{
+    {kParMorphTrigDeath,       "TriggerDeath"},
+    {kParamMax, NULL},
+};
+
 static PARAM gParamKeyword[] =
 {
     {kParKeywordInherit,        "Inherit"},
     {kParKeywordAbove,          "Above"},
     {kParKeywordBelow,          "Below"},
+    {kParKeywordChance,         "Chance"},
+    {kParKeywordHealth,         "Health"},
+    {kParKeywordWake,           "Wake"},
+    {kParKeywordModifiers,      "Modifiers"},
     {kParamMax, NULL},
 };
 
@@ -509,7 +552,6 @@ static char CanSee(spritetype* pSpr1, spritetype* pSpr2)
 }
 
 static char isIdKeyword(const char* fullStr, const char* prefix, int* nID = NULL);
-static char isNone(const char* str) { return (Bstrcasecmp(str, gValTypes[kValNone]) == 0); }
 static char getArrayType(const char* str, int* nLen = NULL);
 static int qsSortWeapons(CUSTOMDUDE_WEAPON* ref1, CUSTOMDUDE_WEAPON* ref2) { return ref1->pickChance - ref2->pickChance; }
 static DICTNODE* helperSeqExists(int nSeq);
@@ -545,6 +587,9 @@ char CUSTOMDUDE::IsMediumMatch(int nMedium)
     if (!nMedium)
         return true;
     
+    if (nMedium & 0x04)
+        return false; // 'none' medium
+
     char uwater = IsUnderwater();
     return (((nMedium & 0x01) && !uwater) || ((nMedium & 0x02) && uwater));
 }
@@ -631,6 +676,11 @@ CUSTOMDUDE_WEAPON* CUSTOMDUDE::PickWeapon(ARG_PICK_WEAPON* pArg)
         if (!irngok(pArg->dudeHealth, pWeap->dudeHpRange[0], pWeap->dudeHpRange[1]))        continue;
         if (!irngok(pArg->targHealth, pWeap->targHpRange[0], pWeap->targHpRange[1]))        continue;
         if (!irngok(pArg->slope, pWeap->slopeRange[0], pWeap->slopeRange[1]))               continue;
+        if (!irngok(pArg->targBurnTime, pWeap->targBurnRange[0], pWeap->targBurnRange[1]))  continue;
+        if (!CheckUnits(pWeap))                                                             continue;
+
+        if (pWeap->realCheck && cdudeWeaponShot(this, pWeap, true) < 0)
+            continue;
 
         pWeap->available = 1; // at least available for akimbo mode
         numAvailWeapons++;
@@ -645,6 +695,74 @@ CUSTOMDUDE_WEAPON* CUSTOMDUDE::PickWeapon(ARG_PICK_WEAPON* pArg)
     }
 
     return (pRetn) ? pRetn : pDefl;
+}
+
+char CUSTOMDUDE::CheckUnits(CUSTOMDUDE_WEAPON* pWeap)
+{
+    static short statList[] = { kStatDude, kStatThing, kStatProjectile, kStatFlare };
+    int nOwn, i, s, shared, current;
+    spritetype* pUnit;
+    char ok;
+            
+    if (!pWeap->maxUnitsShared && !pWeap->maxUnitsThis)
+        return 1;
+
+    current = shared = 0;    
+    i = LENGTH(statList);
+    while (--i >= 0)
+    {
+        if (gStatCount[statList[i]] <= 0)
+            continue;
+        
+        for (s = headspritestat[statList[i]]; s >= 0; s = nextspritesect[s])
+        {
+            pUnit = &sprite[s];
+            nOwn = actOwnerIdToSpriteId(pUnit->owner);
+            if (!spriRangeIsFine(nOwn) || sprite[nOwn].type != kDudeModernCustom)
+                continue;
+
+            ok = 0;
+            switch (pUnit->statnum)
+            {
+                case kStatDude:
+                case kStatThing:
+                    if (pUnit->extra > 0 && xsprite[pUnit->extra].health)
+                    {
+                        if ((pWeap->id == pUnit->type) || (IsCustomDude(pUnit) && xsprite[pUnit->extra].data1 == pWeap->id))
+                        {
+                            shared++;
+                            if (nOwn == pSpr->index)
+                                current++;
+
+                            ok = 1;
+                        }
+                    }
+                    break;
+                case kStatProjectile:
+                case kStatFlare: // flares that stuck in target
+                    if (pWeap->id == pUnit->type)
+                    {
+                        shared++;
+                        if (nOwn == pSpr->index)
+                            current++;
+
+                        ok = 1;
+                    }
+                    break;
+                default:
+                    continue;
+            }
+
+            if (!ok)
+                continue;
+
+            if (pWeap->maxUnitsShared && shared >= pWeap->maxUnitsShared) return 0;
+            if (pWeap->maxUnitsThis && current >= pWeap->maxUnitsThis) return 0;
+        }
+    }
+
+    return 1;
+
 }
 
 char CUSTOMDUDE::IsTooTight(void)
@@ -664,9 +782,6 @@ int CUSTOMDUDE::GetDamage(int nSource, int nDmgType)
 {
     int nDamage = damage.id[nDmgType];
     int nIgnore  = damage.ignoreSources;
-
-    if (IsSleeping())
-        nDamage <<= 4;
 
     if (nSource < 0 || !nIgnore)
         return nDamage;
@@ -809,10 +924,31 @@ void CUSTOMDUDE::Process(void)
 
     if (!IsMorphing() && !IsDying())
     {
-        if (!IsMediumMatch(medium))
+        if (!pXSpr->locked && !IsMediumMatch(medium))
         {
-            Kill(pSpr->index, (IsUnderWater(pSpr)) ? kDamageDrown : kDamageFall, pXSpr->health << 4);
-            return;
+            CUSTOMDUDE_DAMAGE::DELAYED_DAMAGE* pEntry = IsUnderwater() ? &damage.water : &damage.land;
+            if (pEntry->amount && pEntry->delay.Pass())
+            {
+                int nDType = IsUnderwater() ? kDamageDrown : (IsBurning() ? kDamageBurn : kDamageFall);
+                int nDmg = pEntry->amount;
+
+                pXSpr->health = ClipLow(pXSpr->health - nDmg, 0);
+                cumulDamage[pSpr->extra] += nDmg;
+
+                if (pXSpr->health > 0)
+                {
+                    Damage(pSpr->index, nDType, nDmg);
+                    pEntry->delay.Set();
+
+                    if (!pExtra->stats.active)
+                        aiActivateDude(pSpr, pXSpr);
+                }
+                else
+                {
+                    Kill(pSpr->index, nDType, nDmg);
+                    return;
+                }
+            }
         }
 
         if (IsFlipped())
@@ -834,15 +970,18 @@ void CUSTOMDUDE::Process(void)
             ProcessPosture();
     }
 
-    if (damage.stompDamage && (IsStanding() || IsCrouching()))
+    if (damage.stomp.amount && (IsStanding() || IsCrouching()))
     {
         SPRITEHIT* pTouch = &gSpriteHit[pSpr->extra];
         
-        if ((pTouch->florhit & 0xc000) == 0xc000)
+        if ((pTouch->florhit & 0xc000) == 0xc000 && damage.stomp.delay.Pass())
         {
             spritetype* pHSpr = &sprite[pTouch->florhit & 0x3fff];
             if (dudeIsAlive(pHSpr))
-                actDamageSprite(pSpr->index, pHSpr, (Chance(0x8000)) ? kDamageExplode : kDamageFall, damage.stompDamage);
+            {
+                damage.stomp.delay.Set();
+                actDamageSprite(pSpr->index, pHSpr, kDamageFall, damage.stomp.amount);
+            }
         }
     }
 
@@ -1096,6 +1235,8 @@ void CUSTOMDUDE::InitSprite(void)
         StatusRem(kCdudeStatusRespawn);
         StatusRem(kCdudeStatusBurning);
         StatusRem(kCdudeStatusDying);
+        StatusRem(kCdudeStatusLStand);
+        StatusRem(kCdudeStatusLStandAwaked);
 
         if (StatusTest(kCdudeStatusFlipped))
         {
@@ -1180,7 +1321,7 @@ void CUSTOMDUDE::Activate(void)
     
     if (!IsBurning())
     {
-        if (!IsMorphing())
+        if (!IsMorphing() && !IsKnockout())
         {
             if (!IsSleeping())
             {
@@ -1188,7 +1329,7 @@ void CUSTOMDUDE::Activate(void)
                     ChangePosture(kCdudePostureL);
 
                 pExtra->stats.active = 1;
-                NewState(kCdudeStateChase);
+                NewState((pXSpr->target >= 0) ? kCdudeStateChase : kCdudeStateSearch);
             }
             else
             {
@@ -1207,17 +1348,41 @@ int CUSTOMDUDE::Damage(int nFrom, int nDmgType, int nDmg)
 {
     #define CUMUL_OR_CUR (pEvn->cumulative) ? nCDmg : nDmg
     
-    UNREFERENCED_PARAMETER(nFrom);
-    CUSTOMDUDE_EVENT_DAMAGE* pEvn;
+    CUSTOMDUDE_EVENT_DAMAGE* pEvn; spritetype* pFrom; XSPRITE* pXFrom;
+    char selfDmg = (nFrom == pSpr->index);
     int nCDmg = cumulDamage[pSpr->extra];
-    int nTime;
+    int nChance, nTime;
+
+    if (nFrom >= 0 && pXSpr->target != nFrom && !selfDmg)
+    {
+        pFrom = &sprite[nFrom];
+        pEvn = &chgTarg.onDamage[nDmgType];
+        nChance = pEvn->chance; // base chance
+
+        if (nChance > 0 && dudeIsAlive(pFrom))
+        {
+            pXFrom = &xsprite[pFrom->extra];
+            if (IsCustomDude(pFrom) && pXFrom->data1 == pXSpr->data1) // same kin
+                nChance = 0; // maybe can't change
+
+            if (pXFrom->target == pSpr->index)
+                nChance += (kChanceMax >> 4); // raise if targeted, however 
+
+            if (nChance > 0 && pEvn->Allow(pXSpr, CUMUL_OR_CUR, nChance))
+            {
+                aiSetTarget(pXSpr, nFrom);
+                pXSpr->goalAng = getangle(pXSpr->targetX - pSpr->x, pXSpr->targetY - pSpr->y);
+            }
+        }
+    }
+
+    if (!pExtra->stats.active)
+        aiActivateDude(pSpr, pXSpr);
 
     if (IsBurning())
     {
         if (IsUnderwater())
         {
-            pSpr->type = kDudeModernCustom;
-            pInfo = getDudeInfo(pSpr->type);
             pXSpr->burnSource = -1;
             pXSpr->burnTime = 0;
             pXSpr->health = 1;
@@ -1238,66 +1403,93 @@ int CUSTOMDUDE::Damage(int nFrom, int nDmgType, int nDmg)
             return nDmg;
         }
     }
-    else if (pXSpr->health)
+    else
     {
-        if (IsKnockout())
+        if (IsLastStand())
         {
-            pExtra->teslaHit = 0;
+            if (nDmgType == kDamageTesla) pExtra->teslaHit = 1;
+            Kill(nFrom, nDmgType, nDmg);
             return nDmg;
         }
-        else if (CanKnockout())
+        else if (!selfDmg && CanLastStand())
         {
-            pEvn = &knockout.onDamage[nDmgType];
+            pEvn = &lStand.onDamage[nDmgType];
             if (pEvn->Allow(pXSpr, CUMUL_OR_CUR))
             {
+                StatusSet(kCdudeStatusLStand);
+                StatusSet(kCdudeStatusLStandAwaked); // can be only once in this state
+
                 NewState(kCdudeStateKnockEnter);
                 NextState(kCdudeStateKnock, pEvn->PickTime());
 
-                PlaySound(kCdudeSndGotHit);
+                PlaySound(kCdudeSndLStandEnter);
+                pExtra->teslaHit = 0;
+                pXSpr->health = 16;
+                return 0;
+            }
+        }
+        
+        if (pXSpr->health)
+        {
+            if (IsKnockout())
+            {
                 pExtra->teslaHit = 0;
                 return nDmg;
             }
-        }
-
-        if (nDmgType == kDmgElectric)
-            pExtra->teslaHit = 1;
-
-
-        if (CanRecoil() || (pExtra->teslaHit && CanElectrocute()))
-        {
-            pEvn = &recoil.onDamage[nDmgType];
-            if (pEvn->Allow(pXSpr, CUMUL_OR_CUR))
-                Recoil(pEvn->PickTime());
-        }
-
-        if ((IsStanding() && CanCrouch()) || IsCrouching())
-        {
-            pEvn = &crouch.onDamage[nDmgType];
-            if (pEvn->Allow(pXSpr, CUMUL_OR_CUR))
-                timer.crouch.Set(pEvn->PickTime()); // handled in ProcessPosture()
-        }
-
-        pEvn = &dodge.onDamage[nDmgType];
-        if (CanMove() && pEvn->Allow(pXSpr, CUMUL_OR_CUR))
-        {
-            if ((nTime = pEvn->PickTime()) == 0 && (nTime = (30 * Random(2))) == 0)
-                nTime = 90;
-            
-            if (IsRecoil())
+            else if (CanKnockout())
             {
-                NextState(kCdudeStateDodge, nTime);
-            }
-            else
-            {
-                if (Chance(0x0500))
+                pEvn = &knockout.onDamage[nDmgType];
+                if (pEvn->Allow(pXSpr, CUMUL_OR_CUR))
+                {
+                    NewState(kCdudeStateKnockEnter);
+                    NextState(kCdudeStateKnock, pEvn->PickTime());
+
                     PlaySound(kCdudeSndGotHit);
-
-                NewState(kCdudeStateDodge, nTime);
+                    pExtra->teslaHit = 0;
+                    return nDmg;
+                }
             }
-        }
-        else if (IsRecoil())
-        {
-            NextState(kCdudeStateChase);
+
+            if (nDmgType == kDmgElectric)
+                pExtra->teslaHit = 1;
+
+
+            if (CanRecoil() || (pExtra->teslaHit && CanElectrocute()))
+            {
+                pEvn = &recoil.onDamage[nDmgType];
+                if (pEvn->Allow(pXSpr, CUMUL_OR_CUR))
+                    Recoil(pEvn->PickTime());
+            }
+
+            if (!selfDmg && ((IsStanding() && CanCrouch()) || IsCrouching()))
+            {
+                pEvn = &crouch.onDamage[nDmgType];
+                if (pEvn->Allow(pXSpr, CUMUL_OR_CUR))
+                    timer.crouch.Set(pEvn->PickTime()); // handled in ProcessPosture()
+            }
+
+            pEvn = &dodge.onDamage[nDmgType];
+            if (!selfDmg && CanMove() && pEvn->Allow(pXSpr, CUMUL_OR_CUR))
+            {
+                if ((nTime = pEvn->PickTime()) == 0 && (nTime = (30 * Random(2))) == 0)
+                    nTime = 90;
+
+                if (IsRecoil())
+                {
+                    NextState(kCdudeStateDodge, nTime);
+                }
+                else
+                {
+                    if (Chance(0x0500))
+                        PlaySound(kCdudeSndGotHit);
+
+                    NewState(kCdudeStateDodge, nTime);
+                }
+            }
+            else if (IsRecoil())
+            {
+                NextState(kCdudeStateChase);
+            }
         }
     }
 
@@ -1314,12 +1506,7 @@ void CUSTOMDUDE::Recoil(int nStateTime)
             nState = kCdudeStateRecoil;
 
         if (pExtra->teslaHit && CanElectrocute() && !IsUnderwater())
-        {
-            if (CanElectrocute() && !IsUnderwater())
-            {
-                nState = kCdudeStateRecoilT;
-            }
-        }
+            nState = kCdudeStateRecoilT;
 
         PlaySound(kCdudeSndGotHit);
         
@@ -1332,8 +1519,24 @@ void CUSTOMDUDE::Recoil(int nStateTime)
 
 AISTATE* CUSTOMDUDE::PickDeath(int nDmgType)
 {
-    AISTATE* pDeath = &states[kCdudeStateDeathBase + nDmgType][posture];
-    int i, nRand;
+    int i, nRand = Random(kCdudePostureMax);
+    AISTATE* pDeath;
+    
+    if (IsLastStand())
+    {
+        pDeath = &states[kCdudeStateDeathLStand][posture];
+        
+        // try posture mode first
+        if (pDeath->stateType == kCdudeStateTypeDeathPosture
+            && pDeath->seqId > 0)
+                return pDeath;
+        
+        pDeath = &states[kCdudeStateDeathLStand][nRand];
+        if (pDeath->seqId > 0)
+            return pDeath;
+    }
+    
+    pDeath = &states[kCdudeStateDeathBase + nDmgType][posture];
     
     // try posture mode first
     if (pDeath->stateType == kCdudeStateTypeDeathPosture)
@@ -1345,7 +1548,6 @@ AISTATE* CUSTOMDUDE::PickDeath(int nDmgType)
         return &states[kCdudeStateDeathBase][posture];
     }
 
-    nRand = Random(kCdudePostureMax);
     pDeath = &states[kCdudeStateDeathBase + nDmgType][nRand];
     if (pDeath->seqId > 0)
         return pDeath;
@@ -1378,14 +1580,17 @@ void CUSTOMDUDE::Kill(int nFrom, int nDmgType, int nDmg)
 
     for (i = 0; i < kCdudeSndMax; i++) sound[i].Kill(pSpr);
 
-    if (nextDude != -1 || (nextDude = morph.id[nDmgType]) != -1)
+    if (!IsLastStand())
     {
-        // clamp hp so is not count as dead
-        pXSpr->health = ClipLow(pXSpr->health, 16);
-        if (!IsMorphing())
-            NewState(kCdudeStateMorph);
+        if (nextDude != -1 || (nextDude = morph.id[nDmgType]) != -1)
+        {
+            // clamp hp so is not count as dead
+            pXSpr->health = ClipLow(pXSpr->health, 16);
+            if (!IsMorphing())
+                NewState(kCdudeStateMorph);
 
-        return;
+            return;
+        }
     }
 
     if (nDmgType == kDamageDrown && !IsSwimming() && IsUnderWater(pSpr))
@@ -1621,7 +1826,7 @@ void CUSTOMDUDE::LeechKill(char delSpr)
 
 void CUSTOMDUDE::SlavesUpdate()
 {
-    int l, t = 0;
+    int l;
     IDLIST* pSlaves = slaves.list;
     int32_t* pDb;
 
@@ -1671,20 +1876,7 @@ void CUSTOMDUDE::SlavesUpdate()
             }
         }
 
-        t++;
         pDb = pSlaves->Remove(*pDb);
-    }
-
-    if (version == kCdudeVer1 && t)
-    {
-        CUSTOMDUDE_WEAPON* pWeap;
-        // add ammo for summon weapons
-        for (l = 0; l < numWeapons; l++)
-        {
-            pWeap = &weapons[l];
-            if (pWeap->type == kCdudeWeaponSummon)
-                pWeap->ammo.Inc(t);
-        }
     }
 }
 
@@ -1698,7 +1890,14 @@ void CUSTOMDUDE::SlavesKill(void)
         {
             XSPRITE* pXSlave = &xsprite[pSlave->extra];
             if (pXSlave->health > 0)
-                actKillDude(pSpr->index, pSlave, kDamageFall, pXSlave->health << 4);
+            {
+                int nDType;
+                if (spriteIsUnderwater(pSlave)) nDType = kDamageDrown;
+                else if (pXSlave->burnTime > 0) nDType = kDamageBurn;
+                else                            nDType = kDamageFall;
+                
+                actKillDude(pSpr->index, pSlave, (DAMAGE_TYPE)nDType, pXSlave->health << 4);
+            }
         }
     }
 
@@ -2024,7 +2223,7 @@ void CUSTOMDUDE_SETUP::RandomizeDudeSettings()
 {
     // randomize some dude's properties, so they look more or less different
     const int states[] = { kCdudeStateSearch, kCdudeStateKnock, kCdudeStateFlee };
-    int nVal, i, j; AISTATE* pState;
+    int nVal, nVel, i, j; AISTATE* pState;
 
     if (pDude->randomness.statetime)
     {
@@ -2050,9 +2249,10 @@ void CUSTOMDUDE_SETUP::RandomizeDudeSettings()
                 if (j == kParVelocityTurn)
                     continue; // too small values to deal with?
                 
-                nVal = pDude->velocity[i].id[j];
-                pDude->velocity[i].id[j] -= perc2val(pDude->randomness.velocity, nVal);
-                pDude->velocity[i].id[j] += perc2val(nnExtRandom(0, pDude->randomness.velocity), nVal);
+                nVal = nVel = pDude->velocity.GetBase(i, j);
+                nVel -= perc2val(pDude->randomness.velocity, nVal);
+                nVel += perc2val(nnExtRandom(0, pDude->randomness.velocity), nVal);
+                pDude->velocity.SetBase(nVel, i, j);
             }
         }
     }
@@ -2199,8 +2399,15 @@ void CUSTOMDUDE_SETUP::Setup(spritetype* pSpr, XSPRITE* pXSpr)
             pDude->StatusSet(kCdudeStatusAwaked);
         }
 
-        if (pXSpr->data2 & kCdudeStatusForceCrouch)
-            pDude->StatusSet(kCdudeStatusForceCrouch);
+        if (pXSpr->data2 & kCdudeStatusLStandAwaked)
+        {
+            Bmemset(&pDude->lStand, 0, sizeof(pDude->lStand));
+            pDude->StatusSet(kCdudeStatusLStandAwaked);
+        }
+
+        if (pXSpr->data2 & kCdudeStatusForceCrouch) pDude->StatusSet(kCdudeStatusForceCrouch);
+        if (pXSpr->data2 & kCdudeStatusCruel)       pDude->StatusSet(kCdudeStatusCruel);
+        if (pXSpr->data2 & KCdudeStatusInnocent)    pDude->StatusSet(KCdudeStatusInnocent);
     }
 
     SetupLeech();
@@ -2392,6 +2599,8 @@ void CUSTOMDUDE_SETUP::SetupFromDude(CUSTOMDUDE* pSrc)
     Bmemcpy(&pDude->recoil,     &pSrc->recoil,      sizeof(pDude->recoil));
     Bmemcpy(&pDude->crouch,     &pSrc->crouch,      sizeof(pDude->crouch));
     Bmemcpy(&pDude->knockout,   &pSrc->knockout,    sizeof(pDude->knockout));
+    Bmemcpy(&pDude->lStand,     &pSrc->lStand,      sizeof(pDude->lStand));
+    Bmemcpy(&pDude->chgTarg,    &pSrc->chgTarg,     sizeof(pDude->chgTarg));
     Bmemcpy(&pDude->morph,      &pSrc->morph,       sizeof(pDude->morph));
     Bmemcpy(&pDude->flight,     &pSrc->flight,      sizeof(pDude->flight));
     Bmemcpy(&pDude->dropItem,   &pSrc->dropItem,    sizeof(pDude->dropItem));
@@ -2476,6 +2685,8 @@ CUSTOMDUDE* CUSTOMDUDE_SETUP::DudeTemplateCreate()
 
     pSpr->cstat &= ~(CSTAT_SPRITE_BLOCK | CSTAT_SPRITE_BLOCK_HITSCAN);
     pSpr->cstat |= CSTAT_SPRITE_INVISIBLE;
+
+    ChangeSpriteSect(nSpr, 0);
 
     if ((pModel = cdudeGet(pSpr)) == NULL)
     {
@@ -2629,13 +2840,16 @@ void CUSTOMDUDE_SETUP::VelocitySetDefault(int nMaxVel)
 
     if (pXSpr->busyTime)
         nFrontSpeed = ClipHigh((nFrontSpeed / 3) + (2500 * pXSpr->busyTime), nMaxVel);
-
+    
+    pDude->velocity.SetModID(kCdudeVelModNone);
+    Bmemset(pDude->velocity.mods, 0, sizeof(pDude->velocity.mods));
+    
     for (i = 0; i < kCdudePostureMax; i++)
     {
-        pDude->velocity[i].Set(nFrontSpeed, kParVelocityForward);
-        pDude->velocity[i].Set(nSideSpeed, kParVelocityDodge);
-        pDude->velocity[i].Set(nAngSpeed, kParVelocityTurn);
-        pDude->velocity[i].Set(nFrontSpeed, kParVelocityZ);
+        pDude->velocity.SetBase(nFrontSpeed, i, kParVelocityForward);
+        pDude->velocity.SetBase(nSideSpeed, i, kParVelocityDodge);
+        pDude->velocity.SetBase(nAngSpeed, i, kParVelocityTurn);
+        pDude->velocity.SetBase(nFrontSpeed, i, kParVelocityZ);
     }
 }
 
@@ -2728,7 +2942,9 @@ void CUSTOMDUDE_SETUP::AnimationConvert(int baseID)
             // deaths must be filled for random pick
             for (j = 0, k = 0; j < kCdudePostureMax; j++)
             {
-                pState[j].seqId = baseID + pEntry->offset[k];
+                if (!helperSeqExists(baseID + pEntry->offset[k]))
+                    pState[j].seqId = baseID + pEntry->offset[k];
+
                 k = IncRotate(k, LENGTH(pEntry->offset));
             }
         }
@@ -2927,6 +3143,123 @@ void CUSTOMDUDE_SETUP::CountHeight(void)
     pDude->eyeHeight = perc2val(85, pDude->height>>1);
 }
 
+#if 0
+void CUSTOMDUDE_SETUP::ReplaceDudes(void)
+{
+    const int kMaxDudes = kDudeVanillaMax - kDudeBase;
+    
+    static uint8_t replaceRespawn = 1;
+    static uint32_t tableCRC = 0;
+    static struct DUDEENTRY
+    {
+        uint8_t version;
+        uint16_t data[3]; // v2: fileID, flags / v1: weapID, animID, sndID
+    }
+    table[kMaxDudes], *e;
+    
+    DICTNODE* hRes; spritetype* pSpr; XSPRITE* pXSpr;
+    unsigned char* pRaw; const char *k, *v;
+    int nPrevNode = -1, nType, i, t;
+    uint32_t tCRC;
+
+    if ((hRes = gSysRes.Lookup("REPLACE", "CDU")) == NULL)
+        return;
+
+    pRaw = (unsigned char*)gSysRes.Load(hRes);
+    
+    if ((tCRC = Bcrc32(pRaw, gSysRes.Size(hRes), 0)) != tableCRC)
+    {
+        IniFile ini(pRaw, gSysRes.Size(hRes));
+        
+        memset(table, 0, sizeof(table));
+        replaceRespawn = ini.GetKeyBool("Options", "ReplaceRespawn", true);
+        tableCRC = tCRC;
+
+        while (ini.GetNextString(&k, &v, &nPrevNode, "List"))
+        {
+            if (isempty(k) || isempty(v) || !isufix(k))
+                continue;
+
+            nType = atoi(k) - kDudeBase;
+            if (!rngok(nType, 0, kMaxDudes))
+                continue;
+
+            e = &table[nType], i = 0;
+            while ((i = enumStr(i, v, val)) > 0 && i < 4)
+            {
+                if (i == 1)
+                {
+                    if (isIdKeyword(val, gValTypes[kValCdud], &t))
+                    {
+                        e->version = kCdudeVer2;
+                        e->data[0] = t;
+                    }
+                    else if (isufix(val))
+                    {
+                        e->version = kCdudeVer1;
+                        e->data[0] = (uint16_t)atoi(val);
+                    }
+                }
+                else if (isufix(val))
+                {
+                    if (i == 2) e->data[1] = (uint16_t)atoi(val);
+                    if (i == 3) e->data[2] = (uint16_t)atoi(val);
+                }
+            }
+        }
+    }
+
+    for (i = 0; i < kMaxSprites; i++)
+    {
+        pSpr = &sprite[i];
+        if (pSpr->statnum >= kMaxStatus || !xspriRangeIsFine(pSpr->extra))
+            continue;
+
+        if (rngok(pSpr->type, kDudeBase, kDudeVanillaMax))
+        {
+            e = &table[pSpr->type - kDudeBase];
+            
+            if (e->version)
+            {
+                pXSpr = &xsprite[pSpr->extra];
+                
+                if (e->version == kCdudeVer1
+                    && helperTXPointsOnDude(pXSpr->txID))
+                        continue;
+
+                pSpr->type = kDudeModernCustom;
+                pSpr->inittype = pSpr->type;
+
+                pXSpr->data1 = e->data[0];
+                pXSpr->data2 = e->data[1];
+                pXSpr->data3 = e->data[2];
+            }
+        }
+        else if (pSpr->type == kMarkerDudeSpawn && replaceRespawn)
+        {
+            pXSpr = &xsprite[pSpr->extra];
+            if (rngok(pXSpr->data1, kDudeBase, kDudeVanillaMax))
+            {
+                e = &table[pXSpr->data1 - kDudeBase];
+                if (e->version)
+                {
+                    if (e->version == kCdudeVer1
+                       && (pSpr->flags & kModernTypeFlag1) && helperTXPointsOnDude(pXSpr->txID))
+                          continue;
+                    
+                    pSpr->type = kModernCustomDudeSpawn;
+                    pSpr->inittype = pSpr->type;
+
+                    pXSpr->data1 = e->data[0];
+                    pXSpr->data2 = e->data[1];
+                    pXSpr->data3 = e->data[2];
+                    pXSpr->data4 = 0; // this becomes start health
+                }
+            }
+        }
+    }
+}
+#endif
 
 /*************************************************************************************************/
 
@@ -3106,22 +3439,21 @@ void CUSTOMDUDEV2_SETUP::SetupGeneral(void)
 
 void CUSTOMDUDEV2_SETUP::SetupVelocity(void)
 {
-    CUSTOMDUDE_VELOCITY* pVel;
+    CUSTOMDUDE_VELOCITY* pVel = &pDude->velocity;
     VelocitySetDefault(kCdudeMaxVelocity);
     pParam = gParamPosture;
 
-    int nPosture = -1;
-    int c = 0;
+    int nVal, nPar, nPosture = -1;
+    int i, c = 0;
 
     if (DescriptGroupExist(pGroup->text))
     {
-        while (pParam->id != kParamMax)
+        for (pParam = gParamPosture; pParam->id != kParamMax; pParam++)
         {
             if (rngok(pParam->id, kCdudePosture, kCdudePostureMax))
             {
-                pVel = &pDude->velocity[pParam->id - kCdudePosture];
                 pValue = DescriptGetValue(pGroup->text, pParam->text);
-                if (ParseVelocity(pValue, pVel))
+                if (ParseBaseVelocity(pValue, pVel->id[pParam->id]))
                 {
                     if (nPosture < 0)
                         nPosture = pParam->id;
@@ -3129,8 +3461,19 @@ void CUSTOMDUDEV2_SETUP::SetupVelocity(void)
                     c++;
                 }
             }
+        }
 
-            pParam++;
+        if ((pParam = FindParam(kParKeywordModifiers, gParamKeyword)) != NULL)
+        {
+            if ((pValue = DescriptGetValue(pGroup->text, pParam->text)) != NULL && isarray(pValue))
+            {
+                for (i = 0; enumStr(i, pValue, key, val); i++)
+                {
+                    nPar = FindParam(key, gParamVelMod);
+                    if (rngok(nPar, kCdudeVelModChase, kCdudeVelModMax) && (nVal = CheckValue(val, kValPerc, 0)) != 0)
+                        pVel->SetMod(nVal, nPar);
+                }
+            }
         }
     }
 
@@ -3178,7 +3521,7 @@ void CUSTOMDUDEV2_SETUP::SetupAnimation(void)
                 }
                 break;
             case kCdudeStateMove:
-                for (int i = kCdudeStateMoveBase; i < kCdudeStateMoveMax; i++)
+                for (i = kCdudeStateMoveBase; i < kCdudeStateMoveMax; i++)
                 {
                     PARAM* pMove = FindParam(i, gParamAnim);
                     if (!pMove || !DescriptGetValue(pGroup->text, pMove->text))
@@ -3267,11 +3610,15 @@ void CUSTOMDUDEV2_SETUP::SetupSound(void)
 void CUSTOMDUDEV2_SETUP::SetupDamage(void)
 {
     CUSTOMDUDE_DAMAGE* pDamage = &pDude->damage;
-    int nVal, t;
+    CUSTOMDUDE_DAMAGE::DELAYED_DAMAGE* pDelayDmg;
+    int nVal, t, data[2] = {0, 0};
     
     /* ----------------------------------*/
     /* DEFAULT VALUES                    */
     /* ----------------------------------*/
+    Bmemset(pDamage, 0, sizeof(*pDamage));
+    pDamage->water.amount = 65535; // kill
+    pDamage->land.amount  = 65535; // kill
     DamageSetDefault();
 
     if (DescriptGroupExist(pGroup->text))
@@ -3288,7 +3635,30 @@ void CUSTOMDUDEV2_SETUP::SetupDamage(void)
                         pDamage->ignoreSources = ParseKeywords(pValue, gParamDamageSource);
                         break;
                     case kParDmgBotTouch:
-                        pDamage->stompDamage = CheckValue(pValue, kValUfix, 0, 65535, 0) << 2;
+                        switch (ParseIDs(pValue, kValUfix, data, 2))
+                        {
+                            case 2:
+                                pDamage->stomp.delay.rng[0] = data[1];
+                                pDamage->stomp.delay.rng[1] = 0;
+                                fallthrough__;
+                            case 1:
+                                pDamage->stomp.amount = ClipHigh(data[0] << 2, 65535);
+                                break;
+                        }
+                        break;
+                    case kParDmgMediumLand:
+                    case kParDmgMediumWater:
+                        pDelayDmg = (pParam->id == kParDmgMediumLand) ? &pDamage->land : &pDamage->water;
+                        switch (ParseIDs(pValue, kValUfix, data, 2))
+                        {
+                            case 2:
+                                pDelayDmg->delay.rng[0] = data[1];
+                                pDelayDmg->delay.rng[1] = 0;
+                                fallthrough__;
+                            case 1:
+                                pDelayDmg->amount = ClipHigh(data[0] << 2, 65535);
+                                break;
+                        }
                         break;
                     default:
                         if (rngok(pParam->id, kDmgFall, kDmgMax))
@@ -3437,6 +3807,89 @@ void CUSTOMDUDEV2_SETUP::SetupKnockout(void)
         SetupEventDamage(pEvent);
 }
 
+void CUSTOMDUDEV2_SETUP::SetupLastStand(void)
+{
+    CUSTOMDUDE_LASTSTAND* pStand = &pDude->lStand;
+    CUSTOMDUDE_EVENT_DAMAGE* pEvent = pStand->onDamage;
+    int i;
+
+    /* ----------------------------------*/
+    /* DEFAULT VALUES                    */
+    /* ----------------------------------*/
+    Bmemset(pStand, 0, sizeof(*pStand));
+    pStand->wake.chance = kChanceMax >> 1;
+    pStand->wake.health = 0;
+
+    pEvent->cooldown.rng[0] = kCdudeDmgCheckDelay;
+    pEvent->cumulative        = 1;
+    pEvent->hitcount          = 1;
+
+    i = kDmgMax;
+    while(--i > 0)
+        Bmemcpy(&pEvent[i], pEvent, sizeof(*pEvent));
+
+    if (DescriptGroupExist(pGroup->text))
+    {
+        SetupEventDamage(pEvent);
+
+        for (pParam = gParamKeyword; pParam->id != kParamMax; pParam++)
+        {
+            if ((pValue = DescriptGetValue(pGroup->text, pParam->text)) == NULL)
+                continue;
+
+            switch (pParam->id)
+            {
+                case kParKeywordWake:
+                    ParseLastStandWake(pValue, pStand);
+                    break;
+            }
+        }
+
+        // setup the animation
+        PARAM* oParam = pParam, * oGroup = pGroup;
+        AISTATE dummy[kCdudePostureMax]; // use dummy state to get animation IDs
+        if ((pGroup = FindParam(kParGroupAnimation, gParGroup)) != NULL && DescriptGroupExist(pGroup->text))
+        {
+            for (pParam = gParamAnim; pParam->id != kParamMax; pParam++)
+            {
+                if (irngok(pParam->id, kCdudeAnimLStandEnter, kCdudeAnimLStandExit))
+                {
+                    if ((pValue = DescriptGetValue(pGroup->text, pParam->text)) == NULL)
+                        continue;
+
+                    SetupAnimation(dummy, true);
+                    for (i = 0; i < kCdudePostureMax; i++)
+                        pStand->animid[pParam->id - kCdudeAnimLStandEnter][i] = dummy[i].seqId;
+                }
+            }
+        }
+
+        pParam = oParam;
+        pGroup = oGroup;
+    }
+}
+
+void CUSTOMDUDEV2_SETUP::SetupChangeTarget(void)
+{
+    CUSTOMDUDE_CHGTARGET* pChg = &pDude->chgTarg;
+    CUSTOMDUDE_EVENT_DAMAGE* pEvent = pChg->onDamage;
+    int i;
+
+    /* ----------------------------------*/
+    /* DEFAULT VALUES                    */
+    /* ----------------------------------*/
+    Bmemset(pChg, 0, sizeof(*pChg));
+    pEvent->cooldown.rng[0] = kCdudeDmgCheckDelay;
+    pEvent->cumulative        = 1;
+    pEvent->hitcount          = 1;
+
+    i = kDmgMax;
+    while(--i > 0)
+        Bmemcpy(&pEvent[i], pEvent, sizeof(*pEvent));
+
+    if (DescriptGroupExist(pGroup->text))
+        SetupEventDamage(pEvent);
+}
 
 void CUSTOMDUDEV2_SETUP::SetupCrouch(void)
 {
@@ -3921,6 +4374,28 @@ void CUSTOMDUDEV2_SETUP::SetupFlyPattern(void)
     }
 }
 
+static char isIdKeyword(const char* fullStr, const char* prefixA, const char* prefixB, int* nID)
+{
+    if (!fullStr || !prefixA || !prefixB)
+        return false;
+    
+    int l1 = Bstrlen(fullStr);
+    int l2 = Bstrlen(prefixA);
+
+    if (l2 < l1 && Bstrncasecmp(fullStr, prefixA, l2) == 0)
+    {
+        while (fullStr[l2] == '_')
+        {
+            if (++l2 >= l1)
+                return false;
+        }
+        
+        return isIdKeyword(&fullStr[l2], prefixB, nID);
+    }
+
+    return false;
+}
+
 char CUSTOMDUDEV2_SETUP::ParseWeaponBasicInfo(const char* str, CUSTOMDUDE_WEAPON* pWeap)
 {
     int i, nMin, nMax, nID;
@@ -3951,24 +4426,28 @@ char CUSTOMDUDEV2_SETUP::ParseWeaponBasicInfo(const char* str, CUSTOMDUDE_WEAPON
             
             pWeap->id = nID;
         }
-        else if (isIdKeyword(str, pInfo->keyword, &nID))
+        else if (pInfo->range[1] == pInfo->range[0])
+        {
+            if (Bstrcasecmp(str, pInfo->keywordA) != 0)
+                continue;
+            
+            pWeap->id = pInfo->range[0];
+        }
+        else if (isIdKeyword(str, pInfo->keywordA, pInfo->keywordB, &nID) || isIdKeyword(str, pInfo->keywordA, &nID))
         {
             nMin        = 1;
             nMax        = pInfo->range[1] - pInfo->range[0];
             nID         = CheckRange(str, nID, nMin, nMax) - 1;
             pWeap->id   = pInfo->range[0] + nID;
         }
-        else if (isNone(str))
-        {
-            pWeap->id = 0;
-        }
         else
         {
             continue;
         }
 
-        pWeap->clipMask = pInfo->clipMask;
-        pWeap->type     = pInfo->type;
+        pWeap->spawnsSprite     = pInfo->spawnsSprite;
+        pWeap->clipMask         = pInfo->clipMask;
+        pWeap->type             = pInfo->type;
         return true;
     }
 
@@ -4167,6 +4646,11 @@ void CUSTOMDUDEV2_SETUP::SetupMorphing(void)
     const char* oParText; char tmp[64];
     int nDude = -1, nVal, i;
 
+    /* ----------------------------------*/
+    /* DEFAULT VALUES                    */
+    /* ----------------------------------*/
+    pMorph->trDeath = 0;
+
     // clear it out
     pDude->nextDude = -1;
 
@@ -4211,6 +4695,21 @@ void CUSTOMDUDEV2_SETUP::SetupMorphing(void)
                 
                 pParam->text = oParText;
             }
+        }
+    }
+
+    // setup other parameters from new "Morphing" group
+    for (pParam = gParamMorphExtra; pParam->id != kParamMax; pParam++)
+    {
+        pValue = DescriptGetValue(pGroup->text, pParam->text);
+        if (isempty(pValue))
+            continue;
+        
+        switch (pParam->id)
+        {
+            case kParMorphTrigDeath:
+                pMorph->trDeath = CheckValue(pValue, kValBool, 0);
+                break;
         }
     }
 }
@@ -4448,6 +4947,26 @@ void CUSTOMDUDEV2_SETUP::SetupWeapons(void)
                         Warning(GetError(kErrInvalidValType), pValue, GetValType(kValArrC));
                     }
                     break;
+                case kParWeaponTargetBurn:
+                    if (pValue)
+                    {
+                        data[0] = 0; data[1] = 255;
+                        switch (ParseRange(pValue, kValUfix, data))
+                        {
+                            case 1:
+                                pWeap->targBurnRange[0] = 0;
+                                pWeap->targBurnRange[1] = data[0];
+                                break;
+                            case 2:
+                                pWeap->targBurnRange[0] = data[0];
+                                pWeap->targBurnRange[1] = data[1];
+                                break;
+                            default:
+                                Warning(GetError(kErrInvalidValType), pValue, GetValType(kValArrC));
+                                break;
+                        }
+                    }
+                    break;
                 case kParWeaponPosture:
                     pWeap->posture = ParsePosture(pValue);
                     break;
@@ -4546,11 +5065,26 @@ void CUSTOMDUDEV2_SETUP::SetupWeapons(void)
                         pWeap->data2 = data[1];
                         pWeap->data3 = data[2];
                         pWeap->data4 = data[3];
+                        pWeap->data5 = data[4];
                     }
                     break;
                 case kParWeaponIsDefault:
                     if (pValue)
                         pWeap->isDefault = CheckValue(pValue, kValBool, 0, 1, 0);
+                    break;
+                case kParWeaponMaxUnits:
+                    data[0] = 0; data[1] = 32767;
+                    switch (ParseRange(pValue, kValUfix, data))
+                    {
+                        case 2:
+                            pWeap->maxUnitsThis     = data[0];
+                            pWeap->maxUnitsShared   = data[1];
+                            break;
+                        case 1:
+                            pWeap->maxUnitsThis     = data[0];
+                            pWeap->maxUnitsShared   = 0;
+                            break;
+                    }
                     break;
             }
         }
@@ -4561,7 +5095,7 @@ void CUSTOMDUDEV2_SETUP::SetupWeapons(void)
         qsort(pDude->weapons, pDude->numWeapons, sizeof(pDude->weapons[0]), (int(*)(const void*, const void*))qsSortWeapons);
 }
 
-char CUSTOMDUDEV2_SETUP::ParseVelocity(const char* str, CUSTOMDUDE_VELOCITY* pVelocity)
+char CUSTOMDUDEV2_SETUP::ParseBaseVelocity(const char* str, unsigned int pVelocity[kParVelocityMax])
 {
     int nMod = pDude->pXSpr->busyTime;
     int i, nPar, nVal;
@@ -4575,27 +5109,27 @@ char CUSTOMDUDEV2_SETUP::ParseVelocity(const char* str, CUSTOMDUDE_VELOCITY* pVe
             {
                 case kParVelocityDodge:
                 case kParVelocityForward:
-                    if ((nVal = CheckValue(val, kValUfix, 0, kCdudeMaxVelocity, -1)) != -1)
+                    if ((nVal = CheckValue(val, kValUfix, INT32_MAX)) != INT32_MAX)
                     {
                         nVal <<= 2;
                         if (nMod && nPar == kParVelocityForward) // allow to mod velocity by busyTime
                              nVal = (nVal / 3) + (2500 * nMod);
 
-                        pVelocity->id[nPar] = nVal;
+                        pVelocity[nPar] = nVal;
                     }
                     break;
                 case kParVelocityTurn:
                     if ((nVal = CheckValue(val, kValUfix, 0, 100, -1)) == -1) break;
-                    pVelocity->id[nPar] = nVal << 2;
+                    pVelocity[nPar] = nVal << 2;
                     break;
                 case kParVelocityZ:
-                    if ((nVal = CheckValue(val, kValUfix, 0, kCdudeMaxVelocity, -1)) != -1)
+                    if ((nVal = CheckValue(val, kValUfix, INT32_MAX)) != INT32_MAX)
                     {
                         nVal <<= 5;
                         if (nMod) // allow to mod velocity by busyTime
                             nVal = (nVal / 3) + (2500 * nMod);
 
-                        pVelocity->id[nPar] = nVal;
+                        pVelocity[nPar] = nVal;
                     }
                     break;
             }
@@ -4605,13 +5139,13 @@ char CUSTOMDUDEV2_SETUP::ParseVelocity(const char* str, CUSTOMDUDE_VELOCITY* pVe
     }
     else if (!isempty(str))
     {
-        if ((nVal = CheckValue(str, kValUfix, 0, kCdudeMaxVelocity, -1)) != -1)
+        if ((nVal = CheckValue(str, kValUfix, INT32_MAX)) != INT32_MAX)
         {
             nVal <<= 2;
             if (nMod)
                 nVal = (nVal / 3) + (2500 * nMod); // allow to mod forward velocity by busyTime
 
-            pVelocity->id[kParVelocityForward] = nVal;
+            pVelocity[kParVelocityForward] = nVal;
             return true;
         }
     }
@@ -4637,6 +5171,12 @@ char CUSTOMDUDEV2_SETUP::ParseAppearance(const char* str, APPEARANCE* pAppear)
                     if (isIdKeyword(val, gValTypes[kValFX], &nVal))         pAppear->clb = kCdudeFXEffectBase + nVal;
                     else if (isIdKeyword(val, gValTypes[kValGIB], &nVal))   pAppear->clb = kCdudeGIBEffectBase + nVal;
                     else if (isufix(val))                                   pAppear->clb = CheckValue(val, kValUfix, 0, LENGTH(gCdudeCustomCallback));
+                    else                                                    Warning(GetError(kErrInvalidValType), val);
+                    break;
+                case kAppearEffect:
+                    if (isIdKeyword(val, gValTypes[kValFX], &nVal))         pAppear->eff = kCdudeFXEffectBase + nVal;
+                    else if (isIdKeyword(val, gValTypes[kValGIB], &nVal))   pAppear->eff = kCdudeGIBEffectBase + nVal;
+                    else if (isufix(val))                                   pAppear->eff = CheckValue(val, kValUfix, 0, LENGTH(gCdudeCustomCallback));
                     else                                                    Warning(GetError(kErrInvalidValType), val);
                     break;
                 case kAppearSeq:
@@ -4746,10 +5286,11 @@ char CUSTOMDUDEV2_SETUP::ParseAppearance(const char* str, APPEARANCE* pAppear)
 char CUSTOMDUDEV2_SETUP::ParseSound(const char* str, CUSTOMDUDE_SOUND* pSound)
 {
     int i = 0, j, nMedium = pSound->medium, nVolume = pSound->volume;
-    int t = kCdudeMaxSounds, nVal, nLen;
+    int t = kCdudeMaxSounds, nVal, nLen, nPitch = pSound->pitch;
+    int percCnt = 0;
     char tmp[256];
 
-    if ((nLen = CheckArray(str, 0, t + 2, 0)) > 0)
+    if ((nLen = CheckArray(str, 0, t + 3, 0)) > 0)
     {
         // first 1 - 3 elements supposed to be ufix
         while (i < t && enumStr(i, str, tmp) && isufix(tmp))
@@ -4766,16 +5307,23 @@ char CUSTOMDUDEV2_SETUP::ParseSound(const char* str, CUSTOMDUDE_SOUND* pSound)
             t = 0;
         }
         else if (t < nLen) // continue parsing
-            t += 2;
+            t += 3;
 
-        // next is the sound volume % and/or medium
+        // next is the sound volume %, pitch % and/or medium
         while (i < t && enumStr(i, str, tmp))
         {
             if (isperc(tmp))
             {
-                if (nLen - i <= 2)
+                if (nLen - i <= 3 && ++percCnt <= 2)
                 {
-                    nVolume = CheckValue(tmp, kValPerc, 0, 1023, 100);
+                    if (percCnt == 1) // volume first
+                    {
+                        nVolume = CheckValue(tmp, kValPerc, 0, 1023, 100);
+                    }
+                    else
+                    {
+                        nPitch = CheckValue(tmp, kValPerc, 0, 2048, 0);
+                    }
                 }
                 else
                 {
@@ -4803,6 +5351,7 @@ char CUSTOMDUDEV2_SETUP::ParseSound(const char* str, CUSTOMDUDE_SOUND* pSound)
         if (t)
         {
             pSound->volume = perc2val(nVolume, 255);
+            pSound->pitch  = perc2val(nPitch, 0x10000);
             pSound->medium = nMedium;
             return true;
         }
@@ -4912,6 +5461,7 @@ int CUSTOMDUDEV2_SETUP::ParseMedium(const char* str)
     {
         case kParMediumLand:   return 0x01;
         case kParMediumWater:  return 0x02;
+        case kParMediumNone:   return 0x04;
         case kParMediumAny:    return 0x00;
         default:               return   -1;
     }
@@ -5205,6 +5755,36 @@ char CUSTOMDUDEV2_SETUP::ParseWeaponCooldown(const char* str, CUSTOMDUDE_WEAPON*
     return true;
 }
 
+char CUSTOMDUDEV2_SETUP::ParseLastStandWake(const char* str, CUSTOMDUDE_LASTSTAND* pStand)
+{
+    int i = 0;
+    
+    if (isempty(str))
+        return false;
+
+    if (isperc(str))
+    {
+        pStand->wake.chance = perc2val(CheckValue(str, kValPerc, 0, 100, 50), kChanceMax);
+        return true;
+    }
+
+    if (getArrayType(str) == 2)
+    {
+        while ((i = enumStr(i, str, key, val)) != 0)
+        {
+            switch (FindParam(key, gParamKeyword))
+            {
+                case kParKeywordChance: pStand->wake.chance = perc2val(CheckValue(val, kValPerc, 0, 100, 50), kChanceMax);  break;
+                case kParKeywordHealth: pStand->wake.health = CheckValue(val, kValPerc, 0, 255, 1);                         break;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 char CUSTOMDUDEV2_SETUP::ParseAttackSetup(const char* str, CUSTOMDUDE_WEAPON* pWeap)
 {
     int i = 0, j, nPar, nVal;
@@ -5218,21 +5798,11 @@ char CUSTOMDUDEV2_SETUP::ParseAttackSetup(const char* str, CUSTOMDUDE_WEAPON* pW
                 for (j = 0; j < kCdudePostureMax; j++)
                     pDude->states[pWeap->stateID][j].stateTicks = nVal;
                 break;
-            case kParAttackInterrupt:
-            case kParAttackTurn2Target:
-                nVal = CheckValue(val, kValBool, false);
-                switch (nPar)
-                {
-                    case kParAttackInterrupt:     pWeap->interruptable = nVal;    break;
-                    case kParAttackTurn2Target:   pWeap->turnToTarget  = nVal;    break;
-                }
-                break;
-            case kParAttackNumShots:
-                pWeap->numshots = CheckValue(val, kValUfix, 1, 63);
-                break;
-            case kParAttackInertia:
-                pWeap->inertia = CheckValue(val, kValBool, false);
-                break;
+            case kParAttackInterrupt:       pWeap->interruptable = CheckValue(val, kValBool, false);    break;
+            case kParAttackTurn2Target:     pWeap->turnToTarget = CheckValue(val, kValBool, false);     break;
+            case kParAttackNumShots:        pWeap->numshots = CheckValue(val, kValUfix, 1, 255);        break;
+            case kParAttackInertia:         pWeap->inertia = CheckValue(val, kValBool, false);          break;
+            case kParAttackLocked:          pWeap->locked = CheckValue(val, kValBool, false);           break;
             case kParAttackPredict:
                 ParseWeaponPrediction(val, pWeap);
                 break;
@@ -5367,6 +5937,8 @@ void CUSTOMDUDEV2_SETUP::Setup(void)
             case kParGroupRecoil:        SetupRecoil();        break;
             case kParGroupDodge:         SetupDodge();         break;
             case kParGroupKnockout:      SetupKnockout();      break;
+            case kParGroupLastStand:     SetupLastStand();     break;
+            case kParGroupChgTarg:       SetupChangeTarget();  break;
             case kParGroupCrouch:        SetupCrouch();        break;
             case kParGroupWeapon:        SetupWeapons();       break;
             case kParGroupFXEffect:      SetupEffect();        break;
@@ -5547,6 +6119,7 @@ void CUSTOMDUDEV1_SETUP::WeaponConvert(int nWeaponID)
 
     pW1->id                         = nWeaponID;
     pW1->available                  = availStatus;
+    pW1->spawnsSprite               = (pW1->type != kCdudeWeaponHitscan && pW1->type != kCdudeWeaponNone);
     pDude->numWeapons               = 1;
 
     pW1->ammo.SetTotal(0);  pW1->ammo.SetFull();
@@ -5589,9 +6162,7 @@ void CUSTOMDUDEV1_SETUP::WeaponConvert(int nWeaponID)
     }
     else if (pW1->type == kCdudeWeaponSummon)
     {
-        pW1->ammo.SetTotal(gGameOptions.nDifficulty + 1);
-        pW1->ammo.SetFull();
-
+        pW1->maxUnitsThis = gGameOptions.nDifficulty+1;
         WeaponRangeSet(pW1, 2000, kCdudeV1MaxAttackDist);
         pW1->shot.offset.y  = pDude->pSpr->clipdist << 4;
         pW1->angle          = kAng90;
@@ -5681,6 +6252,8 @@ void CUSTOMDUDEV1_SETUP::SetupDamage(void)
     Bmemset(&pDude->recoil,   0, sizeof(pDude->recoil));
     Bmemset(&pDude->knockout, 0, sizeof(pDude->knockout));
     Bmemset(&pDude->crouch,   0, sizeof(pDude->crouch));
+    Bmemset(&pDude->lStand,   0, sizeof(pDude->lStand));
+    Bmemset(&pDude->chgTarg,  0, sizeof(pDude->chgTarg));
 
     pREvn->cooldown.rng[0] = kCdudeDmgCheckDelay;
     pREvn->health            = 0;
@@ -5747,7 +6320,7 @@ void CUSTOMDUDEV1_SETUP::SetupIncarnation(void)
             if (pSpr2->index != pSpr->index && xspriRangeIsFine(pSpr2->extra) && IsDudeSprite(pSpr2))
             {
                 XSPRITE* pXSpr2 = &xsprite[pSpr2->extra];
-                if (pXSpr2->rxID == pXSpr->txID)
+                if (pXSpr2->health > 0 && pXSpr2->rxID == pXSpr->txID)
                 {
                     ChangeSpriteStat(pSpr2->index, kStatInactive);
                     seqKill(OBJ_SPRITE, pSpr2->extra);
@@ -5764,7 +6337,7 @@ void CUSTOMDUDEV1_SETUP::SetupIncarnation(void)
         if (pSpr2->index != pSpr->index && xspriRangeIsFine(pSpr2->extra) && IsDudeSprite(pSpr2))
         {
             XSPRITE* pXSpr2 = &xsprite[pSpr2->extra];
-            if (pXSpr2->rxID == pXSpr->txID)
+            if (pXSpr2->health > 0 && pXSpr2->rxID == pXSpr->txID)
             {
                 nDude = pSpr2->index;
                 if (nnExtRandom(0, 6) == 3) // random stop
@@ -5797,35 +6370,36 @@ void CUSTOMDUDEV1_SETUP::Setup(void)
         SetupIncarnation();
 }
 
+void cdudeDoAppearanceEffect(spritetype* pSpr, int nID)
+{
+    if (rngok(nID, 0, LENGTH(gCdudeCustomCallback)))
+    {
+        int nFunc = gCdudeCustomCallback[nID];
+        if (Chance(0x08000))
+            evKill(pSpr->index, OBJ_SPRITE, (CALLBACK_ID)nFunc);
+
+        evPost(pSpr->index, OBJ_SPRITE, 0, (CALLBACK_ID)nFunc);
+    }
+    else if (rngok(nID, kCdudeGIBEffectBase, kCdudeGIBEffectBase + kGibMax))
+    {
+        CGibPosition gibPos(pSpr->x, pSpr->y, pSpr->z);
+        nID -= kCdudeGIBEffectBase;
+
+        GibSprite(pSpr, (GIBTYPE)nID, &gibPos, NULL);
+    }
+    else if (rngok(nID, kCdudeFXEffectBase, kCdudeFXEffectBase + kFXMax))
+    {
+        nID -= kCdudeFXEffectBase;
+        gFX.fxSpawn((FX_ID)nID, pSpr->sectnum, pSpr->x, pSpr->y, pSpr->z);
+    }
+}
 
 static void callbackSeqCustom(int, int xIndex)
 {
     if (xspriRangeIsFine(xIndex))
     {
         XSPRITE* pXSpr = &xsprite[xIndex];
-        spritetype* pSpr = &sprite[pXSpr->reference];
-        int nID = pXSpr->sysData4;
-
-        if (rngok(nID, 0, LENGTH(gCdudeCustomCallback)))
-        {
-            int nFunc = gCdudeCustomCallback[nID];
-            if (Chance(0x08000))
-                evKill(pXSpr->reference, OBJ_SPRITE, (CALLBACK_ID)nFunc);
-
-            evPost(pXSpr->reference, OBJ_SPRITE, 0, (CALLBACK_ID)nFunc);
-        }
-        else if (rngok(nID, kCdudeGIBEffectBase, kCdudeGIBEffectBase + kGibMax))
-        {
-            CGibPosition gibPos(pSpr->x, pSpr->y, pSpr->z);
-            nID -= kCdudeGIBEffectBase;
-
-            GibSprite(pSpr, (GIBTYPE)nID, &gibPos, NULL);
-        }
-        else if (rngok(nID, kCdudeFXEffectBase, kCdudeFXEffectBase + kFXMax))
-        {
-            nID -= kCdudeFXEffectBase;
-            gFX.fxSpawn((FX_ID)nID, pSpr->sectnum, pSpr->x, pSpr->y, pSpr->z);
-        }
+        cdudeDoAppearanceEffect(&sprite[pXSpr->reference], pXSpr->sysData4);
     }
 }
 
