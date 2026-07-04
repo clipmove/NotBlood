@@ -46,7 +46,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #define kCdudeMaxVelocity           2345648
 #define kCdudeMaxSounds             3
-#define kCdudeMaxWeapons            8
+#define kCdudeMaxWeapons            12
 #define kCdudeMaxDmgScale           32767
 #define kCdudeDmgCheckDelay         1
 #define kCdudeMaxDispersion         3500
@@ -74,6 +74,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define kChanceMax                  0x10000
 
 class CUSTOMDUDE;
+void cdudeDoAppearanceEffect(spritetype* pSpr, int nID);
 extern int nCdudeAppearanceCallback;
 extern char gCdudeCustomCallback[];
 
@@ -86,6 +87,7 @@ kValPerc,
 kValArrC,
 kValArrA,
 kValBool,
+kValHealth,
 kValIdKeywordBase,
 kValCdud                        = kValIdKeywordBase,
 kValWeapon,
@@ -97,6 +99,8 @@ kValThrow,
 kValVdud,
 kValKamikaze,
 kValSpecial,
+kValMorph,
+kValDamage,
 kValIdKeywordMax,
 kValMax                         = kValIdKeywordMax,
 };
@@ -138,6 +142,8 @@ kParGroupMorph,
 kParGroupSleep,
 kParGroupSlaves,
 kParGroupRandomness,
+kParGroupLastStand,
+kParGroupChgTarg,
 };
 
 enum enum_PAR_GENERAL {
@@ -169,6 +175,8 @@ kParEvnDeathNamed,
 enum enum_PAR_DAMAGE {
 kParDmgSource                   = kDmgMax,
 kParDmgBotTouch,
+kParDmgMediumLand,
+kParDmgMediumWater,
 };
 
 enum enum_PAR_DAMAGE_SOURCE {
@@ -189,6 +197,16 @@ kParVelocityZ,
 kParVelocityMax,
 };
 
+enum enum_CDUD_VELOCITY_MOD {
+kCdudeVelModNone                = 0,
+kCdudeVelModChase,
+kCdudeVelModSearch,
+kCdudeVelModBurn,
+kCdudeVelModFlee,
+kCdudeVelModMax,
+};
+
+
 enum enum_PAR_APPEARANCE {
 kAppearSeq                      = 0,
 kAppearClb,
@@ -200,6 +218,7 @@ kAppearShade,
 kAppearSize,
 kAppearOffs1,
 kAppearCstat,
+kAppearEffect,
 };
 
 
@@ -207,6 +226,7 @@ enum enum_PAR_MEDIUM {
 kParMediumAny                   = 0,
 kParMediumLand,
 kParMediumWater,
+kParMediumNone,
 };
 
 enum enum_PAR_WEAPON {
@@ -235,6 +255,9 @@ kParWeaponHeigh,
 kParWeaponData,
 kParWeaponAttackSnd,
 kParWeaponIsDefault,
+kParWeaponMaxUnits,
+kParWeaponRealCheck,
+kParWeaponTargetBurn,
 };
 
 enum enum_PAR_ATTACK {
@@ -244,6 +267,7 @@ kParAttackTurn2Target,
 kParAttackNumShots,
 kParAttackInertia,
 kParAttackPredict,
+kParAttackLocked,
 };
 
 enum enum_PAR_SHOT {
@@ -341,9 +365,13 @@ kParTweaksThinkClock            = 0,
 kParTweaksWaponSort,
 };
 
-enum enum_PAR_MORPH {
+enum enum_PAR_MORPH_DATA {
 kParMorphDude                   = 0,
 kParMorphSkill,
+};
+
+enum enum_PAR_MORPH_EXTRA {
+kParMorphTrigDeath               = 0,
 };
 
 enum enum_CDUD_FLYTYPE {
@@ -382,6 +410,10 @@ enum enum_PAR_KEYWORD {
 kParKeywordInherit              = 0,
 kParKeywordAbove,
 kParKeywordBelow,
+kParKeywordChance,
+kParKeywordHealth,
+kParKeywordWake,
+kParKeywordModifiers,
 };
 
 enum enum_CDUD_POSTURE {
@@ -404,6 +436,9 @@ kCdudeSndTargetDead,
 kCdudeSndTargetChase,
 kCdudeSndTransforming,
 kCdudeSndWake,
+kCdudeSndLStandEnter,
+kCdudeSndLStand,
+kCdudeSndLStandWake,
 kCdudeSndMax,
 kCdudeSndCompatAttack1,
 kCdudeSndCompatAttack2,
@@ -420,6 +455,10 @@ kCdudeWeaponSummon,
 kCdudeWeaponSummonCdude,
 kCdudeWeaponKamikaze,
 kCdudeWeaponSpecial,
+kCdudeWeaponMorph,
+kCdudeWeaponMorphCdude,
+kCdudeWeaponDamage,
+kCdudeWeaponHealth,
 kCdudeWeaponMax,
 };
 
@@ -458,27 +497,38 @@ kCdudeStateDeathExplode,
 kCdudeStateDeathChoke,
 kCdudeStateDeathSpirit,
 kCdudeStateDeathElectric,
+kCdudeStateDeathLStand,
 kCdudeStateDeathMax,
 kCdudeStateAttackBase           = kCdudeStateDeathMax,
 kCdudeStateAttackMax            = kCdudeStateAttackBase + kCdudeMaxWeapons,
-kCdudeStateMax                  = kCdudeStateAttackMax,
+kCdudeStateMax,
 kCdudeStateMove,
 kCdudeStateDeath,
 kCdudeStateAttack,
 kCdudeAnimScale,
+kCdudeAnimLStandEnter,
+kCdudeAnimLStand,
+kCdudeAnimLStandExit,
 };
 
 enum enum_CDUD_STATUS {
 kCdudeStatusNormal              = 0x00,
 kCdudeStatusAwaked              = 0x01,
 kCdudeStatusForceCrouch         = 0x02,
-kCdudeStatusSleep               = 0x04,
-kCdudeStatusMorph               = 0x08,
-kCdudeStatusBurning             = 0x10,
-kCdudeStatusDying               = 0x20,
-kCdudeStatusRespawn             = 0x40,
-kCdudeStatusKnocked             = 0x80,
-kCdudeStatusFlipped             = 0x100,
+kCdudeStatusLStandAwaked        = 0x04,
+kCdudeStatusCruel               = 0x08,
+KCdudeStatusInnocent            = 0x10,
+//....................................
+// reserved
+//....................................
+kCdudeStatusSleep               = 0x10000,
+kCdudeStatusMorph               = 0x20000,
+kCdudeStatusBurning             = 0x40000,
+kCdudeStatusDying               = 0x80000,
+kCdudeStatusRespawn             = 0x100000,
+kCdudeStatusKnocked             = 0x200000,
+kCdudeStatusFlipped             = 0x400000,
+kCdudeStatusLStand              = 0x800000,
 };
 
 struct PARAM
@@ -496,6 +546,7 @@ class ARG_PICK_WEAPON
         signed   int slope          : 32;
         unsigned int dudeHealth     : 8;
         unsigned int targHealth     : 8;
+        unsigned int targBurnTime   : 8;
         ARG_PICK_WEAPON(spritetype* pSpr, XSPRITE* pXSpr, spritetype* pTarg, XSPRITE* pXTarg, int nDist, int nAng, int nSlope)
         {
             int zt, zb;
@@ -504,6 +555,7 @@ class ARG_PICK_WEAPON
             angle = nAng;
             dudeHealth = CountHealthPerc(pSpr, pXSpr);
             targHealth = CountHealthPerc(pTarg, pXTarg);
+            targBurnTime = pXTarg->burnTime / 100;
 
             height = 0, slope = 0;
             GetSpriteExtents(pSpr, &zt, &zb);
@@ -556,6 +608,7 @@ class CUSTOMDUDE_SOUND
         unsigned int interruptable  : 1;
         unsigned int once           : 2;
         signed   int volume         : 11;
+        unsigned int pitch          : 32;
         int  Pick()                                         { return id[Random(kCdudeMaxSounds)]; }
         void Play(spritetype* pSpr)                         { Play(pSpr, Pick()); }
         void Play(spritetype* pSpr, int nID)
@@ -595,14 +648,14 @@ class CUSTOMDUDE_SOUND
                         if (pExtra->clock <= nClock)
                         {
                             sfxKill3DSound(pSpr, AI_SFX_PRIORITY_2, -1);
-                            sfxPlay3DSoundCP(pSpr, nID, AI_SFX_PRIORITY_2, 0, 0x0, volume);
+                            sfxPlay3DSoundCP(pSpr, nID, AI_SFX_PRIORITY_2, 0, pitch, volume);
                             pExtra->sfx_priority = (AI_SFX_PRIORITY)AI_SFX_PRIORITY_2;
                             pExtra->clock = nClock + 384 + nRand;
                         }
                     }
                     else
                     {
-                        sfxPlay3DSoundCP(pSpr, nID, -1, 0, 0x0, volume);
+                        sfxPlay3DSoundCP(pSpr, nID, -1, 0, pitch, volume);
                     }
                 }
             }
@@ -645,9 +698,10 @@ class APPEARANCE
         unsigned int soundAvailable : 1;
         unsigned int seq            : 20;
         unsigned int clb            : 12;
+        unsigned int eff            : 12;
         unsigned int pic            : 16;
-        unsigned int csta           : 20;
-        unsigned int cstr           : 20;
+        signed   int csta           : 20;
+        signed   int cstr           : 20;
         signed   int xrp            : 10;
         signed   int yrp            : 10;
         signed   int xof            : 8;
@@ -737,6 +791,9 @@ class APPEARANCE
                 }
             }
 
+            if (eff)
+                cdudeDoAppearanceEffect(pSpr, eff - 1);
+
             if (shd != 128)
             {
                 seqKill(OBJ_SPRITE, pSpr->extra);
@@ -786,7 +843,7 @@ class CUSTOMDUDE_WEAPON
 {
     public:
         unsigned int  type                  : 4;
-        unsigned int  numshots              : 6;
+        unsigned int  numshots              : 8;
         unsigned int  id                    : 16;
         unsigned int  sharedId              : 4;
         unsigned int  angle                 : 12;
@@ -796,22 +853,29 @@ class CUSTOMDUDE_WEAPON
         unsigned int  posture               : 8;
         unsigned int  interruptable         : 1;
         unsigned int  turnToTarget          : 1;
+        unsigned int  spawnsSprite          : 1;
         unsigned int  stateID               : 8;
         unsigned int  nextStateID           : 8;
         unsigned int  clipMask              : 32;
         unsigned int  group                 : 4;
         unsigned int  inertia               : 1;
         unsigned int  isDefault             : 1;
+        unsigned int  realCheck             : 1;
+        unsigned int  locked                : 1;
         signed   int  data1                 : 32;
         signed   int  data2                 : 32;
         signed   int  data3                 : 32;
         signed   int  data4                 : 32;
+        signed   int  data5                 : 32;
+        unsigned int  maxUnitsThis          : 16;
+        unsigned int  maxUnitsShared        : 16;
         unsigned int  dispersion[2];
         unsigned int  distRange[2];
         signed   int  heighRange[4];
         signed   int  slopeRange[2];
         unsigned char targHpRange[2];
         unsigned char dudeHpRange[2];
+        unsigned char targBurnRange[2];
         CUSTOMDUDE_SOUND shotSound;
         CUSTOMDUDE_SOUND attackSound;
         IDLIST* pFrames;
@@ -896,6 +960,7 @@ class CUSTOMDUDE_WEAPON
             distRange[1]    = 20000;
             dudeHpRange[1]  = 255;
             targHpRange[1]  = 255;
+            targBurnRange[1] = 255;
             
             heighRange[0]   = INT32_MIN;
             heighRange[3]   = INT32_MAX;
@@ -1206,7 +1271,13 @@ class  CUSTOMDUDE_DAMAGE
     public:
         unsigned short id[kDmgMax];
         unsigned int ignoreSources  : 8;
-        unsigned int stompDamage    : 32;
+        struct DELAYED_DAMAGE
+        {
+            CUSTOMDUDE_TIMER delay;
+            unsigned int amount     : 20;
+        }
+        water, land, stomp;
+
         void Set(int nVal, int nFor) { id[nFor] = ClipRange(nVal, 0, kCdudeMaxDmgScale); }
         void Inc(int nVal, int nFor) { Set(id[nFor] + abs(nVal), nFor); }
         void Dec(int nVal, int nFor) { Set(id[nFor] - abs(nVal), nFor); }
@@ -1222,9 +1293,12 @@ struct CUSTOMDUDE_EVENT_DAMAGE
     unsigned short statetime[2];
     CUSTOMDUDE_TIMER cooldown;
     
-    char Allow(XSPRITE* pXSpr, int nAmount)
+    char Allow(XSPRITE* pXSpr, int nAmount, int nChance = 0)
     {
-        int nHealth, nChance = chance;
+        int nHealth;
+
+        if (nChance == 0)
+            nChance = chance;
 
         if (nAmount > amount)
         {
@@ -1277,9 +1351,10 @@ class  CUSTOMDUDE_RECOIL
         CUSTOMDUDE_EVENT_DAMAGE onDamage[kDmgMax];
 };
 
-class  CUSTOMDUDE_KNOCKOUT : public CUSTOMDUDE_RECOIL { };
-class  CUSTOMDUDE_CROUCH   : public CUSTOMDUDE_RECOIL { };
-class  CUSTOMDUDE_DODGE    : public CUSTOMDUDE_RECOIL
+class  CUSTOMDUDE_KNOCKOUT  : public CUSTOMDUDE_RECOIL { };
+class  CUSTOMDUDE_CROUCH    : public CUSTOMDUDE_RECOIL { };
+class  CUSTOMDUDE_CHGTARGET : public CUSTOMDUDE_RECOIL { };
+class  CUSTOMDUDE_DODGE     : public CUSTOMDUDE_RECOIL
 {
     public:
         signed int zDir : 2;
@@ -1291,10 +1366,24 @@ class  CUSTOMDUDE_DODGE    : public CUSTOMDUDE_RECOIL
         onAimMiss;
 };
 
+class CUSTOMDUDE_LASTSTAND : public CUSTOMDUDE_RECOIL
+{
+    public:
+        unsigned int animid[kCdudeAnimLStandExit - kCdudeAnimLStandEnter + 1][kCdudePostureMax];
+        struct WAKE
+        {
+            unsigned int chance : 20;
+            unsigned int health : 8;
+            char Allow(void) { return Chance(chance); }
+        }
+        wake;
+};
+
 class CUSTOMDUDE_MORPH
 {
     public:
         signed short id[kDmgMax];
+        unsigned int trDeath : 1;
 };
 
 class  CUSTOMDUDE_FLIGHT
@@ -1326,11 +1415,16 @@ class  CUSTOMDUDE_FLIGHT
 class CUSTOMDUDE_VELOCITY
 {
     public:
-        unsigned int id[kParVelocityMax];
-        //unsigned short mod[kCdudeStateMoveMax - kCdudeStateMoveBase];
-        void Set(int nVal, int nFor) { id[nFor] = ClipRange(nVal, 0, kCdudeMaxVelocity); }
-        void Inc(int nVal, int nFor) { Set(id[nFor] + abs(nVal), nFor); }
-        void Dec(int nVal, int nFor) { Set(id[nFor] - abs(nVal), nFor); }
+        unsigned int id[kCdudePostureMax][kParVelocityMax];
+        signed short mods[kCdudeVelModMax];
+        unsigned char modID;
+
+        inline void SetBase(int nVal, int nPosture, int nFor)  { id[nPosture][nFor] = ClipLow(nVal, 0); }
+        inline void SetMod(int nVal, int nFor)                 { mods[nFor] = ClipRange(nVal, -32768, 32767); }
+        inline void SetModID(int nMod)                         { modID = nMod; }
+
+        inline int GetBase(int nPosture, int nFor)             { return id[nPosture][nFor]; }
+        inline int Get(int nPosture, int nFor)                 { return GetBase(nPosture, nFor) + perc2val(mods[modID], GetBase(nPosture, nFor)); }
 };
 
 class CUSTOMDUDE_DROPITEM
@@ -1408,12 +1502,14 @@ class CUSTOMDUDE
         CUSTOMDUDE_WEAPON    weapons[kCdudeMaxWeapons];                             // the weapons it may have
         CUSTOMDUDE_WEAPON*   pWeapon;                                               // pointer to current weapon
         CUSTOMDUDE_DAMAGE    damage;                                                // damage control
-        CUSTOMDUDE_VELOCITY  velocity[kCdudePostureMax];                            // velocity control
+        CUSTOMDUDE_VELOCITY  velocity;                                              // velocity control
         CUSTOMDUDE_SOUND     sound[kCdudeSndMax];                                   // ai state sounds
         CUSTOMDUDE_DODGE     dodge;                                                 // dodge control
         CUSTOMDUDE_RECOIL    recoil;                                                // recoil control
+        CUSTOMDUDE_LASTSTAND lStand;                                                // last stand control
         CUSTOMDUDE_KNOCKOUT  knockout;                                              // knock control
         CUSTOMDUDE_CROUCH    crouch;                                                // crouch control
+        CUSTOMDUDE_CHGTARGET chgTarg;                                               // change target control
         CUSTOMDUDE_MORPH     morph;                                                 // morph control
         CUSTOMDUDE_FLIGHT    flight;                                                // flight control
         CUSTOMDUDE_DROPITEM  dropItem;                                              // drop item control
@@ -1464,7 +1560,7 @@ class CUSTOMDUDE
         FORCE_INLINE void PlaySound(int nState)                     { return (sound[nState].Play(pSpr)); }
         FORCE_INLINE int  GetDistToFloor(void)                      { return pXSpr->height << 8; };
         FORCE_INLINE int  GetStateSeq(int nState, int nPosture)     { return states[nState][nPosture].seqId; }
-        FORCE_INLINE int  GetVelocity(int nPosture, int nVelType)   { return velocity[nPosture].id[nVelType]; }
+        FORCE_INLINE int  GetVelocity(int nPosture, int nVelType)   { return velocity.Get(nPosture, nVelType); }
         FORCE_INLINE int  GetVelocity(int nVelType)                 { return GetVelocity(posture, nVelType); }
         //----------------------------------------------------------------------------------------------------
         FORCE_INLINE char IsUnderwater(void)                        { return (pXSpr->medium != kMediumNormal); }
@@ -1478,6 +1574,7 @@ class CUSTOMDUDE
         FORCE_INLINE char IsChasing(void)                           { return (pXSpr->aiState->stateType == kAiStateChase); }
         FORCE_INLINE char IsSearching(void)                         { return (pXSpr->aiState->stateType == kAiStateSearch); }
         FORCE_INLINE char IsKnockout(void)                          { return StatusTest(kCdudeStatusKnocked); }
+        FORCE_INLINE char IsLastStand(void)                         { return StatusTest(kCdudeStatusLStand); }
         FORCE_INLINE char IsBurning(void)                           { return StatusTest(kCdudeStatusBurning); }
         FORCE_INLINE char IsMorphing(void)                          { return StatusTest(kCdudeStatusMorph); }
         FORCE_INLINE char IsDying(void)                             { return StatusTest(kCdudeStatusDying); }
@@ -1493,6 +1590,7 @@ class CUSTOMDUDE
         FORCE_INLINE char CanRecoil(void)                           { return (GetStateSeq(kCdudeStateRecoil, posture) > 0); }
         FORCE_INLINE char CanElectrocute(void)                      { return (GetStateSeq(kCdudeStateRecoilT, posture) > 0); }
         FORCE_INLINE char CanKnockout(void)                         { return (GetStateSeq(kCdudeStateKnock, posture)); }
+        FORCE_INLINE char CanLastStand(void)                        { return (!StatusTest(kCdudeStatusLStandAwaked) && lStand.animid[0][posture] > 0); }
         FORCE_INLINE char CanBurn(void)                             { return (GetStateSeq(kCdudeBurnStateSearch, posture) > 0); }
         FORCE_INLINE char CanStand(void)                            { return (GetStateSeq(kCdudeStateSearch, kCdudePostureL) > 0); }
         FORCE_INLINE char CanCrouch(void)                           { return (GetStateSeq(kCdudeStateSearch, kCdudePostureC) > 0); }
@@ -1512,6 +1610,7 @@ class CUSTOMDUDE
         CUSTOMDUDE_WEAPON* PickWeapon(ARG_PICK_WEAPON* pArg);
         int  AdjustSlope(int nTarget, int zOffs);
         char AdjustSlope(int nDist, int* nSlope);
+        char CheckUnits(CUSTOMDUDE_WEAPON* pWeap);
         //----------------------------------------------------------------------------------------------------
         void InitSprite(void);
         void Activate(void);
@@ -1598,6 +1697,9 @@ class CUSTOMDUDE_SETUP
         static void Setup(spritetype* pSpr, XSPRITE* pXSpr);
         static void Setup(CUSTOMDUDE* pOver = NULL);
         static void SetupFromDude(CUSTOMDUDE* pSrc);
+#if 0
+        static void ReplaceDudes(void);
+#endif
 };
 
 class CUSTOMDUDEV1_SETUP : CUSTOMDUDE_SETUP
@@ -1617,7 +1719,7 @@ class CUSTOMDUDEV1_SETUP : CUSTOMDUDE_SETUP
 class CUSTOMDUDEV2_SETUP : CUSTOMDUDE_SETUP
 {
     private:
-        static char ParseVelocity(const char* str, CUSTOMDUDE_VELOCITY* pVelocity);
+        static char ParseBaseVelocity(const char* str, unsigned int pVelocity[kParVelocityMax]);
         static char ParseAppearance(const char* str, APPEARANCE* pAppear);
         static char ParseSound(const char* str, CUSTOMDUDE_SOUND* pSound);
         static char ParseAnimation(const char* str, AISTATE* pState, char asPosture);
@@ -1646,7 +1748,7 @@ class CUSTOMDUDEV2_SETUP : CUSTOMDUDE_SETUP
         static int  ParseDudeType(const char* str);
         static int  ParseMorphData(const char* str, int* pOut);
         static int  ParseTimer(const char* str, CUSTOMDUDE_TIMER* pTimer);
-
+        static char ParseLastStandWake(const char* str, CUSTOMDUDE_LASTSTAND* pStand);
         /*-------------------------------------------------*/
         static int  CheckArray(const char* str, int nMin = 0, int nMax = 0, int nDefault = 1);
         static int  CheckValue(const char* str, int nValType, int nDefault);
@@ -1668,7 +1770,9 @@ class CUSTOMDUDEV2_SETUP : CUSTOMDUDE_SETUP
         static void SetupRecoil(void);
         static void SetupDodge(void);
         static void SetupKnockout(void);
+        static void SetupLastStand(void);
         static void SetupCrouch(void);
+        static void SetupChangeTarget(void);
         static void SetupWeapons(void);
         static void SetupEffect(void);
         static void SetupDropItem(void);

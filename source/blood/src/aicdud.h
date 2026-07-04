@@ -32,5 +32,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 extern AISTATE gCdudeStateTemplate[kCdudeStateNormalMax][kCdudePostureMax];
 extern AISTATE gCdudeStateAttackTemplate[kCdudePostureMax];
 extern AISTATE gCdudeStateDyingTemplate[kCdudePostureMax];
+int cdudeWeaponShot(CUSTOMDUDE* pDude, CUSTOMDUDE_WEAPON* pMainWeap, char check);
 void cdudeDoExplosion(CUSTOMDUDE* pDude);
 #endif
