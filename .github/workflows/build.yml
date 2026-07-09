@@ -169,9 +169,9 @@ jobs:
       run: |
         brew install sdl2 flac make
         brew unlink lz4
+    - name: build
+      run: gmake -j2 blood tools NETCODE=0
     # Removed until upstream EDuke32 fixes keyboard input for builds - https://forums.duke4.net/topic/12622-cant-use-keyboard-in-osx-build/
-    # - name: build
-      # run: gmake -j2 blood tools NETCODE=0
     # - name: 'prepare files for upload'
       # run: |
         # mkdir -p ./upload
