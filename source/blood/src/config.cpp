@@ -187,6 +187,7 @@ int32_t gFov;
 int32_t gRollAngle;
 int32_t gCenterHoriz;
 int32_t gDeliriumBlur;
+int32_t gWeatherEffect;
 int32_t gShowWeaponSelect;
 int32_t gShowWeaponSelectTimeStart;
 int32_t gShowWeaponSelectTimeHold;
@@ -538,6 +539,7 @@ void CONFIG_SetDefaults(void)
     gRollAngle = 0;
     gCenterHoriz = 1;
     gDeliriumBlur = 1;
+    gWeatherEffect = 0;
     gViewSize = 3;
     gTurnSpeed = 92;
     gTurnAcceleration = 1;

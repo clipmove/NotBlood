@@ -547,6 +547,7 @@ blood_game_objs := \
 	view.cpp \
 	warp.cpp \
 	weapon.cpp \
+	weather.cpp \
 
 ifeq ($(NOONE_EXTENSIONS),1)
     blood_game_objs += nnextsif.cpp
