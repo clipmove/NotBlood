@@ -45,6 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "sfx.h"
 #include "sound.h"
 #include "view.h"
+#include "weather.h"
 #ifdef NOONE_EXTENSIONS
 #include "nnexts.h"
 #endif
@@ -220,6 +221,8 @@ void LoadSave::LoadGame(char *pzFile)
     totalclock = 0;
     gPaused = 0;
     gGameStarted = 1;
+    gWeather.Restart();
+    gWeather.LoadPreset(gGameOptions.uMapCRC);
 
 #ifdef USE_STRUCT_TRACKERS
     Bmemset(sectorchanged, 0, sizeof(sectorchanged));

@@ -59,6 +59,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "view.h"
 #include "warp.h"
 #include "weapon.h"
+#include "weather.h"
 #ifdef NOONE_EXTENSIONS
 #include "nnexts.h"
 #endif
@@ -2846,6 +2847,11 @@ void viewUpdateSkyRatio(void)
         pSky->yscale = 65536;
 }
 
+void viewUpdateWeatherRatio(void)
+{
+    gWeather.SetViewport(xdim, ydim, gViewX0, gViewX1, gViewY0, gViewY1, fix16_from_float(tanf(gFov * (PI / 360.f))), yxaspect);
+}
+
 void viewResizeView(int size)
 {
     const char bDrawFragsBg = (gGameOptions.nGameType != kGameTypeSinglePlayer) && (!VanillaMode() || gGameOptions.nGameType != kGameTypeTeams);
@@ -2895,6 +2901,7 @@ void viewResizeView(int size)
         gViewY1S = divscale16(gViewY1, yscale);
     }
     videoSetViewableArea(gViewX0, gViewY0, gViewX1, gViewY1);
+    viewUpdateWeatherRatio();
     if (gViewMode == 4) // 2D map view
     {
         int nOffset = bDrawFragsBg && !VanillaMode() ? (tilesiz[2229].y*ydim*((gNetPlayers+3)/4))/200 : 0;
@@ -5240,29 +5247,11 @@ RORHACK:
         if (r_usenewaspect)
             newaspect_enable = 0;
         renderSetAspect(viewingRange, yxAspect);
-#if 0
-        int nClipDist = gView->pSprite->clipdist<<2;
-        int ve8, vec, vf0, vf4;
-        GetZRange(gView->pSprite, &vf4, &vf0, &vec, &ve8, nClipDist, 0);
-        int tmpSect = nSectnum;
-        if ((vf0 & 0xc000) == 0x4000)
+        if (gWeatherEffect && (videoGetRenderMode() == REND_CLASSIC))
         {
-            tmpSect = vf0 & (kMaxWalls-1);
+            gWeather.Process(cX, cY, cZ, fix16_to_int(cA), nSectnum, (int)gFrameClock, gView->pSprite->clipdist<<2, gGameOptions.uMapCRC);
+            gWeather.Draw(cX, cY, cZ, fix16_to_int(cA), q16horiz + fix16_from_int(defaultHoriz) + deliriumPitchI, (int)gFrameClock, gInterpolate, gGameOptions.uMapCRC);
         }
-        int v8 = byte_1CE5C2 > 0 && (sector[tmpSect].ceilingstat&1);
-        if (gWeather.at12d8 > 0 || v8)
-        {
-            gWeather.Draw(cX, cY, cZ, cA, q16horiz + defaultHoriz + deliriumPitch, gWeather.at12d8);
-            if (v8)
-            {
-                gWeather.at12d8 = ClipRange(delta*8+gWeather.at12d8, 0, 4095);
-            }
-            else
-            {
-                gWeather.at12d8 = ClipRange(gWeather.at12d8-delta*64, 0, 4095);
-            }
-        }
-#endif
         if (gViewPos == VIEWPOS_0)
         {
             if (gAimReticle)

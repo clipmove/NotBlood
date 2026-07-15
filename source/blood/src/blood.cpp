@@ -69,6 +69,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "view.h"
 #include "warp.h"
 #include "weapon.h"
+#include "weather.h"
 #ifdef NOONE_EXTENSIONS
 #include "nnexts.h"
 #endif
@@ -792,6 +793,8 @@ void StartLevel(GAMEOPTIONS *pOpt)
         gQuitGame = true;
         return;
     }
+    gWeather.Restart();
+    gWeather.LoadPreset(pOpt->uMapCRC);
     char levelName[BMAX_PATH];
     G_LoadMapHack(levelName, pOpt->zLevelName);
     wsrand(pOpt->uMapCRC);
@@ -2246,6 +2249,7 @@ int app_main(int argc, char const * const * argv)
         scrCustomizePalette(gCustomPalette % ARRAY_SSIZE(srcCustomPaletteStr), gCustomPaletteCIEDE2000, gCustomPaletteGrayscale, gCustomPaletteInvert);
     scrSetGamma(gGamma);
     gGameMessageMgr.SetState(gMessageState);
+    gWeather.Initialize();
     viewResizeView(gViewSize);
     vsync = videoSetVsync(vsync);
     LOG_F(INFO, "Initializing sound system");
