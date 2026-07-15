@@ -88,7 +88,7 @@ public:
         return nWeatherForecast;
     }
 
-    WEATHERTYPE nWeatherCheat : 8;
+    WEATHERTYPE nWeatherCheat;
 private:
     void Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, int nCount, int nDelta);
     void UpdateColorTable(void);
