@@ -76,7 +76,7 @@ public:
         nCount = ClipRange(t, 0, kMaxVectors);
     }
 
-    bool Status(void) {
+    bool IsActive(void) {
         return nDraw.bActive ? true : false;
     }
 
@@ -88,7 +88,7 @@ public:
         return nWeatherForecast;
     }
 
-    WEATHERTYPE nWeatherCheat;
+    WEATHERTYPE nWeatherCheat : 8;
 private:
     void Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, int nCount, int nDelta);
     void UpdateColorTable(void);
