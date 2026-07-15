@@ -442,7 +442,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
 
 void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, int nClock, int nInterpolate, unsigned int uMapCRC)
 {
-    if (!Status())
+    if (!IsActive())
         return;
     nClock += mulscale16(1, nInterpolate<<2);
     int nDelta = (nClock - nLastFrameClock)<<16;
