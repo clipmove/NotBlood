@@ -129,6 +129,9 @@
     <ClCompile Include="..\..\source\blood\src\weapon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\blood\src\weather.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\source\blood\src\warp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

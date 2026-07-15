@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "sound.h"
 #include "tile.h"
 #include "view.h"
+#include "weather.h"
 
 void SaveGame(CGameMenuItemZEditBitmap *, CGameMenuEvent *);
 
@@ -3506,6 +3507,8 @@ void SetVideoMode(CGameMenuItemChain *pItem)
 void SetWidescreen(CGameMenuItemZBool *pItem)
 {
     r_usenewaspect = pItem->at20;
+    viewUpdateSkyRatio();
+    viewUpdateWeatherRatio();
 }
 
 void SetWeaponSelectMode(CGameMenuItemZCycle *pItem)
@@ -3522,6 +3525,7 @@ void SetFOV(CGameMenuItemSlider *pItem)
 {
     gFov = pItem->nValue;
     viewUpdateSkyRatio();
+    viewUpdateWeatherRatio();
 }
 
 void SetOxygenSupply(CGameMenuItemZBool *pItem)

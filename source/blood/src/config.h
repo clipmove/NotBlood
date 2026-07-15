@@ -167,6 +167,7 @@ extern int32_t gFov;
 extern int32_t gRollAngle;
 extern int32_t gCenterHoriz;
 extern int32_t gDeliriumBlur;
+extern int32_t gWeatherEffect;
 extern int32_t gShowWeaponSelect;
 extern int32_t gShowWeaponSelectTimeStart;
 extern int32_t gShowWeaponSelectTimeHold;
