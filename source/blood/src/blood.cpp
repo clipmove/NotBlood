@@ -3269,7 +3269,9 @@ void LoadExtraArts(void)
         return;
     for (int i = 0; i < pINISelected->pDescription->nArts; i++)
     {
-        LoadArtFile(pINISelected->pDescription->pzArts[i]);
+        const bool bFoundArt = LoadArtFile(pINISelected->pDescription->pzArts[i]);
+        if (!bFoundArt)
+            ThrowError("Cound not find %s", pINISelected->pDescription->pzArts[i]);
     }
 }
 
