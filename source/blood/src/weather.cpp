@@ -281,7 +281,6 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     pBuffer += nScreenPitch * nOffsetY + nOffsetX;
 
     // adjust to starfield relative scale
-    const int origX = nX, origY = nY, origZ = nZ;
     if (!nDraw.bStaticView)
     {
         nX <<= 1;
