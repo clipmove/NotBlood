@@ -76,8 +76,8 @@ public:
         nCount = ClipRange(t, 0, kMaxVectors);
     }
 
-    BOOL Status(void) {
-        return nDraw.bActive ? 1 : 0;
+    bool Status(void) {
+        return nDraw.bActive ? true : false;
     }
 
     WEATHERTYPE GetWeather(void) {
