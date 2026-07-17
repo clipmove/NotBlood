@@ -48,6 +48,7 @@ CWeather::CWeather()
     nWindXOffset = 0;
     nWindYOffset = 0;
     memset(nPos, 0, sizeof(nPos));
+    memset(clipbit, 0, sizeof(clipbit));
     nPalColor = 1;
     nPalShift = 0;
     nFadeIn = 16;
@@ -93,6 +94,7 @@ CWeather::~CWeather()
     nWindXOffset = 0;
     nWindYOffset = 0;
     memset(nPos, 0, sizeof(nPos));
+    memset(clipbit, 0, sizeof(clipbit));
     nPalColor = 1;
     nPalShift = 0;
     nFadeIn = 16;
@@ -131,6 +133,7 @@ void CWeather::RandomizeVectors(void)
     }
     nWindXOffset = krand()&0x3fff;
     nWindYOffset = krand()&0x3fff;
+    memset(clipbit, 0, sizeof(clipbit));
 }
 
 void CWeather::SetViewport(int nX, int nY, int nXOffset0, int nXOffset1, int nYOffset0, int nYOffset1, int nFov, int nAspect)
@@ -272,7 +275,7 @@ void CWeather::Restart(void)
     SetParticles(0);
 }
 
-void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, int nCount, int nDelta)
+void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nCount, int nDelta)
 {
     dassert(pBuffer != NULL);
     dassert(nCount > 0 && nCount <= kMaxVectors);
@@ -281,7 +284,9 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     pBuffer += nScreenPitch * nOffsetY + nOffsetX;
 
     // adjust to starfield relative scale
-    if (!nDraw.bStaticView)
+    const int origX = nX, origY = nY, origZ = nZ;
+    const char bStaticView = nDraw.bStaticView;
+    if (!bStaticView)
     {
         nX <<= 1;
         nY <<= 1;
@@ -350,6 +355,18 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
             unsigned int screenY = nHoriz + ((nScale * relZ)>>16);
             if (screenY < (unsigned)nHeight) // if within screen bounds
             {
+                if (!bStaticView) // check if particle is clipping wall
+                {
+                    if (TestBitString(clipbit, i<<1)) // this particle is flagged as clipped, ignore
+                        continue;
+                    if ((!TestBitString(clipbit, (i<<1)+1) || !(nDepth&3)) && !cansee(origX, origY, origZ, nSector, (relX>>1)+origX, (relY>>1)+origY, (relZ<<3)+origZ, nSector)) // test if valid position
+                    {
+                        SetBitString(clipbit, i<<1);
+                        continue;
+                    }
+                    SetBitString(clipbit, (i<<1)+1);
+                }
+
                 // size/palette color calculation
                 const int nSize = ClipHigh(nScale>>12, nMaxPixelSize); // why did I pick 12? because it looked the best
                 const uint8_t nColor = nColorTable[nDepth>>8]; // potential range for nDepth is 5-8191, or 0-31 after shift
@@ -436,11 +453,19 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                 }
                 }
             }
+            else if (!bStaticView) // only clear bit when gone off screen on Y axis
+            {
+                if (!(nDepth&3)) // randomly clear the clipbit
+                {
+                    ClearBitString(clipbit, i<<1);
+                    ClearBitString(clipbit, (i<<1)+1);
+                }
+            }
         }
     }
 }
 
-void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, int nClock, int nInterpolate, unsigned int uMapCRC)
+void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nClock, int nInterpolate, unsigned int uMapCRC)
 {
     if (!IsActive())
         return;
@@ -453,7 +478,7 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, int nClock, in
         videoBeginDrawing();
         char *framebuffer = (char*)frameplace;
         if (framebuffer != NULL)
-            Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nCountLimited, nDelta);
+            Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta);
         videoEndDrawing();
     }
     nDelta = ClipLow(nDelta<<16, 1);
@@ -692,6 +717,7 @@ void CWeather::Process(int nX, int nY, int nZ, int nAng, short nSector, int nTim
     {
         nWindXOffset = krand()&0x3fff;
         nWindYOffset = krand()&0x3fff;
+        memset(clipbit, 0, sizeof(clipbit));
         SetWeatherType(nWeatherForecast, uMapCRC);
     }
 }
