@@ -5250,7 +5250,7 @@ RORHACK:
         if (gWeatherEffect && (videoGetRenderMode() == REND_CLASSIC))
         {
             gWeather.Process(cX, cY, cZ, fix16_to_int(cA), nSectnum, (int)gFrameClock, gView->pSprite->clipdist<<2, gGameOptions.uMapCRC);
-            gWeather.Draw(cX, cY, cZ, fix16_to_int(cA), q16horiz + fix16_from_int(defaultHoriz) + deliriumPitchI, (int)gFrameClock, gInterpolate, gGameOptions.uMapCRC);
+            gWeather.Draw(cX, cY, cZ, fix16_to_int(cA), q16horiz + fix16_from_int(defaultHoriz) + deliriumPitchI, nSectnum, (int)gFrameClock, gInterpolate, gGameOptions.uMapCRC);
         }
         if (gViewPos == VIEWPOS_0)
         {
