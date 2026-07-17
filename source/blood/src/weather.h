@@ -65,7 +65,7 @@ public:
     void LoadPreset(unsigned int uMapCRC);
     void UnloadPreset(void);
     void SetWeatherOverride(WEATHERTYPE nOverride, WEATHERTYPE nOverrideInside, short nX, short nY, short nZ);
-    void Process(int nX, int nY, int nZ, int nAng, int nSector, int nTime, int nClipDist, unsigned int uMapCRC);
+    void Process(int nX, int nY, int nZ, int nAng, short nSector, int nTime, int nClipDist, unsigned int uMapCRC);
     void SetWeatherType(WEATHERTYPE nWeather, unsigned int nRNG);
 
     short GetCount(void) {
