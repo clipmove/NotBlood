@@ -61,7 +61,7 @@ public:
     void SetStaticView(char);
     void Initialize(void);
     void Restart(void);
-    void Draw(int nX, int nY, int nZ, int nAng, int nHoriz, int nClock, int nInterpolate, unsigned int uMapCRC);
+    void Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nClock, int nInterpolate, unsigned int uMapCRC);
     void LoadPreset(unsigned int uMapCRC);
     void UnloadPreset(void);
     void SetWeatherOverride(WEATHERTYPE nOverride, WEATHERTYPE nOverrideInside, short nX, short nY, short nZ);
@@ -90,7 +90,7 @@ public:
 
     WEATHERTYPE nWeatherCheat : 8;
 private:
-    void Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, int nCount, int nDelta);
+    void Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nCount, int nDelta);
     void UpdateColorTable(void);
     union {
         uint8_t b;
@@ -116,6 +116,7 @@ private:
     short nWindXOffset;
     short nWindYOffset;
     short nPos[kMaxVectors][3];
+    char clipbit[bitmap_size(kMaxVectors*2)];
     unsigned char nPalColor;
     char nPalShift;
     uint8_t nFadeIn;
