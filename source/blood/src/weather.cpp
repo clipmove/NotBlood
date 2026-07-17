@@ -497,6 +497,7 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector,
         nWindXOffset = krand()&0x3fff;
         nWindYOffset = krand()&0x3fff;
         SetWeatherType(nWeatherForecast, uMapCRC);
+        memset(clipbit, 0, (size_t(nLimit*2)+7)>>3); // only clear bits we're using
     }
 }
 
@@ -717,8 +718,8 @@ void CWeather::Process(int nX, int nY, int nZ, int nAng, short nSector, int nTim
     {
         nWindXOffset = krand()&0x3fff;
         nWindYOffset = krand()&0x3fff;
-        memset(clipbit, 0, sizeof(clipbit));
         SetWeatherType(nWeatherForecast, uMapCRC);
+        memset(clipbit, 0, (size_t(nLimit*2)+7)>>3); // only clear bits we're using
     }
 }
 
