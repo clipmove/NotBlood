@@ -320,8 +320,8 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     const int bShape = nDraw.bShape;
     const int bTransparent = nDraw.nTransparent;
     const int nMaxPixelSize = (nScaleFactor>>16)+1; // use screen res as factor for pixel size
-    const int nGrav = mulscale16(nGravity, nDelta);
-    const int nGravityFast = nDraw.bGravityVariance && (nGrav != 0) ? nGrav - (nGrav >> 2) : nGrav;
+    const int nGrav = nGravity > 0 ? ClipLow(mulscale16(nGravity, nDelta), 1) : mulscale16(nGravity, nDelta);
+    const int nGravityFast = nDraw.bGravityVariance && (nGrav != 0) ? nGrav - (nGrav>>2) : nGrav;
 
     for (int i = 0; i < nCount; i++)
     {
@@ -444,8 +444,8 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, int nClock, in
 {
     if (!IsActive())
         return;
-    nClock += mulscale16(1, nInterpolate<<2);
-    int nDelta = (nClock - nLastFrameClock)<<16;
+    nClock = (nClock<<2) + (nInterpolate>>12); // get sub-tick clock
+    int nDelta = ClipLow(nClock - nLastFrameClock, 0)<<14;
     nLastFrameClock = nClock;
     int nCountLimited = GetCount(); // get count with limit applied
     if (nCountLimited > 0)
@@ -456,7 +456,7 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, int nClock, in
             Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nCountLimited, nDelta);
         videoEndDrawing();
     }
-    nDelta >>= 16;
+    nDelta = ClipLow(nDelta<<16, 1);
     if (nWeatherForecast == nWeatherCur) // increase until reached weather limit
     {
         nCountLimited += nDelta * (int)nFadeIn;
