@@ -282,12 +282,14 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
 {
     dassert(pBuffer != NULL);
     dassert(nCount > 0 && nCount <= kMaxVectors);
+    dassert(nSector >= 0 && nSector < kMaxSectors);
 
     // move to first pixel within framebuffer
     pBuffer += nScreenPitch * nOffsetY + nOffsetX;
 
     // adjust to starfield relative scale
     const int origX = nX, origY = nY, origZ = nZ;
+    const char bFloorBelow = (sector[nSector].floorpicnum < 4080) || (sector[nSector].floorpicnum > 4095); // check if we're in an open air room-over-room sector
     const int nFloor = getflorzofslope(nSector, nX, nY);
     const char bStaticView = nDraw.bStaticView;
     if (!bStaticView)
@@ -362,14 +364,15 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                 // check if particle is clipping wall/floor
                 if (!bStaticView)
                 {
-                    if ((relZ<<3)+origZ > nFloor) // clipped through floor, ignore
-                        continue;
                     if (TestBitString(clipbit, i<<1)) // this particle is flagged as clipped, ignore
                         continue;
-                    if ((!TestBitString(clipbit, (i<<1)+1) || (bCheckClip && !(nDepth&1))) && !cansee(origX, origY, origZ, nSector, (relX >> 1) + origX, (relY >> 1) + origY, (relZ << 3) + origZ, nSector)) // test if valid position
+                    if (!TestBitString(clipbit, (i<<1)+1) || (bCheckClip && !(nDepth&1))) // test if valid position
                     {
-                        SetBitString(clipbit, i<<1);
-                        continue;
+                        if (bFloorBelow && ((relZ<<3)+origZ > nFloor) || !cansee(origX, origY, origZ, nSector, (relX>>1) + origX, (relY>>1) + origY, (relZ<<3) + origZ, nSector))
+                        {
+                            SetBitString(clipbit, i<<1);
+                            continue;
+                        }
                     }
                     SetBitString(clipbit, (i<<1)+1);
                 }
@@ -460,7 +463,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                 }
                 }
             }
-            else if (!bStaticView && bCheckClip && !(nDepth&3)) // only clear bit when gone off screen on Y axis
+            else if (!bStaticView && bCheckClip && !(nDepth&3) && TestBitString(clipbit, i<<1)) // only clear bit when gone off screen on Y axis
             {
                 ClearBitString(clipbit, i<<1);
                 ClearBitString(clipbit, (i<<1)+1);
@@ -489,6 +492,7 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector,
             Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta, nClockDiff != 0);
         videoEndDrawing();
     }
+
     if (nWeatherForecast == nWeatherCur) // increase until reached weather limit
     {
         nCountLimited += nClockDiff * (int)nFadeIn;
