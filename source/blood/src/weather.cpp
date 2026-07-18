@@ -61,6 +61,7 @@ CWeather::CWeather()
     nFovPitchModifier = 0;
     memset(nScaleTable, 0, sizeof(nScaleTable));
     nLastFrameClock = 0;
+    nLastInterpolate = 0;
     nWeatherCheat = WEATHERTYPE_NONE;
     nWeatherCur = WEATHERTYPE_NONE;
     nWeatherForecast = WEATHERTYPE_NONE;
@@ -107,6 +108,7 @@ CWeather::~CWeather()
     nFovPitchModifier = 0;
     memset(nScaleTable, 0, sizeof(nScaleTable));
     nLastFrameClock = 0;
+    nLastInterpolate = 0;
     nWeatherCheat = WEATHERTYPE_NONE;
     nWeatherCur = WEATHERTYPE_NONE;
     nWeatherForecast = WEATHERTYPE_NONE;
@@ -263,6 +265,7 @@ void CWeather::Initialize(void)
 void CWeather::Restart(void)
 {
     nLastFrameClock = 0;
+    nLastInterpolate = 0;
     nWeatherCur = WEATHERTYPE_NONE;
     nWeatherForecast = WEATHERTYPE_NONE;
     UnloadPreset();
@@ -275,16 +278,18 @@ void CWeather::Restart(void)
     SetParticles(0);
 }
 
-void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nCount, int nDelta)
+void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nCount, int nDelta, char bCheckClip)
 {
     dassert(pBuffer != NULL);
     dassert(nCount > 0 && nCount <= kMaxVectors);
+    dassert(nSector >= 0 && nSector < kMaxSectors);
 
     // move to first pixel within framebuffer
     pBuffer += nScreenPitch * nOffsetY + nOffsetX;
 
     // adjust to starfield relative scale
     const int origX = nX, origY = nY, origZ = nZ;
+    const char bFloorBelow = (sector[nSector].floorpicnum < 4080) || (sector[nSector].floorpicnum > 4095); // check if we're in an open air room-over-room sector
     const int nFloor = getflorzofslope(nSector, nX, nY);
     const char bStaticView = nDraw.bStaticView;
     if (!bStaticView)
@@ -301,7 +306,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     }
 
     // calculate wind offsets
-    if (nWindX || nWindY)
+    if ((nWindX || nWindY) && nDelta)
     {
         const int nWindDeltaX = mulscale16(nWindX, nDelta);
         const int nWindDeltaY = mulscale16(nWindY, nDelta);
@@ -326,7 +331,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     const int bShape = nDraw.bShape;
     const int bTransparent = nDraw.nTransparent;
     const int nMaxPixelSize = (nScaleFactor>>16)+1; // use screen res as factor for pixel size
-    const int nGrav = nGravity > 0 ? ClipLow(mulscale16(nGravity, nDelta), 1) : mulscale16(nGravity, nDelta);
+    const int nGrav = nGravity && nDelta ? ClipLow(mulscale16(nGravity, nDelta), 1) : 0;
     const int nGravityFast = nDraw.bGravityVariance && (nGrav != 0) ? nGrav - (nGrav>>2) : nGrav;
 
     for (int i = 0; i < nCount; i++)
@@ -359,14 +364,15 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                 // check if particle is clipping wall/floor
                 if (!bStaticView)
                 {
-                    if ((relZ<<3)+origZ > nFloor) // clipped through floor, ignore
-                        continue;
                     if (TestBitString(clipbit, i<<1)) // this particle is flagged as clipped, ignore
                         continue;
-                    if ((!TestBitString(clipbit, (i<<1)+1) || !(nDepth&3)) && !cansee(origX, origY, origZ, nSector, (relX>>1)+origX, (relY>>1)+origY, (relZ<<3)+origZ, nSector)) // test if valid position
+                    if (!TestBitString(clipbit, (i<<1)+1) || (bCheckClip && !(nDepth&1))) // test if valid position
                     {
-                        SetBitString(clipbit, i<<1);
-                        continue;
+                        if ((bFloorBelow && ((relZ<<3)+origZ > nFloor)) || !cansee(origX, origY, origZ, nSector, (relX>>1) + origX, (relY>>1) + origY, (relZ<<3) + origZ, nSector))
+                        {
+                            SetBitString(clipbit, i<<1);
+                            continue;
+                        }
                     }
                     SetBitString(clipbit, (i<<1)+1);
                 }
@@ -457,13 +463,10 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                 }
                 }
             }
-            else if (!bStaticView) // only clear bit when gone off screen on Y axis
+            else if (!bStaticView && bCheckClip && !(nDepth&3) && TestBitString(clipbit, i<<1)) // only clear bit when gone off screen on Y axis
             {
-                if (!(nDepth&3)) // randomly clear the clipbit
-                {
-                    ClearBitString(clipbit, i<<1);
-                    ClearBitString(clipbit, (i<<1)+1);
-                }
+                ClearBitString(clipbit, i<<1);
+                ClearBitString(clipbit, (i<<1)+1);
             }
         }
     }
@@ -473,27 +476,31 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector,
 {
     if (!IsActive())
         return;
-    nClock = (nClock<<2) + (nInterpolate>>12); // get sub-tick clock
-    int nDelta = ClipLow(nClock - nLastFrameClock, 0)<<14;
+
+    const int nClockDiff = (nClock - nLastFrameClock)&0x7FFFFFFF;
+    int nDelta = nClockDiff<<16; // convert kTicsPerFrame to positive fixed-16
+    nDelta += (nInterpolate - nLastInterpolate)<<2; // add interpolate time to get high precision kTicsPerFrame clock
     nLastFrameClock = nClock;
+    nLastInterpolate = nInterpolate;
+
     int nCountLimited = GetCount(); // get count with limit applied
     if (nCountLimited > 0)
     {
         videoBeginDrawing();
         char *framebuffer = (char*)frameplace;
         if (framebuffer != NULL)
-            Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta);
+            Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta, nClockDiff != 0);
         videoEndDrawing();
     }
-    nDelta = ClipLow(nDelta<<16, 1);
+
     if (nWeatherForecast == nWeatherCur) // increase until reached weather limit
     {
-        nCountLimited += nDelta * (int)nFadeIn;
+        nCountLimited += nClockDiff * (int)nFadeIn;
         SetCount(nCountLimited);
     }
     else if (nCountLimited && (nWeatherForecast != nWeatherCur)) // changed weather type, fade out then switch to new weather type
     {
-        nCountLimited -= nDelta * (int)nFadeOut;
+        nCountLimited -= nClockDiff * (int)nFadeOut;
         SetCount(nCountLimited);
     }
     else if (!nCountLimited && (nWeatherForecast != WEATHERTYPE_NONE)) // fade out complete, now switch to new weather
