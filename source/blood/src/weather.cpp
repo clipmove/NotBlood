@@ -285,6 +285,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
 
     // adjust to starfield relative scale
     const int origX = nX, origY = nY, origZ = nZ;
+    const int nFloor = getflorzofslope(nSector, nX, nY);
     const char bStaticView = nDraw.bStaticView;
     if (!bStaticView)
     {
@@ -355,8 +356,11 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
             unsigned int screenY = nHoriz + ((nScale * relZ)>>16);
             if (screenY < (unsigned)nHeight) // if within screen bounds
             {
-                if (!bStaticView) // check if particle is clipping wall
+                // check if particle is clipping wall/floor
+                if (!bStaticView)
                 {
+                    if ((relZ<<3)+origZ > nFloor) // clipped through floor, ignore
+                        continue;
                     if (TestBitString(clipbit, i<<1)) // this particle is flagged as clipped, ignore
                         continue;
                     if ((!TestBitString(clipbit, (i<<1)+1) || !(nDepth&3)) && !cansee(origX, origY, origZ, nSector, (relX>>1)+origX, (relY>>1)+origY, (relZ<<3)+origZ, nSector)) // test if valid position
