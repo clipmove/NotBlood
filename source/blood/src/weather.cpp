@@ -368,7 +368,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         continue;
                     if (!TestBitString(clipbit, (i<<1)+1) || (bCheckClip && !(nDepth&1))) // test if valid position
                     {
-                        if (bFloorBelow && ((relZ<<3)+origZ > nFloor) || !cansee(origX, origY, origZ, nSector, (relX>>1) + origX, (relY>>1) + origY, (relZ<<3) + origZ, nSector))
+                        if ((bFloorBelow && ((relZ<<3)+origZ > nFloor)) || !cansee(origX, origY, origZ, nSector, (relX>>1) + origX, (relY>>1) + origY, (relZ<<3) + origZ, nSector))
                         {
                             SetBitString(clipbit, i<<1);
                             continue;
