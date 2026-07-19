@@ -125,6 +125,7 @@ extern int32_t gPlayerTeamPreference;
 extern int32_t gPlayerColorPreference;
 extern int32_t gPlayerModel;
 extern int32_t gShowLoadingSavingBackground;
+extern int32_t gShowTyping;
 extern int32_t gShowPlayerNames;
 extern int32_t gShowWeapon;
 extern int32_t gMouseSensitivity;

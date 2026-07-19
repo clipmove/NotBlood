@@ -216,6 +216,8 @@ If you have the GOG version of the game, do the following:
    - Set player damage counter x position (0-320)
 * cl_showdamagey
    - Set player damage counter y position (0-200)
+* cl_showplayertyping
+   - Enable/disable player typing indicator
 * cl_showspeed
    - Enable/disable showing player speed
 * cl_slopecrosshair

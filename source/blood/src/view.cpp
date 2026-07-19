@@ -4085,7 +4085,7 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                     viewAddEffect(nTSprite, kViewEffectReflectiveBall);
                 }
 
-                if (gPlayerTyping[pPlayer->nPlayer] && !VanillaMode()) {
+                if (gShowTyping && gPlayerTyping[pPlayer->nPlayer] && !VanillaMode()) {
                     auto pNTSprite = viewAddEffect(nTSprite, kViewEffectFlag);
                     if (pNTSprite) {
                         pNTSprite->picnum = 9293; // use typing indicator icon tile from notblood.pk3/TILES099.ART
