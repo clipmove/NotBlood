@@ -535,7 +535,7 @@ void CONFIG_SetDefaults(void)
     gRollAngle = 0;
     gCenterHoriz = 1;
     gDeliriumBlur = 1;
-    gWeatherEffect = 0;
+    gWeatherEffect = 1;
     gViewSize = 3;
     gTurnSpeed = 92;
     gTurnAcceleration = 1;
