@@ -346,6 +346,7 @@
     <ClInclude Include="..\..\source\blood\src\triggers.h" />
     <ClInclude Include="..\..\source\blood\src\view.h" />
     <ClInclude Include="..\..\source\blood\src\weapon.h" />
+    <ClInclude Include="..\..\source\blood\src\weather.h" />
     <ClInclude Include="..\..\source\blood\src\_functio.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
