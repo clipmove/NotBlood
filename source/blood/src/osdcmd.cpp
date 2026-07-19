@@ -1222,6 +1222,7 @@ int32_t registerosdcommands(void)
         { "cl_showdamageticks", "set player damage counter duration (0-255)", (void*)&gShowDamageTicks, CVAR_INT, 0, 255 },
         { "cl_showdamagex", "set player damage counter x position (0-320)", (void*)&gShowDamageX, CVAR_INT, 0, 320 },
         { "cl_showdamagey", "set player damage counter y position (0-200)", (void*)&gShowDamageY, CVAR_INT, 0, 200 },
+        { "cl_showplayertyping", "enable/disable player typing indicator", (void *)&gShowTyping, CVAR_BOOL, 0, 1 },
         { "cl_showplayernames", "enable/disable showing player names in multiplayer when looking at other players", (void *)&gShowPlayerNames, CVAR_BOOL, 0, 1 },
         { "cl_showspeed", "enable/disable showing player speed", (void*)&gShowSpeed, CVAR_BOOL, 0, 1 },
         { "cl_showweapon", "enable/disable show weapons (0: disable, 1: sprite, 2: voxel)", (void *)&gShowWeapon, CVAR_INT, 0, 2 },

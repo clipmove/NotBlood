@@ -146,6 +146,7 @@ int32_t gStereo;
 int32_t gPlayerTeamPreference;
 int32_t gPlayerColorPreference;
 int32_t gShowLoadingSavingBackground;
+int32_t gShowTyping;
 int32_t gShowPlayerNames;
 int32_t gShowWeapon;
 int32_t gMouseSensitivity;
@@ -599,6 +600,7 @@ void CONFIG_SetDefaults(void)
     gPlayerColorPreference = 0;
     gPlayerModel = 0;
     gShowLoadingSavingBackground = 0;
+    gShowTyping = 1;
     gShowPlayerNames = 1;
     gShowWeapon = 1;
 
