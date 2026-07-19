@@ -3473,6 +3473,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
     itemOptionsDisplayBoolShowMapTitle.at20 = gShowMapTitle;
     itemOptionsDisplayViewWeaponInterpolation.m_nFocus = gWeaponInterpolate;
     itemOptionsDisplayViewBoolCenterHoriz.at20 = gCenterHoriz;
+    itemOptionsDisplayViewWeatherEffect.at20 = gWeatherEffect;
     gGameMenuMgr.Pop(); // close menu
 }
 
