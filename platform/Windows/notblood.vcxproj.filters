@@ -400,6 +400,9 @@
     <ClInclude Include="..\..\source\blood\src\weapon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\blood\src\weather.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\source\blood\src\warp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
