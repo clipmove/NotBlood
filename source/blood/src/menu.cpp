@@ -2179,8 +2179,10 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewBoolInterpolation.tooltip_pzTextLower = "Set interpolation method (original/integer or modern/float)";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextLower = "Set the display style for secrets";
+#ifdef USE_OPENGL
     itemOptionsDisplayViewWeatherEffect.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewWeatherEffect.tooltip_pzTextLower = "Weather is only available for software renderer";
+#endif
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextLower = "Reduce the speed of flickering sectors (e.g: E1M4)";
 
@@ -3471,6 +3473,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
     itemOptionsDisplayBoolShowMapTitle.at20 = gShowMapTitle;
     itemOptionsDisplayViewWeaponInterpolation.m_nFocus = gWeaponInterpolate;
     itemOptionsDisplayViewBoolCenterHoriz.at20 = gCenterHoriz;
+    itemOptionsDisplayViewWeatherEffect.at20 = gWeatherEffect;
     gGameMenuMgr.Pop(); // close menu
 }
 
