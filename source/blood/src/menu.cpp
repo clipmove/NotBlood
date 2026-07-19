@@ -84,6 +84,7 @@ void SetWeaponInterpolate(CGameMenuItemZCycle *);
 void SetViewInterpolate(CGameMenuItemZBool *);
 void SetLevelCompleteTime(CGameMenuItemZBool *);
 void SetMirrorMode(CGameMenuItemZCycle *);
+void SetWeatherEffect(CGameMenuItemZBool *);
 void SetSlowRoomFlicker(CGameMenuItemZBool *);
 void SetMouseSensitivity(CGameMenuItemSliderFloat *);
 void SetMouseAimFlipped(CGameMenuItemZBool *);
@@ -907,7 +908,8 @@ CGameMenuItemZBool itemOptionsDisplayViewBoolInterpolation("VIEW INTERPOLATE:", 
 CGameMenuItemZBool itemOptionsDisplayViewBoolLevelCompleteTime("LEVEL TIME AT INTERMISSION:", 3, 66, 130, 180, gShowCompleteTime, SetLevelCompleteTime, "SHOW", "HIDE");
 CGameMenuItemZCycle itemOptionsDisplayViewSecretMessageStyle("SECRET MESSAGE STYLE:", 3, 66, 140, 180, 0, SetSecretStyle, pzSecretStyleStrings, ARRAY_SSIZE(pzSecretStyleStrings), 0);
 CGameMenuItemZCycle itemOptionsDisplayViewMirrorMode("MIRROR MODE:", 3, 66, 150, 180, 0, SetMirrorMode, pzMirrorModeStrings, ARRAY_SSIZE(pzMirrorModeStrings), 0);
-CGameMenuItemZBool itemOptionsDisplayViewBoolSlowRoomFlicker("SLOW FLICKERING LIGHTS:", 3, 66, 160, 180, gSlowRoomFlicker, SetSlowRoomFlicker, NULL, NULL);
+CGameMenuItemZBool itemOptionsDisplayViewWeatherEffect("WEATHER EFFECT:", 3, 66, 160, 180, gWeatherEffect, SetWeatherEffect, NULL, NULL);
+CGameMenuItemZBool itemOptionsDisplayViewBoolSlowRoomFlicker("SLOW FLICKERING LIGHTS:", 3, 66, 170, 180, gSlowRoomFlicker, SetSlowRoomFlicker, NULL, NULL);
 
 #ifdef USE_OPENGL
 const char *pzTextureModeStrings[] = {
@@ -2163,6 +2165,7 @@ void SetupOptionsMenu(void)
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolLevelCompleteTime, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewSecretMessageStyle, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewMirrorMode, false);
+    menuOptionsDisplayView.Add(&itemOptionsDisplayViewWeatherEffect, false);
     menuOptionsDisplayView.Add(&itemOptionsDisplayViewBoolSlowRoomFlicker, false);
     menuOptionsDisplayView.Add(&itemBloodQAV, false);
     itemOptionsDisplayViewMirrorMode.bDisableForNet = 1;
@@ -2176,6 +2179,8 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewBoolInterpolation.tooltip_pzTextLower = "Set interpolation method (original/integer or modern/float)";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextLower = "Set the display style for secrets";
+    itemOptionsDisplayViewWeatherEffect.tooltip_pzTextUpper = "";
+    itemOptionsDisplayViewWeatherEffect.tooltip_pzTextLower = "Weather is only available for software renderer";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextLower = "Reduce the speed of flickering sectors (e.g: E1M4)";
 
@@ -2190,6 +2195,7 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewBoolLevelCompleteTime.at20 = gShowCompleteTime;
     itemOptionsDisplayViewSecretMessageStyle.m_nFocus = gSecretStyle % ARRAY_SSIZE(pzSecretStyleStrings);
     itemOptionsDisplayViewMirrorMode.m_nFocus = r_mirrormode % ARRAY_SSIZE(pzMirrorModeStrings);
+    itemOptionsDisplayViewWeatherEffect.at20 = gWeatherEffect;
     itemOptionsDisplayViewBoolSlowRoomFlicker.at20 = gSlowRoomFlicker;
 
     menuOptionsDisplayPowerup.Add(&itemOptionsPowerupTitle, false);
@@ -2864,6 +2870,11 @@ void SetMirrorMode(CGameMenuItemZCycle *pItem)
     r_mirrormode = pItem->m_nFocus % ARRAY_SSIZE(pzMirrorModeStrings);
 }
 
+void SetWeatherEffect(CGameMenuItemZBool *pItem)
+{
+    gWeatherEffect = pItem->at20;
+}
+
 void SetSlowRoomFlicker(CGameMenuItemZBool *pItem)
 {
     gSlowRoomFlicker = pItem->at20;
@@ -3417,6 +3428,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         gShowMapTitle = 0;
         gWeaponInterpolate = 0;
         gCenterHoriz = 0;
+        gWeatherEffect = 0;
     }
     else if (pItem == &itemFirstLaunchNBlood)
     {
@@ -3435,6 +3447,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         gViewSize = 2;
         viewResizeView(gViewSize);
         gCenterHoriz = 0;
+        gWeatherEffect = 0;
     }
     itemOptionsDisplayViewBoolSlopeTilting.at20 = gSlopeTilting;
     itemOptionsDisplayCrosshair.m_nFocus = gAimReticle;
