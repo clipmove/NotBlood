@@ -278,7 +278,7 @@ void CWeather::Restart(void)
     SetParticles(0);
 }
 
-void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nCount, int nDelta, char bCheckClip)
+void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nCount, int nDelta, char bCheckClip, char bFlipX, char bFlipY)
 {
     dassert(pBuffer != NULL);
     dassert(nCount > 0 && nCount <= kMaxVectors);
@@ -352,7 +352,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
 
         // perspective scale with fov adjustment (uses precomputed table instead of divscale16)
         const int nScale = nScaleTable[nDepth]; // potential range for nDepth is 5-8191
-        const unsigned int screenX = (divscale16(nLatOffset * nScale, nAspectRatioModifier)>>16) + (nWidth>>1);
+        unsigned int screenX = (divscale16(nLatOffset * nScale, nAspectRatioModifier)>>16) + (nWidth>>1);
         nPos[i][2] += i&4 ? nGravityFast : nGrav;
         if (screenX < (unsigned)nWidth) // if within screen bounds
         {
@@ -368,7 +368,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         continue;
                     if (!TestBitString(clipbit, (i<<1)+1) || (bCheckClip && !(nDepth&1))) // test if valid position
                     {
-                        if ((bFloorBelow && ((relZ<<3)+origZ > nFloor)) || !cansee(origX, origY, origZ, nSector, (relX>>1) + origX, (relY>>1) + origY, (relZ<<3) + origZ, nSector))
+                        if ((bFloorBelow && ((relZ<<3)+origZ > nFloor)) || !cansee(origX, origY, origZ, nSector, (relX>>1)+origX, (relY>>1)+origY, (relZ<<3)+origZ, nSector))
                         {
                             SetBitString(clipbit, i<<1);
                             continue;
@@ -380,6 +380,11 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                 // size/palette color calculation
                 const int nSize = ClipHigh(nScale>>12, nMaxPixelSize); // why did I pick 12? because it looked the best
                 const uint8_t nColor = nColorTable[nDepth>>8]; // potential range for nDepth is 5-8191, or 0-31 after shift
+
+                if (bFlipX)
+                    screenX = (unsigned int)(-((int)screenX) + (nWidth - 1));
+                if (bFlipY)
+                    screenY = (unsigned int)(-((int)screenY) + (nHeight - 1));
 
                 if (nSize <= 1) // if size is a pixel, don't bother calculating box fill
                 {
@@ -472,7 +477,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     }
 }
 
-void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nClock, int nInterpolate, unsigned int uMapCRC)
+void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nClock, int nInterpolate, unsigned int uMapCRC, char bFlipX, char bFlipY)
 {
     if (!IsActive())
         return;
@@ -489,7 +494,7 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector,
         videoBeginDrawing();
         char *framebuffer = (char*)frameplace;
         if (framebuffer != NULL)
-            Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta, nClockDiff != 0);
+            Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta, nClockDiff != 0, bFlipX, bFlipY);
         videoEndDrawing();
     }
 
