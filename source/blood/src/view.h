@@ -68,6 +68,7 @@ enum INTERPOLATE_TYPE {
 
 #define CROSSHAIR_PAL (MAXPALOOKUPS-RESERVEDPALS-1)
 #define kCrosshairTile 2319
+#define kSplashScreenCRC 290208654
 #define kLoadScreen 2049
 #define kLoadScreenCRC -2051908571
 #define kLoadScreenWideBackWidth 256
