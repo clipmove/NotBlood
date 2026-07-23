@@ -2157,7 +2157,7 @@ int app_main(int argc, char const * const * argv)
 
     LoadExtraArts();
     
-    if (!Bstrcmp(pINISelected->zName, "CRYPTIC.INI")) // if currently selected cryptic passage
+    if (tileGetCRC32(2046) != kSplashScreenCRC) // if menu pic has been changed, use over plasma pak default
         gMenuPicnum = 2046;
 
     levelLoadDefaults();
