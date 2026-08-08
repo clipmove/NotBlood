@@ -3034,7 +3034,6 @@ void DoTankTreads(PLAYERp pp)
     short i,nexti;
     int vel;
     SECTORp *sectp;
-    int j;
     int dot;
     SWBOOL reverse = FALSE;
 
@@ -3046,7 +3045,7 @@ void DoTankTreads(PLAYERp pp)
     if (dot < 0)
         reverse = TRUE;
 
-    for (sectp = pp->sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = pp->sop->sectp; *sectp; sectp++)
     {
         TRAVERSE_SPRITE_SECT(headspritesect[*sectp - sector], i, nexti)
         {
@@ -3338,7 +3337,7 @@ DoPlayerMoveTank(PLAYERp pp)
     SECTORp *sectp;
     SECTOR_OBJECTp sop = pp->sop;
     WALLp wp;
-    int j,k;
+    int k;
     short startwall,endwall;
 
     SW_PACKET last_input;
@@ -3399,7 +3398,7 @@ DoPlayerMoveTank(PLAYERp pp)
 
     if (RectClip)
     {
-        for (sectp = sop->sectp, wallcount = 0, j = 0; *sectp; sectp++, j++)
+        for (sectp = sop->sectp, wallcount = 0; *sectp; sectp++)
         {
             startwall = (*sectp)->wallptr;
             endwall = startwall + (*sectp)->wallnum - 1;

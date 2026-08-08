@@ -1936,7 +1936,7 @@ PlayerPart:
 void
 RefreshPoints(SECTOR_OBJECTp sop, int nx, int ny, SWBOOL dynamic)
 {
-    short wallcount = 0, j, k, startwall, endwall, delta_ang_from_orig;
+    short wallcount = 0, k, startwall, endwall, delta_ang_from_orig;
     SECTORp *sectp;
     WALLp wp;
     short ang;
@@ -1946,7 +1946,7 @@ RefreshPoints(SECTOR_OBJECTp sop, int nx, int ny, SWBOOL dynamic)
     if (dynamic && sop->PreMoveAnimator)
         (*sop->PreMoveAnimator)(sop);
 
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         if (!TEST(sop->flags, SOBJ_SPRITE_OBJ))
         {
@@ -2063,7 +2063,6 @@ void UpdateSectorObjectSprites(SECTOR_OBJECTp sop)
 SECTOR_OBJECTp
 DetectSectorObject(SECTORp sectph)
 {
-    short j;
     SECTORp *sectp;
     SECTOR_OBJECTp sop;
 
@@ -2075,7 +2074,7 @@ DetectSectorObject(SECTORp sectph)
         if (SO_EMPTY(sop))
             continue;
 
-        for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+        for (sectp = sop->sectp; *sectp; sectp++)
         {
             if (sectph == *sectp)
                 return sop;
@@ -2088,7 +2087,7 @@ DetectSectorObject(SECTORp sectph)
 SECTOR_OBJECTp
 DetectSectorObjectByWall(WALLp wph)
 {
-    short j, k, startwall, endwall;
+    short k, startwall, endwall;
     SECTORp *sectp;
     WALLp wp;
     SECTOR_OBJECTp sop;
@@ -2103,7 +2102,7 @@ DetectSectorObjectByWall(WALLp wph)
         if (SO_EMPTY(sop))
             continue;
 
-        for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+        for (sectp = sop->sectp; *sectp; sectp++)
         {
             startwall = (*sectp)->wallptr;
             endwall = startwall + (*sectp)->wallnum - 1;
@@ -2131,13 +2130,13 @@ DetectSectorObjectByWall(WALLp wph)
 void
 CollapseSectorObject(SECTOR_OBJECTp sop, int nx, int ny)
 {
-    short j, k, startwall, endwall;
+    short k, startwall, endwall;
     SECTORp *sectp;
     WALLp wp;
 
     // collapse the SO to a single point
     // move all points to nx,ny
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         if (!TEST(sop->flags, SOBJ_SPRITE_OBJ))
         {
@@ -2589,10 +2588,9 @@ void DoTrack(SECTOR_OBJECTp sop, short locktics, int *nx, int *ny)
         {
             // for lowering the whirlpool in level 1
             SECTORp *sectp;
-            short i;
             SECT_USERp sectu;
 
-            for (i = 0, sectp = &sop->sectp[0]; *sectp; sectp++, i++)
+            for (sectp = &sop->sectp[0]; *sectp; sectp++)
             {
                 sectu = SectUser[*sectp - sector];
 

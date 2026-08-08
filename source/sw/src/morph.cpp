@@ -294,7 +294,6 @@ MorphTornado(SECTOR_OBJECTp sop)
     int ceilingz;
     int floorz;
     SECTORp *sectp;
-    int j;
     int x,y,sx,sy;
 
     // z direction
@@ -346,7 +345,7 @@ MorphTornado(SECTOR_OBJECTp sop)
     ceilingz = sector[sop->op_main_sector].ceilingz;
     floorz = sector[sop->op_main_sector].floorz;
 
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         if (SectUser[*sectp - sector] &&
             TEST(SectUser[*sectp - sector]->flags, SECTFU_SO_SLOPE_CEILING_TO_POINT))
@@ -375,7 +374,6 @@ MorphFloor(SECTOR_OBJECTp sop)
     int mx, my;
     int floorz;
     SECTORp *sectp;
-    int j;
     int x,y;
 
     // z direction
@@ -439,7 +437,7 @@ MorphFloor(SECTOR_OBJECTp sop)
         sop->morph_z_speed *= -1;
     }
 
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         if (SectUser[*sectp - sector] &&
             TEST(SectUser[*sectp - sector]->flags, SECTFU_SO_SLOPE_CEILING_TO_POINT))
@@ -453,9 +451,8 @@ void
 SOBJ_AlignFloorToPoint(SECTOR_OBJECTp sop, int x, int y, int z)
 {
     SECTORp *sectp;
-    int j;
 
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         if (SectUser[*sectp - sector] &&
             TEST(SectUser[*sectp - sector]->flags, SECTFU_SO_SLOPE_CEILING_TO_POINT))
@@ -469,9 +466,8 @@ void
 SOBJ_AlignCeilingToPoint(SECTOR_OBJECTp sop, int x, int y, int z)
 {
     SECTORp *sectp;
-    int j;
 
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         if (SectUser[*sectp - sector] &&
             TEST(SectUser[*sectp - sector]->flags, SECTFU_SO_SLOPE_CEILING_TO_POINT))
@@ -485,9 +481,8 @@ void
 SOBJ_AlignFloorCeilingToPoint(SECTOR_OBJECTp sop, int x, int y, int z)
 {
     SECTORp *sectp;
-    int j;
 
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         if (SectUser[*sectp - sector] &&
             TEST(SectUser[*sectp - sector]->flags, SECTFU_SO_SLOPE_CEILING_TO_POINT))

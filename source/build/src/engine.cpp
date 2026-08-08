@@ -13232,10 +13232,9 @@ int32_t getsectordist(vec2_t const in, int const sectnum, vec2_t * const out /*=
     auto const sec       = (usectorptr_t)&sector[sectnum];
     int const  startwall = sec->wallptr;
     int const  endwall   = sec->wallptr + sec->wallnum;
-    auto       uwal      = (uwallptr_t)&wall[startwall];
     vec2_t     closest = {};
 
-    for (int j = startwall; j < endwall; j++, uwal++)
+    for (int j = startwall; j < endwall; j++)
     {
         vec2_t p;
         int32_t const walldist = getwalldist(in, j, &p);
