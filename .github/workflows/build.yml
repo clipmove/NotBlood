@@ -82,11 +82,11 @@ jobs:
           - name: x86_64 GCC without SDL
             sys: mingw64
             env: x86_64
-            opt: RENDERTYPE=WIN LTO=0
+            opt: SDLCONFIG= RENDERTYPE=WIN LTO=0
           - name: i686 GCC without SDL
             sys: mingw32
             env: i686
-            opt: RENDERTYPE=WIN LTO=0
+            opt: SDLCONFIG= RENDERTYPE=WIN LTO=0
             pkg: nasm
     name: Windows MSYS2 ${{matrix.name}}
     runs-on: windows-latest
@@ -125,7 +125,7 @@ jobs:
       - name: install-prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get -y install libvorbis-dev libflac-dev libglu1-mesa-dev libgtk2.0-dev ${{matrix.pkg}}
+          sudo apt-get -y install lib{flac,vpx,gtk2.0}-dev ${{matrix.pkg}}
       - name: build
         run: make -j$(nproc) blood tools ${{matrix.opt}}
       - name: 'prepare files for upload'
