@@ -4852,7 +4852,7 @@ void G_HandleLocalKeys(void)
 
         // NOTE: sc_F1 .. sc_F10 are contiguous. sc_F11 is not sc_F10+1.
         for (bssize_t j=sc_F1; j<=sc_F10; j++)
-            if (KB_UnBoundKeyPressed(j))
+            if (KB_KeyPressed(j))
             {
                 KB_ClearKeyDown(j);
                 ridiculeNum = j - sc_F1 + 1;

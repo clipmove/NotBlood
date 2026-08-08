@@ -1595,7 +1595,6 @@ void engineSetupImGui(void)
     g_ImGui_IO->IniFilename = nullptr;
     g_ImGui_IO->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     g_ImGui_IO->ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-    g_ImGui_IO->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 

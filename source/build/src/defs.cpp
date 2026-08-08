@@ -368,10 +368,6 @@ public:
 
     bool is_different(const char * tokenname, int32_t tile) const
     {
-#if !LOGURU_DEBUG_LOGGING
-        UNREFERENCED_PARAMETER(tokenname);
-#endif
-
         bool different_crc32 = have_crc32;
         bool different_size = have_size;
 

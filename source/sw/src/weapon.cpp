@@ -19773,9 +19773,7 @@ WarpToUnderwater(short *sectnum, int *x, int *y, int *z)
     short i, nexti;
     SECT_USERp sectu = SectUser[*sectnum];
     SPRITEp under_sp = NULL, over_sp = NULL;
-#if ASSERT_ACTIVE
     char Found = FALSE;
-#endif
     short over, under;
     int sx, sy;
 
@@ -19792,17 +19790,13 @@ WarpToUnderwater(short *sectnum, int *x, int *y, int *z)
             SectUser[over_sp->sectnum] &&
             SectUser[over_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }
 
     ASSERT(Found == TRUE);
-#if ASSERT_ACTIVE
     Found = FALSE;
-#endif
 
     // search for UNDERWATER "under" sprite for reference point
     TRAVERSE_SPRITE_STAT(headspritestat[STAT_UNDERWATER], i, nexti)
@@ -19813,9 +19807,7 @@ WarpToUnderwater(short *sectnum, int *x, int *y, int *z)
             SectUser[under_sp->sectnum] &&
             SectUser[under_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }
@@ -19863,9 +19855,7 @@ WarpToSurface(short *sectnum, int *x, int *y, int *z)
     int sx, sy;
 
     SPRITEp under_sp = NULL, over_sp = NULL;
-#if ASSERT_ACTIVE
     char Found = FALSE;
-#endif
 
     // 0 not valid for water match tags
     if (sectu->number == 0)
@@ -19880,17 +19870,13 @@ WarpToSurface(short *sectnum, int *x, int *y, int *z)
             SectUser[under_sp->sectnum] &&
             SectUser[under_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }
 
     ASSERT(Found == TRUE);
-#if ASSERT_ACTIVE
     Found = FALSE;
-#endif
 
     // search for DIVE_AREA "over" sprite for reference point
     TRAVERSE_SPRITE_STAT(headspritestat[STAT_DIVE_AREA], i, nexti)
@@ -19901,9 +19887,7 @@ WarpToSurface(short *sectnum, int *x, int *y, int *z)
             SectUser[over_sp->sectnum] &&
             SectUser[over_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }
@@ -19941,9 +19925,7 @@ SpriteWarpToUnderwater(SPRITEp sp)
     short i, nexti;
     SECT_USERp sectu = SectUser[sp->sectnum];
     SPRITEp under_sp = NULL, over_sp = NULL;
-#if ASSERT_ACTIVE
     char Found = FALSE;
-#endif
     short over, under;
     int sx, sy;
 
@@ -19960,17 +19942,13 @@ SpriteWarpToUnderwater(SPRITEp sp)
             SectUser[over_sp->sectnum] &&
             SectUser[over_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }
 
     ASSERT(Found == TRUE);
-#if ASSERT_ACTIVE
     Found = FALSE;
-#endif
 
     // search for UNDERWATER "under" sprite for reference point
     TRAVERSE_SPRITE_STAT(headspritestat[STAT_UNDERWATER], i, nexti)
@@ -19981,9 +19959,7 @@ SpriteWarpToUnderwater(SPRITEp sp)
             SectUser[under_sp->sectnum] &&
             SectUser[under_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }
@@ -20030,9 +20006,7 @@ SpriteWarpToSurface(SPRITEp sp)
     int sx, sy;
 
     SPRITEp under_sp = NULL, over_sp = NULL;
-#if ASSERT_ACTIVE
     char Found = FALSE;
-#endif
 
     // 0 not valid for water match tags
     if (sectu->number == 0)
@@ -20047,9 +20021,7 @@ SpriteWarpToSurface(SPRITEp sp)
             SectUser[under_sp->sectnum] &&
             SectUser[under_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }
@@ -20059,9 +20031,7 @@ SpriteWarpToSurface(SPRITEp sp)
     if (under_sp->lotag == 0)
         return FALSE;
 
-#if ASSERT_ACTIVE
     Found = FALSE;
-#endif
 
     // search for DIVE_AREA "over" sprite for reference point
     TRAVERSE_SPRITE_STAT(headspritestat[STAT_DIVE_AREA], i, nexti)
@@ -20072,9 +20042,7 @@ SpriteWarpToSurface(SPRITEp sp)
             SectUser[over_sp->sectnum] &&
             SectUser[over_sp->sectnum]->number == sectu->number)
         {
-#if ASSERT_ACTIVE
             Found = TRUE;
-#endif
             break;
         }
     }

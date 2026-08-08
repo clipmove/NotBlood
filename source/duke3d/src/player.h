@@ -424,7 +424,6 @@ static inline int P_GetP(const void *pSprite)
 #if 0  // unprotected player index retrieval
     return spr->yvel;
 #elif defined NETCODE_DISABLE
-    UNREFERENCED_PARAMETER(pSprite);  // for NDEBUG build
     // NOTE: In the no-netcode build, there's no point to pass player indices
     // at all since there is ever only one player. However, merely returning 0
     // would mean making this build less strict than the normal one.

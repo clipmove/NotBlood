@@ -40,7 +40,7 @@ SECTOR_OBJECTp DetectSectorObjectByWall(WALLp);
 
 void SOwallmove(SECTOR_OBJECTp sop, SPRITEp sp, WALLp find_wallp, int dist, int *nx, int *ny)
 {
-    int j,k,wallcount;
+    int k,wallcount;
     WALLp wp;
     short startwall,endwall;
     SECTORp *sectp;
@@ -49,7 +49,7 @@ void SOwallmove(SECTOR_OBJECTp sop, SPRITEp sp, WALLp find_wallp, int dist, int 
         return;
 
     wallcount = 0;
-    for (sectp = sop->sectp, j = 0; *sectp; sectp++, j++)
+    for (sectp = sop->sectp; *sectp; sectp++)
     {
         startwall = (*sectp)->wallptr;
         endwall = startwall + (*sectp)->wallnum - 1;

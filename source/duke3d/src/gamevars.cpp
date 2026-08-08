@@ -665,7 +665,9 @@ int Gv_ReadSave(buildvfs_kfd kFile)
     A_(!kread_and_test(kFile, buf, Bstrlen(s_EOF)));
     A_(!Bmemcmp(buf, s_EOF, Bstrlen(s_EOF)));
 
+#ifndef NDEBUG
     DVLOG_F(LOG_DEBUG, "Gv_ReadSave(): read %d bytes extended data from offset 0x%08x", ktell(kFile) - startofs, startofs);
+#endif
 
     Xfree(varlabels);
     Xfree(arrlabels);
@@ -892,7 +894,9 @@ void Gv_WriteSave(buildvfs_FILE fil)
     }
 
     buildvfs_fwrite(s_EOF, Bstrlen(s_EOF), 1, fil);
+#ifndef NDEBUG
     DVLOG_F(LOG_DEBUG, "Gv_WriteSave(): wrote %d bytes extended data at offset 0x%08x", (int)buildvfs_ftell(fil) - startofs, startofs);
+#endif
 
     Xfree(varlabels);
     Xfree(arrlabels);

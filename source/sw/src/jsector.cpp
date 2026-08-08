@@ -1244,7 +1244,7 @@ JS_PlockError(short wall_num, short t)
                "sector %d, floor %d", wall_num, TrackerCast(sector[wall_num].floorpicnum));
         break;
     }
-    TerminateWithMsg(0,
+    TerminateWithSimpleMsg(0,
                "ERROR: JS_InitLockouts(), out of range tile number\n"
                "Unrecognizable error!");
 }

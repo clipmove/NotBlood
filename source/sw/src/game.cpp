@@ -3666,7 +3666,7 @@ int32_t app_main(int32_t argc, char const * const * argv)
                 gNet.MultiGameType = MULTI_GAME_COOPERATIVE;
             }
         }
-        else if (FALSE && Bstrncasecmp(arg, "ddr", 3) == 0)
+        else if (Bstrncasecmp(arg, "ddr", 3) == 0)
         {
             //NumSyncBytes = 8;
             DemoRecording = TRUE;
@@ -3681,7 +3681,7 @@ int32_t app_main(int32_t argc, char const * const * argv)
                     strcat(DemoFileName, ".dmo");
             }
         }
-        else if (FALSE && Bstrncasecmp(arg, "dr", 2) == 0)
+        else if (Bstrncasecmp(arg, "dr", 2) == 0)
         {
             //NumSyncBytes = 8;
             DemoRecording = TRUE;
@@ -3695,7 +3695,7 @@ int32_t app_main(int32_t argc, char const * const * argv)
                     strcat(DemoFileName, ".dmo");
             }
         }
-        else if (FALSE && Bstrncasecmp(arg, "dp", 2) == 0)
+        else if (Bstrncasecmp(arg, "dp", 2) == 0)
         {
             DemoPlaying = TRUE;
             DemoRecording = FALSE;
@@ -3744,7 +3744,7 @@ int32_t app_main(int32_t argc, char const * const * argv)
         }
 
 #if DEBUG
-        else if (FALSE && Bstrncasecmp(arg, "de", 2) == 0)
+        else if (Bstrncasecmp(arg, "de", 2) == 0)
         {
 #if DEMO_FILE_TYPE == DEMO_FILE_GROUP
             DemoPlaying = TRUE;
@@ -3814,7 +3814,7 @@ int32_t app_main(int32_t argc, char const * const * argv)
         {
             DebugPanel = TRUE;
         }
-        else if (FALSE && Bstrncasecmp(arg, "dt", 2) == 0)
+        else if (Bstrncasecmp(arg, "dt", 2) == 0)
         {
             if (strlen(arg) > 2)
             {
