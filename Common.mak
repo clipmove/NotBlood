@@ -873,7 +873,8 @@ ifeq ($(PLATFORM),WINDOWS)
         ifeq ($(SDL_TARGET),2)
             COMPILERFLAGS += -Iplatform/Windows/include/SDL2
         endif
-    endif
+    else ifeq ($(RENDERTYPE),WIN)
+        LIBS += -ldxguid -ldwmapi
 else ifeq ($(PLATFORM),DARWIN)
     ifneq ($(shell port --version &>/dev/null; echo $$?),127)
         LIBDIRS += -L/opt/local/lib

@@ -82,11 +82,11 @@ jobs:
           - name: x86_64 GCC without SDL
             sys: mingw64
             env: x86_64
-            opt: SDLCONFIG= RENDERTYPE=WIN LTO=0
+            opt: RENDERTYPE=WIN LTO=0
           - name: i686 GCC without SDL
             sys: mingw32
             env: i686
-            opt: SDLCONFIG= RENDERTYPE=WIN LTO=0
+            opt: RENDERTYPE=WIN LTO=0
             pkg: nasm
     name: Windows MSYS2 ${{matrix.name}}
     runs-on: windows-latest
