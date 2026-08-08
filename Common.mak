@@ -999,7 +999,7 @@ ifeq ($(PLATFORM),WINDOWS)
         L_SSP := -lssp
     endif
     ifeq ($(RENDERTYPE),WIN)
-        LIBS += -ldxguid
+        LIBS += -ldxguid -ldwmapi
     else ifeq ($(SDL_TARGET),1)
         LIBS += -ldxguid
     else
