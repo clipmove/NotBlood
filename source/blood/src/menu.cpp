@@ -3584,7 +3584,7 @@ void SetupVideoModeMenu(CGameMenuItemChain *pItem)
             break;
         }
     }
-    itemOptionsDisplayModeFrameLimit.nRangeHigh = ClipLow(round(refreshfreq), 60);
+    itemOptionsDisplayModeFrameLimit.nValue = ClipLow(r_maxfps, 60);
 }
 
 void PreDrawVideoModeMenu(CGameMenuItem *pItem)
