@@ -1,11 +1,15 @@
+---
 name: Build
 
-on:
+'on':
   push:
     branches: [master]
   pull_request: {}
   merge_group: {}
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -47,10 +51,11 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         ref: ${{matrix.ref}}
-    - uses: msys2/setup-msys2@v2
+    - uses: >-
+          msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884
       with:
         msystem: ${{matrix.sys}}
         update: true
@@ -89,15 +94,16 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-    - uses: actions/checkout@v4
-    - uses: msys2/setup-msys2@v2
-      with:
-        msystem: ${{matrix.sys}}
-        update: true
-        cache: true
-        install: git mingw-w64-${{matrix.env}}-toolchain make ${{matrix.pkg}}
-    - name: build
-      run: make -j$(nproc) blood tools ${{matrix.opt}}
+      - uses: actions/checkout@v7
+      - uses: >-
+          msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884
+        with:
+          msystem: ${{matrix.sys}}
+          update: true
+          cache: true
+          install: git mingw-w64-${{matrix.env}}-toolchain make ${{matrix.pkg}}
+      - name: build
+        run: make -j$(nproc) blood tools ${{matrix.opt}}
 
   build-linux:
     strategy:
@@ -115,22 +121,22 @@ jobs:
     name: Linux ${{matrix.name}}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: install-prerequisites
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install libvorbis-dev libflac-dev libglu1-mesa-dev libgtk2.0-dev ${{matrix.pkg}}
-    - name: build
-      run: make -j$(nproc) blood tools ${{matrix.opt}}
-    - name: 'prepare files for upload'
-      run: |
-        mkdir -p ./upload
-        cp ./notblood ./upload
-    - uses: actions/upload-artifact@v4
-      with:
-        name: notblood-linux-${{matrix.zipname}}
-        path: ./upload
-        if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
+      - uses: actions/checkout@v7
+      - name: install-prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libvorbis-dev libflac-dev libglu1-mesa-dev libgtk2.0-dev ${{matrix.pkg}}
+      - name: build
+        run: make -j$(nproc) blood tools ${{matrix.opt}}
+      - name: 'prepare files for upload'
+        run: |
+          mkdir -p ./upload
+          cp ./notblood ./upload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notblood-linux-${{matrix.zipname}}
+          path: ./upload
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
 
   build-linux-tests:
     strategy:
@@ -152,33 +158,32 @@ jobs:
     name: Linux ${{matrix.name}}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: install-prerequisites
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install libflac-dev libgtk2.0-dev ${{matrix.pkg}}
-    - name: build
-      run: make -j$(nproc) blood tools ${{matrix.opt}}
+      - uses: actions/checkout@v7
+      - name: install-prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libflac-dev libgtk2.0-dev ${{matrix.pkg}}
+      - name: build
+        run: make -j$(nproc) blood tools ${{matrix.opt}}
 
   build-macos:
     name: macOS Clang
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: install-prerequisites
-      run: |
-        brew install sdl2 flac make
-        brew unlink lz4
-    - name: build
-      run: gmake -j2 blood tools NETCODE=0
-    # Removed until upstream EDuke32 fixes keyboard input for builds - https://forums.duke4.net/topic/12622-cant-use-keyboard-in-osx-build/
-    # - name: 'prepare files for upload'
-      # run: |
-        # mkdir -p ./upload
-        # cp -R ./notblood.app ./upload
-    # - uses: actions/upload-artifact@v4
-      # with:
-        # name: notblood-macos
-        # path: ./upload
-        # if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
-
+      - uses: actions/checkout@v7
+      - name: install-prerequisites
+        run: |
+          brew install sdl2 flac make
+          brew unlink lz4
+      - name: build
+        run: gmake -j2 blood tools NETCODE=0
+      # Removed until upstream EDuke32 fixes keyboard input for builds - https://forums.duke4.net/topic/12622-cant-use-keyboard-in-osx-build/
+      # - name: 'prepare files for upload'
+        # run: |
+          # mkdir -p ./upload
+          # cp -R ./notblood.app ./upload
+      # - uses: actions/upload-artifact@v4
+        # with:
+          # name: notblood-macos
+          # path: ./upload
+          # if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
