@@ -1,11 +1,15 @@
+---
 name: Build
 
-on:
+'on':
   push:
     branches: [master]
   pull_request: {}
   merge_group: {}
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -81,51 +85,52 @@ jobs:
       run:
         shell: ${{matrix.shell}}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-    - name: install-prerequisites-windows-msys2
-      if: matrix.shell == 'msys2 {0}'
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: ${{matrix.sys}}
-        update: true
-        cache: true
-        install: git mingw-w64-${{matrix.env}}-toolchain make ${{matrix.pkg}}
+      - name: install-prerequisites-windows-msys2
+        if: matrix.shell == 'msys2 {0}'
+        uses: >-
+          msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884
+        with:
+          msystem: ${{matrix.sys}}
+          update: true
+          cache: true
+          install: git mingw-w64-${{matrix.env}}-toolchain make ${{matrix.pkg}}
 
-    - name: install-prerequisites-linux
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install libflac-dev libvpx-dev libgtk2.0-dev ${{matrix.pkg}}
+      - name: install-prerequisites-linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install lib{flac,vpx,gtk2.0}-dev ${{matrix.pkg}}
 
-    - name: install-prerequisites-macos
-      if: runner.os == 'macOS'
-      run: |
-        brew install sdl2 flac libvpx make ${{matrix.pkg}}
-        brew unlink lz4
+      - name: install-prerequisites-macos
+        if: runner.os == 'macOS'
+        run: |
+          brew install sdl2 flac libvpx make ${{matrix.pkg}}
+          brew unlink lz4
 
-    - name: fetch full history
-      if: github.ref == 'refs/heads/master' && matrix.publish-as != ''
-      run: git fetch --unshallow
+      - name: fetch full history
+        if: github.ref == 'refs/heads/master' && matrix.publish-as != ''
+        run: git fetch --unshallow
 
-    - name: build
-      run: |
-        ${{matrix.make}} -j2 blood rr exhumed ${{matrix.opt}}
-        ${{matrix.make}} -j2 duke3d sw kenbuild tools ${{matrix.opt}}
+      - name: build
+        run: |
+          ${{matrix.make}} -j2 blood rr exhumed ${{matrix.opt}}
+          ${{matrix.make}} -j2 duke3d sw kenbuild tools ${{matrix.opt}}
 
-    - name: prepare artifacts
-      if: github.ref == 'refs/heads/master' && matrix.publish-as != ''
-      run: |
-        mkdir -p upload/nblood/
-        mkdir -p upload/rednukem/
-        mkdir -p upload/pcexhumed/
-        cp nblood.exe upload/nblood/
-        cp rednukem.exe upload/rednukem/
-        cp pcexhumed.exe upload/pcexhumed/
+      - name: prepare artifacts
+        if: github.ref == 'refs/heads/master' && matrix.publish-as != ''
+        run: |
+          mkdir -p upload/nblood/
+          mkdir -p upload/rednukem/
+          mkdir -p upload/pcexhumed/
+          cp nblood.exe upload/nblood/
+          cp rednukem.exe upload/rednukem/
+          cp pcexhumed.exe upload/pcexhumed/
 
-    - uses: actions/upload-artifact@v4
-      if: github.ref == 'refs/heads/master' && matrix.publish-as != ''
-      with:
-        name: ${{matrix.publish-as}}
-        path: upload/
-        if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
+      - uses: actions/upload-artifact@v7
+        if: github.ref == 'refs/heads/master' && matrix.publish-as != ''
+        with:
+          name: ${{matrix.publish-as}}
+          path: upload/
+          if-no-files-found: error
