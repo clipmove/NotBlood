@@ -1149,12 +1149,12 @@ LOGURU_ANONYMOUS_NAMESPACE_END
 #else
 	// Debug logging disabled:
 	// EDUKE32 MODIFICATION
-	#define DLOG_F(verbosity_name, ...) do {} while(0)
-	#define DVLOG_F(verbosity, ...) do {} while(0)
-	#define DLOG_IF_F(verbosity_name, cond, ...) do {} while(0)
-	#define DVLOG_IF_F(verbosity, cond, ...) do {} while(0)
-	#define DRAW_LOG_F(verbosity_name, ...) do {} while(0)
-	#define DRAW_VLOG_F(verbosity, ...) do {} while(0)
+	#define DLOG_F(verbosity_name, ...) do { SILENCE_UNUSED(__VA_ARGS__); } while(0)
+	#define DVLOG_F(verbosity, ...) do { SILENCE_UNUSED(__VA_ARGS__); } while(0)
+	#define DLOG_IF_F(verbosity_name, cond, ...) do { SILENCE_UNUSED(__VA_ARGS__); } while(0)
+	#define DVLOG_IF_F(verbosity, cond, ...) do { SILENCE_UNUSED(__VA_ARGS__); } while(0)
+	#define DRAW_LOG_F(verbosity_name, ...) do { SILENCE_UNUSED(__VA_ARGS__); } while(0)
+	#define DRAW_VLOG_F(verbosity, ...) do { SILENCE_UNUSED(__VA_ARGS__); } while(0)
 	// END EDUKE32 MODIFICATION
 #endif
 
@@ -1202,7 +1202,7 @@ LOGURU_ANONYMOUS_NAMESPACE_END
 		// Debug:
 		#define assert(test) CHECK_WITH_INFO_F(!!(test), #test) // HACK
 	#else
-		#define assert(test)
+		#define assert(test) (void)(test)
 	#endif
 #endif // LOGURU_REDEFINE_ASSERT
 
