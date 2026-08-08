@@ -619,7 +619,7 @@ ifneq (0,$(LTO))
 endif
 
 ifeq (1,$(LLD))
-    COMMONFLAGS += -fuse-ld=lld
+    LINKERFLAGS += -fuse-ld=lld
     LF :=
 endif
 

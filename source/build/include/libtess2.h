@@ -441,7 +441,7 @@ static void tessMeshZapFace(TESSmesh *mesh, TESSface *fZap);
 static void tessMeshFlipEdge(TESSmesh *mesh, TESShalfEdge *edge);
 
 #ifdef NDEBUG
-#define tessMeshCheckMesh(mesh)
+#define tessMeshCheckMesh(mesh) ((void)(mesh))
 #else
 static void tessMeshCheckMesh(TESSmesh *mesh);
 #endif
@@ -1284,7 +1284,9 @@ static void OutputPolymesh(TESStesselator *tess, TESSmesh *mesh, int elementType
 		if(!f->inside) continue;
 
 		auto edge = f->anEdge;
+#ifndef NDEBUG
 		int faceVerts = 0;
+#endif
 		do
 		{
 			auto v = edge->Org;
@@ -1293,7 +1295,9 @@ static void OutputPolymesh(TESStesselator *tess, TESSmesh *mesh, int elementType
 				v->n = maxVertexCount;
 				maxVertexCount++;
 			}
+#ifndef NDEBUG
 			faceVerts++;
+#endif
 			edge = edge->Lnext;
 		}
 		while (edge != f->anEdge);

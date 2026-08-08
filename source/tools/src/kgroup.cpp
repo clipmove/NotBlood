@@ -68,9 +68,14 @@ void findfiles(const char *dafilespec)
     while ((name = Breaddir(di))) {
         if (!checkmatch(name)) continue;
 
-        strcpy(&filelist[numfiles][0],name->name);
+        const char * const fn = name->name;
+        int const len = name->size;
+        if (len == 0)
+            Bprintf("Warning: Zero-length file \"%s\" will cause crashes with original EXEs.\n", fn);
+
+        strcpy(&filelist[numfiles][0],fn);
         jstrupr(&filelist[numfiles][0]);
-        fileleng[numfiles] = name->size;
+        fileleng[numfiles] = len;
         filelist[numfiles][12] = (char)(fileleng[numfiles]&255);
         filelist[numfiles][13] = (char)((fileleng[numfiles]>>8)&255);
         filelist[numfiles][14] = (char)((fileleng[numfiles]>>16)&255);

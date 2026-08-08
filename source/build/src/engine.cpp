@@ -5543,8 +5543,13 @@ static void classicDrawSprite(int32_t snum)
 
     tilenum = tspr->picnum;
 
-    if (tsprflags & TSPR_FLAGS_SLAB)
-        vtilenum = tilenum; // if the game wants voxels, it gets voxels
+    if (tsprflags & TSPR_FLAGS_SLAB) // if the game wants a voxel, it gets a voxel
+    {
+        if ((unsigned)tilenum < MAXVOXELS)
+            vtilenum = tilenum;
+        else
+            tsprflags &= ~TSPR_FLAGS_SLAB; // avoid crashing if the voxel ID is OOB
+    }
     else if (!(cstat & CSTAT_SPRITE_ALIGNMENT_FLOOR) && usevoxels && tiletovox[tilenum] != -1 && spritenum != -1 && !(spriteext[spritenum].flags&SPREXT_NOTMD))
     {
         bool drawVoxel = true;
@@ -13296,10 +13301,9 @@ int32_t getsectordist(vec2_t const in, int const sectnum, vec2_t * const out /*=
     auto const sec       = (usectorptr_t)&sector[sectnum];
     int const  startwall = sec->wallptr;
     int const  endwall   = sec->wallptr + sec->wallnum;
-    auto       uwal      = (uwallptr_t)&wall[startwall];
     vec2_t     closest = {};
 
-    for (int j = startwall; j < endwall; j++, uwal++)
+    for (int j = startwall; j < endwall; j++)
     {
         vec2_t p;
         int32_t const walldist = getwalldist(in, j, &p);

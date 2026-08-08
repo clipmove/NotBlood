@@ -1,42 +1,46 @@
+---
 name: Publish
 
 # Only trigger, when the build workflow succeeded
-on:
+'on':
   workflow_run:
     workflows: [Build]
     types: [completed]
     branches: [master]
+
+permissions:
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: 'Prepare files for upload'
-      run: |
-        mkdir -p ./upload
-        cp ./notblood.pk3 ./upload
-        cp -a ./package/common/. ./upload/
-
-    - uses: dawidd6/action-download-artifact@v6
-      with:
-        workflow: build.yml
-        workflow_conclusion: success
-        path: ./upload
-        
-    - name: Zipping artifacts for release
-      run: |
-        cd ./upload
-        ls -R -l
-        for i in */; do cp *.pk3 "${i%/}"; cp *.txt "${i%/}"; mkdir -p "${i%/}"/autoload; mv "${i%/}"/addons.txt "${i%/}"/autoload; done
-        for i in */; do cd "${i%/}"; zip -9 -r "../${i%/}.zip" ./; cd ..; done
-    - name: Publish artifacts to release
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
-        prerelease: false
-        title: "Latest Build"
-        files: |
-            ./upload/*.zip
+      - uses: actions/checkout@v7
+      - name: 'Prepare files for upload'
+        run: |
+          mkdir -p ./upload
+          cp ./notblood.pk3 ./upload
+          cp -a ./package/common/. ./upload/
+      
+      - uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          workflow_conclusion: success
+          path: ./upload
+          
+      - name: Zipping artifacts for release
+        run: |
+          cd ./upload
+          ls -R -l
+          for i in */; do cp *.pk3 "${i%/}"; cp *.txt "${i%/}"; mkdir -p "${i%/}"/autoload; mv "${i%/}"/addons.txt "${i%/}"/autoload; done
+          for i in */; do cd "${i%/}"; zip -9 -r "../${i%/}.zip" ./; cd ..; done
+      - name: Publish artifacts to release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Latest Build"
+          files: |
+              ./upload/*.zip
