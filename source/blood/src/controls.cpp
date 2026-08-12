@@ -962,6 +962,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                 gWeaponRadialMenuChoice = nNewChoice;
                 if (nSfxChoice >= 0)
                     sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
+                nOldMouseX = nOldMouseY = 0; // reset mouse state when using next/prev buttons
             }
         }
         else if ((klabs(nX) >= nThresholdX) || (klabs(nY) >= nThresholdY)) // above threshold, read from stick
