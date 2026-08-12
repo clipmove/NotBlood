@@ -1934,6 +1934,21 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
         nY = (200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4);
         DrawStatNumber("%3d", nAmmo, 2230, nX, nY, i == nWeaponCur ? -128 : 24, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f), 1);
     }
+    if (gRadialMenuReticle)
+    {
+        int nX = gWeaponRadialMenuY, nY = gWeaponRadialMenuX;
+        const int nDist = approxDist(nX, nY), kDistMax = 960;
+        if (nDist < 64)
+            return;
+        if (nDist > kDistMax) // clamp reticle
+        {
+            const int nAng = getangle(gWeaponRadialMenuX, gWeaponRadialMenuY);
+            nX = mulscale30(kDistMax, Sin(nAng));
+            nY = mulscale30(kDistMax, Cos(nAng));
+        }
+        int nReticleSize[3] = {fix16_from_float(0.5f), fix16_from_float(0.66f), fix16_from_float(0.8f)};
+        DrawStatMaskedSprite(1128, gRadialMenuPosition+(nX>>4), (200>>1)-(200>>5)+(nY>>4), -127, 2, !gRadialMenuDimHud ? RS_AUTO : RS_AUTO|RS_TRANS_MASK, nReticleSize[ClipHigh(gRadialMenuReticle-1, 2)]);
+    }
 }
 
 void viewDrawMapTitle(void)

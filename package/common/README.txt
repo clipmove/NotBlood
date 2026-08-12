@@ -300,8 +300,8 @@ If you have the GOG version of the game, do the following:
    - Toggles crouch button (0:hold, 1:toggle)
 * in_radialmenuslowdown
    - Enable/disable the radial menu slow down behavior
-* in_radialmenumousethreshold
-   - Sets the radial menu mouse threshold (0-2048)
+* in_radialmenumousesensitivity
+   - Sets the radial menu mouse sensitivity
 * in_radialmenuthresholdx
    - Sets the radial menu x threshold (0-1024)
 * in_radialmenuthresholdy
@@ -324,6 +324,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable invert radial menu pitch input
 * in_radialmenuclick
    - Set radial menu sound effect click (0-3)
+* in_radialmenureticle
+   - Show radial menu reticle (0: off, 1: small: 2: medium, 3: large)
 * in_targetaimassist
    - Enable/disable slowing camera movement when aiming towards a target (joystick only)
 * notarget
