@@ -98,7 +98,8 @@ void SetRadialMenuDimBackground(CGameMenuItemZBool *);
 void SetRadialMenuDimHUD(CGameMenuItemZBool *);
 void SetRadialMenuSlowDown(CGameMenuItemZBool *);
 void SetRadialMenuSound(CGameMenuItemZCycle *);
-void SetRadialMenuMouseThreshold(CGameMenuItemSlider *);
+void SetRadialMenuReticle(CGameMenuItemZCycle *);
+void SetRadialMenuMouseSensitivity(CGameMenuItemSlider *);
 void SetRadialMenuThreshold(CGameMenuItemSlider *);
 void SetRadialMenuYaw(CGameMenuItemZCycle *);
 void SetRadialMenuYawInvert(CGameMenuItemZBool *);
@@ -1163,12 +1164,20 @@ const char *zRadialMenuToggle[] =
     "Weapon Switch",
 };
 
-const char *pzSoundClickStrings[] =
+const char *pzRadileMenuSoundStrings[] =
 {
     "OFF",
     "SHARP",
     "MEDIUM",
     "SOFT",
+};
+
+const char *pzRadileMenuReticle[] =
+{
+    "OFF",
+    "ON (SMALL)",
+    "ON (MEDIUM)",
+    "ON (LARGE)",
 };
 
 const char *zRadialMenuAxes[] =
@@ -1220,19 +1229,20 @@ CGameMenuItemSliderFloat itemOptionsControlMouseXSensitivity("HORIZ SENS:", 3, 6
 CGameMenuItemSliderFloat itemOptionsControlMouseYSensitivity("VERT SENS:", 3, 66, 120, 180, &CONTROL_MouseAxesSensitivity[1], 0.f, 100.f, 1.f, SetMouseYSensitivity, -1, -1, kMenuSliderValue);
 
 CGameMenuItemTitle itemOptionsControlRadialTitle("RADIAL SETUP", 1, 160, 20, 2038);
-CGameMenuItemZCycle itemOptionsControlRadialToggle("USAGE BEHAVIOR:", 3, 66, 45, 180, 0, SetRadialMenuToggle, zRadialMenuToggle, ARRAY_SIZE(zRadialMenuToggle), 0);
-CGameMenuItemSlider itemOptionsControlRadialPosition("POSITION:", 3, 66, 55, 180, &gRadialMenuPosition, 0, 320, 16, SetRadialMenuPosition, -1, -1, kMenuSliderPercent);
-CGameMenuItemZBool itemOptionsControlRadialDimBackground("DIM BACKGROUND:", 3, 66, 65, 180, 0, SetRadialMenuDimBackground, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlRadialDimHUD("TRANSPARENT RADIAL:", 3, 66, 75, 180, 0, SetRadialMenuDimHUD, NULL, NULL);
-CGameMenuItemZBool itemOptionsControlRadialSlowDown("MENU SLOW DOWN:", 3, 66, 85, 180, 0, SetRadialMenuSlowDown, NULL, NULL);
-CGameMenuItemZCycle itemOptionsControlRadialSound("SOUND CLICK:", 3, 66, 95, 180, 0, SetRadialMenuSound, pzSoundClickStrings, ARRAY_SIZE(pzSoundClickStrings), 0);
-CGameMenuItemSlider itemOptionsControlRadialMouseThreshold("MOUSE THRESHOLD:", 3, 66, 105, 180, &gRadialMenuMouseThreshold, 0, 2048, 128, SetRadialMenuMouseThreshold, -1, -1, kMenuSliderPercent);
-CGameMenuItemSlider itemOptionsControlRadialThresholdX("JOY X THRESHOLD:", 3, 66, 115, 180, &gRadialMenuThresholdX, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
-CGameMenuItemSlider itemOptionsControlRadialThresholdY("JOY Y THRESHOLD:", 3, 66, 125, 180, &gRadialMenuThresholdY, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
-CGameMenuItemZCycle itemOptionsControlRadialYaw("JOY X AXIS:", 3, 66, 135, 180, 0, SetRadialMenuYaw, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
-CGameMenuItemZBool itemOptionsControlRadialYawInvert("JOY X INVERT:", 3, 66, 145, 180, 0, SetRadialMenuPitchInvert, NULL, NULL);
-CGameMenuItemZCycle itemOptionsControlRadialPitch("JOY Y AXIS:", 3, 66, 155, 180, 0, SetRadialMenuPitch, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
-CGameMenuItemZBool itemOptionsControlRadialPitchInvert("JOY Y INVERT:", 3, 66, 165, 180, 0, SetRadialMenuYawInvert, NULL, NULL);
+CGameMenuItemZCycle itemOptionsControlRadialToggle("USAGE BEHAVIOR:", 3, 66, 40, 180, 0, SetRadialMenuToggle, zRadialMenuToggle, ARRAY_SIZE(zRadialMenuToggle), 0);
+CGameMenuItemSlider itemOptionsControlRadialPosition("POSITION:", 3, 66, 50, 180, &gRadialMenuPosition, 0, 320, 16, SetRadialMenuPosition, -1, -1, kMenuSliderPercent);
+CGameMenuItemZBool itemOptionsControlRadialDimBackground("DIM BACKGROUND:", 3, 66, 60, 180, 0, SetRadialMenuDimBackground, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlRadialDimHUD("TRANSPARENT RADIAL:", 3, 66, 70, 180, 0, SetRadialMenuDimHUD, NULL, NULL);
+CGameMenuItemZBool itemOptionsControlRadialSlowDown("MENU SLOW DOWN:", 3, 66, 80, 180, 0, SetRadialMenuSlowDown, NULL, NULL);
+CGameMenuItemZCycle itemOptionsControlRadialSound("SOUND CLICK:", 3, 66, 90, 180, 0, SetRadialMenuSound, pzRadileMenuSoundStrings, ARRAY_SIZE(pzRadileMenuSoundStrings), 0);
+CGameMenuItemZCycle itemOptionsControlRadialReticle("SHOW RETICLE:", 3, 66, 100, 180, 0, SetRadialMenuReticle, pzRadileMenuReticle, ARRAY_SIZE(pzRadileMenuReticle), 0);
+CGameMenuItemSlider itemOptionsControlRadialMouseSensitivity("MOUSE SENSITIVTY:", 3, 66, 110, 180, &gRadialMenuMouseSensitivity, fix16_from_float(0.1f), fix16_from_float(3.f), fix16_from_float(0.1f), SetRadialMenuMouseSensitivity, -1, -1, kMenuSliderQ16);
+CGameMenuItemSlider itemOptionsControlRadialThresholdX("JOY X THRESHOLD:", 3, 66, 120, 180, &gRadialMenuThresholdX, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
+CGameMenuItemSlider itemOptionsControlRadialThresholdY("JOY Y THRESHOLD:", 3, 66, 130, 180, &gRadialMenuThresholdY, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
+CGameMenuItemZCycle itemOptionsControlRadialYaw("JOY X AXIS:", 3, 66, 140, 180, 0, SetRadialMenuYaw, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlRadialYawInvert("JOY X INVERT:", 3, 66, 150, 180, 0, SetRadialMenuPitchInvert, NULL, NULL);
+CGameMenuItemZCycle itemOptionsControlRadialPitch("JOY Y AXIS:", 3, 66, 160, 180, 0, SetRadialMenuPitch, zRadialMenuAxes, ARRAY_SIZE(zRadialMenuAxes), 0);
+CGameMenuItemZBool itemOptionsControlRadialPitchInvert("JOY Y INVERT:", 3, 66, 170, 180, 0, SetRadialMenuYawInvert, NULL, NULL);
 
 void SetupNetworkMenu(void);
 void SetupNetworkHostMenu(CGameMenuItemChain *pItem);
@@ -2381,7 +2391,8 @@ void SetupControlsMenu(void)
     menuOptionsControlRadial.Add(&itemOptionsControlRadialDimHUD, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialSlowDown, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialSound, false);
-    menuOptionsControlRadial.Add(&itemOptionsControlRadialMouseThreshold, false);
+    menuOptionsControlRadial.Add(&itemOptionsControlRadialReticle, false);
+    menuOptionsControlRadial.Add(&itemOptionsControlRadialMouseSensitivity, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialThresholdX, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialThresholdY, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialYaw, false);
@@ -2395,8 +2406,9 @@ void SetupControlsMenu(void)
     itemOptionsControlRadialDimBackground.at20 = gRadialMenuDimBackground;
     itemOptionsControlRadialDimHUD.at20 = gRadialMenuDimHud;
     itemOptionsControlRadialSlowDown.at20 = gRadialMenuSlowDown;
-    itemOptionsControlRadialSound.m_nFocus = gRadialMenuSfx % ARRAY_SSIZE(pzSoundClickStrings);
-    itemOptionsControlRadialMouseThreshold.nValue = gRadialMenuMouseThreshold;
+    itemOptionsControlRadialSound.m_nFocus = gRadialMenuSfx % ARRAY_SSIZE(pzRadileMenuSoundStrings);
+    itemOptionsControlRadialReticle.m_nFocus = gRadialMenuReticle % ARRAY_SSIZE(pzRadileMenuReticle);
+    itemOptionsControlRadialMouseSensitivity.nValue = gRadialMenuMouseSensitivity;
     itemOptionsControlRadialThresholdX.nValue = gRadialMenuThresholdX;
     itemOptionsControlRadialThresholdY.nValue = gRadialMenuThresholdY;
     itemOptionsControlRadialYaw.m_nFocus = gRadialMenuYaw % ARRAY_SSIZE(zRadialMenuAxes);
@@ -2961,12 +2973,17 @@ void SetRadialMenuSlowDown(CGameMenuItemZBool *pItem)
 
 void SetRadialMenuSound(CGameMenuItemZCycle *pItem)
 {
-    gRadialMenuSfx = pItem->m_nFocus % ARRAY_SIZE(pzSoundClickStrings);
+    gRadialMenuSfx = pItem->m_nFocus % ARRAY_SIZE(pzRadileMenuSoundStrings);
 }
 
-void SetRadialMenuMouseThreshold(CGameMenuItemSlider *pItem)
+void SetRadialMenuReticle(CGameMenuItemZCycle *pItem)
 {
-    gRadialMenuMouseThreshold = pItem->nValue;
+    gRadialMenuReticle = pItem->m_nFocus % ARRAY_SIZE(pzRadileMenuReticle);
+}
+
+void SetRadialMenuMouseSensitivity(CGameMenuItemSlider *pItem)
+{
+    gRadialMenuMouseSensitivity = pItem->nValue;
 }
 
 void SetRadialMenuThreshold(CGameMenuItemSlider *pItem)

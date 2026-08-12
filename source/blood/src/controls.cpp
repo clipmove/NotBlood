@@ -739,6 +739,8 @@ void ctrlJoystickRumble(int nTime)
 
 int gWeaponRadialMenuState = 0;
 int gWeaponRadialMenuChoice = -1;
+int gWeaponRadialMenuX = 0;
+int gWeaponRadialMenuY = 0;
 
 void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
 {
@@ -788,6 +790,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             gTimeSlowed = false;
         }
         nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
+        gWeaponRadialMenuX = gWeaponRadialMenuY = 0;
         return;
     }
 
@@ -844,15 +847,22 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     int nThresholdX, nThresholdY;
     if (!nX && !nY) // no input, defaul to mouse input
     {
-        nOldMouseY += pInput->mousey;
-        nX = nOldMouseY>>2;
-        if (MIRRORMODE & 2) // mirror mode (vert), invert y axis
-            nX = -nX;
-        nOldMouseX += pInput->mousex;
+        nOldMouseY += mulscale16(pInput->mousey, gRadialMenuMouseSensitivity);
+        nOldMouseX += mulscale16(pInput->mousex, gRadialMenuMouseSensitivity);
+        nThresholdX = nThresholdY = 384;
+        const int nDist = approxDist(nOldMouseY, nOldMouseX), kDistMax = 3839;
+        if (nDist > kDistMax+(4096-3839)) // clamp reticle
+        {
+            const int nAng = getangle(nOldMouseY, nOldMouseX);
+            nOldMouseX = mulscale30(kDistMax, Sin(nAng));
+            nOldMouseY = mulscale30(kDistMax, Cos(nAng));
+        }
         nY = nOldMouseX>>2;
         if (MIRRORMODE & 1) // mirror mode (horiz), invert controls
             nY = -nY;
-        nThresholdX = nThresholdY = gRadialMenuMouseThreshold;
+        nX = nOldMouseY>>2;
+        if (MIRRORMODE & 2) // mirror mode (vert), invert y axis
+            nX = -nX;
     }
     else
     {
@@ -880,7 +890,10 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     case 0:
     {
         if (!bButton)
+        {
+            nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
             break;
+        }
         gWeaponRadialMenuState = gRadialMenuToggle ? 4 : 1;
         if (gRadialMenuSlowDown && (gGameOptions.nGameType == kGameTypeSinglePlayer)) // only allow slowdown during singleplayer
         {
@@ -1005,8 +1018,6 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         }
         else // player not moving stick above threshold or pressing next/previous weapon buttons - don't update selection
             break;
-        nOldMouseX = ClipRange(nOldMouseX, -nThresholdX*2, nThresholdX*2); // picked a slot, clamp mouse state
-        nOldMouseY = ClipRange(nOldMouseY, -nThresholdY*2, nThresholdY*2);
         break;
     }
     case 2:
@@ -1044,4 +1055,6 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     default:
         break;
     }
+    gWeaponRadialMenuX = nX;
+    gWeaponRadialMenuY = nY;
 }
