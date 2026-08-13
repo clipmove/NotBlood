@@ -326,6 +326,8 @@ If you have the GOG version of the game, do the following:
    - Set radial menu sound effect click (0-3)
 * in_radialmenureticle
    - Show radial menu reticle (0: off, 1: small: 2: medium, 3: large)
+* in_radialmenureticleposition
+   - Set radial menu reticle position (0: locked, 1: moving)
 * in_targetaimassist
    - Enable/disable slowing camera movement when aiming towards a target (joystick only)
 * notarget

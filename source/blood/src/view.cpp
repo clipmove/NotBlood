@@ -1938,9 +1938,9 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
     {
         int nX = gWeaponRadialMenuY, nY = gWeaponRadialMenuX;
         const int nDist = approxDist(nX, nY), kDistMax = 960;
-        if (nDist < 64)
+        if (!gRadialMenuReticlePosition ? !gWeaponRadialMenuSelectionActive : (nDist < 64))
             return;
-        if (nDist > kDistMax) // clamp reticle
+        if (nDist > kDistMax || !gRadialMenuReticlePosition) // clamp reticle
         {
             const int nAng = getangle(gWeaponRadialMenuX, gWeaponRadialMenuY);
             nX = mulscale30(kDistMax, Sin(nAng));
