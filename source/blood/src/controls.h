@@ -118,6 +118,7 @@ extern int gWeaponRadialMenuState;
 extern int gWeaponRadialMenuChoice;
 extern int gWeaponRadialMenuX;
 extern int gWeaponRadialMenuY;
+extern int gWeaponRadialMenuSelectionActive;
 
 int32_t ctrlCheckAllInput(void);
 void ctrlClearAllInput(void);

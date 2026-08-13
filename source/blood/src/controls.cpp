@@ -741,6 +741,7 @@ int gWeaponRadialMenuState = 0;
 int gWeaponRadialMenuChoice = -1;
 int gWeaponRadialMenuX = 0;
 int gWeaponRadialMenuY = 0;
+int gWeaponRadialMenuSelectionActive = 0;
 
 void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
 {
@@ -791,6 +792,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         }
         nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
         gWeaponRadialMenuX = gWeaponRadialMenuY = 0;
+        gWeaponRadialMenuSelectionActive = 0;
         return;
     }
 
@@ -885,6 +887,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             gInput.keyFlags.prevWeapon = 1;
     }
 
+    gWeaponRadialMenuSelectionActive = 0;
     switch (gWeaponRadialMenuState)
     {
     case 0:
@@ -967,6 +970,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         }
         else if ((klabs(nX) >= nThresholdX) || (klabs(nY) >= nThresholdY)) // above threshold, read from stick
         {
+            gWeaponRadialMenuSelectionActive = 1;
             nNewChoice = getangle(nX, nY) * (12*5) / kAngMask;
             const int nChoiceRounded = nNewChoice%5;
             if ((nChoiceRounded != 0) && (nChoiceRounded != 1) && (nChoiceRounded != 4)) // if player has NOT selected the middle of slice, or the two adjacent points next to the middle, abort
