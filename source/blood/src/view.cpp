@@ -1892,6 +1892,15 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
     }
     if (gRadialMenuDimHud)
         DrawStatMaskedSprite(9287, gRadialMenuPosition, (200>>1)-(200>>5), 24, nPal, RS_AUTO|RS_TRANS_MASK, fix16_from_float(0.56f));
+    if ((gRadialMenuReticle > 0) && gWeaponRadialMenuSelectionActive)
+    {
+        const int kDistMax = 960;
+        const int nAng = getangle(gWeaponRadialMenuX, gWeaponRadialMenuY);
+        const int nX = mulscale30(kDistMax, Sin(nAng));
+        const int nY = mulscale30(kDistMax, Cos(nAng));
+        const int nReticleSize[3] = {fix16_from_float(0.5f), fix16_from_float(0.66f), fix16_from_float(0.8f)};
+        DrawStatMaskedSprite(1128, gRadialMenuPosition+(nX>>4), (200>>1)-(200>>5)+(nY>>4), -127, 2, RS_AUTO, nReticleSize[(gRadialMenuReticle&3)-1]);
+    }
     for (int i = kWeaponPitchfork; i <= kWeaponRemoteTNT; i++)
     {
         if (!WeaponIsEquipable(pPlayer, i))
@@ -1933,15 +1942,6 @@ void viewDrawWeaponRadialMenu(PLAYER *pPlayer, XSPRITE *pXSprite, const int nPal
         nX = gRadialMenuPosition+nX+(nX>>4);
         nY = (200>>1)+(int)nWeaponRadialReticlePos[nWheelSlot][1]+(nY>>4);
         DrawStatNumber("%3d", nAmmo, 2230, nX, nY, i == nWeaponCur ? -128 : 24, nPal, i == nWeaponCur ? 0 : RS_TRANS_MASK, fix16_from_float(0.8f), 1);
-    }
-    if ((gRadialMenuReticle > 0) && gWeaponRadialMenuSelectionActive)
-    {
-        const int kDistMax = 960;
-        const int nAng = getangle(gWeaponRadialMenuX, gWeaponRadialMenuY);
-        const int nX = mulscale30(kDistMax, Sin(nAng));
-        const int nY = mulscale30(kDistMax, Cos(nAng));
-        const int nReticleSize[3] = {fix16_from_float(0.5f), fix16_from_float(0.66f), fix16_from_float(0.8f)};
-        DrawStatMaskedSprite(1128, gRadialMenuPosition+(nX>>4), (200>>1)-(200>>5)+(nY>>4), -127, 2, !gRadialMenuDimHud ? RS_AUTO : RS_AUTO|RS_TRANS_MASK, nReticleSize[(gRadialMenuReticle&3)-1]);
     }
 }
 
