@@ -73,7 +73,6 @@ extern int32_t gRadialMenuPitch;
 extern int32_t gRadialMenuPitchInvert;
 extern int32_t gRadialMenuSfx;
 extern int32_t gRadialMenuReticle;
-extern int32_t gRadialMenuReticlePosition;
 extern int32_t gCrouchToggle;
 extern int32_t gCrouchAuto;
 extern int32_t gDetail;

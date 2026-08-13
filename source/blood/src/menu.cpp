@@ -99,7 +99,6 @@ void SetRadialMenuDimHUD(CGameMenuItemZBool *);
 void SetRadialMenuSlowDown(CGameMenuItemZBool *);
 void SetRadialMenuSound(CGameMenuItemZCycle *);
 void SetRadialMenuReticle(CGameMenuItemZCycle *);
-void SetRadialMenuReticlePosition(CGameMenuItemZBool *);
 void SetRadialMenuMouseSensitivity(CGameMenuItemSlider *);
 void SetRadialMenuThreshold(CGameMenuItemSlider *);
 void SetRadialMenuYaw(CGameMenuItemZCycle *);
@@ -1237,7 +1236,6 @@ CGameMenuItemZBool itemOptionsControlRadialDimHUD("TRANSPARENT RADIAL:", 3, 66, 
 CGameMenuItemZBool itemOptionsControlRadialSlowDown("MENU SLOW DOWN:", 3, 66, 80, 180, 0, SetRadialMenuSlowDown, NULL, NULL);
 CGameMenuItemZCycle itemOptionsControlRadialSound("SOUND CLICK:", 3, 66, 90, 180, 0, SetRadialMenuSound, pzRadileMenuSoundStrings, ARRAY_SIZE(pzRadileMenuSoundStrings), 0);
 CGameMenuItemZCycle itemOptionsControlRadialReticle("SHOW RETICLE:", 3, 66, 100, 180, 0, SetRadialMenuReticle, pzRadileMenuReticle, ARRAY_SIZE(pzRadileMenuReticle), 0);
-CGameMenuItemZBool itemOptionsControlRadialReticlePosition("RETICLE POSITION:", 3, 66, 110, 180, 0, SetRadialMenuReticlePosition, "MOVING", "LOCKED");
 CGameMenuItemSlider itemOptionsControlRadialMouseSensitivity("MOUSE SENSITIVTY:", 3, 66, 120, 180, &gRadialMenuMouseSensitivity, fix16_from_float(0.1f), fix16_from_float(3.f), fix16_from_float(0.1f), SetRadialMenuMouseSensitivity, -1, -1, kMenuSliderQ16);
 CGameMenuItemSlider itemOptionsControlRadialThresholdX("JOY X THRESHOLD:", 3, 66, 130, 180, &gRadialMenuThresholdX, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
 CGameMenuItemSlider itemOptionsControlRadialThresholdY("JOY Y THRESHOLD:", 3, 66, 140, 180, &gRadialMenuThresholdY, 0, 1024, 128, SetRadialMenuThreshold, -1, -1, kMenuSliderPercent);
@@ -2394,7 +2392,6 @@ void SetupControlsMenu(void)
     menuOptionsControlRadial.Add(&itemOptionsControlRadialSlowDown, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialSound, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialReticle, false);
-    menuOptionsControlRadial.Add(&itemOptionsControlRadialReticlePosition, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialMouseSensitivity, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialThresholdX, false);
     menuOptionsControlRadial.Add(&itemOptionsControlRadialThresholdY, false);
@@ -2411,7 +2408,6 @@ void SetupControlsMenu(void)
     itemOptionsControlRadialSlowDown.at20 = gRadialMenuSlowDown;
     itemOptionsControlRadialSound.m_nFocus = gRadialMenuSfx % ARRAY_SSIZE(pzRadileMenuSoundStrings);
     itemOptionsControlRadialReticle.m_nFocus = gRadialMenuReticle % ARRAY_SSIZE(pzRadileMenuReticle);
-    itemOptionsControlRadialReticlePosition.at20 = !!gRadialMenuReticlePosition;
     itemOptionsControlRadialMouseSensitivity.nValue = gRadialMenuMouseSensitivity;
     itemOptionsControlRadialThresholdX.nValue = gRadialMenuThresholdX;
     itemOptionsControlRadialThresholdY.nValue = gRadialMenuThresholdY;
@@ -2983,12 +2979,6 @@ void SetRadialMenuSound(CGameMenuItemZCycle *pItem)
 void SetRadialMenuReticle(CGameMenuItemZCycle *pItem)
 {
     gRadialMenuReticle = pItem->m_nFocus % ARRAY_SIZE(pzRadileMenuReticle);
-    itemOptionsControlRadialReticlePosition.bEnable = pItem->m_nFocus != 0;
-}
-
-void SetRadialMenuReticlePosition(CGameMenuItemZBool *pItem)
-{
-    gRadialMenuReticlePosition = pItem->at20;
 }
 
 void SetRadialMenuMouseSensitivity(CGameMenuItemSlider *pItem)
