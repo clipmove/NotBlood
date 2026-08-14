@@ -168,14 +168,6 @@ kRandomizeDude                      = 1,
 kRandomizeTX                        = 2,
 };
 
-// type of object
-enum {
-OBJ_WALL                            = 0,
-OBJ_SPRITE                          = 3,
-OBJ_SECTOR                          = 6,
-};
-
-
 enum {
 kPatrolMoveForward                  = 0,
 kPatrolMoveBackward                 = 1,

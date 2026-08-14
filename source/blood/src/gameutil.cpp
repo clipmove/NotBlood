@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "db.h"
 #include "gameutil.h"
 #include "globals.h"
+#include "mirrors.h"
 #include "tile.h"
 #include "trig.h"
 #include "warp.h"
@@ -60,9 +61,8 @@ static bool AreSectorsNeighborsDepthCheck(int nSect1, int nSect2, int nDepth, bo
             const int nSectNext = sprite[nLink].sectnum;
             if (!sectRangeIsFine(nSectNext)) // invalid sector, skip
                 continue;
-            const bool floorLinked = i == 0;
-            const int nextSectPic = floorLinked ? sector[nSectNext].ceilingpicnum : sector[nSectNext].floorpicnum;
-            if ((nextSectPic < 4080) || (nextSectPic > 4095)) // if other room is not open air, skip
+            const bool bFloorLinked = i == 0;
+            if (bFloorLinked ? IsRorSector(nSectNext, OBJ_CEILING) : IsRorSector(nSectNext, OBJ_FLOOR)) // if other room is not open air, skip
                 continue;
             if (TestBitString(pSectBit, nSectNext)) // if we've already checked this sector, skip
                 continue;
