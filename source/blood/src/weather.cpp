@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "actor.h"
 #include "gameutil.h"
 #include "levels.h"
+#include "mirrors.h"
 #include "trig.h"
 #include "weather.h"
 
@@ -289,7 +290,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
 
     // adjust to starfield relative scale
     const int origX = nX, origY = nY, origZ = nZ;
-    const char bFloorBelow = (sector[nSector].floorpicnum < 4080) || (sector[nSector].floorpicnum > 4095); // check if we're in an open air room-over-room sector
+    const char bFloorBelow = !IsRorSector(nSector, OBJ_FLOOR); // check if we're in an open air room-over-room sector
     const int nFloor = getflorzofslope(nSector, nX, nY);
     const char bStaticView = nDraw.bStaticView;
     if (!bStaticView)

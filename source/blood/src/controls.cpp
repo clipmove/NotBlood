@@ -35,6 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "globals.h"
 #include "levels.h"
 #include "map2d.h"
+#include "mirrors.h"
 #include "messages.h"
 #include "sound.h"
 #include "trig.h"
@@ -392,7 +393,7 @@ void ctrlGetInput(void)
             nY = pSprite->y;
             nZ = pSprite->z;
             getzsofslope(nSectnum, nX, nY, &cZ, &fZCurrentSect); // get current floor
-            if ((sector[nSectnum].ceilingpicnum < 4080) || (sector[nSectnum].ceilingpicnum > 4095)) // if sector does not have a fake ceiling (e.g. E4M4 elevator), checking this sector
+            if (!IsRorSector(nSectnum, OBJ_CEILING)) // if sector does not have a fake ceiling (e.g. E4M4 elevator), checking this sector
             {
                 nDiff = cZ - fZCurrentSect;
                 if ((nDiff < -3072) && (nDiff > -15000)) // we're in tiny crawl space, keep crouching
@@ -417,7 +418,7 @@ void ctrlGetInput(void)
                     break;
                 if (gLowerLink[nSectnumNew] >= 0) // we have a ror sector above us, abort
                     break;
-                if ((sector[nSectnumNew].ceilingpicnum >= 4080) && (sector[nSectnumNew].ceilingpicnum <= 4095)) // if sector HAS a fake ceiling (e.g. E4M4 elevator), skip
+                if (IsRorSector(nSectnum, OBJ_CEILING)) // if sector HAS a fake ceiling (e.g. E4M4 elevator), skip
                     continue;
                 getzsofslope(nSectnumNew, nX, nY, &cZ, &fZ);
                 if (bInAir) // if player is in air, use current Z height position as compare

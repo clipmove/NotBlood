@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "fx.h"
 #include "gameutil.h"
 #include "levels.h"
+#include "mirrors.h"
 #include "seq.h"
 #include "sfx.h"
 #include "tile.h"
@@ -317,7 +318,7 @@ void CFX::fxProcess(void)
                 {
                     int nSectnum = nSector;
                     oldPos = pSprite->xyz;
-                    const bool bOpenAirROR = (sector[pSprite->sectnum].floorpicnum >= 4080) && (sector[pSprite->sectnum].floorpicnum <= 4095);
+                    const bool bOpenAirROR = IsRorSector(pSprite->sectnum, OBJ_FLOOR);
                     if (bCasingType || bOpenAirROR) // if casing type/current sector is open air, find next floor
                     {
                         if (CheckLink(&pSprite->x, &pSprite->y, &pSprite->z, &nSectnum)) // if found ror floor underneath

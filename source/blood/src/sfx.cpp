@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "config.h"
 #include "gameutil.h"
+#include "mirrors.h"
 #include "player.h"
 #include "resource.h"
 #include "sfx.h"
@@ -134,12 +135,12 @@ inline void Calc3DSects(int *srcx, int *srcy, int *srcz, const int srcsect, cons
         return;
 
     const int nUpper = gUpperLink[srcsect], nLower = gLowerLink[srcsect];
-    if ((nUpper >= 0) && (sector[sprite[nUpper].sectnum].floorpicnum >= 4080) && (sector[sprite[nUpper].sectnum].floorpicnum <= 4095)) // sector has a ror upper link
+    if ((nUpper >= 0) && IsRorSector(sprite[nUpper].sectnum, OBJ_FLOOR)) // sector has a ror upper link
     {
         if (Calc3DSectOffset(&sprite[nUpper], srcx, srcy, srcz, pCanSeeSect, dstsect))
             return;
     }
-    if ((nLower >= 0) && (sector[sprite[nLower].sectnum].ceilingpicnum >= 4080) && (sector[sprite[nLower].sectnum].ceilingpicnum <= 4095)) // sector has a ror lower link
+    if ((nLower >= 0) && IsRorSector(sprite[nLower].sectnum, OBJ_CEILING)) // sector has a ror lower link
     {
         if (Calc3DSectOffset(&sprite[nLower], srcx, srcy, srcz, pCanSeeSect, dstsect))
             return;
