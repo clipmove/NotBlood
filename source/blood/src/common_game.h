@@ -45,7 +45,7 @@ extern int g_useCwd;
 #define BLOODWIDESCREENDEF "blood_widescreen.def"
 #define NOTBLOODDEF "notblood.def"
 
-#define BYTEVERSION 130
+#define BYTEVERSION 131
 
 void _SetErrorLoc(const char *pzFile, int nLine);
 void _ThrowError(const char *pzFormat, ...);
@@ -119,6 +119,15 @@ void _consoleSysMsg(const char* pMessage, ...);
 #define kDmgMax 7
 
 #define kCauserGame (kMaxSprites - 1)
+
+// OBJECT TYPES //////////////////////////////////////////////////
+enum {
+OBJ_WALL                            = 0,
+OBJ_CEILING                         = 1,
+OBJ_FLOOR                           = 2,
+OBJ_SPRITE                          = 3,
+OBJ_SECTOR                          = 6,
+};
 
 // GAMETYPES //////////////////////////////////////////////////
 enum {

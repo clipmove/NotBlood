@@ -39,6 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "mmulti.h"
 #include "nnexts.h"
 #include "nnextsif.h"
+#include "mirrors.h"
 
 #define kSerialStep					        100000
 
@@ -544,17 +545,7 @@ static char wallCmpOverpicnum(void)     { return Cmp(pWall->overpicnum); }
 static char wallChkShow2dWall(void)     { return TestBitString(show2dwall, objIndex); }
 static char wallChkIsMirror(void)
 {
-#if 0
-    // new ROR code
-    int i = mirrorcnt;
-    while (--i >= 0)
-    {
-        if (mirror[i].type == 0 && mirror[i].id == objIndex)
-            return true;
-    }
-#else
-    return (pWall->type != kWallStack && Cmp(pWall->picnum, 4080, (4080 + 16) - 1));
-#endif
+    return (pWall->type != kWallStack && Cmp(pWall->picnum, mirrorPicStart, mirrorPicEnd-1));
 }
 
 static char wallChkSector(void)         { return helperChkSector(sectorofwall(objIndex)); }

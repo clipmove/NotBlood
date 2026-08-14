@@ -2,6 +2,7 @@
 /*
 Copyright (C) 2010-2019 EDuke32 developers and contributors
 Copyright (C) 2019 Nuke.YKT
+Copyright (C) 2026 NoOne
 
 This file is part of NBlood.
 
@@ -22,9 +23,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //-------------------------------------------------------------------------
 #pragma once
 #include "fix16.h"
+
+#define kMaxMirrors             128
+
+extern uint16_t mirrorPicStart;
+extern uint16_t mirrorPicEnd;
+extern uint16_t mirrorcnt;
+
+extern char gMirrorDrawing;
+
 void InitMirrors(void);
 void sub_5571C(char mode);
 void sub_557C4(int x, int y, int interpolation);
 void DrawMirrors(int x, int y, int z, fix16_t a, fix16_t horiz, int smooth, int viewPlayer);
 
-extern bool gMirrorDrawing;
+char IsRorSector(int nSect, int stat);
+char ROR_TestGotPic(int n);
+void ROR_ClearGotPic(int n);
+void ROR_ClearGotPic(void);
