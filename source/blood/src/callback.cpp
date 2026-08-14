@@ -37,6 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "gameutil.h"
 #include "globals.h"
 #include "levels.h"
+#include "mirrors.h"
 #include "player.h"
 #include "replace.h"
 #include "seq.h"
@@ -452,7 +453,7 @@ void fxBloodBits(int nSprite) // 14
             gFX.fxFree(nSprite);
             return;
         }
-        if ((sector[nSector].floorpicnum >= 4080) && (sector[nSector].floorpicnum <= 4095)) // if sector is open air, delete fx
+        if (IsRorSector(nSector, OBJ_FLOOR)) // if sector is open air, delete fx
         {
             gFX.fxFree(nSprite);
             return;
