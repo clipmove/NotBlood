@@ -48,6 +48,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "sfx.h"
 #include "seq.h"
 #include "ai.h"
+#include "mirrors.h"
 #ifdef WITHKPLIB
 #include "kplib.h"
 #endif
@@ -2780,13 +2781,12 @@ void usePropertiesChanger(XSPRITE* pXSource, short objType, int objIndex) {
                                 pLower->type = kMarkerLowWater;
                                 break;
                             default:
-                                if (pSector->ceilingpicnum < 4080 || pSector->ceilingpicnum > 4095) pXLower->sysData1 = kMarkerLowLink;
-                                else pXLower->sysData1 = kMarkerLowStack;
+                                pXLower->sysData1 = (IsRorSector(objIndex, OBJ_CEILING)) ? kMarkerLowStack : kMarkerLowLink;
                                 break;
                         }
                     }
                     else if (pXLower->sysData1 > 0) pLower->type = pXLower->sysData1;
-                    else if (pSector->ceilingpicnum < 4080 || pSector->ceilingpicnum > 4095) pLower->type = kMarkerLowLink;
+                    else if (!IsRorSector(objIndex, OBJ_CEILING)) pLower->type = kMarkerLowLink;
                     else pLower->type = kMarkerLowStack;
                 }
 
@@ -2799,13 +2799,12 @@ void usePropertiesChanger(XSPRITE* pXSource, short objType, int objIndex) {
                                 pUpper->type = kMarkerUpWater;
                                 break;
                             default:
-                                if (pSector->floorpicnum < 4080 || pSector->floorpicnum > 4095) pXUpper->sysData1 = kMarkerUpLink;
-                                else pXUpper->sysData1 = kMarkerUpStack;
+                                pXLower->sysData1 = (IsRorSector(objIndex, OBJ_FLOOR)) ? kMarkerUpStack : kMarkerUpLink;
                                 break;
                         }
                     }
                     else if (pXUpper->sysData1 > 0) pUpper->type = pXUpper->sysData1;
-                    else if (pSector->floorpicnum < 4080 || pSector->floorpicnum > 4095) pUpper->type = kMarkerUpLink;
+                    else if (!IsRorSector(objIndex, OBJ_FLOOR)) pUpper->type = kMarkerUpLink;
                     else pUpper->type = kMarkerUpStack;
                 }
 

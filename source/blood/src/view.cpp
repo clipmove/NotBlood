@@ -2512,16 +2512,16 @@ tspritetype *viewAddEffect(int nTSprite, VIEW_EFFECT nViewEffect)
                 pNSprite->z = top;
                 pNSprite->z--; // offset from fake floor so it isn't z-fighting when being rendered
             }
-            else if ((sector[pNSprite->sectnum].floorpicnum >= 4080) && (sector[pNSprite->sectnum].floorpicnum <= 4095)) // if floor has ror, find actual floor
+            else if (IsRorSector(pNSprite->sectnum, OBJ_FLOOR)) // if floor has ror, find actual floor
             {
                 int cX = pNSprite->x, cY = pNSprite->y, cZ = pNSprite->z, cZrel = pNSprite->z, nSectnum = pNSprite->sectnum;
-                for (int i = 0; i < 16; i++) // scan through max stacked sectors
+                for (int i = 0; i < mirrorcnt; i++) // scan through max stacked sectors
                 {
                     if (!CheckLink(&cX, &cY, &cZ, &nSectnum)) // if no more floors underneath, abort
                         break;
                     const int newFloorZ = getflorzofslope(nSectnum, cX, cZ);
                     cZrel += newFloorZ - cZ; // get height difference for next sector's ceiling/floor, and add to relative height for shadow
-                    if ((sector[nSectnum].floorpicnum < 4080) || (sector[nSectnum].floorpicnum > 4095)) // if current sector is not open air, use as floor for shadow casting, otherwise continue to next sector
+                    if (!IsRorSector(nSectnum, OBJ_FLOOR)) // if current sector is not open air, use as floor for shadow casting, otherwise continue to next sector
                         break;
                     cZ = newFloorZ;
                 }
@@ -2560,7 +2560,7 @@ tspritetype *viewAddEffect(int nTSprite, VIEW_EFFECT nViewEffect)
         sectortype *pSector = &sector[pTSprite->sectnum];
         if (!VanillaMode()) // if ceiling has ror, don't render effect
         {
-            if ((pSector->ceilingpicnum >= 4080) && (pSector->ceilingpicnum <= 4095))
+            if (IsRorSector(pTSprite->sectnum, OBJ_CEILING))    
                 break;
         }
         auto pNSprite = viewInsertTSprite(pTSprite->sectnum, 32767, pTSprite);
@@ -2583,7 +2583,7 @@ tspritetype *viewAddEffect(int nTSprite, VIEW_EFFECT nViewEffect)
         sectortype *pSector = &sector[pTSprite->sectnum];
         if (!VanillaMode()) // if floor has ror, don't render effect
         {
-            if ((pSector->floorpicnum >= 4080) && (pSector->floorpicnum <= 4095))
+            if (IsRorSector(pTSprite->sectnum, OBJ_FLOOR))   
                 break;
         }
         auto pNSprite = viewInsertTSprite(pTSprite->sectnum, 32767, pTSprite);
@@ -3429,8 +3429,8 @@ void UpdateDacs(int nPalette, bool bNoTint)
     }
 }
 
-char otherMirrorGotpic[2];
-char bakMirrorGotpic[2];
+char otherMirrorGotpic[kMaxMirrors >> 3];
+char bakMirrorGotpic[kMaxMirrors >> 3];
 // int gVisibility;
 
 int deliriumTilt, deliriumTurn, deliriumPitch;
@@ -3740,8 +3740,8 @@ void viewDrawScreen(void)
             CheckLink(&vd8, &vd4, &vd0, &vcc);
             if (IsUnderwaterSector(vcc))
                 nPalCrystalBall = 10;
-            memcpy(bakMirrorGotpic, gotpic+510, 2);
-            memcpy(gotpic+510, otherMirrorGotpic, 2);
+            memcpy(bakMirrorGotpic, &gotpic[mirrorPicStart >> 3], kMaxMirrors >> 3);
+            memcpy(&gotpic[mirrorPicStart >> 3], otherMirrorGotpic, kMaxMirrors >> 3);
             g_visibility = (int32_t)(ClipLow(gVisibility-32*pOther->visibility, 0) * (numplayers > 1 ? 1.f : r_ambientlightrecip));
             int vc4, vc8;
             getzsofslope(vcc, vd8, vd4, &vc8, &vc4);
@@ -3756,24 +3756,24 @@ void viewDrawScreen(void)
             v54 = ClipRange(v54, -200, 200);
             int nRORLimit = 32; // limit ROR rendering to 32 times
 RORHACKOTHER:
-            int ror_status[16];
-            for (int i = 0; i < 16; i++)
-                ror_status[i] = TestBitString(gotpic, 4080 + i);
+            char ror_status[kMaxMirrors];
+            for (int i = 0; i < mirrorcnt; i++)
+                ror_status[i] = ROR_TestGotPic(i);
             yax_preparedrawrooms();
             DrawMirrors(vd8, vd4, vd0, fix16_from_int(v50), fix16_from_int(v54 + defaultHoriz), gInterpolate, -1);
             drawrooms(vd8, vd4, vd0, v50, v54 + defaultHoriz, vcc);
             yax_drawrooms(viewProcessSprites, vcc, 0, gInterpolate);
-            for (int i = 0; nRORLimit && (i < 16); i++) // check if ror needs to be rendered
+            for (int i = 0; nRORLimit && (i < mirrorcnt); i++) // check if ror needs to be rendered
             {
-                if (ror_status[i] != TestBitString(gotpic, 4080 + i))
+                if (ror_status[i] != ROR_TestGotPic(i))
                 {
                     spritesortcnt = 0;
                     nRORLimit--;
                     goto RORHACKOTHER;
                 }
             }
-            memcpy(otherMirrorGotpic, gotpic+510, 2);
-            memcpy(gotpic+510, bakMirrorGotpic, 2);
+            memcpy(otherMirrorGotpic, &gotpic[mirrorPicStart >> 3], kMaxMirrors >> 3);
+            memcpy(&gotpic[mirrorPicStart >> 3], bakMirrorGotpic, kMaxMirrors >> 3);
             viewProcessSprites(vd8, vd4, vd0, v50, gInterpolate);
             renderDrawMasks();
             renderRestoreTarget();
@@ -3840,9 +3840,9 @@ RORHACKOTHER:
         int nRORLimit = 32; // limit ROR rendering to 32 times
         ClearGotSectorSectorFX();
 RORHACK:
-        int ror_status[16];
-        for (int i = 0; i < 16; i++)
-            ror_status[i] = TestBitString(gotpic, 4080+i);
+        char ror_status[kMaxMirrors];
+        for (int i = 0; i < mirrorcnt; i++)
+            ror_status[i] = ROR_TestGotPic(i);
         fix16_t deliriumPitchI = gViewInterpolate ? interpolate(fix16_from_int(deliriumPitchO), fix16_from_int(deliriumPitch), gInterpolate) : fix16_from_int(deliriumPitch);
         DrawMirrors(cX, cY, cZ, cA, q16horiz + fix16_from_int(defaultHoriz) + deliriumPitchI, gInterpolate, bLink && !VanillaMode() ? gViewIndex : -1); // only hide self sprite while traversing between sector
         int bakCstat = gView->pSprite->cstat;
@@ -3863,9 +3863,9 @@ RORHACK:
         UpdateGotSectorSectorFX();
         yax_drawrooms(viewProcessSprites, nSectnum, 0, gInterpolate);
         viewProcessSprites(cX, cY, cZ, fix16_to_int(cA), gInterpolate);
-        for (int i = 0; nRORLimit && (i < 16); i++) // check if ror needs to be rendered
+        for (int i = 0; nRORLimit && (i < mirrorcnt); i++) // check if ror needs to be rendered
         {
-            if (ror_status[i] != TestBitString(gotpic, 4080+i))
+            if (ror_status[i] != ROR_TestGotPic(i))
             {
                 gView->pSprite->cstat = bakCstat;
                 spritesortcnt = 0;
