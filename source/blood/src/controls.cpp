@@ -745,6 +745,7 @@ int gWeaponRadialMenuSelectionActive = 0;
 
 void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
 {
+    static char bDisabledJoystickSnapZone = 0;
     const char *sSfxSound[3] = {"runeuse", "footstn1", "footstn2"};
     const int nSfxVol[3] = {42, 44, 64};
     const int nSfxFreq[3] = {14600, 11025, 11025};
@@ -789,6 +790,12 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         {
             timerInit(CLOCKTICKSPERSECOND);
             gTimeSlowed = false;
+        }
+        if (bDisabledJoystickSnapZone) // restore
+        {
+            for (int i = 0; i < MAXJOYAXES; i++)
+                JOYSTICK_SetSnapZone(i, JoystickAnalogueSnap[i]);
+            bDisabledJoystickSnapZone = 0;
         }
         nOldMouseX = nOldMouseY = 0; // reset mouse state when radial is closed
         gWeaponRadialMenuX = gWeaponRadialMenuY = 0;
@@ -902,6 +909,12 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         {
             timerInit(CLOCKTICKSPERSECOND>>4);
             gTimeSlowed = true;
+        }
+        if (!bDisabledJoystickSnapZone) // disable
+        {
+            for (int i = 0; i < MAXJOYAXES; i++)
+                JOYSTICK_SetSnapZone(i, 0);
+            bDisabledJoystickSnapZone = 1;
         }
         if ((gMe->input.newWeapon >= kWeaponPitchfork) && (gMe->input.newWeapon <= kWeaponRemoteTNT)) // set the reticle to the weapon being switched to
             gWeaponRadialMenuChoice = gMe->input.newWeapon;
@@ -1039,6 +1052,12 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         {
             timerInit(CLOCKTICKSPERSECOND);
             gTimeSlowed = false;
+        }
+        if (bDisabledJoystickSnapZone) // restore
+        {
+            for (int i = 0; i < MAXJOYAXES; i++)
+                JOYSTICK_SetSnapZone(i, 0);
+            bDisabledJoystickSnapZone = 0;
         }
         break;
     }
