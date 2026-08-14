@@ -1056,7 +1056,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
         if (bDisabledJoystickSnapZone) // restore
         {
             for (int i = 0; i < MAXJOYAXES; i++)
-                JOYSTICK_SetSnapZone(i, 0);
+                JOYSTICK_SetSnapZone(i, JoystickAnalogueSnap[i]);
             bDisabledJoystickSnapZone = 0;
         }
         break;
