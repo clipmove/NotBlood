@@ -4,6 +4,8 @@ Reverse-engineered ports of Build games using EDuke32 engine technology and deve
 ## NBlood
 Blood port based on EDuke32.
 
+<img width="320" height="240" alt="screenshot" src="https://github.com/user-attachments/assets/f517d412-ac7f-4002-ab47-35e41bab9f26" />
+
 ### Installing
 If you have a digital copy of Blood installed, such as from Steam or GOG, no installation is necessary! Otherwise:
 
@@ -40,6 +42,8 @@ NBlood now uses nblood_cvars.cfg instead of settings.cfg. Please rename your set
 ## PCExhumed
 A port of the PC version of Exhumed based on EDuke32.
 
+<img width="320" height="240" alt="screenshot" src="https://github.com/user-attachments/assets/43ec8959-a6e6-4d8c-a4a9-3d3f9f08d65a" />
+
 ### Installing
 If you have a digital copy of PowerSlave (DOS Classic Edition) installed, such as from Steam or GOG, no installation is necessary! Otherwise:
 
@@ -67,6 +71,8 @@ To change the FOV, add a new line to settings.cfg, e.g. 'fov "120"' where 120 is
 
 ## Rednukem
 A port of several BUILD Engine games derived from the Duke Nukem 3D codebase, based on EDuke32.
+
+<img width="320" height="240" alt="screenshot" src="https://github.com/user-attachments/assets/e7650c88-3907-47c3-81eb-2fb012435ca2" />
 
 ### Supported games
 
