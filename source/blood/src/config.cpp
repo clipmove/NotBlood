@@ -143,6 +143,7 @@ int32_t gMessageFont;
 int32_t gSecretStyle;
 int32_t gShotgunAltFireReload;
 int32_t gGibNoClip;
+int32_t gGibHeadNoClip;
 int32_t gStereo;
 int32_t gPlayerTeamPreference;
 int32_t gPlayerColorPreference;
@@ -601,6 +602,7 @@ void CONFIG_SetDefaults(void)
     gSecretStyle = 1;
     gShotgunAltFireReload = 0;
     gGibNoClip = 0;
+    gGibHeadNoClip = 0;
     gStereo = 1;
     gPlayerTeamPreference = 0;
     gPlayerColorPreference = 0;
