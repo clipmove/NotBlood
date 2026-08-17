@@ -65,7 +65,6 @@ If you have the GOG version of the game, do the following:
    - Improved beast stomp attack sector scanning
    - Fix bloated butchers cleavers hitting prone players
    - Turn enemy around if stuck running into a corner for a few seconds
-   - Limit impulse damage when shooting enemies downward at point-blank
    - Cheogh blasting/attacking can now hit prone players
    - Phantoms blasting/attacking can now hit prone players
    - Fix Beast state when leaving water sector
@@ -91,6 +90,8 @@ If you have the GOG version of the game, do the following:
    - Allows tesla projectiles to be reflected back with reflective shots powerup
    - While quad damage is active, the pitchfork's alt fire max charge will fire a missile
    - Voodoo doll alt fire attacks all targets visible on screen (like V1.X behavior) and consumes all ammo (only in single-player)
+* Weapon Impulse Limit
+   - Limit impulse damage when shooting enemies downward at point-blank
 * Ammo Pickup Scale
    - Scales the amount given for ammo pickups
 * Sector behavior

@@ -87,7 +87,8 @@ struct PKT_STARTGAME {
     bool bNapalmFalloff;
     int nEnemyBehavior;
     bool bEnemyRandomTNT;
-    short nWeaponsVer;
+    char nWeaponsVer;
+    char bWeaponImpulseLimit;
     short nAmmoScale;
     bool bSectorBehavior;
     int nHitscanProjectiles;

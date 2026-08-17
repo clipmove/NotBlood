@@ -65,6 +65,7 @@ void SetNapalmFalloff(CGameMenuItemZBool*);
 void SetEnemyBehavior(CGameMenuItemZCycle*);
 void SetEnemyRandomTNT(CGameMenuItemZBool*);
 void SetWeaponsVer(CGameMenuItemZCycle*);
+void SetWeaponImpulseLimit(CGameMenuItemZBool*);
 void SetAmmoScale(CGameMenuItemZCycle*);
 void SetSectorBehavior(CGameMenuItemZBool*);
 void SetHitscanProjectiles(CGameMenuItemZCycle*);
@@ -625,6 +626,7 @@ CGameMenuItemZBool itemNetMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66,
 CGameMenuItemZCycle itemNetMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 72, 180, 0, NULL, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
 CGameMenuItemZBool itemNetMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 82, 180, false, NULL, NULL, NULL);
 CGameMenuItemZCycle itemNetMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 92, 180, 0, NULL, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
+CGameMenuItemZBool itemNetMutatorBoolWeaponImpulseLimit("WEAPON IMPULSE LIMIT:", 3, 66, 112, 180, false, NULL, "LIMITED", "ORIGINAL");
 CGameMenuItemZCycle itemNetMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 102, 180, 0, NULL, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
 CGameMenuItemZBool itemNetMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 180, false, NULL, "NOTBLOOD", "ORIGINAL");
 CGameMenuItemZCycle itemNetMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
@@ -792,6 +794,7 @@ CGameMenuItemZBool itemMutatorNapalmFalloff("NAPALM GRAVITY FALLOFF:", 3, 66, 62
 CGameMenuItemZCycle itemMutatorEnemyBehavior("ENEMY BEHAVIOR:", 3, 66, 72, 180, 0, SetEnemyBehavior, pzEnemyBehaviorStrings, ARRAY_SSIZE(pzEnemyBehaviorStrings), 0);
 CGameMenuItemZBool itemMutatorBoolEnemyRandomTNT("RANDOM CULTIST TNT:", 3, 66, 82, 180, false, SetEnemyRandomTNT, NULL, NULL);
 CGameMenuItemZCycle itemMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 92, 180, 0, SetWeaponsVer, pzWeaponsVersionStrings, ARRAY_SSIZE(pzWeaponsVersionStrings), 0);
+CGameMenuItemZBool itemMutatorBoolImpulseLimit("WEAPON IMPULSE LIMIT:", 3, 66, 112, 180, false, SetWeaponImpulseLimit, "LIMITED", "ORIGINAL");
 CGameMenuItemZCycle itemMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 102, 180, 0, SetAmmoScale, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
 CGameMenuItemZBool itemMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 180, false, SetSectorBehavior, "NOTBLOOD", "ORIGINAL");
 CGameMenuItemZCycle itemMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, SetHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
@@ -1709,6 +1712,7 @@ void SetupNetStartMenu(void)
     menuNetworkGameMutators.Add(&itemNetMutatorEnemyBehavior, false);
     menuNetworkGameMutators.Add(&itemNetMutatorBoolEnemyRandomTNT, false);
     menuNetworkGameMutators.Add(&itemNetMutatorWeaponsVer, false);
+    menuNetworkGameMutators.Add(&itemNetMutatorBoolWeaponImpulseLimit, false);
     menuNetworkGameMutators.Add(&itemNetMutatorAmmoScale, false);
     menuNetworkGameMutators.Add(&itemNetMutatorSectorBehavior, false);
     menuNetworkGameMutators.Add(&itemNetMutatorHitscanProjectiles, false);
@@ -1732,6 +1736,8 @@ void SetupNetStartMenu(void)
     itemNetMutatorBoolEnemyRandomTNT.tooltip_pzTextLower = "throwing random projectiles";
     itemNetMutatorWeaponsVer.tooltip_pzTextUpper = "Check readme.txt for full";
     itemNetMutatorWeaponsVer.tooltip_pzTextLower = "list of weapon changes";
+    itemNetMutatorBoolWeaponImpulseLimit.tooltip_pzTextUpper = "Fixes damage exploit when";
+    itemNetMutatorBoolWeaponImpulseLimit.tooltip_pzTextLower = "firing downwards at point-blank";
     itemNetMutatorAmmoScale.tooltip_pzTextUpper = "Scale ammo pickup amount";
     itemNetMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector logic";
     itemNetMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
@@ -1787,6 +1793,7 @@ void SetupNetStartMenu(void)
     itemNetMutatorEnemyBehavior.m_nFocus = gEnemyBehavior % ARRAY_SSIZE(pzEnemyBehaviorStrings);
     itemNetMutatorBoolEnemyRandomTNT.at20 = !!gEnemyRandomTNT;
     itemNetMutatorWeaponsVer.m_nFocus = gWeaponsVer % ARRAY_SSIZE(pzWeaponsVersionStrings);
+    itemNetMutatorBoolWeaponImpulseLimit.at20 = !!gWeaponImpulseLimit;
     itemNetMutatorAmmoScale.m_nFocus = gAmmoScale % ARRAY_SSIZE(pzAmmoScaleStrings);
     itemNetMutatorSectorBehavior.at20 = !!gSectorBehavior;
     itemNetMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
@@ -2000,6 +2007,7 @@ void SetupOptionsMenu(void)
     menuOptionsGameMutators.Add(&itemMutatorEnemyBehavior, false);
     menuOptionsGameMutators.Add(&itemMutatorBoolEnemyRandomTNT, false);
     menuOptionsGameMutators.Add(&itemMutatorWeaponsVer, false);
+    menuOptionsGameMutators.Add(&itemMutatorBoolImpulseLimit, false);
     menuOptionsGameMutators.Add(&itemMutatorAmmoScale, false);
     menuOptionsGameMutators.Add(&itemMutatorSectorBehavior, false);
     menuOptionsGameMutators.Add(&itemMutatorHitscanProjectiles, false);
@@ -2024,6 +2032,8 @@ void SetupOptionsMenu(void)
     itemMutatorBoolEnemyRandomTNT.tooltip_pzTextLower = "throwing random projectiles";
     itemMutatorWeaponsVer.tooltip_pzTextUpper = "Check readme.txt for full";
     itemMutatorWeaponsVer.tooltip_pzTextLower = "list of weapon changes";
+    itemMutatorBoolImpulseLimit.tooltip_pzTextUpper = "Fixes damage exploit when";
+    itemMutatorBoolImpulseLimit.tooltip_pzTextLower = "firing downwards at point-blank";
     itemMutatorAmmoScale.tooltip_pzTextUpper = "Scale ammo pickup amount";
     itemMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector logic";
     itemMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
@@ -2058,6 +2068,7 @@ void SetupOptionsMenu(void)
     itemMutatorEnemyBehavior.m_nFocus = gEnemyBehavior % ARRAY_SSIZE(pzEnemyBehaviorStrings);
     itemMutatorBoolEnemyRandomTNT.at20 = !!gEnemyRandomTNT;
     itemMutatorWeaponsVer.m_nFocus = gWeaponsVer % ARRAY_SSIZE(pzWeaponsVersionStrings);
+    itemMutatorBoolImpulseLimit.at20 = !!gWeaponImpulseLimit;
     itemMutatorAmmoScale.m_nFocus = gAmmoScale % ARRAY_SSIZE(pzAmmoScaleStrings);
     itemMutatorSectorBehavior.at20 = !!gSectorBehavior;
     itemMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
@@ -2744,6 +2755,16 @@ void SetWeaponsVer(CGameMenuItemZCycle* pItem)
         gGameOptions.nWeaponsVer = gWeaponsVer;
     } else {
         pItem->m_nFocus = gWeaponsVer % ARRAY_SSIZE(pzWeaponsVersionStrings);
+    }
+}
+
+void SetWeaponImpulseLimit(CGameMenuItemZBool *pItem)
+{
+    if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) {
+        gWeaponImpulseLimit = pItem->at20;
+        gGameOptions.bWeaponImpulseLimit = gWeaponImpulseLimit;
+    } else {
+        pItem->at20 = !!gWeaponImpulseLimit;
     }
 }
 
@@ -4906,6 +4927,7 @@ void StartNetGame(CGameMenuItemChain *pItem)
     gPacketStartGame.nEnemyBehavior = itemNetMutatorEnemyBehavior.m_nFocus % ARRAY_SSIZE(pzEnemyBehaviorStrings);
     gPacketStartGame.bEnemyRandomTNT = itemNetMutatorBoolEnemyRandomTNT.at20;
     gPacketStartGame.nWeaponsVer = itemNetMutatorWeaponsVer.m_nFocus % ARRAY_SSIZE(pzWeaponsVersionStrings);
+    gPacketStartGame.bWeaponImpulseLimit = itemNetMutatorBoolWeaponImpulseLimit.at20;
     gPacketStartGame.nAmmoScale = itemNetMutatorAmmoScale.m_nFocus % ARRAY_SSIZE(pzAmmoScaleStrings);
     gPacketStartGame.bSectorBehavior = itemNetMutatorSectorBehavior.at20;
     gPacketStartGame.nHitscanProjectiles = itemNetMutatorHitscanProjectiles.m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);

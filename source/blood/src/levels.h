@@ -67,7 +67,8 @@ struct GAMEOPTIONS {
     bool bNapalmFalloff;
     int nEnemyBehavior;
     bool bEnemyRandomTNT;
-    short nWeaponsVer;
+    char nWeaponsVer;
+    char bWeaponImpulseLimit;
     short nAmmoScale;
     bool bSectorBehavior;
     char nHitscanProjectiles;
