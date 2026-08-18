@@ -357,7 +357,7 @@ static int MirrorPicsInit(int nRange)
     }
     else
     {
-        viewSetSystemMessage("Not enough range of free tiles for mirrors. Required range = %d.", nRange);
+        consoleSysMsg("Not enough range of free tiles for mirrors. Required range = %d.", nRange);
     }
 
     r = nStart;
@@ -461,7 +461,7 @@ void InitMirrors(void)
             }
             
             if (j < 0)
-                viewSetSystemMessage("Wall #%d has no matching wall link! (data = %d)", i, xwall[pWall->extra].data);
+                consoleSysMsg("Wall #%d has no matching wall link! (data = %d)", i, xwall[pWall->extra].data);
         }
         else if (pWall->picnum == kMirrorTile)
         {
@@ -480,7 +480,7 @@ void InitMirrors(void)
     {
         if (numsectors + 1 >= kMaxSectors || numwalls + 4 >= kMaxWalls)
         {
-            viewSetSystemMessage("Must have at least %d sectors with %d walls free for mirrors!", 1, 4);
+            consoleSysMsg("Must have at least %d sectors with %d walls free for mirrors!", 1, 4);
             mirrorcnt = 0; // cancel the wall mirrors
         }
 
@@ -505,7 +505,9 @@ void InitMirrors(void)
 #ifdef MASKED_ROR_ISSUE
         if (rorTypeA == 2 || rorTypeB == 2)
         {
-            viewSetSystemMessage("Sorry, masked sectors are not supported!");
+            const char* emsg = "Sorry, masked sectors are not supported!";
+            if (rorTypeA == 2) consoleSysMsg("%s (floor #%d)", emsg, i);
+            if (rorTypeB == 2) consoleSysMsg("%s (ceiling #%d)", emsg, j);
             continue;
         }
 #endif
