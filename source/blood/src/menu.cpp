@@ -2200,6 +2200,8 @@ void SetupOptionsMenu(void)
     itemOptionsDisplayViewBoolInterpolation.tooltip_pzTextLower = "Set interpolation method (original/integer or modern/float)";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewSecretMessageStyle.tooltip_pzTextLower = "Set the display style for secrets";
+    itemOptionsDisplayViewWeatherEffect.tooltip_pzTextUpper = "";
+    itemOptionsDisplayViewWeatherEffect.tooltip_pzTextLower = "Restores the unused weather effect";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextUpper = "";
     itemOptionsDisplayViewBoolSlowRoomFlicker.tooltip_pzTextLower = "Reduce the speed of flickering sectors (e.g: E1M4)";
 
@@ -3618,7 +3620,7 @@ void SetupVideoModeMenu(CGameMenuItemChain *pItem)
             break;
         }
     }
-    itemOptionsDisplayModeFrameLimit.nValue = ClipLow(r_maxfps, 60);
+    itemOptionsDisplayModeFrameLimit.nValue = ClipLow(r_maxfps, 30);
 }
 
 void PreDrawVideoModeMenu(CGameMenuItem *pItem)
