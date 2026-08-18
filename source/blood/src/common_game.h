@@ -95,6 +95,9 @@ void _consoleSysMsg(const char* pMessage, ...);
 
 #define DOWNSCALEBUFFER (MAXTILES-3)
 
+#define kWeatherTileStart (MAXTILES-3-256-256-256)
+#define kWeatherTileEnd (MAXTILES-3)
+
 #define kExplodeMax 8
 
 #define kLensSize 80

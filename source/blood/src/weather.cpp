@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "gameutil.h"
 #include "levels.h"
 #include "mirrors.h"
+#include "tile.h"
 #include "trig.h"
 #include "weather.h"
 
@@ -173,6 +174,31 @@ void CWeather::SetViewport(int nX, int nY, int nXOffset0, int nXOffset1, int nYO
     nScaleTableFov = nFov;
     nAspectRatioModifier = r_usenewaspect ? divscale16((nWidth<<16)*3, (nHeight<<16)*4) : fix16_one; // calculate correct screen ratio
     nFovPitchModifier = divscale16(nScaleFactor, nFovV);
+#ifdef USE_OPENGL
+    static char bGenWeatherTiles = 0;
+    if (bGenWeatherTiles)
+        return;
+    bGenWeatherTiles = 1;
+    nDraw.bTilesAvailable = 1;
+    for (int nColor = 0, nTile = kWeatherTileStart, nY = 1; nTile < kWeatherTileEnd; nColor++, nTile++)
+    {
+        if (nColor == 256)
+        {
+            nY++;
+            nColor = 0;
+        }
+        char *pData = tileAllocTile(nTile, 1, nY, 0, 0);
+        if (!pData)
+        {
+            nDraw.bTilesAvailable = 0;
+            break;
+        }
+        memset(pData, nColor, nY);
+        tileInvalidate(nTile, 0, -1);
+    }
+#else
+    nDraw.bTilesAvailable = 0;
+#endif
 }
 
 void CWeather::SetParticles(short nCount, short nLimit)
@@ -287,7 +313,12 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     // move to first pixel within framebuffer
 #ifdef USE_OPENGL
     const char bClassicRenderer = pBuffer != NULL;
-    if (bClassicRenderer)
+    if (!bClassicRenderer)
+    {
+        if (!nDraw.bTilesAvailable) // polymost tiles were not pre-generated, abort
+            return;
+    }
+    else
 #endif
         pBuffer += nScreenPitch * nOffsetY + nOffsetX;
 
@@ -406,7 +437,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         nStat = RS_TOPLEFT|RS_STRETCH;
                         break;
                     }
-                    const int nTile = 8519 + (bShape * 256) + nColor; // load from TILES098.ART
+                    const int nTile = kWeatherTileStart + (bShape * 256) + nColor; // load from generated tile bank
                     rotatesprite_fs((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize<<16, 0, nTile, -128, 0, nStat);
                     continue;
                 }
