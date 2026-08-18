@@ -412,8 +412,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                     SetBitString(clipbit, (i<<1)+1);
                 }
 
-                // size/palette color calculation
-                const int nSize = ClipHigh(nScale>>12, nMaxPixelSize); // why did I pick 12? because it looked the best
+                // color calculation
                 const uint8_t nColor = nColorTable[nDepth>>8]; // potential range for nDepth is 5-8191, or 0-31 after shift
 
                 if (bFlipX)
@@ -437,12 +436,14 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         nStat = RS_TOPLEFT|RS_STRETCH;
                         break;
                     }
+                    const int nSize = ClipHigh(nScale<<4, nMaxPixelSize<<16);
                     const int nTile = kWeatherTileStart + (bShape * 256) + nColor; // load from generated tile bank
-                    rotatesprite_fs((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize<<16, 0, nTile, -128, 0, nStat);
+                    rotatesprite_fs((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize, 0, nTile, -128, 0, nStat);
                     continue;
                 }
 #endif
 
+                const int nSize = ClipHigh(nScale>>12, nMaxPixelSize); // why did I pick 12? because it looked the best
                 if (nSize <= 1) // if size is a pixel, don't bother calculating box fill
                 {
                     for (int j = 1<<bShape; j > 0 && screenY > 0; j--, screenY--)
