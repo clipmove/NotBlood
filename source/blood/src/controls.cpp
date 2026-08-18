@@ -857,8 +857,9 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     int nThresholdX, nThresholdY;
     if (!nX && !nY) // no input, defaul to mouse input
     {
-        nOldMouseY += mulscale16(pInput->mousey, gRadialMenuMouseSensitivity);
-        nOldMouseX += mulscale16(pInput->mousex, gRadialMenuMouseSensitivity);
+        const int nMouseSensitivity = gRadialMenuMouseSensitivity >= fix16_from_float(0.1f) ? gRadialMenuMouseSensitivity : 0;
+        nOldMouseY += mulscale16(pInput->mousey, nMouseSensitivity);
+        nOldMouseX += mulscale16(pInput->mousex, nMouseSensitivity);
         nThresholdX = nThresholdY = 384;
         const int nDist = approxDist(nOldMouseY, nOldMouseX), kDistMax = 3839;
         if (nDist > kDistMax+(4096-3839)) // clamp reticle
