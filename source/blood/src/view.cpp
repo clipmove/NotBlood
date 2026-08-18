@@ -5257,7 +5257,7 @@ RORHACK:
             newaspect_enable = 0;
         renderSetAspect(viewingRange, yxAspect);
 
-        if (gWeatherEffect && (videoGetRenderMode() == REND_CLASSIC))
+        if (gWeatherEffect)
         {
             gWeather.Process(cX, cY, cZ, fix16_to_int(cA), nSectnum, (int)gFrameClock, gView->pSprite->clipdist<<2, gGameOptions.uMapCRC);
             gWeather.Draw(cX, cY, cZ, fix16_to_int(cA), q16horiz + fix16_from_int(defaultHoriz) + deliriumPitchI, nSectnum, (int)gFrameClock, gInterpolate, gGameOptions.uMapCRC, !!(MIRRORMODE&1), !!(MIRRORMODE&2));

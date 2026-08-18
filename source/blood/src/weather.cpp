@@ -281,16 +281,19 @@ void CWeather::Restart(void)
 
 void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nX, int nY, int nZ, int nAng, int nHoriz, short nSector, int nCount, int nDelta, char bCheckClip, char bFlipX, char bFlipY)
 {
-    dassert(pBuffer != NULL);
     dassert(nCount > 0 && nCount <= kMaxVectors);
     dassert(nSector >= 0 && nSector < kMaxSectors);
 
     // move to first pixel within framebuffer
-    pBuffer += nScreenPitch * nOffsetY + nOffsetX;
+#ifdef USE_OPENGL
+    const char bClassicRenderer = pBuffer != NULL;
+    if (bClassicRenderer)
+#endif
+        pBuffer += nScreenPitch * nOffsetY + nOffsetX;
 
     // adjust to starfield relative scale
     const int origX = nX, origY = nY, origZ = nZ;
-    const char bFloorBelow = !IsRorSector(nSector, OBJ_FLOOR); // check if we're in an open air room-over-room sector
+    const char bFloorBelow = IsRorSector(nSector, OBJ_FLOOR) == 0; // check if we're in an open air room-over-room sector
     const int nFloor = getflorzofslope(nSector, nX, nY);
     const char bStaticView = nDraw.bStaticView;
     if (!bStaticView)
@@ -386,6 +389,28 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                     screenX = (unsigned int)(-((int)screenX) + (nWidth - 1));
                 if (bFlipY)
                     screenY = (unsigned int)(-((int)screenY) + (nHeight - 1));
+
+#ifdef USE_OPENGL
+                if (!bClassicRenderer)
+                {
+                    uint32_t nStat;
+                    switch (bTransparent)
+                    {
+                    case 1:
+                        nStat = RS_TOPLEFT|RS_STRETCH|RS_TRANS1|RS_TRANS2;
+                        break;
+                    case 2:
+                        nStat = RS_TOPLEFT|RS_STRETCH|RS_TRANS1;
+                        break;
+                    default:
+                        nStat = RS_TOPLEFT|RS_STRETCH;
+                        break;
+                    }
+                    const int nTile = 8519 + (bShape * 256) + nColor; // load from TILES098.ART
+                    rotatesprite_win((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize<<16, 0, nTile, -128, 0, nStat);
+                    continue;
+                }
+#endif
 
                 if (nSize <= 1) // if size is a pixel, don't bother calculating box fill
                 {
@@ -492,11 +517,20 @@ void CWeather::Draw(int nX, int nY, int nZ, int nAng, int nHoriz, short nSector,
     int nCountLimited = GetCount(); // get count with limit applied
     if (nCountLimited > 0)
     {
-        videoBeginDrawing();
-        char *framebuffer = (char*)frameplace;
-        if (framebuffer != NULL)
-            Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta, nClockDiff != 0, bFlipX, bFlipY);
-        videoEndDrawing();
+        if (videoGetRenderMode() == REND_CLASSIC)
+        {
+            videoBeginDrawing();
+            char *framebuffer = (char*)frameplace;
+            if (framebuffer != NULL)
+                Draw(framebuffer, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta, nClockDiff != 0, bFlipX, bFlipY);
+            videoEndDrawing();
+        }
+#ifdef USE_OPENGL
+        else
+        {
+            Draw(NULL, nWidth, nHeight, nOffsetX, nOffsetY, nX, nY, nZ, nAng, nHoriz, nSector, nCountLimited, nDelta, nClockDiff != 0, bFlipX, bFlipY);
+        }
+#endif
     }
 
     if (nWeatherForecast == nWeatherCur) // increase until reached weather limit
