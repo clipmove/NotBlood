@@ -100,6 +100,7 @@ private:
             unsigned int bShape : 2;
             unsigned int nTransparent : 2;
             unsigned int bGravityVariance : 1;
+            unsigned int bTilesAvailable : 1;
         };
     } nDraw;
     int nWidth;
