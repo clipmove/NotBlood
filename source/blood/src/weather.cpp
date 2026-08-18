@@ -407,7 +407,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         break;
                     }
                     const int nTile = 8519 + (bShape * 256) + nColor; // load from TILES098.ART
-                    rotatesprite_win((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize<<16, 0, nTile, -128, 0, nStat);
+                    rotatesprite_fs((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize<<16, 0, nTile, -128, 0, nStat);
                     continue;
                 }
 #endif
