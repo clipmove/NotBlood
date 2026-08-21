@@ -23,7 +23,8 @@ jobs:
           cp ./notblood.pk3 ./upload
           cp -a ./package/common/. ./upload/
       
-      - uses: dawidd6/action-download-artifact@v6
+      - uses: >-
+          dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151
         with:
           workflow: build.yml
           workflow_conclusion: success
