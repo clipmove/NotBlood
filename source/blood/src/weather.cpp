@@ -436,7 +436,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         nStat = RS_TOPLEFT|RS_STRETCH;
                         break;
                     }
-                    const int nSize = ClipHigh(nScale<<4, nMaxPixelSize<<16);
+                    const int nSize = ClipHigh(nScale, nMaxPixelSize<<12)<<4;
                     const int nTile = kWeatherTileStart + (bShape * 256) + nColor; // load from generated tile bank
                     rotatesprite_fs((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize, 0, nTile, -128, 0, nStat);
                     continue;
