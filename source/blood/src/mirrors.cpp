@@ -426,12 +426,12 @@ static void MirrorPicsUninit(void)
 
 void InitMirrors(void)
 {
-    walltype* pWall;
+    walltype* pWall; uint8_t done[kMaxMirrors];
     int i, j, k, nLinkA, nLinkB;
     char rorTypeA, rorTypeB;
     int nRange = 0;
 
-    memset(mirror, 0, sizeof(mirror));
+    Bmemset(mirror, 0, sizeof(mirror));
     gMirrorDrawing = false;
     mirrorsector = -1;
     mirrorcnt = 0;
@@ -540,34 +540,40 @@ void InitMirrors(void)
         mirrorcnt = 0; // cancel everything
 
     i = mirrorcnt;
+    Bmemset(done, 0, sizeof(done));
     while (--i >= 0 && mirror[i].type != OBJ_WALL)
     {
         // Grouping splitted ROR sectors
         // for better and faster
         // drawing.
 
-        if (mirror[i].hNeighID == 0)
-        {
-            j = 0;
-            ROR_CollectNeighborsH(i, list, &j);
-            for (k = 0; k < j - 1; k++)
-                mirror[list[k]].hNeighID = list[k + 1];
+        if (done[i])
+            continue;
 
-            mirror[list[k]].hNeighID = list[0];
-        }
+        j = 0;
+        ROR_CollectNeighborsH(i, list, &j);
+        for (k = 0; k < j - 1; k++)
+            mirror[list[k]].hNeighID = list[k + 1], done[list[k]] = 1;
 
+        mirror[list[k]].hNeighID = list[0], done[list[k]] = 1;
+    }
+
+    i = mirrorcnt;
+    Bmemset(done, 0, sizeof(done));
+    while (--i >= 0 && mirror[i].type != OBJ_WALL)
+    {
         // Grouping ceilings and floors
         // for faster access.
 
-        if (mirror[i].vNeighID == 0)
-        {
-            j = 0;
-            ROR_CollectNeighborsV(i, list, &j);
-            for (k = 0; k < j - 1; k++)
-                mirror[list[k]].vNeighID = list[k + 1];
+        if (done[i])
+            continue;
 
-            mirror[list[k]].vNeighID = list[0];
-        }
+        j = 0;
+        ROR_CollectNeighborsV(i, list, &j);
+        for (k = 0; k < j - 1; k++)
+            mirror[list[k]].vNeighID = list[k + 1], done[list[k]] = 1;
+
+        mirror[list[k]].vNeighID = list[0], done[list[k]] = 1;
     }
 }
 
@@ -675,7 +681,7 @@ static int DoRoomOverRoom(int x, int y, int z, fix16_t a, fix16_t horiz, int smo
 
     static int32_t hdrawcnt, vdrawcnt, i;
     
-    MIRROR *pRor, *pOth; RORCAM* pCam; spritetype* pSpr; uint16_t* pSecStat;
+    MIRROR *pRor, *pOth; RORCAM* pCam; spritetype* pSpr; uint16_t* pSecStat; short* linkArr;
     int32_t nIndex, t, n, oSprStat, oSectStat, dx, dy, dz;
     int32_t r = 0;
 
@@ -740,35 +746,46 @@ static int DoRoomOverRoom(int x, int y, int z, fix16_t a, fix16_t horiz, int smo
         // covering.
         
         vdrawcnt = 0;
-        pCam = &hcam[hdrawcnt];
-        nIndex = pCam->index; dx = x, dy = y, dz = z;
+        pCam = &hcam[hdrawcnt]; nIndex = pCam->index; pRor = &mirror[nIndex];
+        linkArr = (pRor->type == OBJ_FLOOR) ? gUpperLink : gLowerLink;
+        n = pRor->id; dx = x, dy = y, dz = z;
 
-        n = nIndex;
         do
         {
             // Keep adding rooms until we reach the most far vertically.
             // For ceilings search to the top and for
             // floors to the bottom. 
+            
+            t = nIndex;
+            do
+            {
+                pOth = &mirror[t];
+                if (pOth->type == pRor->type && pOth->id == n)
+                {
+                    ROR_ClearGotPic(t);
+                    pCam = &vcam[vdrawcnt];
+                    pCam->index = t;
                     
-            pRor = &mirror[n];
-            ROR_ClearGotPic(n);
-                        
-            pCam = &vcam[vdrawcnt];
-            pCam->index = n;
-                        
-            dx += pRor->ofs.x;
-            dy += pRor->ofs.y;
-            dz += pRor->ofs.z;
-                        
-            pCam->x = dx;
-            pCam->y = dy;
-            pCam->z = dz;
-                     
-            vdrawcnt++;
+                    dx += pOth->ofs.x;
+                    dy += pOth->ofs.y;
+                    dz += pOth->ofs.z;
+                    
+                    pCam->x = dx;
+                    pCam->y = dy;
+                    pCam->z = dz;
+                    
+                    vdrawcnt++;
+                    break;
+                }
+                
+                t = pOth->vNeighID;
+            }
+            while (t != nIndex);
 
-            n = pRor->vNeighID;
+            if ((n = linkArr[n]) >= 0)
+                n = sprite[n].owner, n = sprite[n].sectnum;
         }
-        while(n != nIndex);
+        while (n >= 0 && n != pRor->id);
             
         r += vdrawcnt;
         
