@@ -125,6 +125,8 @@ int32_t gViewInterpolateMethod;
 int32_t gWeaponInterpolate;
 int32_t gViewHBobbing;
 int32_t gViewVBobbing;
+int32_t gViewScreenRed;
+int32_t gViewScreenShake;
 int32_t gWeaponHBobbing;
 int32_t gSlowRoomFlicker;
 int32_t gFollowMap;
@@ -581,6 +583,8 @@ void CONFIG_SetDefaults(void)
     gWeaponInterpolate = 2;
     gViewHBobbing = 1;
     gViewVBobbing = 1;
+    gViewScreenRed = 1;
+    gViewScreenShake = 1;
     gWeaponHBobbing = 1;
     gSlowRoomFlicker = 0;
     gFollowMap = 1;
