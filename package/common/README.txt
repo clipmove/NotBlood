@@ -235,6 +235,10 @@ If you have the GOG version of the game, do the following:
    - Enable/disable item slot switching to activated item (always enabled in multiplayer)
 * cl_projectileoldsprite
    - Enable/disable old pink sprite for hitscan projectiles
+* cl_viewscreenred
+   - Enable/disable view screen red hurt effect
+* cl_viewscreenshake
+   - Enable/disable view screen shake
 * cl_weaponfastswitch
    - Enable/disable fast weapon switching
 * color

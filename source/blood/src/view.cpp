@@ -4585,9 +4585,12 @@ void UpdateDacs(int nPalette, bool bNoTint)
             nGreen += gView->pickupEffect;
             nBlue -= gView->pickupEffect;
 
-            nRed += ClipHigh(gView->painEffect, 85)*2;
-            nGreen -= ClipHigh(gView->painEffect, 85)*3;
-            nBlue -= ClipHigh(gView->painEffect, 85)*3;
+            if (gViewScreenRed)
+            {
+                nRed += ClipHigh(gView->painEffect, 85)*2;
+                nGreen -= ClipHigh(gView->painEffect, 85)*3;
+                nBlue -= ClipHigh(gView->painEffect, 85)*3;
+            }
 
             nRed -= gView->blindEffect;
             nGreen -= gView->blindEffect;
@@ -4623,9 +4626,12 @@ void UpdateDacs(int nPalette, bool bNoTint)
                 nGreen += gView->pickupEffect;
                 nBlue -= gView->pickupEffect;
 
-                nRed += ClipHigh(gView->painEffect, 85)*2;
-                nGreen -= ClipHigh(gView->painEffect, 85)*3;
-                nBlue -= ClipHigh(gView->painEffect, 85)*3;
+                if (gViewScreenRed)
+                {
+                    nRed += ClipHigh(gView->painEffect, 85)*2;
+                    nGreen -= ClipHigh(gView->painEffect, 85)*3;
+                    nBlue -= ClipHigh(gView->painEffect, 85)*3;
+                }
 
                 nRed -= gView->blindEffect;
                 nGreen -= gView->blindEffect;
@@ -4853,13 +4859,16 @@ void viewDrawScreen(void)
         }
         gViewSpritePredictLoc.x = cX, gViewSpritePredictLoc.y = cY, gViewSpritePredictLoc.ang = cA;
         viewUpdateShake();
-        q16horiz += fix16_from_int(shakeHoriz);
-        cA += fix16_from_int(shakeAngle);
-        cX += shakeX;
-        cY += shakeY;
-        cZ += shakeZ;
-        v4c += shakeBobX;
-        v48 += shakeBobY;
+        if (gViewScreenShake)
+        {
+            q16horiz += fix16_from_int(shakeHoriz);
+            cA += fix16_from_int(shakeAngle);
+            cX += shakeX;
+            cY += shakeY;
+            cZ += shakeZ;
+            v4c += shakeBobX;
+            v48 += shakeBobY;
+        }
         const fix16_t q16tilt = fix16_from_int(mulscale30(0x40000000-Cos(gView->tiltEffect<<2), 30));
         if (gViewInterpolate && (gView->tiltEffect > 0) && !VanillaMode())
             q16horiz += interpolate(fix16_from_int(mulscale30(0x40000000-Cos((gView->tiltEffect+4)<<2), 30)), q16tilt, gInterpolate);

@@ -103,6 +103,8 @@ extern int32_t gViewInterpolateMethod;
 extern int32_t gWeaponInterpolate;
 extern int32_t gViewHBobbing;
 extern int32_t gViewVBobbing;
+extern int32_t gViewScreenRed;
+extern int32_t gViewScreenShake;
 extern int32_t gWeaponHBobbing;
 extern int32_t gSlowRoomFlicker;
 extern int32_t gFollowMap;
