@@ -1213,6 +1213,8 @@ int32_t registerosdcommands(void)
         { "cl_multikill", "enable/disable multi kill messages (0: disable, 1: enable, 2: enable + audio alert)", (void *)&gMultiKill, CVAR_INT, 0, 2 },
         { "cl_viewhbob", "enable/disable view horizontal bobbing", (void *)&gViewHBobbing, CVAR_BOOL, 0, 1 },
         { "cl_viewvbob", "enable/disable view vertical bobbing", (void *)&gViewVBobbing, CVAR_BOOL, 0, 1 },
+        { "cl_viewscreenred", "enable/disable view screen red hurt effect", (void *)&gViewScreenRed, CVAR_BOOL, 0, 1 },
+        { "cl_viewscreenshake", "enable/disable view screen shake", (void *)&gViewScreenShake, CVAR_BOOL, 0, 1 },
         { "cl_weaponhbob", "enable/disable weapon horizontal bobbing (0: off, 1: original, 2: V1.0x)", (void *)&gWeaponHBobbing, CVAR_INT|CVAR_MULTI, 0, 2 },
         { "cl_weather", "enable/disable weather effect (only for software renderer)", (void *)&gWeatherEffect, CVAR_BOOL, 0, 1 },
         { "cl_randomizerscale", "enable/disable randomly scaling enemies for randomizer mode (0: disable, 1: only with seed cheats, 2: always) (always use 1 in multiplayer)", (void *)&gRandomizerScaleMode, CVAR_INT, 0, 2 },
