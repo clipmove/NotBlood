@@ -180,20 +180,20 @@ void CWeather::SetViewport(int nX, int nY, int nXOffset0, int nXOffset1, int nYO
         return;
     bGenWeatherTiles = 1;
     nDraw.bTilesAvailable = 1;
-    for (int nColor = 0, nTile = kWeatherTileStart, nY = 1; nTile < kWeatherTileEnd; nColor++, nTile++)
+    for (int nColor = 0, nTile = kWeatherTileStart, nX = 4, nY = 4; nTile < kWeatherTileEnd; nColor++, nTile++)
     {
         if (nColor == 256)
         {
-            nY++;
+            nY <<= 1;
             nColor = 0;
         }
-        char *pData = tileAllocTile(nTile, 1, nY, 0, 0);
+        char *pData = tileAllocTile(nTile, nX, nY, 0, 0);
         if (!pData)
         {
             nDraw.bTilesAvailable = 0;
             break;
         }
-        memset(pData, nColor, nY);
+        memset(pData, nColor, nX * nY);
         tileInvalidate(nTile, 0, -1);
     }
 #else
@@ -436,9 +436,24 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         nStat = RS_TOPLEFT|RS_STRETCH;
                         break;
                     }
-                    const int nSize = ClipHigh(nScale, nMaxPixelSize<<12)<<4;
+                    const int nSize = ClipHigh(nScale, nMaxPixelSize<<12)<<2;
                     const int nTile = kWeatherTileStart + (bShape * 256) + nColor; // load from generated tile bank
-                    rotatesprite_fs((nOffsetX + screenX)<<16, (nOffsetY + screenY)<<16, nSize, 0, nTile, -128, 0, nStat);
+                    screenX = (screenX + nOffsetX)<<16;
+                    screenY = (screenY + nOffsetY)<<16;
+                    screenX -= nSize<<1;
+                    switch (bShape) // offset to match software rendering
+                    {
+                    case 1:
+                        screenY -= nSize<<2;
+                        break;
+                    case 2:
+                        screenY -= (nSize<<2)+(nSize<<1);
+                        break;
+                    default:
+                        screenY -= nSize<<1;
+                        break;
+                    }
+                    rotatesprite_fs(screenX, screenY, nSize, 0, nTile, -128, 0, nStat);
                     continue;
                 }
 #endif
