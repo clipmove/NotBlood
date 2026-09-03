@@ -311,7 +311,7 @@ void levelLoadMapInfo(IniFile *pIni, LEVELINFO *pLevelInfo, const char *pzSectio
     pLevelInfo->EndingA = pIni->GetKeyInt(pzSection, "EndingA", -1);
     pLevelInfo->EndingB = pIni->GetKeyInt(pzSection, "EndingB", -1);
     pLevelInfo->Fog = pIni->GetKeyInt(pzSection, "Fog", -0);
-    pLevelInfo->WeatherType = pIni->GetKeyInt(pzSection, "WeatherType", -0);
+    pLevelInfo->WeatherType = pIni->GetKeyInt(pzSection, "WeatherType", -1);
 
 #ifdef NOONE_EXTENSIONS
     strncpy(pLevelInfo->cutVideo, pIni->GetKeyString(pzSection, "CutScene", ""), BMAX_PATH);
