@@ -796,7 +796,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         return;
     }
     gWeather.Restart();
-    gWeather.LoadPreset(pOpt->uMapCRC);
+    gWeather.LoadPreset(pOpt->nEpisode, pOpt->nLevel, pOpt->uMapCRC);
     char levelName[BMAX_PATH];
     G_LoadMapHack(levelName, pOpt->zLevelName);
     wsrand(pOpt->uMapCRC);
