@@ -222,7 +222,7 @@ void LoadSave::LoadGame(char *pzFile)
     gPaused = 0;
     gGameStarted = 1;
     gWeather.Restart();
-    gWeather.LoadPreset(gGameOptions.uMapCRC);
+    gWeather.LoadPreset(gGameOptions.nEpisode, gGameOptions.nLevel, gGameOptions.uMapCRC);
 
 #ifdef USE_STRUCT_TRACKERS
     Bmemset(sectorchanged, 0, sizeof(sectorchanged));
