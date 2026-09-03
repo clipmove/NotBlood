@@ -620,7 +620,7 @@ void CWeather::LoadPreset(int nEpisode, int nLevel, unsigned int uMapCRC)
         SetWeatherOverride(WEATHERTYPE_BLOOD, WEATHERTYPE_DUST, (uMapCRC&0x3f) - 0x20, ((uMapCRC>>16)&0x3f) - 0x20, 64);
         return;
     case 4: // custom weather (NotBlood does not support this type)
-        consoleSysMsg("E%dM%d WeatherType 4 is not supported, falling back to random weather...", nEpisode, nLevel);
+        consoleSysMsg("E%dM%d WeatherType 4 is not supported, falling back to random weather...", nEpisode+1, nLevel+1);
         break;
     case -1:
     default:
