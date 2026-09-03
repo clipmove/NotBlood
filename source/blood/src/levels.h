@@ -119,7 +119,7 @@ struct LEVELINFO
     int EndingB;
     char Messages[kMaxMessages][128];
     char Fog;
-    char Weather;
+    char WeatherType;
     char cutVideo[BMAX_PATH];
     char cutSound[BMAX_PATH];
     char showEndScr;
