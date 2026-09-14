@@ -45,6 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "nnextstr.h"
 #include "gib.h"
 #include "nnextcitem.h"
+#include "aipatrol.h"
 
 // Resource system is buggy with a lot external files added
 //#define NNEXTS_USE_RES_SYS
@@ -82,17 +83,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #define kMaxRandomizeRetries 16
 #define kPercFull 100
-#define kPatrolStateSize 50
-#define kPatrolAlarmSeeDist 10000
-#define kPatrolAlarmHearDist 10000
-#define kMaxPatrolVelocity 500000
-#define kMaxPatrolCrouchVelocity kMaxPatrolVelocity >> 1
-#define kMaxPatrolSpotValue 500
-#define kMinPatrolTurnDelay 8
-#define kPatrolTurnDelayRange 20
 
-#define kDudeFlagStealth    0x0001
-#define kDudeFlagCrouch     0x0002
+
+#define kDudeFlagStealth        0x0001
+#define kDudeFlagIgnoreTouch    0x0002
+#define kDudeFlagCrouch         0x0004
 
 #define kSlopeDist 0x20
 #define kEffectGenCallbackBase 200
@@ -112,16 +107,14 @@ kStatModernDudeTargetChanger        = kStatModernBase,
 kStatModernCondition                = 21,
 kStatModernEventRedirector          = 22,
 kStatModernPlayerLinker             = 23,
-kStatModernBrokenDudeLeech          = 24,
 kStatModernQavScene                 = 25,
-kStatModernStealthRegion            = 27,
-kStatModernTmp                      = 39,
+kStatModernPatrolRegion             = 27,
 kStatModernMax                      = 40,
 };
 
 // modern sprite types
 enum {
-kModernStealthRegion                = 16,
+kModernPatrolRegion                 = 16,
 kModernCustomDudeSpawn              = 24,
 kModernRandomTX                     = 25,
 kModernSequentialTX                 = 26,
@@ -166,11 +159,6 @@ enum {
 kRandomizeItem                      = 0,
 kRandomizeDude                      = 1,
 kRandomizeTX                        = 2,
-};
-
-enum {
-kPatrolMoveForward                  = 0,
-kPatrolMoveBackward                 = 1,
 };
 
 // - STRUCTS ------------------------------------------------------------------
@@ -225,14 +213,6 @@ struct DUDEINFO_EXTRA {
     int idlcseqofs : 6;             // used for patrol
     int mvecseqofs : 6;             // used for patrol
     
-};
-
-struct PATROL_FOUND_SOUNDS {
-
-    int snd;
-    int max;
-    int cur;
-
 };
 
 struct OBJECT_STATUS1
@@ -496,7 +476,6 @@ extern EXPLOSION_EXTRA gExplodeExtra[kExplosionMax];
 extern DUDEINFO_EXTRA gDudeInfoExtra[kDudeMax];
 extern TRPLAYERCTRL gPlayerCtrl[kMaxPlayers];
 extern SPRITEMASS gSpriteMass[kMaxXSprites];
-extern AISTATE genPatrolStates[kPatrolStateSize];
 
 extern IDLIST gProxySpritesList;
 extern IDLIST gSightSpritesList;
@@ -629,46 +608,7 @@ void triggerTouchWall(spritetype* pSprite, int nHWall);
 void killEvents(int nRx, int nCmd);
 void changeSpriteAngle(spritetype* pSpr, int nAng);
 int getVelocityAngle(spritetype* pSpr);
-//  -------------------------------------------------------------------------   //
-char aiPatrolSetMarker(spritetype* pSprite, XSPRITE* pXSprite);
-void aiPatrolThink(spritetype* pSprite, XSPRITE* pXSprite);
-void aiPatrolStop(spritetype* pSprite, int target, bool alarm = false);
-void aiPatrolAlarmFull(spritetype* pSprite, XSPRITE* pXTarget, bool chain);
-void aiPatrolAlarmLite(spritetype* pSprite, XSPRITE* pXTarget);
-void aiPatrolState(spritetype* pSprite, int state);
-void aiPatrolMove(spritetype* pSprite, XSPRITE* pXSprite);
-int aiPatrolMarkerBusy(int nExcept, int nMarker);
-bool aiPatrolMarkerReached(spritetype* pSprite, XSPRITE* pXSprite);
-bool aiPatrolGetPathDir(XSPRITE* pXSprite, XSPRITE* pXMarker);
-void aiPatrolFlagsMgr(spritetype* pSource, XSPRITE* pXSource, spritetype* pDest, XSPRITE* pXDest, bool copy, bool init);
-void aiPatrolRandGoalAng(spritetype* pSprite, XSPRITE* pXSprite);
-void aiPatrolTurn(spritetype* pSprite, XSPRITE* pXSprite);
-inline int aiPatrolGetVelocity(int speed, int value) {
-    return (value > 0) ? ClipRange((speed / 3) + (2500 * value), 0, 0x47956) : speed;
-}
 
-inline bool aiPatrolWaiting(AISTATE* pAiState) {
-    return (pAiState->stateType >= kAiStatePatrolWaitL && pAiState->stateType <= kAiStatePatrolWaitW);
-}
-
-inline bool aiPatrolMoving(AISTATE* pAiState) {
-    return (pAiState->stateType >= kAiStatePatrolMoveL && pAiState->stateType <= kAiStatePatrolMoveW);
-}
-
-inline bool aiPatrolTurning(AISTATE* pAiState) {
-    return (pAiState->stateType >= kAiStatePatrolTurnL && pAiState->stateType <= kAiStatePatrolTurnW);
-}
-
-inline bool aiInPatrolState(AISTATE* pAiState) {
-    return (pAiState->stateType >= kAiStatePatrolBase && pAiState->stateType < kAiStatePatrolMax);
-}
-
-inline bool aiInPatrolState(int nAiStateType) {
-    return (nAiStateType >= kAiStatePatrolBase && nAiStateType < kAiStatePatrolMax);
-}
-
-//  -------------------------------------------------------------------------   //
-bool readyForCrit(spritetype* pHunter, spritetype* pVictim);
 int sectorInMotion(int nSector);
 void clampSprite(spritetype* pSprite, int which = 0x03);
 int getSpritesNearWalls(int nSrcSect, int* spriOut, int nMax, int nDist);

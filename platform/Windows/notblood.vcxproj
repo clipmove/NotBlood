@@ -208,6 +208,7 @@
     <ClCompile Include="..\..\source\blood\src\network.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnextcdud.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnextcitem.cpp" />
+    <ClCompile Include="..\..\source\blood\src\aipatrol.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnexts.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnextsif.cpp" />
     <ClCompile Include="..\..\source\blood\src\nnextslaser.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="..\..\source\blood\src\mirrors.h" />
     <ClInclude Include="..\..\source\blood\src\nnextcdud.h" />
     <ClInclude Include="..\..\source\blood\src\nnextcitem.h" />
+    <ClInclude Include="..\..\source\blood\src\aipatrol.h" />
     <ClInclude Include="..\..\source\blood\src\nnexts.h" />
     <ClInclude Include="..\..\source\blood\src\nnextsif.h" />
     <ClInclude Include="..\..\source\blood\src\nnextslaser.h" />

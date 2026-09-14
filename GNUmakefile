@@ -557,6 +557,7 @@ ifeq ($(NOONE_EXTENSIONS),1)
     blood_game_objs += nnextslaser.cpp
     blood_game_objs += nnextcdud.cpp
     blood_game_objs += aicdud.cpp
+    blood_game_objs += aipatrol.cpp
 endif
 
 blood_game_rsrc_objs :=
