@@ -925,25 +925,6 @@ int aiDamageSprite(spritetype *pSprite, XSPRITE *pXSprite, int nSource, DAMAGE_T
             if (aiInPatrolState(pXSprite->aiState))
             {
                 aiPatrolStop(pSprite, pSource->index, pXSprite->dudeAmbush);
-
-                PLAYER* pPlayer = getPlayerById(pSource->type);
-                if (!pPlayer)
-                    return nDamage;
-
-                if (readyForCrit(pSource, pSprite))
-                {
-                    nDamage += aiDamageSprite(pSprite, pXSprite, pSource->index, nDmgType, nDamage * (10 - gGameOptions.nDifficulty));
-                    if (pXSprite->health > 0)
-                    {
-                        int fullHp = (pXSprite->sysData2 > 0) ? ClipRange(pXSprite->sysData2 << 4, 1, 65535) : getDudeInfo(pSprite->type)->startHealth << 4;
-                        if (((100 * pXSprite->health) / fullHp) <= 75)
-                        {
-                            cumulDamage[pSprite->extra] += nDamage << 4; // to be sure any enemy will play the recoil animation
-                            RecoilDude(pSprite, pXSprite);
-                        }
-                    }
-                }
-
                 return nDamage;
             }
 
@@ -1697,20 +1678,10 @@ void aiInitSprite(spritetype *pSprite)
         if (pXSprite->dudeFlag4)
         {
             char patrol = 0;
-            if (target <= 0)
-            {
-                patrol      = 1;
-                stateTimer  = 0;
-                
-                // start new patrol
-                pXSprite->target = -1;
-                patrol = (aiPatrolSetMarker(pSprite, pXSprite) > 0);
-            }
-            else if (rngok(target, 1, kMaxSprites))
+            if (rngok(target, 1, kMaxSprites))
             {
                 spritetype* pTarg = &sprite[target];
-                if (rngok(pTarg->inittype, kDudeBase, kDudeMax)) patrol = 0;
-                else if (pTarg->type == kMarkerPath)
+                if (pTarg->type == kMarkerPath)
                 {
                     // continue patrol
                     pXSprite->target  = target;
@@ -1720,21 +1691,22 @@ void aiInitSprite(spritetype *pSprite)
                     patrol = 1;
                 }
             }
-
+            else
+            {
+                // start new patrol
+                
+                stateTimer  = 0;
+                pXSprite->target = -1;
+                patrol = (aiPatrolSetMarker(pSprite, pXSprite) > 0);
+            }
+            
             if (patrol)
             {
                 pXSprite->data3 = 0; // reset target spot progress
-                bool uwater = spriteIsUnderwater(pSprite);
                 if (stateTimer > 0)
-                {
-                    if (uwater) aiPatrolState(pSprite, kAiStatePatrolWaitW);
-                    else if (pXSprite->unused1 & kDudeFlagCrouch) aiPatrolState(pSprite, kAiStatePatrolWaitC);
-                    else aiPatrolState(pSprite, kAiStatePatrolWaitL);
-                    pXSprite->stateTimer = (unsigned int)stateTimer; // restore state timer
-                }
-                else if (uwater) aiPatrolState(pSprite, kAiStatePatrolMoveW);
-                else if (pXSprite->unused1 & kDudeFlagCrouch) aiPatrolState(pSprite, kAiStatePatrolMoveC);
-                else aiPatrolState(pSprite, kAiStatePatrolMoveL);
+                    aiPatrolState(pSprite, pXSprite, kAiStatePatrolIdle, stateTimer);
+                else
+                    aiPatrolState(pSprite, pXSprite, kAiStatePatrolMove);
             }
         }
     }

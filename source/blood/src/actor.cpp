@@ -4697,7 +4697,7 @@ void MoveDude(spritetype *pSprite)
 
                 #ifdef NOONE_EXTENSIONS
                 if (IsDudeSprite(pSprite) && pXSprite->health > 0 && aiInPatrolState(nAiStateType))
-                    aiPatrolState(pSprite, kAiStatePatrolMoveL); // continue patrol when going from water
+                    aiPatrolState(pSprite, pXSprite, kAiStatePatrolMove); // continue patrol when going from water
                 #endif
             }
             break;
@@ -4802,7 +4802,7 @@ void MoveDude(spritetype *pSprite)
 
                     // continue patrol when fall into water
                     if (IsDudeSprite(pSprite) && pXSprite->health > 0 && aiInPatrolState(nAiStateType))
-                        aiPatrolState(pSprite, kAiStatePatrolMoveW);
+                        aiPatrolState(pSprite, pXSprite, kAiStatePatrolMove);
                 }
                 #endif
 
