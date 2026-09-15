@@ -92,6 +92,7 @@ int32_t gRadialMenuYawInvert;
 int32_t gRadialMenuPitch;
 int32_t gRadialMenuPitchInvert;
 int32_t gRadialMenuSfx;
+int32_t gRadialMenuSfxVol;
 int32_t gRadialMenuReticle;
 int32_t gCrouchToggle;
 int32_t gCrouchAuto;
@@ -560,6 +561,7 @@ void CONFIG_SetDefaults(void)
     gRadialMenuPitch = 1;
     gRadialMenuPitchInvert = 0;
     gRadialMenuSfx = 1;
+    gRadialMenuSfxVol = 1;
     gRadialMenuReticle = 2;
     gCrouchToggle = 0;
     gCrouchAuto = 0;

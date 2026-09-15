@@ -331,6 +331,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable invert radial menu pitch input
 * in_radialmenuclick
    - Set radial menu sound effect click (0-3)
+* in_radialmenuclickvol
+   - Set radial menu sound effect click volume (0: normal: 1: quiet)
 * in_radialmenureticle
    - Show radial menu reticle (0: off, 1: small: 2: medium, 3: large)
 * in_targetaimassist

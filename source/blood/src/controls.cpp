@@ -751,6 +751,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
     const int nSfxVol[3] = {42, 44, 64};
     const int nSfxFreq[3] = {14600, 11025, 11025};
     const int nSfxChoice = (gRadialMenuSfx&3)-1;
+    const int nSfxVolume = gRadialMenuSfxVol ? nSfxVol[nSfxChoice] : nSfxVol[nSfxChoice]>>1;
     const char kWeaponSelectTable[12] = // angle to weapon slot
     {
         kWeaponTNT,
@@ -979,7 +980,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             {
                 gWeaponRadialMenuChoice = nNewChoice;
                 if (nSfxChoice >= 0)
-                    sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
+                    sndStartSample(sSfxSound[nSfxChoice], nSfxVolume, -1, nSfxFreq[nSfxChoice]);
                 nOldMouseX = nOldMouseY = 0; // reset mouse state when using next/prev buttons
             }
         }
@@ -1006,7 +1007,7 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
             {
                 gWeaponRadialMenuChoice = nNewWeapon;
                 if (nSfxChoice >= 0)
-                    sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
+                    sndStartSample(sSfxSound[nSfxChoice], nSfxVolume, -1, nSfxFreq[nSfxChoice]);
             }
             else if (nNewWeapon != gWeaponRadialMenuChoice) // new slot is unselectable, check neighbor slots
             {
@@ -1024,13 +1025,13 @@ void ctrlRadialWeaponMenu(const ControlInfo *pInput, const bool bReset)
                     if (bCanPickNext)
                     {
                         if ((nSfxChoice >= 0) && (gWeaponRadialMenuChoice != nChoiceNext))
-                            sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
+                            sndStartSample(sSfxSound[nSfxChoice], nSfxVolume, -1, nSfxFreq[nSfxChoice]);
                         gWeaponRadialMenuChoice = nChoiceNext;
                     }
                     else if (bCanPickPrev)
                     {
                         if ((nSfxChoice >= 0) && (gWeaponRadialMenuChoice != nChoicePrev))
-                            sndStartSample(sSfxSound[nSfxChoice], nSfxVol[nSfxChoice], -1, nSfxFreq[nSfxChoice]);
+                            sndStartSample(sSfxSound[nSfxChoice], nSfxVolume, -1, nSfxFreq[nSfxChoice]);
                         gWeaponRadialMenuChoice = nChoicePrev;
                     }
                 }
