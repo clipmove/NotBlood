@@ -79,7 +79,8 @@ struct GAMEOPTIONS {
     int nEnemyQuantity;
     int nEnemyHealth;
     short nEnemySpeed;
-    short nPlayerSpeed;
+    char nPlayerSpeed;
+    char nPlayerWater;
     bool bEnemyShuffle;
     bool bPitchforkOnly;
     char bPermaDeath : 1;
