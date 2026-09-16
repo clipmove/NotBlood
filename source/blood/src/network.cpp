@@ -78,7 +78,7 @@ char gNetAddress[48];
 int gNetPort = kNetDefaultPort;
 int gNetPortLocal = -1;
 
-const short kNetVersion = 0x247;
+const short kNetVersion = 0x248;
 
 #ifdef NORENDER
 #ifdef _WIN32
