@@ -446,7 +446,7 @@ public:
     void FocusBottomItem(void);
     bool IsFocusItem(CGameMenuItem *pItem);
     bool MouseEvent(CGameMenuEvent &event);
-    void OrganizeItems(const bool bAddSpace, const bool bAddSpaceForTooltips);
+    void OrganizeItems(const bool bAddSpace, const bool bAddSpaceForTooltips, const int nExtra);
 };
 
 class CGameMenuMgr

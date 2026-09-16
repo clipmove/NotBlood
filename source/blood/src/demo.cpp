@@ -249,6 +249,7 @@ void ReadGameOptionsLegacy(GAMEOPTIONS &gameOptions, GAMEOPTIONSLEGACY &gameOpti
     gameOptions.nEnemyHealth = gameOptions.nDifficulty;
     gameOptions.nEnemySpeed = 0;
     gameOptions.nPlayerSpeed = 0;
+    gameOptions.nPlayerWater = 0;
     gameOptions.bEnemyShuffle = false;
     gameOptions.bPitchforkOnly = false;
     gameOptions.bPermaDeath = 0;

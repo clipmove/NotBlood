@@ -1260,7 +1260,7 @@ void playerStart(int nPlayer, int bNewLevel)
     pPlayer->q16look = 0;
     pPlayer->slope = 0;
     pPlayer->fraggerId = -1;
-    pPlayer->underwaterTime = 1200;
+    pPlayer->underwaterTime = mulscale16(1200, fix16_one + (gGameOptions.nPlayerWater<<15));
     pPlayer->bloodTime = 0;
     pPlayer->gooTime = 0;
     pPlayer->wetTime = 0;
@@ -2546,7 +2546,7 @@ void playerProcess(PLAYER *pPlayer)
     }
     if (!pPlayer->isUnderwater)
     {
-        pPlayer->underwaterTime = 1200;
+        pPlayer->underwaterTime = mulscale16(1200, fix16_one + (gGameOptions.nPlayerWater<<15));
         pPlayer->chokeEffect = 0;
         if (packItemActive(pPlayer, kPackDivingSuit))
             packUseItem(pPlayer, kPackDivingSuit);

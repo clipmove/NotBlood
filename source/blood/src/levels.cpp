@@ -86,12 +86,13 @@ GAMEOPTIONS gSingleGameOptions = {
     -1,    // int nRandomizerCheat;
     2,     // int nEnemyQuantity;
     2,     // int nEnemyHealth;
-    0,     // int nEnemySpeed;
-    0,     // int nPlayerSpeed;
+    0,     // short nEnemySpeed;
+    0,     // char nPlayerSpeed;
+    0,     // char nPlayerWater;
     0,     // bool bEnemyShuffle;
     0,     // bool bPitchforkOnly;
-    0,     // bool bPermaDeath : 1;
-    0,     // bool bDamage2X : 1;
+    0,     // char bPermaDeath : 1;
+    0,     // char bDamage2X : 1;
     0,     // bool bFriendlyFire;
     1,     // char nKeySettings;
     0,     // char bItemWeaponSettings;

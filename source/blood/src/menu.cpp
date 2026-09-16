@@ -71,6 +71,7 @@ void SetSectorBehavior(CGameMenuItemZBool*);
 void SetHitscanProjectiles(CGameMenuItemZCycle*);
 void SetGoreMode(CGameMenuItemZCycle*);
 void SetPlayerSpeed(CGameMenuItemZCycle*);
+void SetPlayerWater(CGameMenuItemZCycle*);
 void SetRandomizerMode(CGameMenuItemZCycle*);
 void SetRandomizerSeed(CGameMenuItemZEdit *pItem, CGameMenuEvent *pEvent);
 
@@ -367,6 +368,14 @@ const char *pzPlayerSpeeds[] = {
     "2.00x",
 };
 
+const char *pzPlayerWater[] = {
+    "Default",
+    "1.50x",
+    "2.00x",
+    "2.50x",
+    "3.00x",
+};
+
 char zUserMapName[BMAX_PATH] = "";
 const char *zEpisodeNames[6];
 const char *zLevelNames[6][kMaxLevels];
@@ -633,6 +642,7 @@ CGameMenuItemZBool itemNetMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 
 CGameMenuItemZCycle itemNetMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
 CGameMenuItemZCycle itemNetMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 132, 180, 0, NULL, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
 CGameMenuItemZCycle itemNetMutatorPlayerSpeed("PLAYER SPEED:", 3, 66, 142, 180, 0, NULL, pzPlayerSpeeds, ARRAY_SSIZE(pzPlayerSpeeds), 0);
+CGameMenuItemZCycle itemNetMutatorPlayerWater("PLAYER OXYGEN SUPPLY:", 3, 66, 142, 180, 0, NULL, pzPlayerWater, ARRAY_SSIZE(pzPlayerWater), 0);
 CGameMenuItemZCycle itemNetMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 152, 180, 0, NULL, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
 CGameMenuItemZEdit itemNetMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 162, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
 ///////////////////
@@ -801,6 +811,7 @@ CGameMenuItemZBool itemMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 180
 CGameMenuItemZCycle itemMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, SetHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
 CGameMenuItemZCycle itemMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 132, 180, 0, SetGoreMode, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
 CGameMenuItemZCycle itemMutatorPlayerSpeed("PLAYER SPEED:", 3, 66, 142, 180, 0, SetPlayerSpeed, pzPlayerSpeeds, ARRAY_SSIZE(pzPlayerSpeeds), 0);
+CGameMenuItemZCycle itemMutatorPlayerWater("PLAYER OXYGEN SUPPLY:", 3, 66, 142, 180, 0, SetPlayerWater, pzPlayerWater, ARRAY_SSIZE(pzPlayerWater), 0);
 CGameMenuItemZCycle itemMutatorRandomizerMode("RANDOMIZER MODE:", 3, 66, 152, 180, 0, SetRandomizerMode, pzRandomizerModeStrings, ARRAY_SSIZE(pzRandomizerModeStrings), 0);
 CGameMenuItemZEdit itemMutatorRandomizerSeed("RANDOMIZER SEED:", 3, 66, 162, 180, szRandomizerSeedMenu, sizeof(szRandomizerSeedMenu), 0, SetRandomizerSeed, 0);
 ///////////////////
@@ -1398,7 +1409,7 @@ void SetupDifficultyMenu(void)
     menuCustomDifficulty.Add(&itemCustomDifficultyBannedItems, false);
     menuCustomDifficulty.Add(&itemCustomDifficultyStart, false);
     menuCustomDifficulty.Add(&itemBloodQAV, false);
-    menuCustomDifficulty.OrganizeItems(false, true);
+    menuCustomDifficulty.OrganizeItems(false, true, 0);
     itemCustomDifficultyStartLevel.tooltip_pzTextUpper = "";
     itemCustomDifficultyStartLevel.tooltip_pzTextLower = "Set the starting level for this episode";
     itemCustomDifficultyEnemyQuantity.tooltip_pzTextUpper = "";
@@ -1720,10 +1731,11 @@ void SetupNetStartMenu(void)
     menuNetworkGameMutators.Add(&itemNetMutatorHitscanProjectiles, false);
     menuNetworkGameMutators.Add(&itemNetMutatorGoreBehavior, false);
     menuNetworkGameMutators.Add(&itemNetMutatorPlayerSpeed, false);
+    menuNetworkGameMutators.Add(&itemNetMutatorPlayerWater, false);
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerMode, false);
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerSeed, false);
     menuNetworkGameMutators.Add(&itemBloodQAV, false);
-    menuNetworkGameMutators.OrganizeItems(true, true);
+    menuNetworkGameMutators.OrganizeItems(true, true, 4);
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";
     itemNetMutatorBoolBeastVision.tooltip_pzTextLower = "Replace beast vision item function";
@@ -1748,6 +1760,7 @@ void SetupNetStartMenu(void)
 #endif
     itemNetMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
     itemNetMutatorPlayerSpeed.tooltip_pzTextUpper = "Adjusts the player speed";
+    itemNetMutatorPlayerWater.tooltip_pzTextUpper = "Adjusts the oxygen supply";
     itemNetMutatorRandomizerMode.tooltip_pzTextUpper = "Set the randomizer's mode";
     itemNetMutatorRandomizerSeed.tooltip_pzTextUpper = "Set the randomizer's seed";
     itemNetMutatorRandomizerSeed.tooltip_pzTextLower = "No seed = always use a random seed";
@@ -1801,6 +1814,7 @@ void SetupNetStartMenu(void)
     itemNetMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     itemNetMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
     itemNetMutatorPlayerSpeed.m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
+    itemNetMutatorPlayerWater.m_nFocus = gPlayerModWaterOxygen % ARRAY_SSIZE(pzPlayerWater);
     itemNetMutatorRandomizerMode.m_nFocus = gRandomizerMode % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(szRandomizerSeedMenu, gzRandomizerSeed, sizeof(gPacketStartGame.szRandomizerSeed));
     ///////
@@ -2015,10 +2029,11 @@ void SetupOptionsMenu(void)
     menuOptionsGameMutators.Add(&itemMutatorHitscanProjectiles, false);
     menuOptionsGameMutators.Add(&itemMutatorGoreBehavior, false);
     menuOptionsGameMutators.Add(&itemMutatorPlayerSpeed, false);
+    menuOptionsGameMutators.Add(&itemMutatorPlayerWater, false);
     menuOptionsGameMutators.Add(&itemMutatorRandomizerMode, false);
     menuOptionsGameMutators.Add(&itemMutatorRandomizerSeed, false);
     menuOptionsGameMutators.Add(&itemBloodQAV, false);
-    menuOptionsGameMutators.OrganizeItems(true, true);
+    menuOptionsGameMutators.OrganizeItems(true, true, 4);
     itemOptionsChainMutators.bDisableForNet = 1;
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";
@@ -2044,6 +2059,7 @@ void SetupOptionsMenu(void)
 #endif
     itemMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
     itemMutatorPlayerSpeed.tooltip_pzTextUpper = "Adjusts the player speed";
+    itemMutatorPlayerWater.tooltip_pzTextUpper = "Adjusts the oxygen supply";
     itemMutatorRandomizerMode.tooltip_pzTextUpper = "Set the randomizer's mode";
     itemMutatorRandomizerSeed.tooltip_pzTextUpper = "Set the randomizer's seed";
     itemMutatorRandomizerSeed.tooltip_pzTextLower = "No seed = always use a random seed";
@@ -2076,6 +2092,7 @@ void SetupOptionsMenu(void)
     itemMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     itemMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
     itemMutatorPlayerSpeed.m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
+    itemMutatorPlayerWater.m_nFocus = gPlayerModWaterOxygen % ARRAY_SSIZE(pzPlayerWater);
     itemMutatorRandomizerMode.m_nFocus = gRandomizerMode % ARRAY_SSIZE(pzRandomizerModeStrings);
     Bstrncpy(szRandomizerSeedMenu, gzRandomizerSeed, sizeof(szRandomizerSeedMenu));
     ///////
@@ -2817,6 +2834,16 @@ void SetPlayerSpeed(CGameMenuItemZCycle *pItem)
         gGameOptions.nPlayerSpeed = gPlayerModSpeed;
     } else {
         pItem->m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
+    }
+}
+
+void SetPlayerWater(CGameMenuItemZCycle *pItem)
+{
+    if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) {
+        gPlayerModWaterOxygen = pItem->m_nFocus % ARRAY_SSIZE(pzPlayerSpeeds);
+        gGameOptions.nPlayerWater = gPlayerModWaterOxygen;
+    } else {
+        pItem->m_nFocus = gPlayerModWaterOxygen % ARRAY_SSIZE(pzPlayerWater);
     }
 }
 
