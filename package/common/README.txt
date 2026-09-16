@@ -121,6 +121,8 @@ If you have the GOG version of the game, do the following:
    - Make blood splatter effect be affected by explosive impulses
 * Player Speed
    - Adjusts the player speed in 25% increments
+* Player Oxygen Supply
+   - Adjusts the player oxygen supply in 50% increments
 * Randomizer mode
    - Set the enemy/pickups randomizer mode
    - The randomizer does not support custom modern map enemies
