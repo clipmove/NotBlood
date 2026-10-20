@@ -365,7 +365,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
     const int nSin = Sin(nAng)>>16;
     const int bShape = nDraw.bShape;
     const int bTransparent = nDraw.nTransparent;
-    const int nMaxPixelSize = (nScaleFactor>>16)+1; // use screen res as factor for pixel size
+    const int nMaxPixelSize = ((nScaleFactor>>16)+1)<<1; // use screen res as factor for pixel size
     const int nGrav = nGravity && nDelta ? ClipLow(mulscale16(nGravity, nDelta), 1) : 0;
     const int nGravityFast = nDraw.bGravityVariance && (nGrav != 0) ? nGrav - (nGrav>>2) : nGrav;
 
@@ -377,7 +377,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
 
         // depth in rotated/view space
         const int nDepth = (relX * nCos + relY * nSin)>>14;
-        if (nDepth <= 4)
+        if (nDepth <= 32)
             continue;
 
         // cull by radius in rotated space
