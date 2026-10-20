@@ -436,7 +436,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                         nStat = RS_TOPLEFT|RS_STRETCH;
                         break;
                     }
-                    const int nSize = ClipHigh(nScale, nMaxPixelSize<<13)<<2;
+                    const int nSize = ClipHigh(nScale, nMaxPixelSize<<12)<<2;
                     const int nTile = kWeatherTileStart + (bShape * 256) + nColor; // load from generated tile bank
                     screenX = (screenX + nOffsetX)<<16;
                     screenY = (screenY + nOffsetY)<<16;
@@ -458,7 +458,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
                 }
 #endif
 
-                const int nSize = ClipHigh(nScale>>12, nMaxPixelSize<<1); // why did I pick 12? because it looked the best
+                const int nSize = ClipHigh(nScale>>12, nMaxPixelSize); // why did I pick 12? because it looked the best
                 if (nSize <= 1) // if size is a pixel, don't bother calculating box fill
                 {
                     for (int j = 1<<bShape; j > 0 && screenY > 0; j--, screenY--)
