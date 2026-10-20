@@ -377,7 +377,7 @@ void CWeather::Draw(char *pBuffer, int nWidth, int nHeight, int nOffsetX, int nO
 
         // depth in rotated/view space
         const int nDepth = (relX * nCos + relY * nSin)>>14;
-        if (nDepth <= 4)
+        if (nDepth <= 32)
             continue;
 
         // cull by radius in rotated space
