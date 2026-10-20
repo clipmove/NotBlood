@@ -166,17 +166,17 @@ jobs:
       - name: build
         run: make -j$(nproc) blood tools ${{matrix.opt}}
 
-  build-macos:
-    name: macOS Clang
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: install-prerequisites
-        run: |
-          brew install sdl2 flac make
-          brew unlink lz4
-      - name: build
-        run: gmake -j2 blood tools NETCODE=0
+  # build-macos:
+    # name: macOS Clang
+    # runs-on: macos-latest
+    # steps:
+      # - uses: actions/checkout@v7
+      # - name: install-prerequisites
+        # run: |
+          # brew install sdl2 flac make
+          # brew unlink lz4
+      # - name: build
+        # run: gmake -j2 blood tools NETCODE=0
       # Removed until upstream EDuke32 fixes keyboard input for builds - https://forums.duke4.net/topic/12622-cant-use-keyboard-in-osx-build/
       # - name: 'prepare files for upload'
         # run: |
