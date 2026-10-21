@@ -438,7 +438,11 @@ enum {
     kMissileLifeLeechAltSmall = 317,
     kMissileShell = 318,
     kMissileBullet = 319,
-    kMissileMax = 320,
+    kMissilePlayerShell = 320,
+    kMissilePlayerShellAP = 321,
+    kMissilePlayerBullet = 322,
+    kMissilePlayerBulletAP = 323,
+    kMissileMax = 324,
 
     // things
     kThingBase = 400,

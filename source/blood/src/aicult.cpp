@@ -108,7 +108,7 @@ static void TommySeqCallback(int, int nXSprite)
     dx += Random3((5-gGameOptions.nDifficulty)*1000);
     dy += Random3((5-gGameOptions.nDifficulty)*1000);
     dz += Random3((5-gGameOptions.nDifficulty)*500);
-    bool useProjectile = gGameOptions.nHitscanProjectiles && !VanillaMode(); // if enemy hitscan projectiles are enabled, spawn bullet projectile
+    bool useProjectile = gGameOptions.nEnemyHitscanProjectiles && !VanillaMode(); // if enemy hitscan projectiles are enabled, spawn bullet projectile
     if (useProjectile && spriRangeIsFine(pXSprite->target)) // if target is valid
     {
         spritetype *pTarget = &sprite[pXSprite->target];
@@ -167,7 +167,7 @@ static void ShotSeqCallback(int, int nXSprite)
     dx += Random2((5-gGameOptions.nDifficulty)*1000-500);
     dy += Random2((5-gGameOptions.nDifficulty)*1000-500);
     dz += Random2((5-gGameOptions.nDifficulty)*500);
-    bool useProjectile = gGameOptions.nHitscanProjectiles && !VanillaMode(); // if enemy hitscan projectiles are enabled, spawn bullet projectile
+    bool useProjectile = gGameOptions.nEnemyHitscanProjectiles && !VanillaMode(); // if enemy hitscan projectiles are enabled, spawn bullet projectile
     if (useProjectile && spriRangeIsFine(pXSprite->target)) // if target is valid
     {
         const spritetype *pTarget = &sprite[pXSprite->target];
