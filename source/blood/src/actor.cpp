@@ -7532,7 +7532,7 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
     if (!VanillaMode())
     {
         hit = VectorScanROR(pShooter, a2, a3, a4, a5, a6, nRange, 1, &shooterPos);
-        if (IsPlayerSprite(pShooter) && gGameOptions.nPlayerHitscanProjectiles) // if player fired hitscan weapon and player hitscan projectiles is on, spawn bullet and return
+        if (IsPlayerSprite(pShooter) && gGameOptions.nPlayerHitscanProjectiles && (approxDist(gHitInfo.hitx-shooterPos.x, gHitInfo.hity-shooterPos.y) > 1024)) // if player fired hitscan weapon and player hitscan projectiles is on, spawn bullet and return
         {
             switch (vectorType)
             {
