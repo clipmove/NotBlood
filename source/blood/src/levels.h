@@ -71,7 +71,8 @@ struct GAMEOPTIONS {
     char bWeaponImpulseLimit;
     short nAmmoScale;
     bool bSectorBehavior;
-    char nHitscanProjectiles;
+    char nEnemyHitscanProjectiles : 4;
+    char nPlayerHitscanProjectiles : 4;
     char nGoreBehavior;
     char nRandomizerMode;
     char szRandomizerSeed[9];

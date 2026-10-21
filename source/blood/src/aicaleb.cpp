@@ -80,7 +80,7 @@ static void SeqAttackCallback(int, int nXSprite)
     dx += Random2(1500);
     dy += Random2(1500);
     dz += Random2(1500);
-    bool useProjectile = gGameOptions.nHitscanProjectiles && !VanillaMode(); // if enemy hitscan projectiles are enabled, spawn bullet projectile
+    bool useProjectile = gGameOptions.nEnemyHitscanProjectiles && !VanillaMode(); // if enemy hitscan projectiles are enabled, spawn bullet projectile
     if (useProjectile && spriRangeIsFine(pXSprite->target)) // if target is valid
     {
         const spritetype *pTarget = &sprite[pXSprite->target];

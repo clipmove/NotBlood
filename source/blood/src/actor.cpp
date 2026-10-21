@@ -1702,6 +1702,46 @@ MissileType missileInfo[] = {
         14,
         (char)-128,
         8,
+    },
+    // Shotgun shell projectile (player)
+    {
+        9295, // use bullet sprite from notblood.pk3/TILES099.ART
+        (625)<<12,
+        0,
+        14,
+        14,
+        (char)-128,
+        8,
+    },
+    // Shotgun alt-fire shell projectile (player)
+    {
+        9295, // use bullet sprite from notblood.pk3/TILES099.ART
+        (625)<<12,
+        0,
+        14,
+        14,
+        (char)-128,
+        8,
+    },
+    // Tommy gun bullet projectile (player)
+    {
+        9295, // use bullet sprite from notblood.pk3/TILES099.ART
+        (625)<<12,
+        0,
+        14,
+        14,
+        (char)-128,
+        8,
+    },
+    // Tommy gun bullet projectile (player)
+    {
+        9295, // use bullet sprite from notblood.pk3/TILES099.ART
+        (625)<<12,
+        0,
+        14,
+        14,
+        (char)-128,
+        8,
     }
 };
 
@@ -5874,11 +5914,33 @@ void MoveMissileBullet(spritetype *pSprite)
     const int dx = Cos(pSprite->ang)>>16;
     const int dy = Sin(pSprite->ang)>>16;
     int dz = zvel[nSprite]>>7;
-    const VECTOR_TYPE nType = pSprite->type == kMissileShell ? kVectorShell : kVectorBullet;
+    VECTOR_TYPE nType;
+    switch (pSprite->type)
+    {
+    case kMissileShell:
+        nType = kVectorShell;
+        break;
+    case kMissilePlayerShell:
+        nType = kVectorShell;
+        break;
+    case kMissilePlayerShellAP:
+        nType = kVectorShellAP;
+        break;
+    case kMissilePlayerBullet:
+        nType = kVectorTommyregular;
+        break;
+    case kMissilePlayerBulletAP:
+        nType = kVectorTommyAP;
+        break;
+    default:
+        nType = kVectorBullet;
+        break;
+    }
     int speed = missileInfo[pSprite->type - kMissileBase].velocity;
-    if (gGameOptions.nHitscanProjectiles == 1) // if hitscan projectile speed is 75%, adjust hitscan range
+    const char bIsPlayer = IsPlayerSprite(pOwner);
+    if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 1 : gGameOptions.nEnemyHitscanProjectiles == 1) // if hitscan projectile speed is 75%, adjust hitscan range
         speed = (speed>>1) + (speed>>2);
-    else if (gGameOptions.nHitscanProjectiles == 3) // if hitscan projectile speed is 125%, adjust hitscan range
+    else if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 3 : gGameOptions.nEnemyHitscanProjectiles == 3) // if hitscan projectile speed is 125%, adjust hitscan range
         speed += (speed>>2);
     if (underwaterSector) // if bullet is underwater, adjust hitscan range by 50%
         speed >>= 1;
@@ -6438,7 +6500,7 @@ void actProcessSprites(void)
         if (pSprite->flags & 32)
             continue;
         viewBackupSpriteLoc(nSprite, pSprite);
-        if ((pSprite->type != kMissileShell) && (pSprite->type != kMissileBullet)) // if regular missile sprites
+        if (pSprite->type < kMissileShell) // if regular missile sprites
         {
             int hit = MoveMissile(pSprite);
             if (hit >= 0)
@@ -7223,26 +7285,29 @@ spritetype* actFireMissile(spritetype *pSprite, int a2, int a3, int a4, int a5, 
     zvel[nMissile] = mulscale14(pMissileInfo->velocity, a6);
     actPropagateSpriteOwner(pMissile, pSprite);
     pMissile->cstat |= CSTAT_SPRITE_BLOCK;
-    if ((nType == kMissileShell) || (nType == kMissileBullet)) // do not set collisions on for bullet projectiles (so bullets will not collide with each other)
+    if (nType >= kMissileShell) // do not set collisions on for bullet projectiles (so bullets will not collide with each other)
     {
         if (gProjectileOldSprite)
         {
             pMissile->picnum = 9288; // use old bullet sprite from notblood.pk3/TILES099.ART
             pMissile->xrepeat = pMissile->yrepeat = 32;
         }
-        pMissile->cstat &= ~(CSTAT_SPRITE_BLOCK|CSTAT_SPRITE_BLOCK_HITSCAN);
-        if (gGameOptions.nHitscanProjectiles == 1) // if hitscan projectile speed is 75%, adjust speed
+        const char bIsPlayer = IsPlayerSprite(pSprite);
+        if (bIsPlayer) // player projectiles are half sized
+            pMissile->xrepeat = pMissile->yrepeat = 9;
+        if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 1 : gGameOptions.nEnemyHitscanProjectiles == 1) // if hitscan projectile speed is 75%, adjust speed
         {
             xvel[nMissile] = (xvel[nMissile]>>1) + (xvel[nMissile]>>2);
             yvel[nMissile] = (yvel[nMissile]>>1) + (yvel[nMissile]>>2);
             zvel[nMissile] = (zvel[nMissile]>>1) + (zvel[nMissile]>>2);
         }
-        else if (gGameOptions.nHitscanProjectiles == 3) // if hitscan projectile speed is 125%, adjust speed
+        else if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 3 : gGameOptions.nEnemyHitscanProjectiles == 3) // if hitscan projectile speed is 125%, adjust speed
         {
             xvel[nMissile] += (xvel[nMissile]>>2);
             yvel[nMissile] += (yvel[nMissile]>>2);
             zvel[nMissile] += (zvel[nMissile]>>2);
         }
+        pMissile->cstat &= ~(CSTAT_SPRITE_BLOCK | CSTAT_SPRITE_BLOCK_HITSCAN);
     }
     int nXSprite = pMissile->extra;
     dassert(nXSprite > 0 && nXSprite < kMaxXSprites);
@@ -7251,7 +7316,7 @@ spritetype* actFireMissile(spritetype *pSprite, int a2, int a3, int a4, int a5, 
    
     actBuildMissile(pMissile, nXSprite, nSprite);
     
-    if (v4 && (nType != kMissileShell) && (nType != kMissileBullet))
+    if (v4 && (nType < kMissileShell))
     {
         actImpactMissile(pMissile, hit);
         pMissile = NULL;
@@ -7467,6 +7532,26 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
     if (!VanillaMode())
     {
         hit = VectorScanROR(pShooter, a2, a3, a4, a5, a6, nRange, 1, &shooterPos);
+        if (IsPlayerSprite(pShooter) && gGameOptions.nPlayerHitscanProjectiles) // if player fired hitscan weapon and player hitscan projectiles is on, spawn bullet and return
+        {
+            switch (vectorType)
+            {
+            case kVectorShell:
+                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerShell);
+                return;
+            case kVectorShellAP:
+                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerShellAP);
+                return;
+            case kVectorTommyregular:
+                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerBullet);
+                return;
+            case kVectorTommyAP:
+                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerBulletAP);
+                return;
+            default:
+                break;
+            }
+        }
     }
     else
     {

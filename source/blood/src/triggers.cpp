@@ -2570,7 +2570,7 @@ void MGunFireSeqCallback(int, int nXSprite)
         int dx = (Cos(pSprite->ang)>>16)+Random2(1000);
         int dy = (Sin(pSprite->ang)>>16)+Random2(1000);
         int dz = Random2(1000);
-        if (gGameOptions.nHitscanProjectiles && !VanillaMode()) // if enemy hitscan projectiles are enabled, spawn bullet projectile
+        if (gGameOptions.nEnemyHitscanProjectiles && !VanillaMode()) // if enemy hitscan projectiles are enabled, spawn bullet projectile
         {
             const int bakX = pSprite->x, bakY = pSprite->y;
             pSprite->x += mulscale14(missileInfo[kMissileBullet-kMissileBase].velocity, dx)>>14; // move origin away from attached wall so it doesn't collide on first tick (this happens with BB6 - twin fortress)
