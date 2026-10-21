@@ -705,7 +705,8 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->bWeaponImpulseLimit = gWeaponImpulseLimit;
         pOpt->nAmmoScale = gAmmoScale;
         pOpt->bSectorBehavior = gSectorBehavior;
-        pOpt->nHitscanProjectiles = gHitscanProjectiles;
+        pOpt->nEnemyHitscanProjectiles = gEnemyHitscanProjectiles;
+        pOpt->nPlayerHitscanProjectiles = gPlayerHitscanProjectiles;
         pOpt->nGoreBehavior = gGoreBehavior;
         pOpt->nPlayerSpeed = gPlayerModSpeed;
         pOpt->nPlayerWater = gPlayerModWaterOxygen;
@@ -757,7 +758,8 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->bWeaponImpulseLimit = gPacketStartGame.bWeaponImpulseLimit;
         pOpt->nAmmoScale = gPacketStartGame.nAmmoScale;
         pOpt->bSectorBehavior = gPacketStartGame.bSectorBehavior;
-        pOpt->nHitscanProjectiles = gPacketStartGame.nHitscanProjectiles;
+        pOpt->nEnemyHitscanProjectiles = gPacketStartGame.nEnemyHitscanProjectiles;
+        pOpt->nPlayerHitscanProjectiles = gPacketStartGame.nPlayerHitscanProjectiles;
         pOpt->nGoreBehavior = gPacketStartGame.nGoreBehavior;
         pOpt->nPlayerSpeed = gPacketStartGame.nPlayerSpeed;
         pOpt->nPlayerWater = gPacketStartGame.nPlayerWater;

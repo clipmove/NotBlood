@@ -68,7 +68,8 @@ void SetWeaponsVer(CGameMenuItemZCycle*);
 void SetWeaponImpulseLimit(CGameMenuItemZBool*);
 void SetAmmoScale(CGameMenuItemZCycle*);
 void SetSectorBehavior(CGameMenuItemZBool*);
-void SetHitscanProjectiles(CGameMenuItemZCycle*);
+void SetEnemyHitscanProjectiles(CGameMenuItemZCycle*);
+void SetPlayerHitscanProjectiles(CGameMenuItemZCycle*);
 void SetGoreMode(CGameMenuItemZCycle*);
 void SetPlayerSpeed(CGameMenuItemZCycle*);
 void SetPlayerWater(CGameMenuItemZCycle*);
@@ -639,7 +640,8 @@ CGameMenuItemZCycle itemNetMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 92, 180,
 CGameMenuItemZBool itemNetMutatorBoolWeaponImpulseLimit("WEAPON IMPULSE LIMIT:", 3, 66, 112, 180, false, NULL, "LIMITED", "ORIGINAL");
 CGameMenuItemZCycle itemNetMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 102, 180, 0, NULL, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
 CGameMenuItemZBool itemNetMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 180, false, NULL, "NOTBLOOD", "ORIGINAL");
-CGameMenuItemZCycle itemNetMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
+CGameMenuItemZCycle itemNetMutatorEnemyHitscanProjectiles("ENEMY HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
+CGameMenuItemZCycle itemNetMutatorPlayerHitscanProjectiles("PLAYER HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, NULL, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
 CGameMenuItemZCycle itemNetMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 132, 180, 0, NULL, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
 CGameMenuItemZCycle itemNetMutatorPlayerSpeed("PLAYER SPEED:", 3, 66, 142, 180, 0, NULL, pzPlayerSpeeds, ARRAY_SSIZE(pzPlayerSpeeds), 0);
 CGameMenuItemZCycle itemNetMutatorPlayerWater("PLAYER OXYGEN SUPPLY:", 3, 66, 142, 180, 0, NULL, pzPlayerWater, ARRAY_SSIZE(pzPlayerWater), 0);
@@ -808,7 +810,8 @@ CGameMenuItemZCycle itemMutatorWeaponsVer("WEAPON BEHAVIOR:", 3, 66, 92, 180, 0,
 CGameMenuItemZBool itemMutatorBoolImpulseLimit("WEAPON IMPULSE LIMIT:", 3, 66, 112, 180, false, SetWeaponImpulseLimit, "LIMITED", "ORIGINAL");
 CGameMenuItemZCycle itemMutatorAmmoScale("AMMO PICKUP SCALE:", 3, 66, 102, 180, 0, SetAmmoScale, pzAmmoScaleStrings, ARRAY_SSIZE(pzAmmoScaleStrings), 0);
 CGameMenuItemZBool itemMutatorSectorBehavior("SECTOR BEHAVIOR:", 3, 66, 112, 180, false, SetSectorBehavior, "NOTBLOOD", "ORIGINAL");
-CGameMenuItemZCycle itemMutatorHitscanProjectiles("HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, SetHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
+CGameMenuItemZCycle itemMutatorEnemyHitscanProjectiles("ENEMY HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, SetEnemyHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
+CGameMenuItemZCycle itemMutatorPlayerHitscanProjectiles("PLAYER HITSCAN PROJECTILES:", 3, 66, 122, 180, 0, SetPlayerHitscanProjectiles, pzHitscanProjectilesStrings, ARRAY_SSIZE(pzHitscanProjectilesStrings), 0);
 CGameMenuItemZCycle itemMutatorGoreBehavior("GORE BEHAVIOR:", 3, 66, 132, 180, 0, SetGoreMode, pzGoreStrings, ARRAY_SSIZE(pzGoreStrings), 0);
 CGameMenuItemZCycle itemMutatorPlayerSpeed("PLAYER SPEED:", 3, 66, 142, 180, 0, SetPlayerSpeed, pzPlayerSpeeds, ARRAY_SSIZE(pzPlayerSpeeds), 0);
 CGameMenuItemZCycle itemMutatorPlayerWater("PLAYER OXYGEN SUPPLY:", 3, 66, 142, 180, 0, SetPlayerWater, pzPlayerWater, ARRAY_SSIZE(pzPlayerWater), 0);
@@ -1728,7 +1731,8 @@ void SetupNetStartMenu(void)
     menuNetworkGameMutators.Add(&itemNetMutatorBoolWeaponImpulseLimit, false);
     menuNetworkGameMutators.Add(&itemNetMutatorAmmoScale, false);
     menuNetworkGameMutators.Add(&itemNetMutatorSectorBehavior, false);
-    menuNetworkGameMutators.Add(&itemNetMutatorHitscanProjectiles, false);
+    menuNetworkGameMutators.Add(&itemNetMutatorEnemyHitscanProjectiles, false);
+    menuNetworkGameMutators.Add(&itemNetMutatorPlayerHitscanProjectiles, false);
     menuNetworkGameMutators.Add(&itemNetMutatorGoreBehavior, false);
     menuNetworkGameMutators.Add(&itemNetMutatorPlayerSpeed, false);
     menuNetworkGameMutators.Add(&itemNetMutatorPlayerWater, false);
@@ -1754,10 +1758,11 @@ void SetupNetStartMenu(void)
     itemNetMutatorBoolWeaponImpulseLimit.tooltip_pzTextLower = "firing downwards at point-blank";
     itemNetMutatorAmmoScale.tooltip_pzTextUpper = "Scale ammo pickup amount";
     itemNetMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector logic";
-    itemNetMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
+    itemNetMutatorEnemyHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
 #ifdef NOONE_EXTENSIONS
-    itemNetMutatorHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
+    itemNetMutatorEnemyHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
 #endif
+    itemNetMutatorPlayerHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan weapons to spawn projectiles";
     itemNetMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
     itemNetMutatorPlayerSpeed.tooltip_pzTextUpper = "Adjusts the player speed";
     itemNetMutatorPlayerWater.tooltip_pzTextUpper = "Adjusts the oxygen supply";
@@ -1811,7 +1816,8 @@ void SetupNetStartMenu(void)
     itemNetMutatorBoolWeaponImpulseLimit.at20 = !!gWeaponImpulseLimit;
     itemNetMutatorAmmoScale.m_nFocus = gAmmoScale % ARRAY_SSIZE(pzAmmoScaleStrings);
     itemNetMutatorSectorBehavior.at20 = !!gSectorBehavior;
-    itemNetMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+    itemNetMutatorEnemyHitscanProjectiles.m_nFocus = gEnemyHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+    itemNetMutatorPlayerHitscanProjectiles.m_nFocus = gPlayerHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     itemNetMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
     itemNetMutatorPlayerSpeed.m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
     itemNetMutatorPlayerWater.m_nFocus = gPlayerModWaterOxygen % ARRAY_SSIZE(pzPlayerWater);
@@ -2026,7 +2032,8 @@ void SetupOptionsMenu(void)
     menuOptionsGameMutators.Add(&itemMutatorBoolImpulseLimit, false);
     menuOptionsGameMutators.Add(&itemMutatorAmmoScale, false);
     menuOptionsGameMutators.Add(&itemMutatorSectorBehavior, false);
-    menuOptionsGameMutators.Add(&itemMutatorHitscanProjectiles, false);
+    menuOptionsGameMutators.Add(&itemMutatorEnemyHitscanProjectiles, false);
+    menuOptionsGameMutators.Add(&itemMutatorPlayerHitscanProjectiles, false);
     menuOptionsGameMutators.Add(&itemMutatorGoreBehavior, false);
     menuOptionsGameMutators.Add(&itemMutatorPlayerSpeed, false);
     menuOptionsGameMutators.Add(&itemMutatorPlayerWater, false);
@@ -2053,10 +2060,11 @@ void SetupOptionsMenu(void)
     itemMutatorBoolImpulseLimit.tooltip_pzTextLower = "firing downwards at point-blank";
     itemMutatorAmmoScale.tooltip_pzTextUpper = "Scale ammo pickup amount";
     itemMutatorSectorBehavior.tooltip_pzTextUpper = "Improve room over room sector logic";
-    itemMutatorHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
+    itemMutatorEnemyHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan enemies to spawn projectiles";
 #ifdef NOONE_EXTENSIONS
-    itemMutatorHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
+    itemMutatorEnemyHitscanProjectiles.tooltip_pzTextLower = "(does not support xmapedit enemies)";
 #endif
+    itemMutatorPlayerHitscanProjectiles.tooltip_pzTextUpper = "Set hitscan weapons to spawn projectiles";
     itemMutatorGoreBehavior.tooltip_pzTextUpper = "Spawns excessive gibs and increases particles";
     itemMutatorPlayerSpeed.tooltip_pzTextUpper = "Adjusts the player speed";
     itemMutatorPlayerWater.tooltip_pzTextUpper = "Adjusts the oxygen supply";
@@ -2089,7 +2097,8 @@ void SetupOptionsMenu(void)
     itemMutatorBoolImpulseLimit.at20 = !!gWeaponImpulseLimit;
     itemMutatorAmmoScale.m_nFocus = gAmmoScale % ARRAY_SSIZE(pzAmmoScaleStrings);
     itemMutatorSectorBehavior.at20 = !!gSectorBehavior;
-    itemMutatorHitscanProjectiles.m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+    itemMutatorEnemyHitscanProjectiles.m_nFocus = gEnemyHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+    itemMutatorPlayerHitscanProjectiles.m_nFocus = gPlayerHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     itemMutatorGoreBehavior.m_nFocus = gGoreBehavior % ARRAY_SSIZE(pzGoreStrings);
     itemMutatorPlayerSpeed.m_nFocus = gPlayerModSpeed % ARRAY_SSIZE(pzPlayerSpeeds);
     itemMutatorPlayerWater.m_nFocus = gPlayerModWaterOxygen % ARRAY_SSIZE(pzPlayerWater);
@@ -2807,13 +2816,23 @@ void SetSectorBehavior(CGameMenuItemZBool *pItem)
     }
 }
 
-void SetHitscanProjectiles(CGameMenuItemZCycle *pItem)
+void SetEnemyHitscanProjectiles(CGameMenuItemZCycle *pItem)
 {
     if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) {
-        gHitscanProjectiles = pItem->m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
-        gGameOptions.nHitscanProjectiles = gHitscanProjectiles;
+        gEnemyHitscanProjectiles = pItem->m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+        gGameOptions.nEnemyHitscanProjectiles = gEnemyHitscanProjectiles;
     } else {
-        pItem->m_nFocus = gHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+        pItem->m_nFocus = gEnemyHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+    }
+}
+
+void SetPlayerHitscanProjectiles(CGameMenuItemZCycle *pItem)
+{
+    if ((gGameOptions.nGameType == kGameTypeSinglePlayer) && (numplayers == 1)) {
+        gPlayerHitscanProjectiles = pItem->m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+        gGameOptions.nPlayerHitscanProjectiles = gPlayerHitscanProjectiles;
+    } else {
+        pItem->m_nFocus = gPlayerHitscanProjectiles % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     }
 }
 
@@ -4964,7 +4983,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
     gPacketStartGame.bWeaponImpulseLimit = itemNetMutatorBoolWeaponImpulseLimit.at20;
     gPacketStartGame.nAmmoScale = itemNetMutatorAmmoScale.m_nFocus % ARRAY_SSIZE(pzAmmoScaleStrings);
     gPacketStartGame.bSectorBehavior = itemNetMutatorSectorBehavior.at20;
-    gPacketStartGame.nHitscanProjectiles = itemNetMutatorHitscanProjectiles.m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+    gPacketStartGame.nEnemyHitscanProjectiles = itemNetMutatorEnemyHitscanProjectiles.m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
+    gPacketStartGame.nPlayerHitscanProjectiles = itemNetMutatorPlayerHitscanProjectiles.m_nFocus % ARRAY_SSIZE(pzHitscanProjectilesStrings);
     gPacketStartGame.nGoreBehavior = itemNetMutatorGoreBehavior.m_nFocus % ARRAY_SSIZE(pzGoreStrings);
     gPacketStartGame.nPlayerSpeed = itemNetMutatorPlayerSpeed.m_nFocus % ARRAY_SSIZE(pzPlayerSpeeds);
     gPacketStartGame.randomizerMode = itemNetMutatorRandomizerMode.m_nFocus % ARRAY_SSIZE(pzRandomizerModeStrings);

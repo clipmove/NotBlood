@@ -91,7 +91,8 @@ struct PKT_STARTGAME {
     char bWeaponImpulseLimit;
     short nAmmoScale;
     bool bSectorBehavior;
-    int nHitscanProjectiles;
+    short nEnemyHitscanProjectiles;
+    short nPlayerHitscanProjectiles;
     char nGoreBehavior;
     char nPlayerSpeed;
     char nPlayerWater;

@@ -108,10 +108,13 @@ If you have the GOG version of the game, do the following:
    - Support wall sprites moving along with elevators
    - Fix bullet hole being placed across sky tile walls
    - Use Raze phase calculation for smoother elevator rides
-* Hitscan projectiles
+* Enemy Hitscan projectiles
    - Makes enemies that use hitscan bullets spawn physical sprite based bullets with travel time
    - Projectile speed is adjusted if bullet is underwater (50% speed penalty)
    - This mutator does not support custom modern map enemies
+* Player Hitscan projectiles
+   - Makes players that use hitscan weapons spawn physical sprite based bullets with travel time
+   - Projectile speed is adjusted if bullet is underwater (50% speed penalty)
 * Gore behavior (Extended)
    - Increase lifespan duration of blood particles
 * Gore behavior (Excessive)
