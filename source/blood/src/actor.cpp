@@ -7806,6 +7806,8 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
                         int nSplatIncrement = kMaxSplatIncrementBase - gGameOptions.nDifficulty;
                         nSplatIncrement >>= 1;
                         const int nBloodSplats = pVectorData->bloodSplats + nSplatIncrement;
+                        if (!pShooter)
+                            break;
                         int nType = pShooter->type;
                         if (IsPlayerSprite(pShooter))
                         {
