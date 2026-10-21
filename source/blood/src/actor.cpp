@@ -5773,7 +5773,7 @@ static bool MoveMissileBulletVectorTest(spritetype *pSource, spritetype *pShoote
                         int nSplatIncrement = kMaxSplatIncrementBase - gGameOptions.nDifficulty;
                         nSplatIncrement >>= 1;
                         const int nBloodSplats = pVectorData->bloodSplats + nSplatIncrement;
-                        if (pShooter)
+                        if (!pShooter)
                             break;
                         int nType = pShooter->type;
                         if (IsPlayerSprite(pShooter))
@@ -5937,7 +5937,7 @@ void MoveMissileBullet(spritetype *pSprite)
         break;
     }
     int speed = missileInfo[pSprite->type - kMissileBase].velocity;
-    const char bIsPlayer = IsPlayerSprite(pOwner);
+    const char bIsPlayer = (pOwner != NULL) && IsPlayerSprite(pOwner);
     if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 1 : gGameOptions.nEnemyHitscanProjectiles == 1) // if hitscan projectile speed is 75%, adjust hitscan range
         speed = (speed>>1) + (speed>>2);
     else if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 3 : gGameOptions.nEnemyHitscanProjectiles == 3) // if hitscan projectile speed is 125%, adjust hitscan range
