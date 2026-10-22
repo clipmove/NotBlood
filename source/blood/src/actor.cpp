@@ -5906,7 +5906,8 @@ void MoveMissileBullet(spritetype *pSprite)
         else
             pOwner = NULL;
     }
-    const bool underwaterSector = (sector[pSprite->sectnum].extra >= 0 && xsector[sector[pSprite->sectnum].extra].Underwater);
+    const char bIsPlayer = (pOwner != NULL) && IsPlayerSprite(pOwner);
+    const bool underwaterSector = !bIsPlayer && (sector[pSprite->sectnum].extra >= 0 && xsector[sector[pSprite->sectnum].extra].Underwater); // do not slow projectile down for player owned projectiles
     const int nSprite = pSprite->index;
     const int bakX = pSprite->x;
     const int bakY = pSprite->y;
@@ -5937,7 +5938,6 @@ void MoveMissileBullet(spritetype *pSprite)
         break;
     }
     int speed = missileInfo[pSprite->type - kMissileBase].velocity;
-    const char bIsPlayer = (pOwner != NULL) && IsPlayerSprite(pOwner);
     if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 1 : gGameOptions.nEnemyHitscanProjectiles == 1) // if hitscan projectile speed is 75%, adjust hitscan range
         speed = (speed>>1) + (speed>>2);
     else if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 3 : gGameOptions.nEnemyHitscanProjectiles == 3) // if hitscan projectile speed is 125%, adjust hitscan range
@@ -7534,19 +7534,22 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
         hit = VectorScanROR(pShooter, a2, a3, a4, a5, a6, nRange, 1, &shooterPos);
         if (IsPlayerSprite(pShooter) && gGameOptions.nPlayerHitscanProjectiles && (approxDist(gHitInfo.hitx-shooterPos.x, gHitInfo.hity-shooterPos.y) > 1024)) // if player fired hitscan weapon and player hitscan projectiles is on, spawn bullet and return
         {
+            PLAYER *pPlayer = &gPlayer[pShooter->type-kDudePlayer1];
+            int zAimOffset = pPlayer->zWeapon-pPlayer->pSprite->z;
+            zAimOffset -= fix16_clamp(pPlayer->q16look, F16(-347), F16(289))>>13;
             switch (vectorType)
             {
             case kVectorShell:
-                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerShell);
+                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerShell);
                 return;
             case kVectorShellAP:
-                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerShellAP);
+                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerShellAP);
                 return;
             case kVectorTommyregular:
-                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerBullet);
+                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerBullet);
                 return;
             case kVectorTommyAP:
-                actFireMissile(pShooter, a2, a3, a4, a5, a6, kMissilePlayerBulletAP);
+                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerBulletAP);
                 return;
             default:
                 break;
