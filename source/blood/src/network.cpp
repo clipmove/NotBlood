@@ -1483,6 +1483,8 @@ void netPlayerQuit(int nPlayer)
         actPostSprite(gPlayer[nPlayer].nSprite, kStatFree);
         if (nPlayer == gViewIndex)
             gViewIndex = myconnectindex;
+        if (gPlayerJuggernaut == nPlayer) // reset current juggernaut
+            gPlayerJuggernaut = -1;
         gView = &gPlayer[gViewIndex];
     }
     if (nPlayer == connecthead)

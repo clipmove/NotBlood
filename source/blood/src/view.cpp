@@ -1544,9 +1544,9 @@ void viewDrawPowerUps(PLAYER* pPlayer)
     nPowerActive[1] = pPlayer->pwUpTime[kPwUpReflectShots]; // reflects enemy shots
     nPowerActive[2] = pPlayer->pwUpTime[kPwUpDeathMask]; // invulnerability
     if (powerupCheck(pPlayer, kPwUpTwoGuns) && gGameOptions.bQuadDamagePowerup && !VanillaMode()) // if quad damage is enabled, use quad damage icon from notblood.pk3/TILES099.ART
-        nPowerActive[3] = 0, nPowerActive[4] = !gMatrixMode ? pPlayer->pwUpTime[kPwUpTwoGuns] : 0; // quad damage
+        nPowerActive[3] = 0, nPowerActive[4] = !gMatrixMode && (pPlayer->nPlayer != gPlayerJuggernaut) ? pPlayer->pwUpTime[kPwUpTwoGuns] : 0; // quad damage
     else
-        nPowerActive[3] = !gMatrixMode ? pPlayer->pwUpTime[kPwUpTwoGuns] : 0, nPowerActive[4] = 0; // guns akimbo
+        nPowerActive[3] = !gMatrixMode && (pPlayer->nPlayer != gPlayerJuggernaut) ? pPlayer->pwUpTime[kPwUpTwoGuns] : 0, nPowerActive[4] = 0; // guns akimbo
     nPowerActive[5] = pPlayer->pwUpTime[kPwUpShadowCloakUseless]; // shadow cloak
 
     // not in official maps
@@ -2185,6 +2185,26 @@ void viewDrawCtfHud(ClockTicks arg)
     flashTeamScore(arg, 1, true);
 }
 
+void viewDrawJuggernaut(ClockTicks arg)
+{
+    if (!((gPlayerJuggernaut >= 0) && (gPlayerJuggernaut < kMaxPlayers)) || gGameMenuMgr.m_bActive)
+        return;
+
+    int nY = 40;
+    if (gGameOptions.nGameType != kGameTypeSinglePlayer) // offset for multiplayer stats bar
+    {
+        for (int nRows = (gNetPlayers - 1) / 4; nRows >= 0; nRows--)
+        {
+            nY += 5;
+        }
+    }
+    char buffer[128] = "";
+    int nPal = playerColorPalMessage(gPlayer[gPlayerJuggernaut].teamId);
+    sprintf(buffer, "Juggernaut: %s", gProfile[gPlayerJuggernaut].name);
+    COLORSTR colorStr = {nPal, 0, {12, 127}, {-1, -1}};
+    viewDrawText(3, buffer, 160, nY, -128, 0, 1, 1, 0, 0, &colorStr);
+}
+
 void viewDrawKillMsg(ClockTicks arg)
 {
     if (gKillMsg == 0)
@@ -2216,10 +2236,10 @@ void viewDrawKillMsg(ClockTicks arg)
         playerResetKillMsg();
 }
 
-void viewDrawMultiKill(ClockTicks arg)
+char viewDrawMultiKill(ClockTicks arg)
 {
     if (gMultiKill == 0)
-        return;
+        return 0;
 
     int nY = 40;
     if (gGameOptions.nGameType != kGameTypeSinglePlayer) // offset for multiplayer stats bar
@@ -2233,13 +2253,14 @@ void viewDrawMultiKill(ClockTicks arg)
     if (bShowMultiKill)
     {
         const int nPalette = playerColorPalMultiKill(gMe->teamId);
+        const int nKills = gMultiKillsFrags[gMe->nPlayer];
         if ((int)totalclock & 16) // flash multi kill message
-            return;
-        switch (gMultiKillsFrags[gMe->nPlayer])
+            return nKills > 1;
+        switch (nKills)
         {
             case 0:
             case 1:
-                break;
+                return 0;
             case 2:
                 viewDrawText(0, "Double Kill!", 160, nY, -128, nPalette, 1, 1);
                 break;
@@ -2253,19 +2274,21 @@ void viewDrawMultiKill(ClockTicks arg)
                 viewDrawText(0, "M O N S T E R  K I L L !!!", 160, nY, -128, nPalette, 1, 1);
                 break;
         }
+        return 1;
     }
     else if ((gAnnounceKillingSpreeTicks > 0) && (gAnnounceKillingSpreePlayer < kMaxPlayers)) // announce player's kill streak
     {
         const int nPalette = playerColorPalMultiKill(gPlayer[gAnnounceKillingSpreePlayer].teamId);
+        const int nKills = gMultiKillsFrags[gAnnounceKillingSpreePlayer];
         char buffer[128] = "";
-        switch (gMultiKillsFrags[gAnnounceKillingSpreePlayer])
+        switch (nKills)
         {
             case 0:
             case 1:
             case 2:
             case 3:
             case 4:
-                return;
+                return 0;
             case 5:
             case 6:
             case 7:
@@ -2310,7 +2333,9 @@ void viewDrawMultiKill(ClockTicks arg)
         gAnnounceKillingSpreeTicks = gAnnounceKillingSpreeTicks - arg;
         if (gAnnounceKillingSpreeTicks <= 0) // reset currently announced kill streak
             playerResetAnnounceKillingSpree();
+        return 1;
     }
+    return 0;
 }
 
 void viewDrawWinner(const char *pString, int nPal)
@@ -2664,7 +2689,10 @@ void UpdateStatusBar(ClockTicks arg)
         if (gPlayerRoundEnding) // let winner message override multikill message
             viewDrawWinner();
         else
-            viewDrawMultiKill(arg);
+        {
+            if (!viewDrawMultiKill(arg)) // if the multi-kill text space is not occupied
+                viewDrawJuggernaut(arg);
+        }
     }
 
     if (gGameOptions.nGameType == kGameTypeTeams)
