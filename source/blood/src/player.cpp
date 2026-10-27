@@ -1301,6 +1301,7 @@ void playerStart(int nPlayer, int bNewLevel)
     gSonicMode = 0;
     gNukeMode = 0;
     gMatrixMode = 0;
+    gNoTarget = 0;
     gFullMap = 0;
     pPlayer->throwPower = 0;
     pPlayer->tauntTime = 0;
