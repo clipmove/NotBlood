@@ -289,6 +289,7 @@ extern PROFILE gProfileNet[kMaxPlayers];
 
 extern bool gBlueFlagDropped;
 extern bool gRedFlagDropped;
+extern int gPlayerJuggernaut;
 
 extern int         gPlayerScores[kMaxPlayers];
 extern ClockTicks  gPlayerScoreTicks[kMaxPlayers];

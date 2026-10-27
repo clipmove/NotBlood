@@ -777,6 +777,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
     {
         gBlueFlagDropped = false;
         gRedFlagDropped = false;
+        gPlayerJuggernaut = -1;
         gView = gMe;
         gViewIndex = myconnectindex;
         r_mirrormodemulti = 4; // set active flag

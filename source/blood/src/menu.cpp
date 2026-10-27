@@ -604,6 +604,7 @@ CGameMenuItemZCycle itemNetGameCycleItemWeapon("ITEM/WEAPON SETTING:", 3, 66, 12
 CGameMenuItemZBool itemNetGameBoolTeamColors("TEAM COLORS:", 3, 66, 97, 180, true, 0, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolAutoTeams("AUTO TEAMS:", 3, 66, 113, 180, true, 0, NULL, NULL);
 CGameMenuItemZBool itemNetGameBoolTeamFlags("TEAM FLAGS:", 3, 66, 121, 180, true, 0, NULL, NULL);
+CGameMenuItemZBool itemNetGameBoolJuggernaut("JUGGERNAUT MODE:", 3, 66, 121, 180, false, 0, NULL, NULL);
 CGameMenuItemZCycle itemNetGameCycleSpawnLocation("SPAWN AREA:", 3, 66, 129, 180, 0, 0, zRespawnStrings, ARRAY_SSIZE(zRespawnStrings), 0);
 CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverride("ENEMY WEAPONS:", 3, 66, 137, 180, 0, SetNetShowWeapon, zShowWeapon, ARRAY_SSIZE(zShowWeapon), 0);
 CGameMenuItemZCycle itemNetGameCycleShowWeaponsOverrideTeams("ENEMY WEAPONS:", 3, 66, 137, 180, 0, SetNetShowWeapon, zShowWeaponTeams, ARRAY_SSIZE(zShowWeaponTeams), 0);
@@ -1668,6 +1669,7 @@ void SetupNetStartMenu(void)
     menuNetworkGameMode.Add(&itemNetGameCycleItemWeapon, false);
     menuNetworkGameMode.Add(&itemNetGameBoolAutoTeams, false);
     menuNetworkGameMode.Add(&itemNetGameBoolTeamFlags, false);
+    menuNetworkGameMode.Add(&itemNetGameBoolJuggernaut, false);
     menuNetworkGameMode.Add(&itemNetGameCycleSpawnLocation, false);
     menuNetworkGameMode.Add(&itemNetGameCycleShowWeaponsOverride, false);
     menuNetworkGameMode.Add(&itemNetGameCycleShowWeaponsOverrideTeams, false);
@@ -1691,6 +1693,8 @@ void SetupNetStartMenu(void)
     itemNetGameBoolPlayerColors.tooltip_pzTextUpper = "Allow non-vanilla player colors";
     itemNetGameBoolTeamColors.tooltip_pzTextUpper = "Highlight players with team colors";
     itemNetGameBoolTeamFlags.tooltip_pzTextUpper = "Toggle team flags for teams mode";
+    itemNetGameBoolJuggernaut.tooltip_pzTextUpper = "Toggle Juggernaut game mode";
+    itemNetGameBoolJuggernaut.tooltip_pzTextLower = "(Juggernaut gets akimbo/quad)";
     itemNetGameCycleSpawnLocation.tooltip_pzTextUpper = "Set spawn location behavior";
     itemNetGameCycleShowWeaponsOverride.tooltip_pzTextUpper = "Set global setting for show weapons option";
     itemNetGameCycleShowWeaponsOverride.tooltip_pzTextLower = "(This is applied to all players in round)";
@@ -3944,6 +3948,8 @@ void SetNetGameMode(CGameMenuItemZCycle *pItem)
         itemNetGameBoolTeamColors.bNoDraw = !itemNetGameBoolTeamColors.bEnable;
         itemNetGameBoolTeamFlags.bEnable = nGameType == kGameTypeTeams;
         itemNetGameBoolTeamFlags.bNoDraw = !itemNetGameBoolTeamFlags.bEnable;
+        itemNetGameBoolJuggernaut.bEnable = nGameType == kGameTypeBloodBath;
+        itemNetGameBoolJuggernaut.bNoDraw = !itemNetGameBoolJuggernaut.bEnable;
         itemNetGameCycleShowWeaponsOverride.bEnable = nGameType != kGameTypeTeams;
         itemNetGameCycleShowWeaponsOverride.bNoDraw = !itemNetGameCycleShowWeaponsOverride.bEnable;
         itemNetGameCycleShowWeaponsOverrideTeams.bEnable = nGameType == kGameTypeTeams;
@@ -4922,6 +4928,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamColors;
     if (!itemNetGameBoolTeamFlags.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamFlags;
+    if (itemNetGameBoolJuggernaut.at20)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagJuggernautGame;
     if (itemNetGameCycleSpawnLocation.m_nFocus > 0)
         gPacketStartGame.uNetGameFlags |= itemNetGameCycleSpawnLocation.m_nFocus == 1 ? kNetGameFlagSpawnSmart : kNetGameFlagSpawnDist;
     if (gPacketStartGame.gameType == kGameTypeTeams)

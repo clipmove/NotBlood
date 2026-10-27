@@ -178,6 +178,7 @@ kNetGameFlagNoChaseView         =  1 << 27, // client sided limit that can be ea
 kNetGameFlagNoHolstering        =  1 << 28,
 kNetGameFlagVanillaColors       =  1 << 29,
 kNetGameFlagSecondWindToggle    =  1 << 30,
+kNetGameFlagJuggernautGame      =  1 << 31,
 
 };
 
