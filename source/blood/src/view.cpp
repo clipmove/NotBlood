@@ -1006,6 +1006,14 @@ void viewCorrectViewOffsets(int nPlayer, vec3_t const *oldpos)
     pView->at38 += pPlayer->pSprite->z-oldpos->z;
 }
 
+void viewGetPlayerPrediction(int nPlayer, GINPUT *pInput)
+{
+    PLAYER *pPlayer = &gPlayer[nPlayer];
+    VIEW *pView = &gPrevView[nPlayer];
+    pInput->xoffset = gPrediction ? int8_t(ClipRange((pPlayer->pSprite->x-pView->at50)>>5, INT8_MIN, INT8_MAX)) : 0;
+    pInput->yoffset = gPrediction ? int8_t(ClipRange((pPlayer->pSprite->y-pView->at54)>>5, INT8_MIN, INT8_MAX)) : 0;
+}
+
 static char bInterpWarnVanilla = 0;
 
 void viewClearInterpolations(void)

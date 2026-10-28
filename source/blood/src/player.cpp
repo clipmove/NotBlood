@@ -413,6 +413,30 @@ uint32_t PLAYER::CalcNonSpriteChecksum(void)
     return sum;
 }
 
+static vec3_t gLastPredictOffset;
+
+char playerPredictPositionApply(PLAYER *pPlayer)
+{
+    if (!(gGameOptions.uNetGameFlags&kNetGameFlagLagCompensation) || !pPlayer || !pPlayer->pSprite || !pPlayer->pXSprite || !pPlayer->pXSprite->health || !sectRangeIsFine(pPlayer->pSprite->sectnum))
+        return 0;
+    vec3_t playerPos = gLastPredictOffset = pPlayer->pSprite->xyz;
+
+    GINPUT *pInput = &pPlayer->input;
+    playerPos.x += int32_t(pInput->xoffset)<<6;
+    playerPos.y += int32_t(pInput->yoffset)<<6;
+    if (cansee(playerPos.x, playerPos.y, playerPos.z, pPlayer->pSprite->sectnum, pPlayer->pSprite->x, pPlayer->pSprite->y, pPlayer->pSprite->z, pPlayer->pSprite->sectnum)) // if predicted position is valid
+    {
+        pPlayer->pSprite->xyz = playerPos;
+        return 1;
+    }
+    return 0;
+}
+
+void playerPredictPositionRestore(PLAYER *pPlayer)
+{
+    pPlayer->pSprite->xyz = gLastPredictOffset;
+}
+
 int powerupCheck(PLAYER *pPlayer, int nPowerUp)
 {
     dassert(pPlayer != NULL);
@@ -1317,6 +1341,7 @@ void playerStart(int nPlayer, int bNewLevel)
     pInput->q16mlook = 0;
     pInput->buttonFlags.byte = 0;
     pInput->useFlags.byte = 0;
+    pInput->xoffset = pInput->yoffset;
     pPlayer->flickerEffect = 0;
     pPlayer->quakeEffect = 0;
     pPlayer->tiltEffect = 0;

@@ -7217,6 +7217,9 @@ spritetype* actFireMissile(spritetype *pSprite, int a2, int a3, int a4, int a5, 
     dassert(nType >= kMissileBase && nType < kMissileMax);
     char v4 = 0;
     int nSprite = pSprite->index;
+    char bLagCompensation = 0;
+    if (IsPlayerSprite(pSprite))
+        bLagCompensation = playerPredictPositionApply(&gPlayer[pSprite->type-kDudePlayer1]);
     MissileType *pMissileInfo = &missileInfo[nType-kMissileBase];
     int x = pSprite->x+mulscale30(a2, Cos(pSprite->ang+512));
     int y = pSprite->y+mulscale30(a2, Sin(pSprite->ang+512));
@@ -7321,6 +7324,8 @@ spritetype* actFireMissile(spritetype *pSprite, int a2, int a3, int a4, int a5, 
         actImpactMissile(pMissile, hit);
         pMissile = NULL;
     }
+    if (bLagCompensation)
+        playerPredictPositionRestore(&gPlayer[pSprite->type-kDudePlayer1]);
     return pMissile;
 }
 
@@ -7529,6 +7534,9 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
     int nRange = pVectorData->maxDist;
     int hit;
     vec3_t shooterPos;
+    char bLagCompensation = 0;
+    if (IsPlayerSprite(pShooter))
+        bLagCompensation = playerPredictPositionApply(&gPlayer[pShooter->type-kDudePlayer1]);
     if (!VanillaMode())
     {
         hit = VectorScanROR(pShooter, a2, a3, a4, a5, a6, nRange, 1, &shooterPos);
@@ -7555,6 +7563,8 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
             if (nType >= kMissileBase && nType < kMissileMax)
             {
                 PLAYER *pPlayer = &gPlayer[pShooter->type-kDudePlayer1];
+                if (bLagCompensation)
+                    playerPredictPositionRestore(pPlayer);
                 int zAimOffset = pPlayer->zWeapon-pPlayer->pSprite->z;
                 zAimOffset -= fix16_clamp(pPlayer->q16look, F16(-347), F16(289))>>13;
                 actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, nType);
@@ -7919,6 +7929,9 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
 
     if (pVectorData->surfHit[nSurf].fxSnd >= 0)
         sfxPlay3DSound(x, y, z, pVectorData->surfHit[nSurf].fxSnd, nSector);
+
+    if (bLagCompensation)
+        playerPredictPositionRestore(&gPlayer[pShooter->type-kDudePlayer1]);
 }
 
 void FireballSeqCallback(int, int nXSprite)

@@ -467,6 +467,8 @@ inline int playerColorPalAimName(int nTeam)
     return playerColorPalDefault(nTeam);
 }
 
+char        playerPredictPositionApply(PLAYER *pPlayerd);
+void        playerPredictPositionRestore(PLAYER *pPlayer);
 int         powerupCheck(PLAYER *pPlayer, int nPowerUp);
 char        powerupActivate(PLAYER *pPlayer, int nPowerUp);
 void        powerupDeactivate(PLAYER *pPlayer, int nPowerUp);
