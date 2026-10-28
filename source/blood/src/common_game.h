@@ -170,6 +170,7 @@ kNetGameFlagTimeLimitMask       =  1 << 14|1 << 15|1 << 16|1 << 17|1 << 18|1 << 
 kNetGameFlagSpawnSmart          =  1 << 20,
 kNetGameFlagSpawnDist           =  1 << 21,
 kNetGameFlagNoTeamFlags         =  1 << 22,
+kNetGameFlagJuggernautGame      =  kNetGameFlagNoTeamFlags, // reuse flag for bloodbath
 kNetGameFlagMirrorHoriz         =  1 << 23,
 kNetGameFlagMirrorVert          =  1 << 24,
 kNetGameFlagCalebOnly           =  1 << 25, // no items, caleb only, final destination
@@ -178,8 +179,7 @@ kNetGameFlagNoChaseView         =  1 << 27, // client sided limit that can be ea
 kNetGameFlagNoHolstering        =  1 << 28,
 kNetGameFlagVanillaColors       =  1 << 29,
 kNetGameFlagSecondWindToggle    =  1 << 30,
-kNetGameFlagJuggernautGame      =  1 << 31,
-
+kNetGameFlagLagCompensation     =  1 << 31,
 };
 
 // MEDIUM /////////////////////////////////////////////////////
