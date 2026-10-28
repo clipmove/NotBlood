@@ -622,7 +622,6 @@ void CWeather::LoadPreset(int nEpisode, int nLevel, unsigned int uMapCRC)
     case 4: // custom weather (NotBlood does not support this type)
         consoleSysMsg("E%dM%d WeatherType 4 is not supported, falling back to random weather...", nEpisode+1, nLevel+1);
         break;
-    case -1:
     default:
         break;
     }

@@ -78,7 +78,7 @@ char gNetAddress[48];
 int gNetPort = kNetDefaultPort;
 int gNetPortLocal = -1;
 
-const short kNetVersion = 0x24B;
+const short kNetVersion = 0x24C;
 
 #ifdef NORENDER
 #ifdef _WIN32
@@ -447,6 +447,10 @@ void netGetPackets(void)
                         pInput->newWeapon = GetPacketByte(pPacket);
                     if (pInput->syncFlags.mlookChange)
                         pInput->q16mlook = GetPacketDWord(pPacket);
+                    if (pInput->syncFlags.xoffset)
+                        pInput->xoffset = GetPacketWord(pPacket);
+                    if (pInput->syncFlags.yoffset)
+                        pInput->yoffset = GetPacketWord(pPacket);
                     gPlayerTyping[p] = pInput->keyFlags.isTyping;
                     gNetFifoHead[p]++;
                 }
@@ -465,6 +469,10 @@ void netGetPackets(void)
                         pPacket++;
                     if (syncFlags.mlookChange)
                         pPacket+=4;
+                    if (syncFlags.xoffset)
+                        pPacket+=2;
+                    if (syncFlags.yoffset)
+                        pPacket+=2;
                 }
             }
             if (((gNetFifoHead[connecthead]-1)&15)==0)
@@ -508,6 +516,10 @@ void netGetPackets(void)
                 pInput->newWeapon = GetPacketByte(pPacket);
             if (pInput->syncFlags.mlookChange)
                 pInput->q16mlook = GetPacketDWord(pPacket);
+            if (pInput->syncFlags.xoffset)
+                pInput->xoffset = GetPacketWord(pPacket);
+            if (pInput->syncFlags.yoffset)
+                pInput->yoffset = GetPacketWord(pPacket);
             gPlayerTyping[nPlayer] = pInput->keyFlags.isTyping;
             gNetFifoHead[nPlayer]++;
             while (pPacket < packet+nSize)
@@ -546,6 +558,10 @@ void netGetPackets(void)
                 pInput->newWeapon = GetPacketByte(pPacket);
             if (pInput->syncFlags.mlookChange)
                 pInput->q16mlook = GetPacketDWord(pPacket);
+            if (pInput->syncFlags.xoffset)
+                pInput->xoffset = GetPacketWord(pPacket);
+            if (pInput->syncFlags.yoffset)
+                pInput->yoffset = GetPacketWord(pPacket);
             gPlayerTyping[nPlayer] = pInput->keyFlags.isTyping;
             gNetFifoHead[nPlayer]++;
             while (pPacket < packet+nSize)
@@ -912,6 +928,10 @@ void netMasterUpdate(void)
                 pInput->syncFlags.weaponChange = 1;
             if (pInput->q16mlook)
                 pInput->syncFlags.mlookChange = 1;
+            if (pInput->xoffset != 0)
+                pInput->syncFlags.xoffset = 1;
+            if (pInput->yoffset != 0)
+                pInput->syncFlags.yoffset = 1;
             PutPacketByte(pPacket, pInput->syncFlags.byte);
             PutPacketWord(pPacket, pInput->forward);
             PutPacketDWord(pPacket, pInput->q16turn);
@@ -926,6 +946,10 @@ void netMasterUpdate(void)
                 PutPacketByte(pPacket, pInput->newWeapon);
             if (pInput->syncFlags.mlookChange)
                 PutPacketDWord(pPacket, pInput->q16mlook);
+            if (pInput->syncFlags.xoffset)
+                PutPacketWord(pPacket, pInput->xoffset);
+            if (pInput->syncFlags.yoffset)
+                PutPacketWord(pPacket, pInput->yoffset);
             gPlayerTyping[p] = pInput->keyFlags.isTyping;
         }
         if ((gNetFifoMasterTail&15) == 0)
@@ -1034,6 +1058,10 @@ void netGetInput(void)
             input.syncFlags.weaponChange = 1;
         if (input.q16mlook)
             input.syncFlags.mlookChange = 1;
+        if (input.xoffset != 0)
+            input.syncFlags.xoffset = 1;
+        if (input.yoffset != 0)
+            input.syncFlags.yoffset = 1;
         PutPacketByte(pPacket, input.syncFlags.byte);
         PutPacketWord(pPacket, input.forward);
         PutPacketDWord(pPacket, input.q16turn);
@@ -1048,6 +1076,10 @@ void netGetInput(void)
             PutPacketByte(pPacket, input.newWeapon);
         if (input.syncFlags.mlookChange)
             PutPacketDWord(pPacket, input.q16mlook);
+        if (input.syncFlags.xoffset)
+            PutPacketWord(pPacket, input.xoffset);
+        if (input.syncFlags.yoffset)
+            PutPacketWord(pPacket, input.yoffset);
         gPlayerTyping[myconnectindex] = input.keyFlags.isTyping;
         while (gSendCheckTail != gCheckHead[myconnectindex])
         {
@@ -1072,6 +1104,10 @@ void netGetInput(void)
             input.syncFlags.weaponChange = 1;
         if (input.q16mlook)
             input.syncFlags.mlookChange = 1;
+        if (input.xoffset != 0)
+            input.syncFlags.xoffset = 1;
+        if (input.yoffset != 0)
+            input.syncFlags.yoffset = 1;
         PutPacketByte(pPacket, input.syncFlags.byte);
         PutPacketWord(pPacket, input.forward);
         PutPacketDWord(pPacket, input.q16turn);
@@ -1086,6 +1122,10 @@ void netGetInput(void)
             PutPacketByte(pPacket, input.newWeapon);
         if (input.syncFlags.mlookChange)
             PutPacketDWord(pPacket, input.q16mlook);
+        if (input.syncFlags.xoffset)
+            PutPacketWord(pPacket, input.xoffset);
+        if (input.syncFlags.yoffset)
+            PutPacketWord(pPacket, input.yoffset);
         gPlayerTyping[myconnectindex] = input.keyFlags.isTyping;
         if (((gNetFifoHead[myconnectindex]-1)&15) == 0)
         {

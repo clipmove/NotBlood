@@ -579,13 +579,14 @@ CGameMenuItemChain itemNetStart5("MONSTER SETTING:", 3, 66, 75, 180, 0, &menuNet
 CGameMenuItemZCycle itemNetStart6("WEAPONS:", 3, 66, 85, 180, 0, 0, zWeaponStrings, 4, 0);
 CGameMenuItemZCycle itemNetStart7("ITEMS:", 3, 66, 95, 180, 0, 0, zItemStrings, 3, 0);
 CGameMenuItemZBool itemNetStartBoolChaseView("CHASE VIEW:", 3, 66, 105, 180, false, NULL, NULL, NULL);
-CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 115, 180, false, NULL, NULL, NULL);
-CGameMenuItemZBool itemNetStartBoolSecondWind("SECOND WIND:", 3, 66, 125, 180, true, 0, NULL, NULL);
-CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 135, 180, false, 0, NULL, NULL);
-CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 143, 256, 1, &menuBannedItems, -1, NULL, 0);
-CGameMenuItemChain itemNetStart8Load("LOAD ITEMS", 3, 0, 143, 384, 1, &menuMultiUserItems, 0, NULL, 0);
-CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 153, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
-CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 163, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
+CGameMenuItemZBool itemNetStartBoolHolstering("HOLSTERING:", 3, 66, 113, 180, false, NULL, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolSecondWind("SECOND WIND:", 3, 66, 121, 180, true, 0, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolSpectatorMode("SPECTATING:", 3, 66, 129, 180, false, 0, NULL, NULL);
+CGameMenuItemZBool itemNetStartBoolLagCompensation("LAG COMPENSATION:", 3, 66, 137, 180, true, 0, NULL, NULL);
+CGameMenuItemChain itemNetStart8("SET ITEMS", 3, 0, 146, 256, 1, &menuBannedItems, -1, NULL, 0);
+CGameMenuItemChain itemNetStart8Load("LOAD ITEMS", 3, 0, 146, 384, 1, &menuMultiUserItems, 0, NULL, 0);
+CGameMenuItemChain itemNetStart9("SET MUTATORS", 3, 0, 155, 320, 1, &menuNetworkGameMutators, -1, NULL, 0);
+CGameMenuItemChain itemNetStart10("USER MAP", 3, 0, 164, 320, 1, &menuMultiUserMaps, 0, NULL, 0);
 CGameMenuItemChain itemNetStart11(zNetStartGame, 1, 0, 175, 320, 1, 0, -1, StartNetGame, 0);
 
 CGameMenuItemTitle itemNetGameTitle("GAME SETTINGS", 1, 160, 20, 2038);
@@ -1641,6 +1642,7 @@ void SetupNetStartMenu(void)
     menuNetStart.Add(&itemNetStartBoolHolstering, false);
     menuNetStart.Add(&itemNetStartBoolSecondWind, false);
     menuNetStart.Add(&itemNetStartBoolSpectatorMode, false);
+    menuNetStart.Add(&itemNetStartBoolLagCompensation, false);
     menuNetStart.Add(&itemNetStart8, false);
     menuNetStart.Add(&itemNetStart8Load, false);
     menuNetStart.Add(&itemNetStart9, false);
@@ -4926,14 +4928,12 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagVanillaColors;
     if (!itemNetGameBoolTeamColors.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamColors;
-    if (!itemNetGameBoolTeamFlags.at20)
-        gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamFlags;
-    if (itemNetGameBoolJuggernaut.at20)
-        gPacketStartGame.uNetGameFlags |= kNetGameFlagJuggernautGame;
     if (itemNetGameCycleSpawnLocation.m_nFocus > 0)
         gPacketStartGame.uNetGameFlags |= itemNetGameCycleSpawnLocation.m_nFocus == 1 ? kNetGameFlagSpawnSmart : kNetGameFlagSpawnDist;
     if (gPacketStartGame.gameType == kGameTypeTeams)
     {
+        if (!itemNetGameBoolTeamFlags.at20)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamFlags;
         if (itemNetGameCycleShowWeaponsOverrideTeams.m_nFocus == 1)
             gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsCloak;
         else if (itemNetGameCycleShowWeaponsOverrideTeams.m_nFocus == 2)
@@ -4943,6 +4943,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
     }
     else
     {
+        if (itemNetGameBoolJuggernaut.at20)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagJuggernautGame;
         if (itemNetGameCycleShowWeaponsOverride.m_nFocus == 1)
             gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsCloak;
         else if (itemNetGameCycleShowWeaponsOverride.m_nFocus == 2)
@@ -4960,6 +4962,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagSecondWindToggle;
     if (itemNetStartBoolSpectatorMode.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagSpectatingAllow;
+    if (itemNetStartBoolLagCompensation.at20)
+        gPacketStartGame.uNetGameFlags |= kNetGameFlagLagCompensation;
     gPacketStartGame.episodeId = itemNetStart2.m_nFocus;
     gPacketStartGame.levelId = itemNetStart3.m_nFocus;
     gPacketStartGame.difficulty = itemNetStart4.m_nFocus;

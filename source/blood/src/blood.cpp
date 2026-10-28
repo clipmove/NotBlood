@@ -1275,6 +1275,13 @@ void ProcessFrame(void)
         gPlayer[i].input.q16turn = gFifoInput[gNetFifoTail&255][i].q16turn;
         gPlayer[i].input.strafe = gFifoInput[gNetFifoTail&255][i].strafe;
         gPlayer[i].input.q16mlook = gFifoInput[gNetFifoTail&255][i].q16mlook;
+        if (gGameOptions.uNetGameFlags&kNetGameFlagLagCompensation)
+        {
+            gPlayer[i].input.xoffset = gFifoInput[gNetFifoTail&255][i].xoffset;
+            gPlayer[i].input.yoffset = gFifoInput[gNetFifoTail&255][i].yoffset;
+        }
+        else
+            gPlayer[i].input.xoffset = gPlayer[i].input.yoffset = 0;
     }
     gNetFifoTail++;
     if (!(gFrame&7))
@@ -2343,6 +2350,8 @@ RESTART:
             ctrlGetInput();
             if (totalclock >= gNetFifoClock && ready2send)
             {
+                if ((numplayers > 1) && gGameStarted && (gGameOptions.uNetGameFlags&kNetGameFlagLagCompensation))
+                    viewGetPlayerPrediction(myconnectindex, &gInput);
                 do
                 {
                     if (!frameJustDrawn)

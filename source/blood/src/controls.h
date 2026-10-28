@@ -86,15 +86,19 @@ union SYNCFLAGS
         unsigned int weaponChange : 1;
         unsigned int mlookChange : 1;
         unsigned int run : 1;
+        unsigned int xoffset : 1;
+        unsigned int yoffset : 1;
     };
 };
 struct GINPUT
 {
     SYNCFLAGS syncFlags;
+    int8_t xoffset;
     int16_t forward;
     fix16_t q16turn;
     int16_t strafe;
     BUTTONFLAGS buttonFlags;
+    int8_t yoffset;
     KEYFLAGS keyFlags;
     USEFLAGS useFlags;
     uint8_t newWeapon;
