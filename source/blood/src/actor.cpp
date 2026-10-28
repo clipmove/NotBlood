@@ -7534,25 +7534,31 @@ void actFireVector(spritetype *pShooter, int a2, int a3, int a4, int a5, int a6,
         hit = VectorScanROR(pShooter, a2, a3, a4, a5, a6, nRange, 1, &shooterPos);
         if (IsPlayerSprite(pShooter) && gGameOptions.nPlayerHitscanProjectiles && (approxDist(gHitInfo.hitx-shooterPos.x, gHitInfo.hity-shooterPos.y) > 1024)) // if player fired hitscan weapon and player hitscan projectiles is on, spawn bullet and return
         {
-            PLAYER *pPlayer = &gPlayer[pShooter->type-kDudePlayer1];
-            int zAimOffset = pPlayer->zWeapon-pPlayer->pSprite->z;
-            zAimOffset -= fix16_clamp(pPlayer->q16look, F16(-347), F16(289))>>13;
+            int nType = 0;
             switch (vectorType)
             {
             case kVectorShell:
-                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerShell);
-                return;
+                nType = kMissilePlayerShell;
+                break;
             case kVectorShellAP:
-                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerShellAP);
-                return;
+                nType = kMissilePlayerShellAP;
+                break;
             case kVectorTommyregular:
-                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerBullet);
-                return;
+                nType = kMissilePlayerBullet;
+                break;
             case kVectorTommyAP:
-                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, kMissilePlayerBulletAP);
-                return;
+                nType = kMissilePlayerBulletAP;
+                break;
             default:
                 break;
+            }
+            if (nType >= kMissileBase && nType < kMissileMax)
+            {
+                PLAYER *pPlayer = &gPlayer[pShooter->type-kDudePlayer1];
+                int zAimOffset = pPlayer->zWeapon-pPlayer->pSprite->z;
+                zAimOffset -= fix16_clamp(pPlayer->q16look, F16(-347), F16(289))>>13;
+                actFireMissile(pShooter, a2, zAimOffset, a4, a5, a6, nType);
+                return;
             }
         }
     }
