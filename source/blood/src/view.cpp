@@ -2193,7 +2193,7 @@ void viewDrawCtfHud(ClockTicks arg)
     flashTeamScore(arg, 1, true);
 }
 
-void viewDrawJuggernaut(ClockTicks arg)
+void viewDrawJuggernaut(void)
 {
     if (!((gPlayerJuggernaut >= 0) && (gPlayerJuggernaut < kMaxPlayers)) || gGameMenuMgr.m_bActive)
         return;
@@ -2699,7 +2699,7 @@ void UpdateStatusBar(ClockTicks arg)
         else
         {
             if (!viewDrawMultiKill(arg)) // if the multi-kill text space is not occupied
-                viewDrawJuggernaut(arg);
+                viewDrawJuggernaut();
         }
     }
 
