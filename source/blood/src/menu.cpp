@@ -4926,14 +4926,12 @@ void StartNetGame(CGameMenuItemChain *pItem)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagVanillaColors;
     if (!itemNetGameBoolTeamColors.at20)
         gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamColors;
-    if (!itemNetGameBoolTeamFlags.at20)
-        gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamFlags;
-    if (itemNetGameBoolJuggernaut.at20)
-        gPacketStartGame.uNetGameFlags |= kNetGameFlagJuggernautGame;
     if (itemNetGameCycleSpawnLocation.m_nFocus > 0)
         gPacketStartGame.uNetGameFlags |= itemNetGameCycleSpawnLocation.m_nFocus == 1 ? kNetGameFlagSpawnSmart : kNetGameFlagSpawnDist;
     if (gPacketStartGame.gameType == kGameTypeTeams)
     {
+        if (!itemNetGameBoolTeamFlags.at20)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagNoTeamFlags;
         if (itemNetGameCycleShowWeaponsOverrideTeams.m_nFocus == 1)
             gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsCloak;
         else if (itemNetGameCycleShowWeaponsOverrideTeams.m_nFocus == 2)
@@ -4943,6 +4941,8 @@ void StartNetGame(CGameMenuItemChain *pItem)
     }
     else
     {
+        if (itemNetGameBoolJuggernaut.at20)
+            gPacketStartGame.uNetGameFlags |= kNetGameFlagJuggernautGame;
         if (itemNetGameCycleShowWeaponsOverride.m_nFocus == 1)
             gPacketStartGame.uNetGameFlags |= kNetGameFlagHideWeaponsCloak;
         else if (itemNetGameCycleShowWeaponsOverride.m_nFocus == 2)

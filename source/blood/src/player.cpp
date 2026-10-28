@@ -2644,7 +2644,7 @@ void playerFrag(PLAYER *pKiller, PLAYER *pVictim)
         {
             pKiller->fragCount++;
             pKiller->fragInfo[nVictim]++;
-            if ((gGameOptions.uNetGameFlags&kNetGameFlagJuggernautGame) && (gPlayerJuggernaut == -1 || gPlayerJuggernaut == nVictim))
+            if ((gGameOptions.nGameType == kGameTypeBloodBath) && (gGameOptions.uNetGameFlags&kNetGameFlagJuggernautGame) && (gPlayerJuggernaut == -1 || gPlayerJuggernaut == nVictim))
             {
                 gPlayerJuggernaut = nKiller;
                 if (!powerupCheck(pKiller, kPwUpTwoGuns)) // give akimbo/quad
