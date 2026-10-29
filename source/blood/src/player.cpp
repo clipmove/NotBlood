@@ -422,8 +422,8 @@ char playerPredictPositionApply(PLAYER *pPlayer)
     vec3_t playerPos = gLastPredictOffset = pPlayer->pSprite->xyz;
 
     GINPUT *pInput = &pPlayer->input;
-    playerPos.x += int32_t(pInput->xoffset)<<6;
-    playerPos.y += int32_t(pInput->yoffset)<<6;
+    playerPos.x += int32_t(pInput->xoffset)<<5;
+    playerPos.y += int32_t(pInput->yoffset)<<5;
     if (cansee(playerPos.x, playerPos.y, playerPos.z, pPlayer->pSprite->sectnum, pPlayer->pSprite->x, pPlayer->pSprite->y, pPlayer->pSprite->z, pPlayer->pSprite->sectnum)) // if predicted position is valid
     {
         pPlayer->pSprite->xyz = playerPos;
