@@ -5893,8 +5893,6 @@ void MoveMissileBullet(spritetype *pSprite)
     {
         int nOwner = actSpriteOwnerToSpriteId(pSprite);
         pOwner = &sprite[nOwner];
-        if (sprite[nOwner].type != sprite[nOwner].inittype)
-            sprite[nOwner].type = sprite[nOwner].type;
         bool bDudeSprite = IsDudeSprite(pOwner);
         if (!bDudeSprite) // if false, check inittype range (dudes can die before projectiles have hit their target - which mean their type may be set to gibs instead)
             bDudeSprite = (pOwner->inittype >= kDudeBase) && (pOwner->inittype < kDudeMax);
@@ -6509,6 +6507,13 @@ void actProcessSprites(void)
         else // bullet projectile sprites
         {
             MoveMissileBullet(pSprite);
+            if (gGameOptions.nPlayerHitscanProjectiles == 4 || gGameOptions.nEnemyHitscanProjectiles == 4)
+            {
+                const int nOwner = actSpriteOwnerToSpriteId(pSprite);
+                const char bIsPlayer = spriRangeIsFine(nOwner) && IsDudeSprite(&sprite[nOwner]);
+                if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 4 : gGameOptions.nEnemyHitscanProjectiles == 4) // if hitscan projectile speed is 200%, move twice
+                    MoveMissileBullet(pSprite);
+            }
         }
     }
     for (nSprite = headspritestat[kStatExplosion]; nSprite >= 0; nSprite = nextspritestat[nSprite])
