@@ -6507,6 +6507,13 @@ void actProcessSprites(void)
         else // bullet projectile sprites
         {
             MoveMissileBullet(pSprite);
+            if (gGameOptions.nPlayerHitscanProjectiles == 4 || gGameOptions.nEnemyHitscanProjectiles == 4)
+            {
+                const int nOwner = actSpriteOwnerToSpriteId(pSprite);
+                const char bIsPlayer = spriRangeIsFine(nOwner) && IsDudeSprite(&sprite[nOwner]);
+                if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 4 : gGameOptions.nEnemyHitscanProjectiles == 4) // if hitscan projectile speed is 200%, move twice
+                    MoveMissileBullet(pSprite);
+            }
         }
     }
     for (nSprite = headspritestat[kStatExplosion]; nSprite >= 0; nSprite = nextspritestat[nSprite])
