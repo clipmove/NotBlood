@@ -62,7 +62,7 @@ jobs:
         cache: true
         install: git mingw-w64-${{matrix.env}}-toolchain make ${{matrix.pkg}}
     - name: Build and install SDL 1.2 for i686 # mingw32 has since dropped SDL1 support, we need to now build and install this (this was *annoying* to find out)
-      if: matrix.sys == 'mingw32'
+      if: matrix.ref == 'windows-xp' # This is the only Windows target that uses SDL 1.2
       run: |
         git clone https://github.com/libsdl-org/SDL-1.2.git "$RUNNER_TEMP/SDL-1.2"
         git -C "$RUNNER_TEMP/SDL-1.2" checkout ef3a6c05beb9523895a1ba7e53d322ec5b7c806b
