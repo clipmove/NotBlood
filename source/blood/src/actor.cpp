@@ -5882,7 +5882,7 @@ static bool MoveMissileBulletVectorTest(spritetype *pSource, spritetype *pShoote
     return didHit;
 }
 
-void MoveMissileBullet(spritetype *pSprite)
+char MoveMissileBullet(spritetype *pSprite)
 {
     dassert(pSprite != NULL);
     const int nXMissile = pSprite->extra;
@@ -6022,6 +6022,7 @@ void MoveMissileBullet(spritetype *pSprite)
     }
     if (pOwner)
         pOwner->cstat = bakCstat;
+    return weHitSomething;
 }
 
 void actExplodeSprite(spritetype *pSprite)
@@ -6506,8 +6507,8 @@ void actProcessSprites(void)
         }
         else // bullet projectile sprites
         {
-            MoveMissileBullet(pSprite);
-            if (gGameOptions.nPlayerHitscanProjectiles == 4 || gGameOptions.nEnemyHitscanProjectiles == 4)
+            const char weHitSomething = MoveMissileBullet(pSprite);
+            if (!weHitSomething && gGameOptions.nPlayerHitscanProjectiles == 4 || gGameOptions.nEnemyHitscanProjectiles == 4)
             {
                 const int nOwner = actSpriteOwnerToSpriteId(pSprite);
                 const char bIsPlayer = spriRangeIsFine(nOwner) && IsDudeSprite(&sprite[nOwner]);
