@@ -2098,8 +2098,6 @@ void videoMirrorDrawing(void)
 //
 void videoEndDrawing(void)
 {
-    if (sdl_minimized || !appactive && !g_mouseGrabbed) // force game to stall at 60fps
-        SDL_Delay(1000/60);
     if (bpp > 8)
     {
         if (!offscreenrendering) frameplace = 0;
@@ -2124,6 +2122,9 @@ void videoShowFrame(int32_t w)
 {
     UNREFERENCED_PARAMETER(w);
 
+    // force game to stall at 60fps
+    if (sdl_minimized || !appactive && !g_mouseGrabbed)
+        SDL_Delay(1000/60);
     // if we're minimized or about to resize, just throw away the frame
     if (sdl_resize.x || sdl_minimized)
         return;
