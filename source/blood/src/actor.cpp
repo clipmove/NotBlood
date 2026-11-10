@@ -6511,7 +6511,7 @@ void actProcessSprites(void)
             if (!weHitSomething && gGameOptions.nPlayerHitscanProjectiles == 4 || gGameOptions.nEnemyHitscanProjectiles == 4)
             {
                 const int nOwner = actSpriteOwnerToSpriteId(pSprite);
-                const char bIsPlayer = spriRangeIsFine(nOwner) && IsDudeSprite(&sprite[nOwner]);
+                const char bIsPlayer = spriRangeIsFine(nOwner) && IsPlayerSprite(&sprite[nOwner]);
                 if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 4 : gGameOptions.nEnemyHitscanProjectiles == 4) // if hitscan projectile speed is 200%, move twice
                     MoveMissileBullet(pSprite);
             }
