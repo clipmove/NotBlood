@@ -338,6 +338,7 @@ const char *pzHitscanProjectilesStrings[] = {
     "Slow",
     "Medium",
     "Fast",
+    "Very Fast",
     "Ludicrous",
 };
 

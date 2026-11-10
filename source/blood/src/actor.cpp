@@ -6508,12 +6508,14 @@ void actProcessSprites(void)
         else // bullet projectile sprites
         {
             const char weHitSomething = MoveMissileBullet(pSprite);
-            if (!weHitSomething && gGameOptions.nPlayerHitscanProjectiles == 4 || gGameOptions.nEnemyHitscanProjectiles == 4)
+            if (!weHitSomething && (gGameOptions.nPlayerHitscanProjectiles >= 4 || gGameOptions.nEnemyHitscanProjectiles >= 4)) // if hitscan projectile speed is 200%/300%, move bullet twice/thrice
             {
                 const int nOwner = actSpriteOwnerToSpriteId(pSprite);
                 const char bIsPlayer = spriRangeIsFine(nOwner) && IsPlayerSprite(&sprite[nOwner]);
-                if (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles == 4 : gGameOptions.nEnemyHitscanProjectiles == 4) // if hitscan projectile speed is 200%, move twice
-                    MoveMissileBullet(pSprite);
+                for (int nMoveTimes = (bIsPlayer ? gGameOptions.nPlayerHitscanProjectiles-4 : gGameOptions.nEnemyHitscanProjectiles-4); nMoveTimes >= 0; nMoveTimes--)
+                {
+                    MoveMissileBullet(pSprite); // moving the bullet really far in a single tick can sometimes hit the wrong things, so do it multiple times for 200%/300% speed
+                }
             }
         }
     }
