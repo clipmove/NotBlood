@@ -4215,13 +4215,12 @@ void viewProcessSprites(int32_t cX, int32_t cY, int32_t cZ, int32_t cA, int32_t 
                 }
 
                 if ((gPlayerJuggernaut >= 0) && (gGameOptions.nGameType == kGameTypeBloodBath) && (pPlayer->nPlayer == gPlayerJuggernaut)) { // if player is juggernaut, highlight red and make bigger by 150%
+                    int topnew, topold, bottomnew, bottomold;
+                    GetSpriteExtents(pTSprite, &topold, &bottomold);
                     pTSprite->xrepeat += pTSprite->xrepeat>>1;
                     pTSprite->yrepeat += pTSprite->yrepeat>>1;
                     pTSprite->pal = 2;
-                    if (gSpriteHit[nSprite].florhit) { // only do this if player is standing on ground
-                        int topnew, topold, bottomnew, bottomold;
-                        GetSpriteExtents(pTSprite, &topold, &bottomold);
-                        pTSprite->picnum = nTile;
+                    if (gSpriteHit[nXSprite].florhit) { // only do this if player is standing on ground
                         GetSpriteExtents(pTSprite, &topnew, &bottomnew);
                         if (bottomnew != bottomold) // align bottom of new tile to old tile
                             pTSprite->z -= bottomnew - bottomold;
