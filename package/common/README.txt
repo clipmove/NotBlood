@@ -279,7 +279,7 @@ If you have the GOG version of the game, do the following:
 * hud_powerupdurationshowdivingsuit
    - Enable/disable diving suit as a power-up
 * hud_powerupdurationshowoxygen
-   - Enable/disable oxygen supply as a power-up (0: off, 1: show as powerup, 2: show on hud bar)
+   - Enable/disable oxygen supply as a power-up (0: off, 1: show as power-up, 2: show on hud bar)
 * hud_powerupdurationstyle
    - Set the display style for the remaining time for power-ups (0: nblood, 1: notblood)
 * hud_powerupdurationticks
