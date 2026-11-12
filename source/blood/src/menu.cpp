@@ -130,7 +130,7 @@ void SetWeaponSelectMode(CGameMenuItemZCycle *);
 void SetDetail(CGameMenuItemSlider *);
 void SetVoxels(CGameMenuItemZBool *);
 void SetFOV(CGameMenuItemSlider *);
-void SetOxygenSupply(CGameMenuItemZBool*);
+void SetOxygenSupply(CGameMenuItemZCycle*);
 void SetDivingSuit(CGameMenuItemZBool*);
 void UpdateVideoColorMenu(CGameMenuItemSliderFloat *);
 void UpdateVideoPaletteCycleMenu(CGameMenuItemZCycle *);
@@ -766,6 +766,12 @@ const char *pzHudRatioStrings[] = {
     "21:9",
 };
 
+const char *pzPowerupOxygenMeter[] = {
+    "OFF",
+    "POWERUP",
+    "HUD BAR",
+};
+
 const char *pzWeaponHBobbingStrings[] = {
     "OFF",
     "ORIGINAL",
@@ -854,8 +860,8 @@ CGameMenuItemTitle itemOptionsPowerupTitle("POWERUP DISPLAY", 1, 160, 20, 2038);
 CGameMenuItemZBool itemOptionsDisplayPowerupDuration("SHOW POWERUP DURATION:", 1, 18, 50, 280, 0, SetPowerupDuration, NULL, NULL);
 CGameMenuItemZCycle itemOptionsDisplayPowerupPosition("POWERUP POSITION:", 1, 18, 70, 280, 0, SetPowerupPosition, pzHudRatioStrings, ARRAY_SSIZE(pzHudRatioStrings), 0);
 CGameMenuItemZBool itemOptionsDisplayBoolPowerupStyle("POWERUP STYLE:", 1, 18, 90, 280, gPowerupStyle, SetPowerupStyle, "NOTBLOOD", "NBLOOD");
-CGameMenuItemZBool itemOptionsDisplayBoolShowOxygen("SHOW OXYGEN REMAINING:", 1, 18, 110, 280, gPowerupShowOxygenSupply, SetOxygenSupply, NULL, NULL);
-CGameMenuItemZBool itemOptionsDisplayBoolShowDivingSuit("SHOW DIVE SUIT USAGE:", 1, 18, 130, 280, gPowerupShowDivingSuit, SetDivingSuit, NULL, NULL);
+CGameMenuItemZBool itemOptionsDisplayBoolShowDivingSuit("SHOW DIVE SUIT USAGE:", 1, 18, 110, 280, gPowerupShowDivingSuit, SetDivingSuit, NULL, NULL);
+CGameMenuItemZCycle itemOptionsDisplayCycleShowOxygen("SHOW OXYGEN REMAINING:", 1, 18, 130, 280, 0, SetOxygenSupply, pzPowerupOxygenMeter, ARRAY_SSIZE(pzPowerupOxygenMeter), 0);
 
 const char *pzRendererStrings[] = {
     "CLASSIC",
@@ -2259,22 +2265,22 @@ void SetupOptionsMenu(void)
     menuOptionsDisplayPowerup.Add(&itemOptionsDisplayPowerupDuration, true);
     menuOptionsDisplayPowerup.Add(&itemOptionsDisplayPowerupPosition, false);
     menuOptionsDisplayPowerup.Add(&itemOptionsDisplayBoolPowerupStyle, false);
-    menuOptionsDisplayPowerup.Add(&itemOptionsDisplayBoolShowOxygen, false);
     menuOptionsDisplayPowerup.Add(&itemOptionsDisplayBoolShowDivingSuit, false);
+    menuOptionsDisplayPowerup.Add(&itemOptionsDisplayCycleShowOxygen, false);
     menuOptionsDisplayPowerup.Add(&itemBloodQAV, false);
     itemOptionsDisplayBoolPowerupStyle.tooltip_pzTextUpper = "Set the display style for power-ups";
-    itemOptionsDisplayBoolShowOxygen.tooltip_pzTextUpper = "Show oxygen supply while underwater";
     itemOptionsDisplayBoolShowDivingSuit.tooltip_pzTextUpper = "Show diving suit usage while underwater";
+    itemOptionsDisplayCycleShowOxygen.tooltip_pzTextUpper = "Show oxygen supply while underwater";
+    itemOptionsDisplayCycleShowOxygen.tooltip_pzTextLower = "(show as a powerup item or display a meter on HUD)";
 
     itemOptionsDisplayPowerupDuration.at20 = !!gPowerupDuration;
     itemOptionsDisplayPowerupPosition.m_nFocus = gPowerupDuration ? (gPowerupDuration-1) % ARRAY_SSIZE(pzHudRatioStrings) : 0;
     itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolPowerupStyle.at20 = gPowerupStyle;
     itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
-    itemOptionsDisplayBoolShowOxygen.at20 = gPowerupShowOxygenSupply;
-    itemOptionsDisplayBoolShowOxygen.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolShowDivingSuit.at20 = gPowerupShowDivingSuit;
     itemOptionsDisplayBoolShowDivingSuit.bEnable = !!gPowerupDuration;
+    itemOptionsDisplayCycleShowOxygen.m_nFocus = gPowerupShowOxygenSupply % ARRAY_SSIZE(pzHudRatioStrings);
 
 #ifdef USE_OPENGL
     menuOptionsDisplayPolymost.Add(&itemOptionsDisplayPolymostTitle, false);
@@ -3154,7 +3160,6 @@ void SetPowerupDuration(CGameMenuItemZBool *pItem)
         gPowerupDuration = (itemOptionsDisplayPowerupPosition.m_nFocus % ARRAY_SSIZE(pzHudRatioStrings))+1;
     itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
-    itemOptionsDisplayBoolShowOxygen.bEnable = !!gPowerupDuration;
     itemOptionsDisplayBoolShowDivingSuit.bEnable = !!gPowerupDuration;
     viewResizeView(gViewSize);
 }
@@ -3561,8 +3566,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
     itemOptionsDisplayBoolPowerupStyle.at20 = gPowerupStyle;
     itemOptionsDisplayBoolPowerupStyle.bEnable = !!gPowerupDuration;
     itemOptionsDisplayPowerupPosition.bEnable = !!gPowerupDuration;
-    itemOptionsDisplayBoolShowOxygen.at20 = gPowerupShowOxygenSupply;
-    itemOptionsDisplayBoolShowOxygen.bEnable = !!gPowerupDuration;
+    itemOptionsDisplayCycleShowOxygen.m_nFocus = gPowerupShowOxygenSupply;
     itemOptionsDisplayBoolShowDivingSuit.at20 = gPowerupShowDivingSuit;
     itemOptionsDisplayBoolShowDivingSuit.bEnable = !!gPowerupDuration;
     itemOptionsDisplayViewSecretMessageStyle.m_nFocus = gSecretStyle;
@@ -3643,9 +3647,9 @@ void SetFOV(CGameMenuItemSlider *pItem)
     viewUpdateWeatherRatio();
 }
 
-void SetOxygenSupply(CGameMenuItemZBool *pItem)
+void SetOxygenSupply(CGameMenuItemZCycle *pItem)
 {
-    gPowerupShowOxygenSupply = pItem->at20;
+    gPowerupShowOxygenSupply = pItem->m_nFocus % ARRAY_SSIZE(pzPowerupOxygenMeter);
 }
 
 void SetDivingSuit(CGameMenuItemZBool *pItem)
