@@ -27,7 +27,6 @@ jobs:
             sys: mingw64
             env: x86_64
             opt: SDLCONFIG= LTO=0
-            additional-cmd: cp -a ./package/updater/w64/notbloodupdate ./upload/notbloodupdate.exe
             zipname: win64
           - name: i686 GCC
             ref: master
@@ -35,7 +34,6 @@ jobs:
             env: i686
             pkg: nasm mingw-w64-i686-autotools
             opt: SDLCONFIG= LTO=0
-            additional-cmd: cp -a ./package/updater/w32/notbloodupdate ./upload/notbloodupdate.exe
             zipname: win32
           - name: i686 GCC WinXP
             ref: windows-xp
