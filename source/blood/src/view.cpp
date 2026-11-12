@@ -1276,7 +1276,7 @@ void DrawStatNumber(const char *pFormat, int nNumber, int nTile, int x, int y, i
     }
 }
 
-void TileHGauge(int nTile, int x, int y, int nMult, int nDiv, int nStat, int nScale)
+void TileHGauge(int nTile, int x, int y, int nMult, int nDiv, int nStat, int nScale, int nPal)
 {
     int bx = scale(mulscale16(tilesiz[nTile].x,nScale),nMult,nDiv)+x;
     int sbx;
@@ -1294,7 +1294,7 @@ void TileHGauge(int nTile, int x, int y, int nMult, int nDiv, int nStat, int nSc
         sbx = (xdim>>1)+mulscale16(bx, xscalecorrect)-1;
         break;
     }
-    rotatesprite(x<<16, y<<16, nScale, 0, nTile, 0, 0, nStat|90, 0, 0, sbx, ydim-1);
+    rotatesprite(x<<16, y<<16, nScale, 0, nTile, 0, nPal, nStat|90, 0, 0, sbx, ydim-1);
 }
 
 int gPackIcons[kPackMax] = {
@@ -1566,7 +1566,7 @@ void viewDrawPowerUps(PLAYER* pPlayer)
     nPowerActive[11] = pPlayer->pwUpTime[kPwUpShrinkShroom]; // shrink shroom
 
     nPowerActive[12] = !gPowerupShowDivingSuit ? 0 : pPlayer->isUnderwater && packItemActive(pPlayer, kPackDivingSuit) ? pPlayer->pwUpTime[kPwUpDivingSuit] : 0; // diving suit supply
-    nPowerActive[13] = !gPowerupShowOxygenSupply ? 0 : pPlayer->isUnderwater && !packItemActive(pPlayer, kPackDivingSuit) ? ClipLow(pPlayer->underwaterTime, 1) : 0; // underwater air supply
+    nPowerActive[13] = gPowerupShowOxygenSupply != 1 ? 0 : pPlayer->isUnderwater && !packItemActive(pPlayer, kPackDivingSuit) ? ClipLow(pPlayer->underwaterTime, 1) : 0; // underwater air supply
 
     int nSortPower[kPowerUps+1];
     unsigned char nSortIndex[kPowerUps+1];
@@ -2480,6 +2480,8 @@ void UpdateStatusBar(ClockTicks arg)
 
         if (pPlayer->throwPower && pXSprite->health > 0)
             TileHGauge(2260, 124, 175-10, pPlayer->throwPower, 65536);
+        else if (!pPlayer->packItemTime && pPlayer->isUnderwater && (gPowerupShowOxygenSupply == 2) && pPlayer->underwaterTime && (pPlayer->underwaterTime < 1200))
+            TileHGauge(2260, 124, 175-10, int((float)ClipLow(pPlayer->underwaterTime, 1) * (65536.f / 1200.f)), 65536, 0, 65536, 10);
         else
             viewDrawPack(pPlayer, 166, 200-tilesiz[2201].y/2-30);
         viewDrawStats(pPlayer, 2-xscalestats, 140);
@@ -2491,6 +2493,8 @@ void UpdateStatusBar(ClockTicks arg)
     {
         if (pPlayer->throwPower && pXSprite->health > 0)
             TileHGauge(2260, 124, 175, pPlayer->throwPower, 65536);
+        else if (!pPlayer->packItemTime && pPlayer->isUnderwater && (gPowerupShowOxygenSupply == 2) && pPlayer->underwaterTime && (pPlayer->underwaterTime < 1200))
+            TileHGauge(2260, 124, 175, int((float)ClipLow(pPlayer->underwaterTime, 1) * (65536.f / 1200.f)), 65536, 0, 65536, 10);
         else
             viewDrawPack(pPlayer, 166, 200-tilesiz[2201].y/2);
     }
@@ -2673,6 +2677,8 @@ void UpdateStatusBar(ClockTicks arg)
         {
             TileHGauge(2260, 124, 175, pPlayer->throwPower, 65536);
         }
+        else if (pPlayer->isUnderwater && pPlayer->underwaterTime && (gPowerupShowOxygenSupply == 2) && (pPlayer->underwaterTime < 1200))
+            TileHGauge(2260, 124, 175, int((float)ClipLow(pPlayer->underwaterTime, 1) * (65536.f / 1200.f)), 65536, 0, 65536, 10);
         viewDrawStats(pPlayer, 2-xscalestats, 140-yscalestats);
         viewDrawDamage(pPlayer);
         viewDrawSpeed();
