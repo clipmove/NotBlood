@@ -376,11 +376,6 @@ static void SetPage(int pageNum)
 
 static void EnableConfig(bool n)
 {
-#ifndef NETCODE_DISABLE
-    EnableWindow(GetDlgItem(startupdlg, WIN_STARTWIN_UPDATE), n);
-#else
-    ShowWindow(GetDlgItem(startupdlg, WIN_STARTWIN_UPDATE), SW_HIDE);
-#endif
     //EnableWindow(GetDlgItem(startupdlg, WIN_STARTWIN_CANCEL), n);
     EnableWindow(GetDlgItem(startupdlg, WIN_STARTWIN_START), n);
     EnableWindow(GetDlgItem(pages[TAB_CONFIG], IDCDATA), n);
@@ -391,33 +386,6 @@ static void EnableConfig(bool n)
     EnableWindow(GetDlgItem(pages[TAB_CONFIG], IDCQUICKSTART), n);
     EnableWindow(GetDlgItem(pages[TAB_CONFIG], IDCVMODE), n);
 }
-
-#ifndef NETCODE_DISABLE
-bool ExecUpdater(void)
-{
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    char szRootDir[BMAX_PATH], szUpdaterPath[BMAX_PATH];
-
-    ZeroMemory(&si,sizeof(si));
-    ZeroMemory(&pi,sizeof(pi));
-    si.cb = sizeof(si);
-    si.dwFlags = STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
-
-    GetModuleFileName(NULL,szRootDir,BMAX_PATH);
-    Bcorrectfilename(szRootDir,1);
-    Bstrcpy(szUpdaterPath, szRootDir);
-    Bstrcat(szUpdaterPath,"notbloodupdate.exe -RestartIfSuccessful");
-
-    if (!CreateProcessA(nullptr,(LPSTR)szUpdaterPath,nullptr,nullptr,FALSE,CREATE_NO_WINDOW,nullptr,szRootDir,&si,&pi))
-    {
-        MessageBox(win_gethwnd(),"Error, could not launch notbloodupdate.exe\n\nPlease reinstall your copy of NotBlood.","Error",MB_OK|MB_ICONERROR);
-        return false;
-    }
-    return true;
-}
-#endif
 
 static INT_PTR CALLBACK startup_dlgproc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -447,14 +415,6 @@ static INT_PTR CALLBACK startup_dlgproc(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
         rtab.bottom -= rtab.top - 1;
         rtab.left  -= rdlg.left;
         rtab.top -= rdlg.top;
-
-        RECT rupdate;
-        GetWindowRect(GetDlgItem(hwndDlg, WIN_STARTWIN_UPDATE), &rupdate);
-
-        rupdate.right -= rupdate.left - 1;
-        rupdate.bottom -= rupdate.top - 1;
-        rupdate.left -= rdlg.left;
-        rupdate.top -= rdlg.top;
 
         RECT rcancel;
         GetWindowRect(GetDlgItem(hwndDlg, WIN_STARTWIN_CANCEL), &rcancel);
@@ -493,8 +453,6 @@ static INT_PTR CALLBACK startup_dlgproc(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
         // Shift and resize the controls that require it
         rtab.left += xoffset;
         rtab.bottom += yoffset;
-        rupdate.left = r.right-r.left+7;
-        rupdate.top += yoffset;
         rcancel.left += xoffset;
         rcancel.top += yoffset;
         rstart.left += xoffset;
@@ -504,7 +462,6 @@ static INT_PTR CALLBACK startup_dlgproc(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
 
         // Move the controls to their new positions
         MoveWindow(GetDlgItem(hwndDlg, WIN_STARTWIN_TABCTL), rtab.left, rtab.top, rtab.right, rtab.bottom, FALSE);
-        MoveWindow(GetDlgItem(hwndDlg, WIN_STARTWIN_UPDATE), rupdate.left, rupdate.top, rupdate.right, rupdate.bottom, FALSE);
         MoveWindow(GetDlgItem(hwndDlg, WIN_STARTWIN_CANCEL), rcancel.left, rcancel.top, rcancel.right, rcancel.bottom, FALSE);
         MoveWindow(GetDlgItem(hwndDlg, WIN_STARTWIN_START), rstart.left, rstart.top, rstart.right, rstart.bottom, FALSE);
 
@@ -606,14 +563,6 @@ static INT_PTR CALLBACK startup_dlgproc(HWND hwndDlg, UINT uMsg, WPARAM wParam, 
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
-        case WIN_STARTWIN_UPDATE:
-#ifndef NETCODE_DISABLE
-            if (!ExecUpdater()) break;
-            done = 0;
-            return TRUE;
-#else
-            break;
-#endif
         case WIN_STARTWIN_CANCEL:
             if (mode == TAB_CONFIG) done = 0;
             else quitevent++;
