@@ -1,4 +1,11 @@
 <p align="center">
+  <b>As of 2026 NotBlood has finished being developed and will be archived</b>
+  <br>
+  <b>No further features or requests will be accepted</b>
+  <br><br>
+  2021/Jul/03 - 2026/Nov/12
+</p><h1></h1>
+<p align="center">
   <!-- logo -->
   <a href="https://github.com/clipmove/NotBlood" target="_blank"><img src="https://raw.githubusercontent.com/clipmove/NotBlood/master/.github/workflows/logo.png"></a>
   <br>
