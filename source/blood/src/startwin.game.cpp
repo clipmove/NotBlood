@@ -387,33 +387,6 @@ static void EnableConfig(bool n)
     EnableWindow(GetDlgItem(pages[TAB_CONFIG], IDCVMODE), n);
 }
 
-#ifndef NETCODE_DISABLE
-bool ExecUpdater(void)
-{
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    char szRootDir[BMAX_PATH], szUpdaterPath[BMAX_PATH];
-
-    ZeroMemory(&si,sizeof(si));
-    ZeroMemory(&pi,sizeof(pi));
-    si.cb = sizeof(si);
-    si.dwFlags = STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
-
-    GetModuleFileName(NULL,szRootDir,BMAX_PATH);
-    Bcorrectfilename(szRootDir,1);
-    Bstrcpy(szUpdaterPath, szRootDir);
-    Bstrcat(szUpdaterPath,"notbloodupdate.exe -RestartIfSuccessful");
-
-    if (!CreateProcessA(nullptr,(LPSTR)szUpdaterPath,nullptr,nullptr,FALSE,CREATE_NO_WINDOW,nullptr,szRootDir,&si,&pi))
-    {
-        MessageBox(win_gethwnd(),"Error, could not launch notbloodupdate.exe\n\nPlease reinstall your copy of NotBlood.","Error",MB_OK|MB_ICONERROR);
-        return false;
-    }
-    return true;
-}
-#endif
-
 static INT_PTR CALLBACK startup_dlgproc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static HBITMAP hbmp = NULL;
