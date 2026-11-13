@@ -1,5 +1,5 @@
 <p align="center">
-  <b>As of 2026 NotBlood has finished being developed and will be archived</b>
+  <b>As of 2026 NotBlood is no longer being maintained and will be archived</b>
   <br>
   <b>No further features or requests will be accepted</b>
   <br><br>
