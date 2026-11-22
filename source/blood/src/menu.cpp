@@ -1187,9 +1187,10 @@ const char *pzTurnAccelerationStrings[] = {
 
 const char *zRadialMenuToggle[] =
 {
-    "Button Held",
-    "Button Toggle",
+    "Radial Bind Held",
+    "Radial Bind Toggle",
     "Weapon Switch",
+    "Disabled",
 };
 
 const char *pzRadileMenuSoundStrings[] =
@@ -1257,7 +1258,7 @@ CGameMenuItemSliderFloat itemOptionsControlMouseXSensitivity("HORIZ SENS:", 3, 6
 CGameMenuItemSliderFloat itemOptionsControlMouseYSensitivity("VERT SENS:", 3, 66, 120, 180, &CONTROL_MouseAxesSensitivity[1], 0.f, 100.f, 1.f, SetMouseYSensitivity, -1, -1, kMenuSliderValue);
 
 CGameMenuItemTitle itemOptionsControlRadialTitle("RADIAL SETUP", 1, 160, 20, 2038);
-CGameMenuItemZCycle itemOptionsControlRadialToggle("USAGE BEHAVIOR:", 3, 66, 40, 180, 0, SetRadialMenuToggle, zRadialMenuToggle, ARRAY_SIZE(zRadialMenuToggle), 0);
+CGameMenuItemZCycle itemOptionsControlRadialToggle("SHOW RADIAL:", 3, 66, 40, 180, 0, SetRadialMenuToggle, zRadialMenuToggle, ARRAY_SIZE(zRadialMenuToggle), 0);
 CGameMenuItemSlider itemOptionsControlRadialPosition("POSITION:", 3, 66, 50, 180, &gRadialMenuPosition, 0, 320, 16, SetRadialMenuPosition, -1, -1, kMenuSliderPercent);
 CGameMenuItemZBool itemOptionsControlRadialDimBackground("DIM BACKGROUND:", 3, 66, 60, 180, 0, SetRadialMenuDimBackground, NULL, NULL);
 CGameMenuItemZBool itemOptionsControlRadialDimHUD("TRANSPARENT RADIAL:", 3, 66, 70, 180, 0, SetRadialMenuDimHUD, NULL, NULL);
@@ -3535,6 +3536,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         gWeaponInterpolate = 0;
         gCenterHoriz = 0;
         gWeatherEffect = 0;
+        gRadialMenuToggle = 3;
     }
     else if (pItem == &itemFirstLaunchNBlood)
     {
@@ -3554,6 +3556,7 @@ void SetFirstLaunchOptions(CGameMenuItemChain *pItem)
         viewResizeView(gViewSize);
         gCenterHoriz = 0;
         gWeatherEffect = 0;
+        gRadialMenuToggle = 3;
     }
     itemOptionsDisplayViewBoolSlopeTilting.at20 = gSlopeTilting;
     itemOptionsDisplayCrosshair.m_nFocus = gAimReticle;

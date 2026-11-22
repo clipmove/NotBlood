@@ -1335,7 +1335,7 @@ int32_t registerosdcommands(void)
         { "in_radialmenumousesensitivity", "sets the radial menu mouse sensitivity", (void*)&gRadialMenuMouseSensitivity, CVAR_INT, 0, fix16_from_float(3.f)},
         { "in_radialmenuthresholdx", "sets the radial x menu threshold (0-1024)", (void*)&gRadialMenuThresholdX, CVAR_INT, 0, 1024 },
         { "in_radialmenuthresholdy", "sets the radial y menu threshold (0-1024)", (void*)&gRadialMenuThresholdY, CVAR_INT, 0, 1024 },
-        { "in_radialmenutoggle", "sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon)", (void*)&gRadialMenuToggle, CVAR_INT, 0, 2 },
+        { "in_radialmenutoggle", "sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon, 3: disabled)", (void*)&gRadialMenuToggle, CVAR_INT, 0, 3 },
         { "in_radialmenuposition", "sets the radial menu position", (void*)&gRadialMenuPosition, CVAR_INT, 0, 320 },
         { "in_radialmenudim", "enable/disable radial menu dimming background", (void*)&gRadialMenuDimBackground, CVAR_BOOL, 0, 1 },
         { "in_radialmenudimhud", "enable/disable radial menu dimming hud", (void*)&gRadialMenuDimHud, CVAR_BOOL, 0, 1 },
