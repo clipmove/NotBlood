@@ -97,6 +97,7 @@ extern int32_t gHealthBlink;
 extern int32_t gKillObituary;
 extern int32_t gKillMsg;
 extern int32_t gMultiKill;
+extern int32_t gMultiTimeAlarm;
 extern int32_t gViewDim;
 extern int32_t gViewInterpolate;
 extern int32_t gViewInterpolateChase;
