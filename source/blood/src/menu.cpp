@@ -1095,6 +1095,7 @@ void SetShowPlayerNames(CGameMenuItemZBool *);
 void SetShowWeapons(CGameMenuItemZCycle *);
 void UpdateTeamsScoreDisplay(CGameMenuItemZBool *pItem);
 void UpdatePlayerChatMessageSound(CGameMenuItemZBool *pItem);
+void UpdatePlayerMultiTimeLimitSound(CGameMenuItemZBool *pItem);
 void UpdatePlayerColorMessages(CGameMenuItemZBool *pItem);
 void UpdatePlayerKillObituaryMessages(CGameMenuItemZBool *pItem);
 void UpdatePlayerKillMessage(CGameMenuItemZBool *pItem);
@@ -1139,19 +1140,20 @@ const char *pzShowWeaponStrings[] = {
 };
 
 CGameMenuItemTitle itemOptionsPlayerTitle("PLAYER SETUP", 1, 160, 20, 2038);
-CGameMenuItemZEdit itemOptionsPlayerName("PLAYER NAME:", 3, 66, 35, 180, szPlayerName, MAXPLAYERNAME, 0, UpdatePlayerName, 0);
-CGameMenuItemZCycle itemOptionsPlayerSkill("HEALTH HANDICAP:", 3, 66, 45, 180, 0, UpdatePlayerSkill, pzPlayerSkillStrings, ARRAY_SIZE(pzPlayerSkillStrings), 0);
-CGameMenuItemZCycle itemOptionsPlayerTeamPreference("TEAM PREFERENCE:", 3, 66, 55, 180, 0, UpdatePlayerTeamPreference, pzPlayerTeamPreferenceStrings, ARRAY_SIZE(pzPlayerTeamPreferenceStrings), 0);
-CGameMenuItemZCycle itemOptionsPlayerColorPreference("COLOR PREFERENCE:", 3, 66, 65, 180, 0, UpdatePlayerColorPreference, pzPlayerColorPreferenceStrings, ARRAY_SIZE(pzPlayerColorPreferenceStrings), 0);
-CGameMenuItemZBool itemOptionsPlayerModel("PLAYER MODEL:", 3, 66, 75, 180, false, UpdatePlayerModel, "CULTIST", "CALEB");
-CGameMenuItemZBool itemOptionsPlayerBoolShowPlayerNames("SHOW PLAYER NAMES:", 3, 66, 90, 180, gShowPlayerNames, SetShowPlayerNames, NULL, NULL);
-CGameMenuItemZCycle itemOptionsPlayerShowWeapons("SHOW WEAPONS:", 3, 66, 100, 180, 0, SetShowWeapons, pzShowWeaponStrings, ARRAY_SSIZE(pzShowWeaponStrings), 0);
-CGameMenuItemZBool itemOptionsPlayerTeamsScoreStyle("TEAMS SCORE STYLE:", 3, 66, 110, 180, true, UpdateTeamsScoreDisplay, "NBLOOD", "ORIGINAL");
-CGameMenuItemZBool itemOptionsPlayerChatSound("MESSAGE BEEP:", 3, 66, 120, 180, true, UpdatePlayerChatMessageSound, NULL, NULL);
-CGameMenuItemZBool itemOptionsPlayerColorMsg("COLORED MESSAGES:", 3, 66, 130, 180, true, UpdatePlayerColorMessages, NULL, NULL);
-CGameMenuItemZBool itemOptionsPlayerObituaryMsg("USE OBITUARY MESSAGES:", 3, 66, 140, 180, true, UpdatePlayerKillObituaryMessages, NULL, NULL);
-CGameMenuItemZBool itemOptionsPlayerKillMsg("SHOW KILLS ON HUD:", 3, 66, 150, 180, true, UpdatePlayerKillMessage, NULL, NULL);
-CGameMenuItemZCycle itemOptionsPlayerMultiKill("MULTI KILL MESSAGES:", 3, 66, 160, 180, 0, UpdatePlayerMultiKill, pzPlayerMultiKillStrings, ARRAY_SIZE(pzPlayerMultiKillStrings), 0);
+CGameMenuItemZEdit itemOptionsPlayerName("PLAYER NAME:", 3, 66, 40, 180, szPlayerName, MAXPLAYERNAME, 0, UpdatePlayerName, 0);
+CGameMenuItemZCycle itemOptionsPlayerSkill("HEALTH HANDICAP:", 3, 66, 48, 180, 0, UpdatePlayerSkill, pzPlayerSkillStrings, ARRAY_SIZE(pzPlayerSkillStrings), 0);
+CGameMenuItemZCycle itemOptionsPlayerTeamPreference("TEAM PREFERENCE:", 3, 66, 56, 180, 0, UpdatePlayerTeamPreference, pzPlayerTeamPreferenceStrings, ARRAY_SIZE(pzPlayerTeamPreferenceStrings), 0);
+CGameMenuItemZCycle itemOptionsPlayerColorPreference("COLOR PREFERENCE:", 3, 66, 64, 180, 0, UpdatePlayerColorPreference, pzPlayerColorPreferenceStrings, ARRAY_SIZE(pzPlayerColorPreferenceStrings), 0);
+CGameMenuItemZBool itemOptionsPlayerModel("PLAYER MODEL:", 3, 66, 72, 180, false, UpdatePlayerModel, "CULTIST", "CALEB");
+CGameMenuItemZBool itemOptionsPlayerBoolShowPlayerNames("SHOW PLAYER NAMES:", 3, 66, 80, 180, gShowPlayerNames, SetShowPlayerNames, NULL, NULL);
+CGameMenuItemZCycle itemOptionsPlayerShowWeapons("SHOW WEAPONS:", 3, 66, 96, 180, 0, SetShowWeapons, pzShowWeaponStrings, ARRAY_SSIZE(pzShowWeaponStrings), 0);
+CGameMenuItemZBool itemOptionsPlayerTeamsScoreStyle("TEAMS SCORE STYLE:", 3, 66, 104, 180, true, UpdateTeamsScoreDisplay, "NBLOOD", "ORIGINAL");
+CGameMenuItemZBool itemOptionsPlayerChatSound("MESSAGE BEEP:", 3, 66, 112, 180, true, UpdatePlayerChatMessageSound, NULL, NULL);
+CGameMenuItemZBool itemOptionsMultiTimeLimitAlarm("TIME LIMIT ALARM:", 3, 66, 120, 180, true, UpdatePlayerMultiTimeLimitSound, NULL, NULL);
+CGameMenuItemZBool itemOptionsPlayerColorMsg("COLORED MESSAGES:", 3, 66, 128, 180, true, UpdatePlayerColorMessages, NULL, NULL);
+CGameMenuItemZBool itemOptionsPlayerObituaryMsg("USE OBITUARY MESSAGES:", 3, 66, 136, 180, true, UpdatePlayerKillObituaryMessages, NULL, NULL);
+CGameMenuItemZBool itemOptionsPlayerKillMsg("SHOW KILLS ON HUD:", 3, 66, 144, 180, true, UpdatePlayerKillMessage, NULL, NULL);
+CGameMenuItemZCycle itemOptionsPlayerMultiKill("MULTI KILL MESSAGES:", 3, 66, 152, 180, 0, UpdatePlayerMultiKill, pzPlayerMultiKillStrings, ARRAY_SIZE(pzPlayerMultiKillStrings), 0);
 
 #define JOYSTICKITEMSPERPAGE 16 // this must be an even value, as double tap inputs rely on odd index position
 #define MAXJOYSTICKBUTTONPAGES (max(1, (MAXJOYBUTTONSANDHATS*2 / JOYSTICKITEMSPERPAGE))) // we double all buttons/hats so each input can be bind for double tap
@@ -2347,6 +2349,7 @@ void SetupOptionsMenu(void)
     menuOptionsPlayer.Add(&itemOptionsPlayerShowWeapons, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerTeamsScoreStyle, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerChatSound, false);
+    menuOptionsPlayer.Add(&itemOptionsMultiTimeLimitAlarm, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerColorMsg, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerObituaryMsg, false);
     menuOptionsPlayer.Add(&itemOptionsPlayerKillMsg, false);
@@ -2363,6 +2366,7 @@ void SetupOptionsMenu(void)
     itemOptionsPlayerShowWeapons.tooltip_pzTextUpper = "Display player's weapon";
     itemOptionsPlayerShowWeapons.tooltip_pzTextLower = "over their head";
     itemOptionsPlayerChatSound.tooltip_pzTextUpper = "Play beep sound for chat messages";
+    itemOptionsMultiTimeLimitAlarm.tooltip_pzTextUpper = "Play alarm near end of time limit";
     itemOptionsPlayerColorMsg.tooltip_pzTextUpper = "Color player names for chat messages";
     itemOptionsPlayerObituaryMsg.tooltip_pzTextUpper = "Use random obituary kill messages";
     itemOptionsPlayerKillMsg.tooltip_pzTextUpper = "Show player killed on screen";
@@ -2378,6 +2382,7 @@ void SetupOptionsMenu(void)
     itemOptionsPlayerShowWeapons.m_nFocus = gShowWeapon;
     itemOptionsPlayerTeamsScoreStyle.at20 = gTeamsScoreStyle;
     itemOptionsPlayerChatSound.at20 = gChatSnd;
+    itemOptionsMultiTimeLimitAlarm.at20 = gMultiTimeAlarm;
     itemOptionsPlayerColorMsg.at20 = gColorMsg;
     itemOptionsPlayerObituaryMsg.at20 = gKillObituary;
     itemOptionsPlayerKillMsg.at20 = gKillMsg;
@@ -4211,6 +4216,11 @@ void UpdateTeamsScoreDisplay(CGameMenuItemZBool *pItem)
 void UpdatePlayerChatMessageSound(CGameMenuItemZBool *pItem)
 {
     gChatSnd = pItem->at20;
+}
+
+void UpdatePlayerMultiTimeLimitSound(CGameMenuItemZBool *pItem)
+{
+    gMultiTimeAlarm = pItem->at20;
 }
 
 void UpdatePlayerColorMessages(CGameMenuItemZBool *pItem)
