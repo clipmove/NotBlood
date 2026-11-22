@@ -118,6 +118,7 @@ int32_t gHealthBlink;
 int32_t gKillObituary;
 int32_t gKillMsg;
 int32_t gMultiKill;
+int32_t gMultiTimeAlarm;
 int32_t gPlayerModel;
 int32_t gViewDim;
 int32_t gViewInterpolate;
@@ -580,6 +581,7 @@ void CONFIG_SetDefaults(void)
     gKillObituary = 1;
     gKillMsg = 1;
     gMultiKill = 2;
+    gMultiTimeAlarm = 1;
     gViewDim = 1;
     gViewInterpolate = 1;
     gViewInterpolateChase = 1;
