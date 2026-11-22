@@ -200,6 +200,8 @@ If you have the GOG version of the game, do the following:
    - Enable/disable health blinking when under 15 health points
 * cl_killmsg
    - Enable/disable kill messages
+* cl_multitimealarm
+   - Enable/disable multi time limit alarm
 * cl_killobituaries
    - Enable/disable random obituary kill messages
 * cl_multikill
@@ -319,7 +321,7 @@ If you have the GOG version of the game, do the following:
 * in_radialmenuthresholdy
    - Sets the radial menu y threshold (0-1024)
 * in_radialmenutoggle
-   - Sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon)
+   - Sets the radial menu behavior (0: held, 1: toggle, 2: on next/prev weapon, 3: disabled)
 * in_radialmenuposition
    - Sets the radial menu position
 * in_radialmenudim
