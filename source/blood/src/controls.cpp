@@ -626,7 +626,10 @@ void ctrlGetInput(void)
     else
         input.forward -= info.mousey;
 
-    ctrlRadialWeaponMenu(&info, false);
+    if (gRadialMenuToggle < 3)
+        ctrlRadialWeaponMenu(&info, false);
+    else
+        ctrlRadialWeaponMenu(NULL, true);
     if (gWeaponRadialMenuState != 0) // clear button state if radial menu is active
     {
         gInput.buttonFlags.shoot = gInput.buttonFlags.shoot2 = 0;
