@@ -292,6 +292,7 @@ void LoadSave::LoadGame(char *pzFile)
         gGameOptions.nEnemyHitscanProjectiles = gEnemyHitscanProjectiles;
         gGameOptions.nPlayerHitscanProjectiles = gPlayerHitscanProjectiles;
         gGameOptions.nGoreBehavior = gGoreBehavior;
+        gGameOptions.nGoreCollision = gGoreCollision;
         gGameOptions.nPlayerSpeed = gPlayerModSpeed;
         gGameOptions.nPlayerWater = gPlayerModWaterOxygen;
         gGameOptions.nRandomizerMode = gRandomizerMode;

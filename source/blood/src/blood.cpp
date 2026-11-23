@@ -708,6 +708,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->nEnemyHitscanProjectiles = gEnemyHitscanProjectiles;
         pOpt->nPlayerHitscanProjectiles = gPlayerHitscanProjectiles;
         pOpt->nGoreBehavior = gGoreBehavior;
+        pOpt->nGoreCollision = gGoreCollision;
         pOpt->nPlayerSpeed = gPlayerModSpeed;
         pOpt->nPlayerWater = gPlayerModWaterOxygen;
         pOpt->nRandomizerMode = gRandomizerMode;
@@ -761,6 +762,7 @@ void StartLevel(GAMEOPTIONS *pOpt)
         pOpt->nEnemyHitscanProjectiles = gPacketStartGame.nEnemyHitscanProjectiles;
         pOpt->nPlayerHitscanProjectiles = gPacketStartGame.nPlayerHitscanProjectiles;
         pOpt->nGoreBehavior = gPacketStartGame.nGoreBehavior;
+        pOpt->nGoreCollision = gPacketStartGame.nGoreCollision;
         pOpt->nPlayerSpeed = gPacketStartGame.nPlayerSpeed;
         pOpt->nPlayerWater = gPacketStartGame.nPlayerWater;
         pOpt->nRandomizerMode = gPacketStartGame.randomizerMode;
