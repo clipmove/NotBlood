@@ -94,6 +94,7 @@ struct PKT_STARTGAME {
     short nEnemyHitscanProjectiles;
     short nPlayerHitscanProjectiles;
     char nGoreBehavior;
+    char nGoreCollision;
     char nPlayerSpeed;
     char nPlayerWater;
     bool bFriendlyFire;

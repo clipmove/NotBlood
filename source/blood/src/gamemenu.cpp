@@ -537,7 +537,7 @@ bool CGameMenu::MouseEvent(CGameMenuEvent &event)
     return pItemList[m_nFocus]->MouseEvent(event);
 }
 
-void CGameMenu::OrganizeItems(const bool bAddSpace, const bool bAddSpaceForTooltips, const int nExtra)
+void CGameMenu::OrganizeItems(const bool bAddSpace, const bool bAddSpaceForTooltips, const int nExtra, const bool bHasTitleBox)
 {
     int nCount = 0;
     for (int i = 0; i < m_nItems; i++) // get count
@@ -553,7 +553,7 @@ void CGameMenu::OrganizeItems(const bool bAddSpace, const bool bAddSpaceForToolt
 
     if (!bAddSpace && (nCount > 1))
         nCount--;
-    int nStart = 32 - nExtra;
+    int nStart = bHasTitleBox ? 32 - nExtra : 8;
     int nEnd = (bAddSpaceForTooltips ? 162 : 192) + nExtra;
     float nStep = (float)(nEnd - nStart) / (float)nCount;
     if (bAddSpace)

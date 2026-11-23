@@ -396,13 +396,18 @@ void GibThing(spritetype *pSprite, GIBTHING *pGThing, CGibPosition *pPos, CGibVe
         dassert(pGib != NULL);
         if (pGThing->at4 > -1)
             pGib->picnum = pGThing->at4;
-        if ((pGThing->at0 == kThingBloodBits) && gGibNoClip && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !VanillaMode()) // disable collisions for small blood chunks
+        switch (pGThing->at0) // disable collisions for small blood chunks/heads
         {
-            pGib->cstat = 384;
-        }
-        if ((pGThing->at0 == kThingZombieHead) && gGibHeadNoClip && (gGameOptions.nGameType == kGameTypeSinglePlayer) && !VanillaMode()) // disable collisions for zombie heads
-        {
-            pGib->cstat = 384;
+        case kThingBloodBits:
+            if ((gGameOptions.nGoreCollision != 0) && !VanillaMode())
+                pGib->cstat = 384;
+            break;
+        case kThingZombieHead:
+            if ((gGameOptions.nGoreCollision == 2) && !VanillaMode())
+                pGib->cstat = 384;
+            break;
+        default:
+            break;
         }
         if (pVel)
         {
