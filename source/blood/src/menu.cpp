@@ -808,7 +808,6 @@ void SetRestoreLastSave(CGameMenuItemZBool *pItem);
 void SetVanillaMode(CGameMenuItemZCycle *pItem);
 
 ///////////////
-CGameMenuItemTitle itemGameMutatorsTitle("MUTATORS", 1, 160, 20, 2038);
 CGameMenuItemZBool itemMutatorBoolQuadDamagePowerup("REPLACE AKIMBO WITH 4X DAMAGE:", 3, 66, 32, 180, false, SetQuadDamagePowerup, NULL, NULL);
 CGameMenuItemZCycle itemMutatorCycleBeastVisionReplacement("REPLACE BEAEST VISION:", 3, 66, 32, 180, 0, SetBeastVisionReplacement, pzBeastVisionReplacementStrings, ARRAY_SSIZE(pzBeastVisionReplacementStrings), 0);
 CGameMenuItemZCycle itemMutatorDamageInvul("INVULNERABILITY DURATION:", 3, 66, 42, 180, 0, SetDamageInvul, pzDamageInvulBehaviorStrings, ARRAY_SSIZE(pzDamageInvulBehaviorStrings), 0);
@@ -1736,7 +1735,6 @@ void SetupNetStartMenu(void)
     menuNetworkGameMonsters.Add(&itemBloodQAV, false);
 
     //////////////////////
-    menuNetworkGameMutators.Add(&itemGameMutatorsTitle, false);
     menuNetworkGameMutators.Add(&itemNetMutatorBoolQuadDamagePowerup, true);
     menuNetworkGameMutators.Add(&itemNetMutatorBoolBeastVision, false);
     menuNetworkGameMutators.Add(&itemNetMutatorDamageInvul, false);
@@ -1756,7 +1754,7 @@ void SetupNetStartMenu(void)
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerMode, false);
     menuNetworkGameMutators.Add(&itemNetMutatorRandomizerSeed, false);
     menuNetworkGameMutators.Add(&itemBloodQAV, false);
-    menuNetworkGameMutators.OrganizeItems(true, true, 4);
+    menuNetworkGameMutators.OrganizeItems(true, true, 4, false);
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemNetMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";
     itemNetMutatorBoolBeastVision.tooltip_pzTextLower = "Replace beast vision item function";
@@ -2037,7 +2035,6 @@ void SetupOptionsMenu(void)
     itemOptionsGameBoolVanillaMode.tooltip_pzTextLower = "and restores bugs (v1.21 DOS compatibility mode)";
 
     //////////////////////
-    menuOptionsGameMutators.Add(&itemGameMutatorsTitle, false);
     menuOptionsGameMutators.Add(&itemMutatorBoolQuadDamagePowerup, true);
     menuOptionsGameMutators.Add(&itemMutatorCycleBeastVisionReplacement, false);
     menuOptionsGameMutators.Add(&itemMutatorDamageInvul, false);
@@ -2057,7 +2054,7 @@ void SetupOptionsMenu(void)
     menuOptionsGameMutators.Add(&itemMutatorRandomizerMode, false);
     menuOptionsGameMutators.Add(&itemMutatorRandomizerSeed, false);
     menuOptionsGameMutators.Add(&itemBloodQAV, false);
-    menuOptionsGameMutators.OrganizeItems(true, true, 4);
+    menuOptionsGameMutators.OrganizeItems(true, true, 4, false);
     itemOptionsChainMutators.bDisableForNet = 1;
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextUpper = "Replaces guns akimbo powerup";
     itemMutatorBoolQuadDamagePowerup.tooltip_pzTextLower = "with Quake's quad damage";
