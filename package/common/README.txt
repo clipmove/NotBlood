@@ -192,10 +192,6 @@ If you have the GOG version of the game, do the following:
    - Enable/disable view interpolation for drawn weapon (0: disable, 1: position, 2: position/qav animation)
 * cl_colormsg
    - Enable/disable colored player names in messages
-* cl_gibnoclip
-   - Toggles gib clipping (always on in multiplayer)
-* cl_gibheadnoclip
-   - Toggles zombie head clipping (always on in multiplayer)
 * cl_healthblink
    - Enable/disable health blinking when under 15 health points
 * cl_killmsg

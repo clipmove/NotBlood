@@ -73,7 +73,8 @@ struct GAMEOPTIONS {
     bool bSectorBehavior;
     char nEnemyHitscanProjectiles : 4;
     char nPlayerHitscanProjectiles : 4;
-    char nGoreBehavior;
+    char nGoreBehavior : 4;
+    char nGoreCollision : 4;
     char nRandomizerMode;
     char szRandomizerSeed[9];
     int nRandomizerCheat;

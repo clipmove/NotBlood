@@ -81,7 +81,8 @@ GAMEOPTIONS gSingleGameOptions = {
     0,     // bool bSectorBehavior;
     0,     // nEnemyHitscanProjectiles : 4;
     0,     // nPlayerHitscanProjectiles : 4;
-    0,     // char nGoreBehavior;
+    0,     // char nGoreBehavior : 4;
+    0,     // char nGoreCollision : 4;
     0,     // char nRandomizerMode;
     "",    // char szRandomizerSeed[9];
     -1,    // int nRandomizerCheat;
